@@ -24,14 +24,14 @@ The application includes a variety of features that help riders stay connected, 
 🛠️ Technology Stack
 ## Core Technologies
 
-- Language: Kotlin, Java
+- Language: Kotlin, Java, Swift UI 
 - Build System: Gradle with Version Catalogs
 - Architecture: MVVM with StateFlow
 - Platforms: Android, iOS (Kotlin Multiplatform Mobile)
 
 ## UI & Design
 
-- UI Framework: Jetpack Compose
+- UI Framework: Jetpack Compose, Swift UI
 - Design System: Material3
 - Navigation: Navigation 3
 - Responsive Design: Adaptive layouts for different screen sizes
@@ -46,7 +46,7 @@ The application includes a variety of features that help riders stay connected, 
 ## Testing & Quality
 
 - Unit Tests: Common tests in commonTest, platform-specific tests
-- UI Tests: Compose UI testing framework
+- UI Tests: Compose UI testing framework, XCTest for Swift UI
 - Mocking: MockK for Kotlin mocking
 - Code Quality: Detekt for static analysis
 - Coverage: Kover for code coverage analysis
