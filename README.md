@@ -2,17 +2,17 @@
 
 ## Project Overview
 
-Asphalt-A is a mobile app designed to help motorcycle and bike riders during their group rides and trips.  
-The application includes a variety of features that help riders stay connected, share knowledge, and test their skills.  
-
 A Kotlin Multiplatform Mobile (KMP) application for Motorcycle and Bike Riders during their group rides and trips. 
 This project provides a unified codebase for Android and iOS platforms with shared business logic and platform-specific implementations.
 
+Asphalt-A is a mobile app designed to help motorcycle and bike riders during their group rides and trips.  
+The application includes a variety of features that help riders stay connected, share knowledge, and test their skills.  
+
 ## Architecture
 
-androidApp -> shared (KMP + Native)
-iOSApp -> shared (KMP + Native)
-androidApp -> feature Modules (KMP) -> shared (KMP + Native)
+- androidApp -> shared (KMP + Native)
+- iOSApp -> shared (KMP + Native)
+- androidApp -> feature Modules (KMP) -> shared (KMP + Native)
 
 ## Module Structure
 
