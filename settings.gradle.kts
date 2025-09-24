@@ -30,3 +30,6 @@ dependencyResolutionManagement {
 
 include(":composeApp")
 include(":shared")
+include(":feature")
+include(":feature:registration")
+include(":commonui")
