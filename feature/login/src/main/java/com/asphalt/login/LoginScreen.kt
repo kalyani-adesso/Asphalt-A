@@ -41,7 +41,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.asphalt.commonui.Theme.Dimensions
+import com.asphalt.commonui.theme.Dimensions
+
+
 import java.nio.file.WatchEvent
 
 @Composable
@@ -51,7 +53,7 @@ fun LoginScreen() {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        Spacer(modifier = Modifier.height(Dimensions.padding85))
+        Spacer(modifier = Modifier.height(Dimensions.spacing85))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,11 +69,13 @@ fun LoginScreen() {
                 color = Color.Gray
             )
             Spacer(Modifier.height(Dimensions.spacing20))
-            Box(
+            Image(
+                painter = painterResource(com.asphalt.commonui.R.drawable.ic_app_icon),
+                contentDescription = "",
                 modifier = Modifier
                     .height(Dimensions.padding100)
                     .width(Dimensions.padding100)
-                    .background(Color.Red)
+
             )
             //Image(painter = painterResource(R.drawable.),contentDescription = null)
             Text(text = "adesso Riders's Club", modifier = Modifier.padding(top = 20.dp))
