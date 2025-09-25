@@ -27,16 +27,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.getstarted.CarouselItem
+import com.asphalt.getstarted.sealedclasses.Carousels
 
 @Composable
-fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: PagerState) {
+fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: PagerState) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -50,13 +51,13 @@ fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: Page
                 .padding(top = carouselTopPadding, bottom = Dimensions.padding28)
                 .align(Alignment.CenterHorizontally)
         ) { page ->
-            val item = items[page]
+            val carousel = carousels[page]
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = item.imageRes), "",
+                    painter = painterResource(id = carousel.carouselItem.imageRes), "",
                     modifier = Modifier
                         .width(Dimensions.size296)
                         .height(Dimensions.size307)
@@ -95,7 +96,7 @@ fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: Page
         }
 
         Text(
-            items[pagerState.currentPage].title,
+            stringResource(carousels[pagerState.currentPage].carouselItem.title),
             color = NeutralWhite,
             style = TypographyBold.headlineSmall,
             lineHeight = Dimensions.lineSpacing30,
@@ -104,7 +105,7 @@ fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: Page
         )
         Spacer(modifier = Modifier.height(Dimensions.size20))
         Text(
-            items[pagerState.currentPage].description,
+            stringResource(carousels[pagerState.currentPage].carouselItem.description),
             color = NeutralWhite,
             style = Typography.titleMedium,
             lineHeight = Dimensions.lineSpacing20,

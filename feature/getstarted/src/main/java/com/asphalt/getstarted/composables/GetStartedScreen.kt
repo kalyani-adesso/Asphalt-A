@@ -23,7 +23,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.getstarted.CarouselItem
+import com.asphalt.getstarted.sealedclasses.Carousels
 import com.asphalt.getstarted.Constants
 import com.asphalt.getstarted.R
 
@@ -33,22 +33,8 @@ fun GetStartedScreen() {
     val density = LocalResources.current.displayMetrics.density
     val screenHeightPx = windowInfo.containerSize.height
     val carouselItems = listOf(
-        CarouselItem(
-            R.drawable.joy_riding,
-            stringResource(R.string.joy_riding),
-            stringResource(R.string.joy_riding_desc)
-
-        ),
-        CarouselItem(
-            R.drawable.community_features,
-            stringResource(R.string.community_features),
-            stringResource(R.string.community_features_desc)
-        ),
-        CarouselItem(
-            R.drawable.ride_together_safely,
-            stringResource(R.string.ride_together_safely),
-            stringResource(R.string.ride_together_safely_desc)
-        )
+        Carousels.JoyRideCarousel, Carousels.CommunityFeatureCarousel,
+        Carousels.RideTogetherCarousel
     )
     val carouselTopPadding = ((screenHeightPx * Constants.CAROUSEL_HEIGHT_RATIO) / density).dp
     val cardHeight = ((screenHeightPx * Constants.CARD_HEIGHT_RATIO) / density).dp
@@ -59,7 +45,7 @@ fun GetStartedScreen() {
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Image(
-            painter = painterResource(id = carouselItems[pagerState.currentPage].imageRes), "",
+            painter = painterResource(id = carouselItems[pagerState.currentPage].carouselItem.imageRes), "",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
