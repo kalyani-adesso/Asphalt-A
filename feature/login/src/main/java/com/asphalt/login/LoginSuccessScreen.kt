@@ -38,7 +38,7 @@ fun LoginSuccessScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = NeutralPaperGrey),
+                .background(color = NeutralWhite),
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
@@ -56,7 +56,7 @@ fun LoginSuccessScreen() {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_success),
                     contentDescription = "",
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,
 
                     )
             }
