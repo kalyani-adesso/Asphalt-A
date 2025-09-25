@@ -42,10 +42,10 @@ fun LoginSuccessScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            Spacer(Modifier.height(Dimensions.padding100))
+            Spacer(Modifier.height(Dimensions.spacing144))
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().weight(1.4f)
                     .padding(
                         start = Dimensions.padding30,
                         end = Dimensions.padding30
@@ -56,7 +56,7 @@ fun LoginSuccessScreen() {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_success),
                     contentDescription = "",
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.Fit,
 
                     )
             }
@@ -66,7 +66,7 @@ fun LoginSuccessScreen() {
                     .fillMaxWidth()
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+
             ) {
                 Text(text = "Yey! Login Successfull", style = TypographyBold.headlineSmall)
                 Spacer(modifier = Modifier.height(Dimensions.spacing16))
@@ -80,21 +80,23 @@ fun LoginSuccessScreen() {
                         end = Dimensions.padding30
                     )
                 )
-            }
-            Box(
-                modifier = Modifier
-                    .padding(
-                        start = Dimensions.padding30,
-                        end = Dimensions.padding30
-                    )
-                    .weight(1f)
-            ) {
-                GradientButton(
-                    PrimaryDarkerLightB75, PrimaryDarkerLightB50,
-                    buttonText = "Lets Explore".uppercase(),
+                Spacer(modifier = Modifier.height(80.dp))
+                Box(
+                    modifier = Modifier
+                        .padding(
+                            start = Dimensions.padding30,
+                            end = Dimensions.padding30
+                        )
 
-                    ) {}
+                ) {
+                    GradientButton(
+                        PrimaryDarkerLightB75, PrimaryDarkerLightB50,
+                        buttonText = "Lets Explore".uppercase(),
+
+                        ) {}
+                }
             }
+
 
         }
 

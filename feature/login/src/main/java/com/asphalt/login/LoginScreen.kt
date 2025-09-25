@@ -45,6 +45,7 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -224,6 +225,7 @@ fun LoginScreen() {
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(),
+                    visualTransformation= PasswordVisualTransformation(),//if (passwordVisible) VisualTransformation.None
                     textStyle = Typography.bodySmall,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = TextFieldDefaults.colors(
