@@ -57,7 +57,7 @@ fun GetStartedScreen() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = carouselItems[pagerState.currentPage].imageRes), "logo",
+            painter = painterResource(id = carouselItems[pagerState.currentPage].imageRes), "",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -76,7 +76,7 @@ fun GetStartedScreen() {
         ) {
             GradientButton(
                 {
-
+                    //TODO: Handle button click for get started
                 },
                 PaddingValues(
                     start = Dimensions.padding40,
