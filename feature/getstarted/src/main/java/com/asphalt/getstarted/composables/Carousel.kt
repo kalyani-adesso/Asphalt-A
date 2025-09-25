@@ -8,12 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -34,6 +33,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
 import com.asphalt.getstarted.GetStartedConstants
 import com.asphalt.getstarted.sealedclasses.Carousels
 
@@ -41,7 +41,7 @@ import com.asphalt.getstarted.sealedclasses.Carousels
 fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: PagerState) {
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
@@ -60,8 +60,12 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
                 Image(
                     painter = painterResource(id = carousel.carouselItem.imageRes), null,
                     modifier = Modifier
-                        .width(Dimensions.size296)
-                        .height(Dimensions.size307)
+                        .height(
+                            calculateHeightDpForPercentage(
+                                GetStartedConstants.CAROUSEL_IMAGE_HEIGHT_RATIO
+                            )
+                        )
+                        .aspectRatio(GetStartedConstants.CAROUSEL_IMAGE_ASPECT_RATIO)
                         .border(
                             width = Dimensions.size2,
                             shape = RoundedCornerShape(Dimensions.radius40),
