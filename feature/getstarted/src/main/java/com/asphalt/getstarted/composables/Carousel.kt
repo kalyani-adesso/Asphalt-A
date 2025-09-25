@@ -27,10 +27,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.getstarted.CarouselItem
 
 @Composable
@@ -79,9 +82,9 @@ fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: Page
             repeat(pagerState.pageCount) { iteration ->
                 val color =
                     if (pagerState.currentPage == iteration)
-                        Color.White
+                        NeutralWhite
                     else
-                        Color.White.copy(alpha = 0.25f)
+                        NeutralWhite.copy(alpha = 0.25f)
                 Box(
                     modifier = Modifier
                         .padding(Dimensions.padding4)
@@ -94,15 +97,18 @@ fun Carousel(items: List<CarouselItem>, carouselTopPadding: Dp, pagerState: Page
 
         Text(
             items[pagerState.currentPage].title,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
+            color = NeutralWhite,
+            style = TypographyBold.headlineSmall,
+            lineHeight = Dimensions.lineSpacing30,
             fontSize = Dimensions.textSize26,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(Dimensions.size18))
+        Spacer(modifier = Modifier.height(Dimensions.size20))
         Text(
             items[pagerState.currentPage].description,
-            color = Color.White,
+            color = NeutralWhite,
+            style = Typography.titleMedium,
+            lineHeight = Dimensions.lineSpacing20,
             fontSize = Dimensions.textSize17,
             textAlign = TextAlign.Center
         )

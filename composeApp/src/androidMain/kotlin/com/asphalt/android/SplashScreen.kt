@@ -12,14 +12,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.asphalt.commonui.R.drawable
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
+import com.asphalt.commonui.theme.TypographyBold
 
 @Composable
 fun SplashScreen() {
@@ -31,7 +34,7 @@ fun SplashScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0XFF006EC7)),
+            .background(color = PrimaryDarkerLightB75),
     ) {
         Column(
             modifier = Modifier
@@ -39,14 +42,15 @@ fun SplashScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(painter = painterResource(R.drawable.adesso_logo), "")
+            Image(painter = painterResource(drawable.ic_adesso_logo), "")
             Spacer(modifier = Modifier.height(Dimensions.size60))
-            Image(painter = painterResource(R.drawable.riders_club_logo), "")
+            Image(painter = painterResource(drawable.ic_riders_club_logo), "")
             Spacer(modifier = Modifier.height(Dimensions.size20))
             Text(
-                "adesso Rider's\nClub",
-                color = Color.White,
-                fontSize = 26.sp,
+                stringResource(R.string.adesso_riders_club),
+                color = NeutralWhite,
+                fontSize = Dimensions.textSize26,
+                style = TypographyBold.headlineSmall,
                 textAlign = TextAlign.Center
             )
         }

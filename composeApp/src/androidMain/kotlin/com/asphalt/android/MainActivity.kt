@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.getstarted.composables.GetStartedScreen
 
 class MainActivity : ComponentActivity() {
@@ -16,7 +17,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AsphaltApp()
+            AsphaltTheme {
+                AsphaltApp()
+            }
+
         }
     }
 }

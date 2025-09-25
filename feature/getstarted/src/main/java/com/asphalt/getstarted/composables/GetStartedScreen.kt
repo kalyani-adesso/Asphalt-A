@@ -55,7 +55,7 @@ fun GetStartedScreen() {
     })
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Image(
             painter = painterResource(id = carouselItems[pagerState.currentPage].imageRes), "",
             modifier = Modifier.fillMaxSize(),
@@ -75,6 +75,8 @@ fun GetStartedScreen() {
 
         ) {
             GradientButton(
+                startColor = Color(0XFF266EB7),
+                endColor = Color(0XFF132F4F),
                 {
                     //TODO: Handle button click for get started
                 },
@@ -83,7 +85,7 @@ fun GetStartedScreen() {
                     bottom = Dimensions.padding69,
                     end = Dimensions.padding40
                 ),
-                buttonText = stringResource(R.string.get_started),
+                buttonText = stringResource(R.string.get_started).uppercase(),
                 showArrow = true
             )
         }
