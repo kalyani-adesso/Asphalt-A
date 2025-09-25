@@ -47,5 +47,6 @@ object Dimensions {
     val size18 = 18.dp
     val size60 = 60.dp
     val radius15 = 15.dp
+    val size278 = 278.dp
 
 }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.login.LoginScreen
+import com.asphalt.login.LoginSuccessScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +17,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AsphaltTheme {
-                LoginScreen()
+                //LoginScreen()
+                LoginSuccessScreen()
             }
 
         }
