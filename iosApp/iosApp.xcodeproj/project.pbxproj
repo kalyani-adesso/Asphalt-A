@@ -18,7 +18,6 @@
 				Rider/Feature/Home,
 				Rider/Feature/Login,
 				Rider/Feature/SignUp,
-				Rider/Feature/WelocmePage,
 				Rider/Service/LoginService,
 				Shared/Feature/DesignSystem,
 			);
@@ -120,6 +119,10 @@
 			);
 			mainGroup = 79C58F19043067806ED0F2DE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CE07257E2E854BA8008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelocmePage" */,
+				CE0725832E854E79008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelcomePage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0657DC9FC4DDAC98975E3C11 /* Products */;
 			projectDirPath = "";
@@ -374,6 +377,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CE07257E2E854BA8008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelocmePage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = iosApp/Rider/Feature/WelocmePage;
+		};
+		CE0725832E854E79008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelcomePage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = iosApp/Rider/Feature/WelcomePage;
+		};
+/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 2B673DBDE9E5B856F5716F00 /* Project object */;
 }
