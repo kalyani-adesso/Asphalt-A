@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import com.asphalt.commonui.Theme.Dimensions
+import com.asphalt.commonui.theme.Dimensions
 
 @Composable
 fun GradientButton(

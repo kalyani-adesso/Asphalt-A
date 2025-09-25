@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.asphalt.commonui.Theme.Dimensions
+import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.getstarted.CarouselItem
 import com.asphalt.getstarted.Constants
 import com.asphalt.getstarted.R
