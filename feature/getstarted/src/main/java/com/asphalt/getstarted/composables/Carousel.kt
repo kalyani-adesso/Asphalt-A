@@ -34,6 +34,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.getstarted.GetStartedConstants
 import com.asphalt.getstarted.sealedclasses.Carousels
 
 @Composable
@@ -84,7 +85,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
                     if (pagerState.currentPage == iteration)
                         NeutralWhite
                     else
-                        NeutralWhite.copy(alpha = 0.25f)
+                        NeutralWhite.copy(alpha = GetStartedConstants.CAROUSEL_INDICATOR_ALPHA_INACTIVE)
                 Box(
                     modifier = Modifier
                         .padding(Dimensions.padding4)
