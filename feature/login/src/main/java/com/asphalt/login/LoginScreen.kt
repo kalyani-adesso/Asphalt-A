@@ -126,12 +126,22 @@ fun LoginScreen() {
                     .height(Dimensions.padding50)
                     .background(
                         Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
+                    ).then(
+                        if(text1.isEmpty()){
+                            Modifier .border(
+                                width = Dimensions.padding1,
+                                color = Color(0xFFF8F7FB) ,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }else{
+                            Modifier .border(
+                                width = Dimensions.padding1,
+                                color = PrimaryDarkerLightB75 ,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }
                     )
-                    .border(
-                        width = Dimensions.padding1,
-                        color = Color(0xFFF8F7FB),
-                        shape = RoundedCornerShape(Dimensions.padding10)
-                    ), verticalAlignment = Alignment.CenterVertically
+                    , verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
                     value = text1,
@@ -186,10 +196,20 @@ fun LoginScreen() {
                     .background(
                         Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
                     )
-                    .border(
-                        width = Dimensions.padding1,
-                        color = Color(0xFFF8F7FB),
-                        shape = RoundedCornerShape(Dimensions.padding10)
+                    .then(
+                        if(text2.isEmpty()){
+                            Modifier .border(
+                                width = Dimensions.padding1,
+                                color = Color(0xFFF8F7FB) ,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }else{
+                            Modifier .border(
+                                width = Dimensions.padding1,
+                                color = PrimaryDarkerLightB75 ,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }
                     ), verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
@@ -223,11 +243,14 @@ fun LoginScreen() {
                         )
                     },
                     trailingIcon = {
-                        Icon(
-                            painter = painterResource(com.asphalt.commonui.R.drawable.ic_eye_slash), // Specify the icon (e.g., Email)
-                            contentDescription = "Email icon", tint = Color.Unspecified
-                            // Set the icon color
-                        )
+                        if(!text2.isEmpty()){
+                            Icon(
+                                painter = painterResource(com.asphalt.commonui.R.drawable.ic_eye_slash), // Specify the icon (e.g., Email)
+                                contentDescription = "Email icon", tint = Color.Unspecified
+                                // Set the icon color
+                            )
+                        }
+
                     })
                 //Image()
             }
