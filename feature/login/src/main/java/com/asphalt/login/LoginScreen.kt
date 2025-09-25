@@ -27,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -100,7 +101,7 @@ fun LoginScreen() {
             //Image(painter = painterResource(R.drawable.),contentDescription = null)
             Text(
                 text = "adesso Riders's Club",
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(top = Dimensions.spacing20),
                 style = TypographyBlack.headlineSmall
             )
 
@@ -114,7 +115,7 @@ fun LoginScreen() {
         ) {
             Text(
                 text = "Email or Phone Number",
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(top = Dimensions.spacing20),
                 style = TypographyBold.titleMedium,
                 color = NeutralBlack
             )
@@ -126,28 +127,28 @@ fun LoginScreen() {
                     .height(Dimensions.padding50)
                     .background(
                         Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
-                    ).then(
-                        if(text1.isEmpty()){
-                            Modifier .border(
+                    )
+                    .then(
+                        if (text1.isEmpty()) {
+                            Modifier.border(
                                 width = Dimensions.padding1,
-                                color = Color(0xFFF8F7FB) ,
+                                color = Color(0xFFF8F7FB),
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
-                        }else{
-                            Modifier .border(
+                        } else {
+                            Modifier.border(
                                 width = Dimensions.padding1,
-                                color = PrimaryDarkerLightB75 ,
+                                color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    )
-                    , verticalAlignment = Alignment.CenterVertically
+                    ), verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
                     value = text1,
                     onValueChange = { text1 = it },
                     //label = { Text("Enter your email") },
-                    placeholder = { Text("Enter your email", style = TextStyle(fontSize = 16.sp)) },
+                    placeholder = { Text("Enter your email", style = Typography.bodySmall) },
                     textStyle = Typography.bodySmall,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
@@ -197,16 +198,16 @@ fun LoginScreen() {
                         Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
                     )
                     .then(
-                        if(text2.isEmpty()){
-                            Modifier .border(
+                        if (text2.isEmpty()) {
+                            Modifier.border(
                                 width = Dimensions.padding1,
-                                color = Color(0xFFF8F7FB) ,
+                                color = Color(0xFFF8F7FB),
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
-                        }else{
-                            Modifier .border(
+                        } else {
+                            Modifier.border(
                                 width = Dimensions.padding1,
-                                color = PrimaryDarkerLightB75 ,
+                                color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
@@ -217,7 +218,7 @@ fun LoginScreen() {
                     onValueChange = { text2 = it },
                     placeholder = {
                         Text(
-                            "Enter your password", style = TextStyle(fontSize = 16.sp)
+                            "Enter your password", style = Typography.bodySmall
                         )
                     },
                     modifier = Modifier
@@ -243,7 +244,7 @@ fun LoginScreen() {
                         )
                     },
                     trailingIcon = {
-                        if(!text2.isEmpty()){
+                        if (!text2.isEmpty()) {
                             Icon(
                                 painter = painterResource(com.asphalt.commonui.R.drawable.ic_eye_slash), // Specify the icon (e.g., Email)
                                 contentDescription = "Email icon", tint = Color.Unspecified
@@ -263,7 +264,11 @@ fun LoginScreen() {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Checkbox(
+                    Checkbox(modifier = Modifier,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = PrimaryDarkerLightB75,
+                            uncheckedColor = NeutralMidGrey,
+                            checkmarkColor = Color.White),
                         checked = checked, onCheckedChange = { checked = it })
                     Text(text = "Keep me signed in", style = Typography.bodySmall)
                 }
@@ -291,7 +296,7 @@ fun LoginScreen() {
             ) {
                 Divider(
                     color = NeutralMidGrey,
-                    thickness = 1.dp,
+                    thickness = Dimensions.spacing1,
                     modifier = Modifier.weight(1f)
 
                 )
@@ -304,7 +309,7 @@ fun LoginScreen() {
                 )
                 Divider(
                     color = NeutralMidGrey,
-                    thickness = 1.dp,
+                    thickness = Dimensions.spacing1,
                     modifier = Modifier.weight(1f)
                 )
 
