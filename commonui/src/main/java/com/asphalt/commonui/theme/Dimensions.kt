@@ -3,18 +3,23 @@ package com.asphalt.commonui.theme
 import androidx.compose.ui.unit.dp
 
 object Dimensions {
+
     val padding = 16.dp
     val padding1 = 1.dp
     val padding8 = 8.dp
     val padding32 = 32.dp
+    val padding30 = 30.dp
 
     val padding24 = 24.dp
 
     val padding146 = 146.dp
 
     val padding50 = 50.dp
+    val padding10= 10.dp
 
     val padding100 = 100.dp
+    val padding85 = 85.dp
+    val padding15 = 15.dp
 
     val spacing1 = 1.dp
     val spacing4 = 4.dp
