@@ -9,7 +9,7 @@ struct LoginView: View {
     @State private var showContent = false
     var body: some View {
         VStack {
-            TextView(text:"Welcome", font: Font(token: .KlavikaBold),color: Color.black, insets:.bottom,length: .sm)
+            TextView(text:AppStrings.WelcomeStrings, font: Font(token: .KlavikaBold),color: Color.black, insets:.bottom,length: .sm)
         }
     }
     
