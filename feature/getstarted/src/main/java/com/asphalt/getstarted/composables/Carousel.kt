@@ -35,10 +35,10 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
 import com.asphalt.getstarted.GetStartedConstants
-import com.asphalt.getstarted.sealedclasses.Carousels
+import com.asphalt.getstarted.data.CarouselItem
 
 @Composable
-fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: PagerState) {
+fun Carousel(carouselItems: List<CarouselItem>, carouselTopPadding: Dp, pagerState: PagerState) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -52,13 +52,13 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
                 .padding(top = carouselTopPadding, bottom = Dimensions.padding28)
                 .align(Alignment.CenterHorizontally)
         ) { page ->
-            val carousel = carousels[page]
+            val carouselItem = carouselItems[page]
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = carousel.carouselItem.imageRes), null,
+                    painter = painterResource(id = carouselItem.imageRes), null,
                     modifier = Modifier
                         .height(
                             calculateHeightDpForPercentage(
@@ -101,7 +101,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
         }
 
         Text(
-            stringResource(carousels[pagerState.currentPage].carouselItem.titleRes),
+            stringResource(carouselItems[pagerState.currentPage].titleRes),
             color = NeutralWhite,
             style = TypographyBold.headlineSmall,
             lineHeight = Dimensions.lineSpacing30,
@@ -110,7 +110,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
         )
         Spacer(modifier = Modifier.height(Dimensions.size20))
         Text(
-            stringResource(carousels[pagerState.currentPage].carouselItem.descriptionRes),
+            stringResource(carouselItems[pagerState.currentPage].descriptionRes),
             color = NeutralWhite,
             style = Typography.titleMedium,
             lineHeight = Dimensions.lineSpacing20,

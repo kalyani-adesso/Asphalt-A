@@ -32,8 +32,8 @@ import com.asphalt.getstarted.sealedclasses.Carousels
 @Composable
 fun GetStartedScreen() {
     val carouselItems = listOf(
-        Carousels.JoyRideCarousel, Carousels.CommunityFeatureCarousel,
-        Carousels.RideTogetherCarousel
+        Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
+        Carousels.RideTogetherCarousel.carouselItem
     )
     val carouselTopPadding =
         calculateHeightDpForPercentage(GetStartedConstants.CAROUSEL_HEIGHT_RATIO)
@@ -44,7 +44,7 @@ fun GetStartedScreen() {
     Scaffold { innerPadding ->
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Image(
-                painter = painterResource(id = carouselItems[pagerState.currentPage].carouselItem.imageRes),
+                painter = painterResource(id = carouselItems[pagerState.currentPage].imageRes),
                 null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
