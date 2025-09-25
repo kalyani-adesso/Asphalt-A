@@ -19,7 +19,6 @@
 				Rider/Feature/Login,
 				Rider/Feature/SignUp,
 				Rider/Feature/WelocmePage,
-				Rider/Service/LoginService,
 				Shared/Feature/DesignSystem,
 			);
 			target = 5E1F3BFF75C627F835CE626C /* iosApp */;

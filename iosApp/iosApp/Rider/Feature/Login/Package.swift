@@ -19,7 +19,7 @@ let package = Package(
         .target(
             name: "Login",
             dependencies: [
-                "DesignSystem"   // 👈 Add dependency here
+                "DesignSystem" 
             ]
         ),
         .testTarget(

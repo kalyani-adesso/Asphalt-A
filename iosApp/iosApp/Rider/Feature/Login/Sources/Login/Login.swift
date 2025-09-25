@@ -10,7 +10,6 @@ struct LoginView: View {
     var body: some View {
         VStack {
             TextView(text:"Welcome", font: Font(token: .KlavikaBold),color: Color.black, insets:.bottom,length: .sm)
-            
         }
     }
     
