@@ -96,7 +96,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
         }
 
         Text(
-            stringResource(carousels[pagerState.currentPage].carouselItem.title),
+            stringResource(carousels[pagerState.currentPage].carouselItem.titleRes),
             color = NeutralWhite,
             style = TypographyBold.headlineSmall,
             lineHeight = Dimensions.lineSpacing30,
@@ -105,7 +105,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
         )
         Spacer(modifier = Modifier.height(Dimensions.size20))
         Text(
-            stringResource(carousels[pagerState.currentPage].carouselItem.description),
+            stringResource(carousels[pagerState.currentPage].carouselItem.descriptionRes),
             color = NeutralWhite,
             style = Typography.titleMedium,
             lineHeight = Dimensions.lineSpacing20,
