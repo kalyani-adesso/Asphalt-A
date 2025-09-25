@@ -8,16 +8,16 @@ import androidx.compose.ui.unit.dp
 
 object ComposeUtils {
     @Composable
-    fun getScreenHeightPx(): Int {
+    fun getScreenHeight(): Int {
         val windowInfo = LocalWindowInfo.current
-        val screenHeightPx = windowInfo.containerSize.height
-        return screenHeightPx
+        val screenHeight = windowInfo.containerSize.height
+        return screenHeight
     }
 
     @Composable
     fun calculateHeightDpForPercentage(percentage: Float): Dp {
-        val screenHeightPx = getScreenHeightPx()
+        val screenHeight = getScreenHeight()
         val density = LocalResources.current.displayMetrics.density
-        return ((screenHeightPx * percentage) / density).dp
+        return ((screenHeight * percentage) / density).dp
     }
 }
