@@ -18,7 +18,7 @@
 				Rider/Feature/Home,
 				Rider/Feature/Login,
 				Rider/Feature/SignUp,
-				Rider/Feature/WelocmePage,
+				Rider/Service/LoginService,
 				Shared/Feature/DesignSystem,
 			);
 			target = 5E1F3BFF75C627F835CE626C /* iosApp */;
@@ -119,6 +119,10 @@
 			);
 			mainGroup = 79C58F19043067806ED0F2DE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CE07257E2E854BA8008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelocmePage" */,
+				CE0725832E854E79008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelcomePage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0657DC9FC4DDAC98975E3C11 /* Products */;
 			projectDirPath = "";
@@ -190,7 +194,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -342,7 +345,6 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -375,6 +377,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CE07257E2E854BA8008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelocmePage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = iosApp/Rider/Feature/WelocmePage;
+		};
+		CE0725832E854E79008C18F1 /* XCLocalSwiftPackageReference "iosApp/Rider/Feature/WelcomePage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = iosApp/Rider/Feature/WelcomePage;
+		};
+/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 2B673DBDE9E5B856F5716F00 /* Project object */;
 }
