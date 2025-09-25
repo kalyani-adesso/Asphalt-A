@@ -1,4 +1,4 @@
-package com.asphalt.commonui.Theme
+package com.asphalt.commonui.theme
 
 import androidx.compose.ui.unit.dp
 
