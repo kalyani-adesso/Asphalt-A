@@ -40,7 +40,7 @@ fun GetStartedScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Image(
             painter = painterResource(id = carouselItems[pagerState.currentPage].carouselItem.imageRes),
-            "",
+            null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

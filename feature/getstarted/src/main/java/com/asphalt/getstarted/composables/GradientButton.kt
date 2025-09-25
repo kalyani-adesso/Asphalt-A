@@ -87,7 +87,7 @@ fun GradientButton(
                     if (showArrow)
                         Icon(
                             painter = painterResource(R.drawable.ic_arrow),
-                            contentDescription = "",
+                            contentDescription = null,
                         )
                 }
             }

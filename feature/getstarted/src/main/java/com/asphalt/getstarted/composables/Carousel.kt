@@ -57,7 +57,7 @@ fun Carousel(carousels: List<Carousels>, carouselTopPadding: Dp, pagerState: Pag
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = carousel.carouselItem.imageRes), "",
+                    painter = painterResource(id = carousel.carouselItem.imageRes), null,
                     modifier = Modifier
                         .width(Dimensions.size296)
                         .height(Dimensions.size307)
