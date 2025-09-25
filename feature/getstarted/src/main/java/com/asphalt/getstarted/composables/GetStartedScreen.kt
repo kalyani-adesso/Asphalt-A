@@ -21,6 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.PrimaryBrighterLightW75
+import com.asphalt.commonui.theme.PrimaryDarkerLightB50
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.getstarted.CarouselItem
 import com.asphalt.getstarted.Constants
 import com.asphalt.getstarted.R
@@ -71,12 +74,12 @@ fun GetStartedScreen() {
                 topEnd = Dimensions.radius40
             ),
 
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF006EC7))
+            colors = CardDefaults.cardColors(containerColor = PrimaryDarkerLightB75)
 
         ) {
             GradientButton(
-                startColor = Color(0XFF266EB7),
-                endColor = Color(0XFF132F4F),
+                startColor = PrimaryBrighterLightW75,
+                endColor = PrimaryDarkerLightB50,
                 {
                     //TODO: Handle button click for get started
                 },
