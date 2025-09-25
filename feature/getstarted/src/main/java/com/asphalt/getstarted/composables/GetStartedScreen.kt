@@ -14,38 +14,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.getstarted.sealedclasses.Carousels
-import com.asphalt.getstarted.Constants
+import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
+import com.asphalt.getstarted.GetStartedConstants
 import com.asphalt.getstarted.R
+import com.asphalt.getstarted.sealedclasses.Carousels
 
 @Composable
 fun GetStartedScreen() {
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalResources.current.displayMetrics.density
-    val screenHeightPx = windowInfo.containerSize.height
     val carouselItems = listOf(
         Carousels.JoyRideCarousel, Carousels.CommunityFeatureCarousel,
         Carousels.RideTogetherCarousel
     )
-    val carouselTopPadding = ((screenHeightPx * Constants.CAROUSEL_HEIGHT_RATIO) / density).dp
-    val cardHeight = ((screenHeightPx * Constants.CARD_HEIGHT_RATIO) / density).dp
+    val carouselTopPadding = calculateHeightDpForPercentage(GetStartedConstants.CAROUSEL_HEIGHT_RATIO)
+    val cardHeight = calculateHeightDpForPercentage(GetStartedConstants.CARD_HEIGHT_RATIO)
     val pagerState = rememberPagerState(pageCount = {
         carouselItems.size
     })
 
-
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Image(
-            painter = painterResource(id = carouselItems[pagerState.currentPage].carouselItem.imageRes), "",
+            painter = painterResource(id = carouselItems[pagerState.currentPage].carouselItem.imageRes),
+            "",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

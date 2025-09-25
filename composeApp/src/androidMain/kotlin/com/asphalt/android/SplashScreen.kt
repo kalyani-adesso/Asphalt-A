@@ -12,24 +12,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R.drawable
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
 
 @Composable
 fun SplashScreen() {
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalResources.current.displayMetrics.density
-    val screenHeightPx = windowInfo.containerSize.height
-    val logoPaddingVertical = ((screenHeightPx * 0.25f) / density).dp
+
+    val logoPaddingVertical = calculateHeightDpForPercentage(0.2f)
 
     Box(
         modifier = Modifier
