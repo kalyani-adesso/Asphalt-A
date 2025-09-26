@@ -17,8 +17,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AsphaltTheme {
-                //LoginScreen()
-                LoginSuccessScreen()
+                LoginScreen()
+                //LoginSuccessScreen()
             }
 
         }

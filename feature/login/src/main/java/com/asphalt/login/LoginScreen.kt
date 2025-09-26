@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -61,14 +63,16 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.login.viewmodel.LoginScreenViewModel
 
 
 import java.nio.file.WatchEvent
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
     var checked by remember { mutableStateOf(false) }
-    var text1 by remember { mutableStateOf("") }
+
+    var emailState = viewModel._emailTextState.collectAsState()
     var text2 by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
@@ -130,7 +134,7 @@ fun LoginScreen() {
                         Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
                     )
                     .then(
-                        if (text1.isEmpty()) {
+                        if (emailState.value.isEmpty()) {
                             Modifier.border(
                                 width = Dimensions.padding1,
                                 color = Color(0xFFF8F7FB),
@@ -146,8 +150,8 @@ fun LoginScreen() {
                     ), verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
-                    value = text1,
-                    onValueChange = { text1 = it },
+                    value = emailState.value,
+                    onValueChange = { viewModel.updateEmailState(it)  },
                     //label = { Text("Enter your email") },
                     placeholder = { Text("Enter your email", style = Typography.bodySmall) },
                     textStyle = Typography.bodySmall,
@@ -225,7 +229,7 @@ fun LoginScreen() {
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(),
-                    visualTransformation= PasswordVisualTransformation(),//if (passwordVisible) VisualTransformation.None
+                    visualTransformation = PasswordVisualTransformation(),//if (passwordVisible) VisualTransformation.None
                     textStyle = Typography.bodySmall,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = TextFieldDefaults.colors(
@@ -266,11 +270,13 @@ fun LoginScreen() {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Checkbox(modifier = Modifier,
+                    Checkbox(
+                        modifier = Modifier,
                         colors = CheckboxDefaults.colors(
                             checkedColor = PrimaryDarkerLightB75,
                             uncheckedColor = NeutralMidGrey,
-                            checkmarkColor = Color.White),
+                            checkmarkColor = Color.White
+                        ),
                         checked = checked, onCheckedChange = { checked = it })
                     Text(text = "Keep me signed in", style = Typography.bodySmall)
                 }
