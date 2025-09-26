@@ -168,7 +168,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         placeholder = { Text("Enter your email", style = Typography.bodySmall) },
                         textStyle = Typography.bodySmall,
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = Color.Transparent,
