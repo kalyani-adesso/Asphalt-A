@@ -40,6 +40,7 @@ fun GradientButton(
     buttonRadius: Dp = Dimensions.radius15,
     buttonText: String,
     showArrow: Boolean = false,
+    isEnable :Boolean =true,
     onClick: () -> Unit
 ) {
 
@@ -56,8 +57,14 @@ fun GradientButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(buttonHeight)
-                .background(gradient, RoundedCornerShape(buttonRadius))
+                .then(
+                    if(isEnable){
+                        Modifier.background(gradient, RoundedCornerShape(buttonRadius))
+                    }else{
+                        Modifier.background(gradient, RoundedCornerShape(buttonRadius))
+                    }
 
+                )
 
         ) {
             Button(
@@ -89,8 +96,10 @@ fun GradientButton(
 @Composable
 fun ButtonPreview() {
     //LoginScreen()
-    GradientButton(PrimaryDarkerLightB75, PrimaryDarkerLightB50,
-        buttonText="Signin"){
+    GradientButton(
+        PrimaryDarkerLightB75, PrimaryDarkerLightB50,
+        buttonText = "Signin"
+    ) {
 
     }
 }
