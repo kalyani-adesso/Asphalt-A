@@ -6,6 +6,7 @@ import android.provider.CalendarContract
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +67,6 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.util.ShowSnackBar
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import kotlinx.coroutines.coroutineScope
 
@@ -75,6 +76,7 @@ import java.nio.file.WatchEvent
 @Composable
 fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
     var checked by remember { mutableStateOf(false) }
+    var showPassword by remember { mutableStateOf(false) }
 
     var emailState = viewModel.emailTextState.collectAsState()
     var isValidEmail = viewModel.isEmailVaild.collectAsState()
@@ -242,7 +244,12 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(),
-                        visualTransformation = PasswordVisualTransformation(),//if (passwordVisible) VisualTransformation.None
+                        visualTransformation = if (showPassword) {
+                            VisualTransformation.None
+                        } else {
+                            PasswordVisualTransformation()
+
+                        },//if (passwordVisible) VisualTransformation.None
                         textStyle = Typography.bodySmall,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         colors = TextFieldDefaults.colors(
@@ -265,8 +272,12 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         trailingIcon = {
                             if (!passwordState.value.isEmpty()) {
                                 Icon(
-                                    painter = painterResource(com.asphalt.commonui.R.drawable.ic_eye_slash), // Specify the icon (e.g., Email)
-                                    contentDescription = "Email icon", tint = Color.Unspecified
+                                    painter = painterResource(if (showPassword)com.asphalt.commonui.R.drawable.ic_eye_slash else com.asphalt.commonui.R.drawable.ic_eye), // Specify the icon (e.g., Email)
+                                    contentDescription = "Email icon",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.clickable {
+                                        showPassword = !showPassword
+                                    }
                                     // Set the icon color
                                 )
                             }
