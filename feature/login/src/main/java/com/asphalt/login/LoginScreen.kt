@@ -93,7 +93,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 .verticalScroll(scrollState)
                 .background(Color.White)
         ) {
-            Spacer(modifier = Modifier.height(Dimensions.spacing85))
+            Spacer(modifier = Modifier.height(Dimensions.spacing75))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
