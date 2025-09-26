@@ -75,15 +75,21 @@ fun GetStartedScreen() {
                             bottom = innerPadding.calculateBottomPadding()
                         ),
                 ) {
-                    GradientButton(
-                        startColor = PrimaryBrighterLightW75,
-                        endColor = PrimaryDarkerLightB50,
-                        {
-                            //TODO: Handle button click for get started
-                        },
-                        buttonText = stringResource(R.string.get_started).uppercase(),
-                        showArrow = true
-                    )
+                    Card(
+                        modifier = Modifier.wrapContentSize(),
+                        elevation = CardDefaults.cardElevation(Dimensions.padding1),
+                        shape = RoundedCornerShape(Dimensions.radius15)
+                    ) {
+                        GradientButton(
+                            startColor = PrimaryBrighterLightW75,
+                            endColor = PrimaryDarkerLightB50,
+                            {
+                                //TODO: Handle button click for get started
+                            },
+                            buttonText = stringResource(R.string.get_started).uppercase(),
+                            showArrow = true
+                        )
+                    }
                 }
                 Spacer(Modifier.weight(1f))
 
