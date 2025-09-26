@@ -24,8 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -151,7 +150,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
             ) {
                 TextField(
                     value = emailState.value,
-                    onValueChange = { viewModel.updateEmailState(it)  },
+                    onValueChange = { viewModel.updateEmailState(it) },
                     //label = { Text("Enter your email") },
                     placeholder = { Text("Enter your email", style = Typography.bodySmall) },
                     textStyle = Typography.bodySmall,
