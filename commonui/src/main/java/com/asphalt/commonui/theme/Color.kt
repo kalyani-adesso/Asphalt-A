@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 val PrimaryDarkerLightB75 = Color(0xFF006EC7)
 val PrimaryDarkerLightB50 = Color(0xFF132F4F)
 val PrimaryLight = Color(0xFF027EFF)
-val PrimaryBrighterLightW75 = Color(0xFF132F4F)
+val PrimaryBrighterLightW75 = Color(0XFF266EB7)
 val PrimaryBrighterLightW25 = Color(0xFF419EFF)
 
 val NeutralWhite = Color(0xFFFFFFFF)
