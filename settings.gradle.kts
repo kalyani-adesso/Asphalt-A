@@ -28,8 +28,8 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
-include(":shared")
+include(":composeApp") // Android app module
+include(":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    //id("co.touchlab.skie") version "0.10.6"
 }
 
 kotlin {
@@ -13,10 +14,11 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
+
     
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "Shared"
@@ -25,21 +27,25 @@ kotlin {
     }
     
     sourceSets {
+
         commonMain.dependencies {
             // put your Multiplatform dependencies here
             implementation(libs.koin.core)
             implementation(libs.kotlinx.serialization.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.ktor.client.core)
+
 
         }
+
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.client.core)
             implementation(libs.koin.android)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
-
-
-
+            implementation(libs.kotlinx.coroutines.android)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

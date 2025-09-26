@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.kotlinx.serialization.core)
+            implementation(libs.ktor.client.core)
 
             implementation(projects.shared)
         }
