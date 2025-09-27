@@ -7,10 +7,10 @@
 
 import Foundation
 
-class AppStrings{
+public struct AppStrings{
     
    
-    public static let appName = "adesso Rider’s Club"
+    public static let appName = "adesso Rider’s\n Club"
     
    
     
@@ -29,13 +29,13 @@ class AppStrings{
 
 
     public enum WelcomeStrings {
-        public static let welcomeTitle = "Welcome to the Joy of Riding"
+        public static let welcomeTitle = "Welcome to the Joy\nof Riding"
         public static let welcomeSubtitle = "Connect with fellow motorcycle enthusiasts and discover amazing rides in your area."
         
-        public static let communityTitle = "Community Features"
+        public static let communityTitle = "Community\nFeatures"
         public static let communitySubtitle = "Share knowledge, ask questions, and connect with mechanics and experienced riders."
         
-        public static let rideTitle = "Ride Together Safely"
+        public static let rideTitle = "Ride Together\nSafely"
         public static let rideSubtitle = "Create group rides, track locations in real-time, and ensure everyone stays connected."
     }
 
