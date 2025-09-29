@@ -23,5 +23,8 @@
     <string name="enter_valid_email">Enter a Valid Email</string>
     <string name="enter_valid_password">Enter a Valid Password</string>
     <string name="empty_string"> </string>
+    <string name="login_success_ful">Yey! Login Successful</string>
+    <string name="login_success_msg">You will be moved to home screen right now.Enjoy the features!</string>
+    <string name="lets_explore">Lets Explore</string>
 
 </resources>

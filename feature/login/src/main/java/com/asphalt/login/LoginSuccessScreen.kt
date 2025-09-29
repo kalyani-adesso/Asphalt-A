@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.R.string
 
 @Composable
 fun LoginSuccessScreen() {
@@ -68,10 +70,10 @@ fun LoginSuccessScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                Text(text = "Yey! Login Successfull", style = TypographyBold.headlineSmall)
+                Text(text = stringResource(string.login_success_ful), style = TypographyBold.headlineSmall)
                 Spacer(modifier = Modifier.height(Dimensions.spacing16))
                 Text(
-                    text = "You will be moved to home screen right now.Enjoy the features!",
+                    text = stringResource(string.login_success_msg),
                     textAlign = TextAlign.Center,
                     style = TypographyBlack.bodyMedium,
                     color = NeutralDarkGrey,
@@ -91,7 +93,7 @@ fun LoginSuccessScreen() {
                 ) {
                     GradientButton(
                         PrimaryDarkerLightB75, PrimaryDarkerLightB50,
-                        buttonText = "Lets Explore".uppercase(),
+                        buttonText = stringResource(string.lets_explore).uppercase(),
 
                         ) {}
                 }
