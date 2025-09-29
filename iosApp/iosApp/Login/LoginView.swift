@@ -29,7 +29,6 @@ struct SignInView: View {
                 .padding(16)
             Text(AppStrings.SignInLabel.clubName.rawValue)
                 .font(KlavikaFont.medium.font(size: 22))
-                .foregroundColor(.celticBlue)
                 .padding(.bottom,42)
             
             // Form fields
@@ -167,9 +166,12 @@ struct SignInView: View {
                 Text(AppStrings.SignInAction.signUpPrompt.rawValue)
                     .font(KlavikaFont.medium.font(size: 14))
                     .foregroundStyle(AppColor.black)
-                Button(AppStrings.SignInAction.signUpAction.rawValue) {
-                    // Handler for sign up
+                NavigationLink(destination: SignUpView()) {
+                    Text(AppStrings.SignInAction.signUpAction.rawValue)
+                        .font(KlavikaFont.medium.font(size: 14))
+                        .foregroundStyle(AppColor.celticBlue)
                 }
+                
                 .font(KlavikaFont.medium.font(size: 14))
                 .foregroundStyle(AppColor.celticBlue)
             }

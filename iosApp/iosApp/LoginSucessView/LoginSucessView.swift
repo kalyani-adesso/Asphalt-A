@@ -23,28 +23,37 @@ struct LoginSucessView: View {
                 .foregroundStyle(AppColor.stoneGray)
                 .padding(.bottom,82)
                 .frame(alignment: .center)
-            Text(AppStrings.SignInLabel.signInTitle.rawValue)
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            AppColor.royalBlue,
-                            AppColor.pursianBlue,
-                        ]),
-                        startPoint: .leading,
-                        endPoint: .trailing
+                .multilineTextAlignment(.center)
+                .lineSpacing(5)
+            NavigationLink(destination: HomeScreen()) {
+                Text(AppStrings.SignInSucessView.exploreButton.rawValue)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.royalBlue,
+                                AppColor.pursianBlue,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                )
-                .cornerRadius(15)
-                .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
-                .foregroundStyle(AppColor.white)
-                .font(KlavikaFont.bold.font(size: 18))
-                .padding(.bottom, 21)
+                    .cornerRadius(15)
+                    .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
+                    .foregroundStyle(AppColor.white)
+                    .font(KlavikaFont.bold.font(size: 18))
+            }
+            .padding(.bottom, 21)
         }
-        .padding([.leading, .trailing], 46)
-        .padding(.top, 100)
+        .padding(.horizontal, 24)
         .navigationBarBackButtonHidden(true)
+        .padding(.top, 100)
     }
 }
 
+struct LoginSucessView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginSucessView()
+    }
+}
