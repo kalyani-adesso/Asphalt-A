@@ -9,9 +9,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.login.LoginScreen
 import com.asphalt.login.LoginSuccessScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.asphalt.commonui.theme.AsphaltTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -19,6 +22,7 @@ class MainActivity : ComponentActivity() {
             AsphaltTheme {
                 LoginScreen()
                 //LoginSuccessScreen()
+                //AsphaltApp()
             }
 
         }

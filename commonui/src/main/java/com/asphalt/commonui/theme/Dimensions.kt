@@ -1,22 +1,28 @@
 package com.asphalt.commonui.theme
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 object Dimensions {
 
 
     val padding = 16.dp
     val padding1 = 1.dp
+    val padding4 = 4.dp
     val padding8 = 8.dp
     val padding32 = 32.dp
     val padding30 = 30.dp
 
     val padding24 = 24.dp
+    val padding28 = 28.dp
+    val padding40 = 40.dp
 
     val padding146 = 146.dp
 
     val padding50 = 50.dp
     val padding10 = 10.dp
+    val padding69 = 69.dp
+    val padding87 = 87.dp
 
     val padding100 = 100.dp
     val padding85 = 85.dp
@@ -42,7 +48,9 @@ object Dimensions {
     val spacing144 = 144.dp
 
     val size = 24.dp
+    val size2 = 2.dp
     val size4 = 4.dp
+    val size8 = 8.dp
 
     val size14 = 14.dp
     val size20 = 20.dp
@@ -52,4 +60,13 @@ object Dimensions {
     val radius15 = 15.dp
     val size278 = 278.dp
 
+    val size296 = 296.dp
+    val size307 = 307.dp
+    val radius40 = 40.dp
+
+    val textSize18 = 18.sp
+    val textSize17 = 17.sp
+    val textSize26 = 26.sp
+    val lineSpacing20 = 20.sp
+    val lineSpacing30 = 30.sp
 }

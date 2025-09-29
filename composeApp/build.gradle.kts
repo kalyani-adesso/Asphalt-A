@@ -80,6 +80,7 @@ dependencies {
     implementation(projects.shared)
     implementation(projects.feature.registration)
     implementation(projects.feature.login)
+    implementation(projects.feature.welcome)
     implementation(projects.commonui)
 
     //dependencies
