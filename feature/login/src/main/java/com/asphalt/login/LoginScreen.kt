@@ -115,7 +115,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         .width(Dimensions.padding50)
 
                 )
-                //Image(painter = painterResource(R.drawable.),contentDescription = null)
+
                 Text(
                     text = "adesso Riders's Club",
                     modifier = Modifier.padding(top = Dimensions.spacing20),
@@ -164,7 +164,6 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     TextField(
                         value = emailState.value,
                         onValueChange = { viewModel.updateEmailState(it) },
-                        //label = { Text("Enter your email") },
                         placeholder = { Text("Enter your email", style = Typography.bodySmall) },
                         textStyle = Typography.bodySmall,
                         singleLine = true,
@@ -249,7 +248,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         } else {
                             PasswordVisualTransformation()
 
-                        },//if (passwordVisible) VisualTransformation.None
+                        },
                         textStyle = Typography.bodySmall,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         colors = TextFieldDefaults.colors(
@@ -272,7 +271,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         trailingIcon = {
                             if (!passwordState.value.isEmpty()) {
                                 Icon(
-                                    painter = painterResource(if (showPassword)com.asphalt.commonui.R.drawable.ic_eye_slash else com.asphalt.commonui.R.drawable.ic_eye), // Specify the icon (e.g., Email)
+                                    painter = painterResource(if (showPassword) com.asphalt.commonui.R.drawable.ic_eye_slash else com.asphalt.commonui.R.drawable.ic_eye), // Specify the icon (e.g., Email)
                                     contentDescription = "Email icon",
                                     tint = Color.Unspecified,
                                     modifier = Modifier.clickable {
@@ -283,7 +282,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                             }
 
                         })
-                    //Image()
+
                 }
                 Spacer(modifier = Modifier.height(Dimensions.size14))
                 Row(
@@ -319,7 +318,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 }
             }
             Spacer(modifier = Modifier.height(Dimensions.spacing20))
-            //===
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
