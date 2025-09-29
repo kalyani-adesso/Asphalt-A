@@ -1,7 +1,7 @@
 package com.asphalt.getstarted.sealedclasses
 
+import com.asphalt.commonui.R
 import com.asphalt.getstarted.data.CarouselItem
-import com.asphalt.getstarted.R
 
 sealed class Carousels(val carouselItem: CarouselItem) {
     object JoyRideCarousel : Carousels(

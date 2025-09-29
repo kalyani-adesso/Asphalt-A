@@ -1,4 +1,4 @@
-package com.asphalt.getstarted.composables
+package com.asphalt.commonui.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

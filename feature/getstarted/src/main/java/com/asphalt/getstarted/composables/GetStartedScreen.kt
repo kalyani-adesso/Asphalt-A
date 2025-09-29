@@ -20,13 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
+import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.getstarted.GetStartedConstants
-import com.asphalt.getstarted.R
 import com.asphalt.getstarted.sealedclasses.Carousels
 
 @Composable

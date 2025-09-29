@@ -9,6 +9,7 @@ val PrimaryBrighterLightW75 = Color(0XFF266EB7)
 val PrimaryBrighterLightW25 = Color(0xFF419EFF)
 
 val NeutralWhite = Color(0xFFFFFFFF)
+val NeutralWhite25 = Color(0x40FFFFFF)
 val NeutralPaperGrey = Color(0xFFF5F5F5)
 val NeutralLightGrey = Color(0xFFE5E5E5)
 val NeutralMidGrey = Color(0xFFD6D6D6)

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
@@ -89,7 +90,7 @@ fun Carousel(carouselItems: List<CarouselItem>, carouselTopPadding: Dp, pagerSta
                     if (pagerState.currentPage == iteration)
                         NeutralWhite
                     else
-                        NeutralWhite.copy(alpha = GetStartedConstants.CAROUSEL_INDICATOR_ALPHA_INACTIVE)
+                        NeutralWhite25
                 Box(
                     modifier = Modifier
                         .padding(Dimensions.padding4)
