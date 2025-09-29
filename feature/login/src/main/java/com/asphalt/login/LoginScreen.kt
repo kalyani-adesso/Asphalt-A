@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -71,9 +72,13 @@ import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import kotlinx.coroutines.coroutineScope
+import com.asphalt.commonui.R.string
+
 
 
 import java.nio.file.WatchEvent
+
+
 
 @Composable
 fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
@@ -102,9 +107,9 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                Text(text = "Welcome", style = TypographyBold.headlineMedium)
+                Text(text = stringResource(string.welcome), style = TypographyBold.headlineMedium)
                 Text(
-                    text = "Let’s login for explore continues",
+                    text = stringResource(string.login_explore_continue),
                     modifier = Modifier.padding(top = Dimensions.padding15),
                     style = TypographyBlack.bodyMedium,
                     color = NeutralDarkGrey
@@ -120,7 +125,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 )
 
                 Text(
-                    text = "adesso Riders's Club",
+                    text = stringResource(string.adesso_rider_club),
                     modifier = Modifier.padding(top = Dimensions.spacing20),
                     style = TypographyBlack.headlineSmall
                 )
@@ -134,7 +139,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     .padding(start = Dimensions.padding30, end = Dimensions.padding30),
             ) {
                 Text(
-                    text = "Email or Phone Number",
+                    text = stringResource(string.email_phone),
                     modifier = Modifier.padding(top = Dimensions.spacing20),
                     style = TypographyBold.titleMedium,
                     color = NeutralBlack
@@ -167,7 +172,13 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     TextField(
                         value = emailState.value,
                         onValueChange = { viewModel.updateEmailState(it) },
-                        placeholder = { Text("Enter your email", style = Typography.bodySmall,color=NeutralDarkGrey) },
+                        placeholder = {
+                            Text(
+                                text = stringResource(string.enter_email),
+                                style = Typography.bodySmall,
+                                color = NeutralDarkGrey
+                            )
+                        },
                         textStyle = Typography.bodySmall,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -206,7 +217,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 }
                 if (validateState.value.isShowEmailError) {
                     Text(
-                        text = validateState.value.emailError,
+                        text = stringResource(validateState.value.emailError),
                         Modifier.padding(top = Dimensions.size4),
                         style = Typography.bodySmall,
                         color = NeutralRed
@@ -214,7 +225,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 }
 
                 Text(
-                    text = "Password",
+                    text = stringResource(string.password),
                     modifier = Modifier.padding(top = Dimensions.size20),
                     style = TypographyBold.titleMedium,
                     color = NeutralBlack
@@ -249,7 +260,9 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         onValueChange = { viewModel.updatePassword(it) },
                         placeholder = {
                             Text(
-                                "Enter your password", style = Typography.bodySmall,color=NeutralDarkGrey
+                                text = stringResource(string.enter_password),
+                                style = Typography.bodySmall,
+                                color = NeutralDarkGrey
                             )
                         },
                         modifier = Modifier
@@ -298,7 +311,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 }
                 if (validateState.value.isShowPasswordError) {
                     Text(
-                        text = validateState.value.passwordError,
+                        text = stringResource(validateState.value.passwordError),
                         Modifier.padding(top = Dimensions.size4),
                         style = Typography.bodySmall,
                         color = NeutralRed
@@ -322,17 +335,22 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                                 checkmarkColor = Color.White
                             ),
                             checked = checked, onCheckedChange = { checked = it })
-                        Text(text = "Keep me signed in", style = Typography.bodySmall)
+                        Text(
+                            text = stringResource(string.keep_signed_in),
+                            style = Typography.bodySmall
+                        )
                     }
                     Text(
-                        text = "Forgot password",
+                        text = stringResource(string.forgot_password),
                         style = TypographyBlack.bodySmall,
                         color = PrimaryDarkerLightB75
                     )
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing16))
                 GradientButton(
-                    PrimaryDarkerLightB75, PrimaryDarkerLightB50, buttonText = "SIGN IN"
+                    PrimaryDarkerLightB75,
+                    PrimaryDarkerLightB50,
+                    buttonText = stringResource(string.sign_in)
                 ) {
 
                     viewModel.callLogin()
@@ -356,7 +374,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
 
                     )
                     Text(
-                        text = "You can connect with",
+                        text = stringResource(string.you_can_connect),
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = Dimensions.padding8),
@@ -394,9 +412,9 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text("Don’t have an account?", style = TypographyBlack.bodySmall)
+                    Text(text=stringResource(string.dont_have_account), style = TypographyBlack.bodySmall)
                     Text(
-                        "Sign Up here",
+                        text= stringResource(string.sign_up_here),
                         style = TypographyBlack.bodySmall,
                         color = PrimaryDarkerLightB75
                     )

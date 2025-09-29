@@ -3,6 +3,7 @@ package com.asphalt.login.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.asphalt.commonui.R
 import com.asphalt.commonui.util.EmailValidator
 import com.asphalt.login.model.LoginValidationModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,21 +46,21 @@ class LoginScreenViewModel : ViewModel() {
         if (_emailTextMutableState.value.isEmpty()) {
             _validationMutableState.value = _validationMutableState.value.copy(
                 isShowEmailError = true,
-                emailError = "Enter a Valid Email"
+                emailError = R.string.enter_valid_email
             )
             return false
         }
         if (!EmailValidator.isValid(_emailTextMutableState.value)) {
             _validationMutableState.value = _validationMutableState.value.copy(
                 isShowEmailError = true,
-                emailError = "Enter a Valid Email"
+                emailError = R.string.enter_valid_email
             )
             return false
         }
         if (_passwordTextMutableState.value.isEmpty()) {
             _validationMutableState.value = _validationMutableState.value.copy(
                 isShowPasswordError = true,
-                passwordError = "Enter a Valid Password"
+                passwordError = R.string.enter_valid_password
             )
             return false
         }
@@ -71,8 +72,6 @@ class LoginScreenViewModel : ViewModel() {
         _validationMutableState.value = _validationMutableState.value.copy(
             isShowEmailError = false,
             isShowPasswordError = false,
-            emailError = "",
-            passwordError = ""
         )
     }
 
