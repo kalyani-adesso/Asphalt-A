@@ -57,11 +57,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.GrayLight
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey
+import com.asphalt.commonui.theme.NeutralLightGray25
 import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
@@ -144,13 +144,13 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         .fillMaxWidth()
                         .height(Dimensions.padding50)
                         .background(
-                            GrayLight, shape = RoundedCornerShape(Dimensions.padding10)
+                            NeutralLightGray25, shape = RoundedCornerShape(Dimensions.padding10)
                         )
                         .then(
                             if (emailState.value.isEmpty()) {
                                 Modifier.border(
                                     width = Dimensions.padding1,
-                                    color = GrayLight,
+                                    color = NeutralLightGray25,
                                     shape = RoundedCornerShape(Dimensions.padding10)
                                 )
                             } else {
@@ -215,13 +215,13 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         .fillMaxWidth()
                         .height(Dimensions.padding50)
                         .background(
-                            GrayLight, shape = RoundedCornerShape(Dimensions.padding10)
+                            NeutralLightGray25, shape = RoundedCornerShape(Dimensions.padding10)
                         )
                         .then(
                             if (passwordState.value.isEmpty()) {
                                 Modifier.border(
                                     width = Dimensions.padding1,
-                                    color = GrayLight,
+                                    color = NeutralLightGray25,
                                     shape = RoundedCornerShape(Dimensions.padding10)
                                 )
                             } else {
