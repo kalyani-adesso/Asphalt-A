@@ -33,4 +33,4 @@ include(":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")
-include(":feature:getstarted")
+include(":feature:welcome")

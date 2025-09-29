@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import asphalta.composeapp.generated.resources.Res
 import asphalta.composeapp.generated.resources.compose_multiplatform
-import com.asphalt.getstarted.composables.GetStartedScreen
+import com.asphalt.welcome.composables.GetStartedScreen
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview

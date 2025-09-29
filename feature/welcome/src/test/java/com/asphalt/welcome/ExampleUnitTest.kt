@@ -1,4 +1,4 @@
-package com.asphalt.getstarted
+package com.asphalt.welcome
 
 import org.junit.Test
 

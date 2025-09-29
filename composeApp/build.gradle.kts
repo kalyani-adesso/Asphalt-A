@@ -79,7 +79,7 @@ dependencies {
     // modules
     implementation(projects.shared)
     implementation(projects.feature.registration)
-    implementation(projects.feature.getstarted)
+    implementation(projects.feature.welcome)
     implementation(projects.commonui)
 
     //dependencies

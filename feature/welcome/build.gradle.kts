@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.asphalt.getstarted"
+    namespace = "com.asphalt.welcome"
     compileSdk = 36
 
     defaultConfig {

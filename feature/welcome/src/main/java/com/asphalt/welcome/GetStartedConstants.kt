@@ -1,4 +1,4 @@
-package com.asphalt.getstarted
+package com.asphalt.welcome
 
 object GetStartedConstants {
     const val CARD_HEIGHT_RATIO = 0.62f

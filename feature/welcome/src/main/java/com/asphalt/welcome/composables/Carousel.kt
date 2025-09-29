@@ -1,4 +1,4 @@
-package com.asphalt.getstarted.composables
+package com.asphalt.welcome.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,8 +35,8 @@ import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
-import com.asphalt.getstarted.GetStartedConstants
-import com.asphalt.getstarted.data.CarouselItem
+import com.asphalt.welcome.GetStartedConstants
+import com.asphalt.welcome.data.CarouselItem
 
 @Composable
 fun Carousel(carouselItems: List<CarouselItem>, carouselTopPadding: Dp, pagerState: PagerState) {

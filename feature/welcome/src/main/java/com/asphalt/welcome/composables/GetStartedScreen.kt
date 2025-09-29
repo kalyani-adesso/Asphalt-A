@@ -1,4 +1,4 @@
-package com.asphalt.getstarted.composables
+package com.asphalt.welcome.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -27,8 +27,8 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.getstarted.GetStartedConstants
-import com.asphalt.getstarted.sealedclasses.Carousels
+import com.asphalt.welcome.GetStartedConstants
+import com.asphalt.welcome.sealedclasses.Carousels
 
 @Composable
 fun GetStartedScreen() {
