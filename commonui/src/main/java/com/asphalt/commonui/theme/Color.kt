@@ -16,5 +16,6 @@ val NeutralGrey = Color(0xFF999999)
 val NeutralDarkGrey = Color(0xFF887D75)
 val NeutralBlackGrey = Color(0xFF262626)
 val NeutralBlack = Color(0xFF000000)
+val GrayLight= Color(0xFFF8F7FB)
 
 

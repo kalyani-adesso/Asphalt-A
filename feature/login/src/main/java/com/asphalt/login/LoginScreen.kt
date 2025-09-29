@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.GrayLight
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
@@ -143,13 +144,13 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         .fillMaxWidth()
                         .height(Dimensions.padding50)
                         .background(
-                            Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
+                            GrayLight, shape = RoundedCornerShape(Dimensions.padding10)
                         )
                         .then(
                             if (emailState.value.isEmpty()) {
                                 Modifier.border(
                                     width = Dimensions.padding1,
-                                    color = Color(0xFFF8F7FB),
+                                    color = GrayLight,
                                     shape = RoundedCornerShape(Dimensions.padding10)
                                 )
                             } else {
@@ -181,7 +182,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         ),
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(com.asphalt.commonui.R.drawable.ic_email_blue_icon), // Specify the icon (e.g., Email)
+                                painter = painterResource(com.asphalt.commonui.R.drawable.ic_email_blue_icon),
                                 contentDescription = "Email icon", tint = Color.Unspecified
 
                             )
@@ -189,9 +190,9 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         trailingIcon = {
                             if (isValidEmail.value) {
                                 Icon(
-                                    painter = painterResource(com.asphalt.commonui.R.drawable.ic_tick_green), // Specify the icon (e.g., Email)
+                                    painter = painterResource(com.asphalt.commonui.R.drawable.ic_tick_green),
                                     contentDescription = "Email icon", tint = Color.Unspecified
-                                    // Set the icon color
+
                                 )
                             }
 
@@ -203,7 +204,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                 }
                 Text(
                     text = "Password",
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = Dimensions.size20),
                     style = TypographyBold.titleMedium,
                     color = NeutralBlack
                 )
@@ -214,13 +215,13 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         .fillMaxWidth()
                         .height(Dimensions.padding50)
                         .background(
-                            Color(0xFFF8F7FB), shape = RoundedCornerShape(Dimensions.padding10)
+                            GrayLight, shape = RoundedCornerShape(Dimensions.padding10)
                         )
                         .then(
                             if (passwordState.value.isEmpty()) {
                                 Modifier.border(
                                     width = Dimensions.padding1,
-                                    color = Color(0xFFF8F7FB),
+                                    color = GrayLight,
                                     shape = RoundedCornerShape(Dimensions.padding10)
                                 )
                             } else {
@@ -277,7 +278,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                                     modifier = Modifier.clickable {
                                         showPassword = !showPassword
                                     }
-                                    // Set the icon color
+
                                 )
                             }
 
