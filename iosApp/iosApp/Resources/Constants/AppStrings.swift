@@ -73,6 +73,15 @@ public struct AppStrings{
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+   
+    enum SignInSucessView: String {
+        case loginSuccessTitle = "Yey! Login Successfull"
+        case loginSuccessSubtitle = "You will be moved to home screen right now. Enjoy the features!"
+       case exploreButton = "Lets Explore"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
 }
 

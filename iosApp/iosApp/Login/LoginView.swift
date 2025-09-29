@@ -9,6 +9,8 @@ struct SignInView: View {
     @State private var password: String = ""
     @State private var showPassword: Bool = false
     @State private var rememberMe: Bool = false
+    @State private var isValidEmail: Bool = false
+    @State private var isPasswordEntering: Bool = false
     
     var body: some View {
         VStack {
@@ -40,11 +42,16 @@ struct SignInView: View {
                         AppIcon.Login.email
                             .frame(width: 20, height: 20)
                         TextField(AppStrings.SignInPlaceholder.email.rawValue, text: $emailOrPhone)
+                            .onChange(of: emailOrPhone) { value in
+                                isValidEmail = value.isValidEmail
+                            }
                             .font(KlavikaFont.regular.font(size: 16))
                             .autocapitalization(.none)
                             .foregroundStyle(AppColor.richBlack)
-                        AppIcon.Login.validEmail
-                            .frame(width: 20, height: 20)
+                        if isValidEmail {
+                            AppIcon.Login.validEmail
+                                .frame(width: 20, height: 20)
+                        }
                     }
                     .padding()
                     .background(AppColor.backgroundLight)
@@ -57,23 +64,29 @@ struct SignInView: View {
                         .foregroundStyle(AppColor.black)
                     HStack {
                         if showPassword {
-                            AppIcon.Login.passwordEncrypt
+                            AppIcon.Login.password
                                 .frame(width: 20, height: 20)
                             TextField(AppStrings.SignInPlaceholder.password.rawValue, text: $password)
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .autocapitalization(.none)
                                 .foregroundStyle(AppColor.richBlack)
                         } else {
-                            AppIcon.Login.password
+                            (isPasswordEntering ? AppIcon.Login.passwordEncrypt : AppIcon.Login.password)
                                 .frame(width: 20, height: 20)
                             SecureField(AppStrings.SignInPlaceholder.password.rawValue, text: $password)
+                                .onChange(of: password) { value in
+                                    isPasswordEntering = !value.isEmpty
+                                }
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .autocapitalization(.none)
                         }
-                        Button(action: { showPassword.toggle() }) {
-                            Image(systemName: showPassword ? "eye" : "eye.slash")
-                                .foregroundColor(.stoneGray)
-                                .frame(width: 20, height: 20)
+                        
+                        if isPasswordEntering {
+                            Button(action: { showPassword.toggle() }) {
+                                Image(systemName: showPassword ? "eye" : "eye.slash")
+                                    .foregroundColor(.stoneGray)
+                                    .frame(width: 20, height: 20)
+                            }
                         }
                     }
                     .padding()
@@ -103,26 +116,26 @@ struct SignInView: View {
             .padding(.bottom,27)
             
             // Sign In button
-            Button(AppStrings.SignInLabel.signInTitle.rawValue) {
-                // Handler for sign-in
+            NavigationLink(destination: LoginSucessView()) {
+                Text(AppStrings.SignInLabel.signInTitle.rawValue)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.royalBlue,
+                                AppColor.pursianBlue,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(15)
+                    .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
+                    .foregroundStyle(AppColor.white)
+                    .font(KlavikaFont.bold.font(size: 18))
+                    .padding(.bottom, 21)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 60)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        AppColor.royalBlue,
-                        AppColor.pursianBlue,
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .cornerRadius(15)
-            .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
-            .foregroundStyle(AppColor.white)
-            .font(KlavikaFont.bold.font(size: 18))
-            .padding(.bottom, 21)
             
             // Social sign-in options
             VStack(spacing: 16) {
