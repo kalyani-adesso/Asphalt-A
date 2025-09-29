@@ -68,7 +68,7 @@ fun GradientButton(
 
         ) {
             Button(
-                onClick = { onClick },
+                onClick = { onClick.invoke() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .fillMaxSize(),

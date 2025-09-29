@@ -63,6 +63,7 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralLightGray25
 import com.asphalt.commonui.theme.NeutralMidGrey
+import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
@@ -82,6 +83,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
     var emailState = viewModel.emailTextState.collectAsState()
     var isValidEmail = viewModel.isEmailVaild.collectAsState()
     var passwordState = viewModel.passwordTextState.collectAsState()
+    var validateState = viewModel.validateState.collectAsState()
     val scrollState = rememberScrollState()
     Scaffold() { paddingValues ->
         Column(
@@ -202,6 +204,15 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
 
 
                 }
+                if (validateState.value.isShowEmailError) {
+                    Text(
+                        text = validateState.value.emailError,
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
+                }
+
                 Text(
                     text = "Password",
                     modifier = Modifier.padding(top = Dimensions.size20),
@@ -285,6 +296,15 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         })
 
                 }
+                if (validateState.value.isShowPasswordError) {
+                    Text(
+                        text = validateState.value.passwordError,
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(Dimensions.size14))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -315,7 +335,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     PrimaryDarkerLightB75, PrimaryDarkerLightB50, buttonText = "SIGN IN"
                 ) {
 
-
+                    viewModel.callLogin()
                 }
             }
             Spacer(modifier = Modifier.height(Dimensions.spacing20))
