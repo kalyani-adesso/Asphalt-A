@@ -38,6 +38,41 @@ public struct AppStrings{
         public static let rideTitle = "Ride Together\nSafely"
         public static let rideSubtitle = "Create group rides, track locations in real-time, and ensure everyone stays connected."
     }
+    
+    enum SignInLabel: String {
+        case signInTitle = "SIGN IN"
+        case welcome = "Welcome"
+        case welcomeSubtitle = "Let’s login for explore continues"
+        case clubName = "adesso Rider’s Club"
+        case emailOrPhone = "Email or Phone Number"
+        case password = "Password"
+
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+
+    enum SignInPlaceholder: String {
+        case email = "Enter your email"
+        case password = "Enter your password"
+
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+
+    enum SignInToggle: String {
+        case keepMeSignedIn = "Keep me signed in"
+        case rememberMe = "Remember me"
+
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+
+    enum SignInAction: String {
+        case forgotPassword = "Forgot password"
+        case signInButton = "SIGN IN"
+        case signUpPrompt = "Don’t have an account?"
+        case signUpAction = "Sign Up here"
+        case connectWith = "You can connect with"
+
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
 }
 
