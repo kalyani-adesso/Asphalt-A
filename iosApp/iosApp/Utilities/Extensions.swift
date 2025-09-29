@@ -13,4 +13,10 @@ extension String {
         let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
         return emailPred.evaluate(with: self)
     }
+    
+ 
+        var numbersOnly: String {
+            filter { $0.isNumber }
+        
+    }
 }
