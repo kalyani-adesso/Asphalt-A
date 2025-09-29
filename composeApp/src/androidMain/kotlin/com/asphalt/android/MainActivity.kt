@@ -11,9 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.registration.RegistrationCodeScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.asphalt.commonui.theme.AsphaltTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -25,6 +28,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                 }
                 RegistrationCodeScreen()
+            }
+            AsphaltTheme {
+                AsphaltApp()
             }
         }
     }

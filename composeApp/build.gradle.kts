@@ -79,6 +79,8 @@ dependencies {
     // modules
     implementation(projects.shared)
     implementation(projects.feature.registration)
+    implementation(projects.feature.welcome)
+    implementation(projects.commonui)
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen
