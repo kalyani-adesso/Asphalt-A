@@ -80,7 +80,7 @@ fun LoginSuccessScreen() {
                         end = Dimensions.padding30
                     )
                 )
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(Dimensions.padding80))
                 Box(
                     modifier = Modifier
                         .padding(
