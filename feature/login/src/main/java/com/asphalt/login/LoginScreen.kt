@@ -167,7 +167,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                     TextField(
                         value = emailState.value,
                         onValueChange = { viewModel.updateEmailState(it) },
-                        placeholder = { Text("Enter your email", style = Typography.bodySmall) },
+                        placeholder = { Text("Enter your email", style = Typography.bodySmall,color=NeutralDarkGrey) },
                         textStyle = Typography.bodySmall,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -249,7 +249,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel()) {
                         onValueChange = { viewModel.updatePassword(it) },
                         placeholder = {
                             Text(
-                                "Enter your password", style = Typography.bodySmall
+                                "Enter your password", style = Typography.bodySmall,color=NeutralDarkGrey
                             )
                         },
                         modifier = Modifier
