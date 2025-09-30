@@ -14,7 +14,11 @@ struct CreateAccount: View {
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var isPasswordEntering: Bool = false
+    @State private var isConfirmPasswordEntering: Bool = false
     @State private var showPassword: Bool = false
+    @State private var showConfirmPassword: Bool = false
+    @State private var passwordsMatch: Bool = true
+
     
     var body: some View {
         VStack{
@@ -34,7 +38,7 @@ struct CreateAccount: View {
             Text(AppStrings.SignInLabel.clubName.rawValue)
                 .font(KlavikaFont.medium.font(size: 22))
                 .padding(.bottom,42)
-          
+            
             // Form fields
             VStack(spacing: 25) {
                 VStack(alignment: .leading, spacing: 10) {
@@ -89,12 +93,14 @@ struct CreateAccount: View {
                             SecureField(AppStrings.SignUpPlaceholder.password.rawValue, text: $password)
                                 .onChange(of: password) { value in
                                     isPasswordEntering = !value.isEmpty
+                                    validatePasswords()
+                                                           
                                 }
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .autocapitalization(.none)
                         }
                         
-                        if isPasswordEntering {
+                        if isPasswordEntering  {
                             Button(action: { showPassword.toggle() }) {
                                 Image(systemName: showPassword ? "eye" : "eye.slash")
                                     .foregroundColor(.stoneGray)
@@ -112,7 +118,7 @@ struct CreateAccount: View {
                         .font(KlavikaFont.medium.font(size: 16))
                         .foregroundStyle(AppColor.black)
                     HStack {
-                        if showPassword {
+                        if showConfirmPassword {
                             AppIcon.Login.password
                                 .frame(width: 20, height: 20)
                             TextField(AppStrings.SignUpPlaceholder.confirmPassword.rawValue, text: $confirmPassword)
@@ -120,19 +126,20 @@ struct CreateAccount: View {
                                 .autocapitalization(.none)
                                 .foregroundStyle(AppColor.richBlack)
                         } else {
-                            (isPasswordEntering ? AppIcon.Login.passwordEncrypt : AppIcon.Login.password)
+                            (isConfirmPasswordEntering ? AppIcon.Login.passwordEncrypt : AppIcon.Login.password)
                                 .frame(width: 20, height: 20)
                             SecureField(AppStrings.SignUpPlaceholder.confirmPassword.rawValue, text: $confirmPassword)
-                                .onChange(of: password) { value in
-                                    isPasswordEntering = !value.isEmpty
+                                .onChange(of: confirmPassword) { value in
+                                    isConfirmPasswordEntering = !value.isEmpty
+                                    validatePasswords()
                                 }
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .autocapitalization(.none)
                         }
                         
-                        if isPasswordEntering {
-                            Button(action: { showPassword.toggle() }) {
-                                Image(systemName: showPassword ? "eye" : "eye.slash")
+                        if isConfirmPasswordEntering {
+                            Button(action: { showConfirmPassword.toggle() }) {
+                                Image(systemName: showConfirmPassword ? "eye" : "eye.slash")
                                     .foregroundColor(.stoneGray)
                                     .frame(width: 20, height: 20)
                             }
@@ -166,19 +173,26 @@ struct CreateAccount: View {
                 .padding(.bottom, 21)
                 
             }
-                            
-                            
-                            
-                            
-                         
-                            
-                        
+            
+            
+            
+            
+            
+            
+            
             
         }
         .padding()
         .padding(.horizontal, 24)
         
     }
+    private func validatePasswords() {
+           if confirmPassword.isEmpty {
+               passwordsMatch = true
+           } else {
+               passwordsMatch = password == confirmPassword
+           }
+       }
 }
 
 #Preview {

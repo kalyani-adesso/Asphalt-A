@@ -16,7 +16,7 @@ public struct WelcomeTabView: View {
     
     public var body: some View {
         VStack(spacing: 20) {
-
+            
             ZStack {
                 image
                     .resizable()
@@ -38,7 +38,7 @@ public struct WelcomeTabView: View {
                 }
             }
             
-          
+            
             Text(title)
                 .font(.custom("Klavika-Bold", size: 26))
                 .foregroundColor(.white)
@@ -46,7 +46,7 @@ public struct WelcomeTabView: View {
                 .frame(width: 227, height: 62)
                 .fixedSize(horizontal: false, vertical: true)
             
-           
+            
             Text(subtitle)
                 .font(.custom("Klavika-Regular", size: 17))
                 .foregroundColor(.white.opacity(0.9))

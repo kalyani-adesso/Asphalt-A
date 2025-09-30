@@ -1,8 +1,8 @@
 import SwiftUI
 
 public struct WelcomeScreen: View {
-    public init() {}
     
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @State private var currentPage = 0
     private let totalPages = 3
     @State private var showSignin: Bool = false
@@ -34,7 +34,7 @@ public struct WelcomeScreen: View {
                 }
                 VStack {
                     Spacer() .frame(height: 150)
-
+                    
                     TabView(selection: $currentPage) {
                         ForEach(0..<totalPages, id: \.self) { index in
                             VStack(spacing: 16) {
@@ -52,22 +52,23 @@ public struct WelcomeScreen: View {
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                     Button(action: {
+                        hasSeenOnboarding = true 
                         showSignin = true
                     }) {
                         HStack {
                             Text("GET STARTED")
                             Spacer()
                             AppIcon.Welcome.arrow
-              
+                            
                         }
                         .padding(.horizontal, 30)
                         .frame(width: 296, height: 60)
                         .background(
                             LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        AppColor.royalBlue,
-                                        AppColor.pursianBlue,
-                                    ]),
+                                gradient: Gradient(colors: [
+                                    AppColor.royalBlue,
+                                    AppColor.pursianBlue,
+                                ]),
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
@@ -85,7 +86,7 @@ public struct WelcomeScreen: View {
                 }
             }
         }
-      
+        
     }
     private func title(for index: Int) -> String {
         switch index {
