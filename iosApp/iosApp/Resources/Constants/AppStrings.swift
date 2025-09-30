@@ -9,25 +9,6 @@ import Foundation
 
 public struct AppStrings{
     
-   
-    public static let appName = "adesso Rider’s\n Club"
-    
-   
-    
-    public enum loginStrings{
-        public static let loginTitle = "Welcome"
-        public static let loginSubtitle = "Let’s login for explore continues"
-        public static let loginSuccessfulTitle = "Yey! Login Successfull"
-        public static let loginSuccessfulSubtitle = "You will be moved to home screen right now. Enjoy the features!"
-    }
-    
-    public enum signUpStrings{
-        public static let signUpTitle = "Create your account"
-        public static let signUpSubtitle = "Create your account to get started"
-    }
-    
-
-
     public enum WelcomeStrings {
         public static let welcomeTitle = "Welcome to the Joy\nof Riding"
         public static let welcomeSubtitle = "Connect with fellow motorcycle enthusiasts and discover amazing rides in your area."
@@ -38,6 +19,52 @@ public struct AppStrings{
         public static let rideTitle = "Ride Together\nSafely"
         public static let rideSubtitle = "Create group rides, track locations in real-time, and ensure everyone stays connected."
     }
+    
+    enum SignUpLabel: String {
+ 
+        case continueButton = "CONTINUE"
+        case welcome = "Create Your Account"
+        case welcomeSubtitle = "Create your account to get started"
+        case clubName = "adesso Rider’s Club"
+        case emailOrPhone = "Email or Phone Number"
+        case password = "Password"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    enum VerificationLabel: String {
+        case verifyButton = "VERIFY ACCOUNT"
+        case confirmation = "Confirm Your Email"
+        case confirmationText = "We’ve sent 5 digits verification code to %@"
+        case verifyTitle = "Enter Verification Code"
+        case verificationCode = "Code"
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    
+    enum CreateAccountLabel: String {
+        case createTitle = "CREATE ACCOUNT"
+        case firstName = "First Name"
+        case lastName = "Last Name"
+        case password = "Password"
+        case confirmPassword = "Confirm Password"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum SignUpPlaceholder: String {
+ 
+        case email = "Enter your email"
+        case otp = "Enter your OTP"
+        case firstName = "First Name"
+        case lastName = "Last Name"
+        case password = "Enter your password"
+        case confirmPassword = "Confirm Password"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    
+ 
     
     enum SignInLabel: String {
         case signInTitle = "SIGN IN"
@@ -82,6 +109,7 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+
 
 }
 

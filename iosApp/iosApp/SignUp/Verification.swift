@@ -14,7 +14,7 @@ struct Verification: View {
     @State private var timeRemaining = 180
     @State private var timer: Timer? = nil
     @State private var canResend = false
-
+    
     func startTimer() {
         timer?.invalidate() // stop previous timer if any
         timeRemaining = 180
@@ -29,17 +29,17 @@ struct Verification: View {
         }
     }
     private func resendOTP() {
-           print("🔁 Resend OTP tapped")
-           // Call your API to resend the OTP here
-           startTimer()  // restart the timer after resend
-       }
+        print("🔁 Resend OTP tapped")
+        // Call your API to resend the OTP here
+        startTimer()  // restart the timer after resend
+    }
     
     var formattedTime: String {
         let minutes = timeRemaining / 60
         let seconds = timeRemaining % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
-
+    
     
     var body: some View {
         VStack {
@@ -51,7 +51,7 @@ struct Verification: View {
                 .font(KlavikaFont.bold.font(size: 24))
                 .padding(.bottom,11)
                 .foregroundStyle(AppColor.black)
-        
+            
             formattedConfirmationText
                 .font(KlavikaFont.medium.font(size: 16))
                 .multilineTextAlignment(.center)
@@ -70,9 +70,9 @@ struct Verification: View {
                             .frame(width: 20, height: 20)
                         TextField(AppStrings.SignUpPlaceholder.otp.rawValue, text: $otp)
                             .keyboardType(.numberPad)
-                                .onChange(of: otp) { newValue in
-                                    otp = newValue.numbersOnly
-                                }
+                            .onChange(of: otp) { newValue in
+                                otp = newValue.numbersOnly
+                            }
                             .font(KlavikaFont.regular.font(size: 16))
                             .autocapitalization(.none)
                             .foregroundStyle(AppColor.richBlack)
@@ -86,7 +86,7 @@ struct Verification: View {
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .foregroundStyle(AppColor.stoneGray)
                         }
-                       
+                        
                     }
                     .padding()
                     .background(AppColor.backgroundLight)
@@ -140,7 +140,7 @@ struct Verification: View {
         + Text(suffix)
             .foregroundColor(AppColor.stoneGray)
     }
-
+    
 }
 
 
