@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,7 +30,8 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 
 @Composable
-fun RegistrationCodeScreen(modifier: Modifier = Modifier) {
+fun RegistrationDetailsScreen(modifier: Modifier = Modifier) {
+
 
     Scaffold(modifier = modifier
         .fillMaxSize()
@@ -40,13 +40,13 @@ fun RegistrationCodeScreen(modifier: Modifier = Modifier) {
         Column(
             modifier = modifier.padding(paddingValues),
         ) {
-            RegistrationHeader()
+            RegistrationDetailsHeader()
         }
     }
 }
 
 @Composable
-private fun RegistrationHeader() {
+private fun RegistrationDetailsHeader() {
 
     Column(
         modifier = Modifier
@@ -60,7 +60,6 @@ private fun RegistrationHeader() {
             text = "Create Your Account",
             style = TypographyMedium.labelLarge
         )
-
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding24),
             text = "Create your account to get started",
@@ -71,29 +70,55 @@ private fun RegistrationHeader() {
             contentDescription = "App Logo"
         )
         Text(
-            modifier = Modifier.padding(vertical = Dimensions.padding32),
+            modifier = Modifier.padding(vertical = Dimensions.spacing20),
             text = "adesso Rider's Club",
             style = TypographyMedium.labelLarge
         )
-
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_email),
-            contentDescription = "App Logo"
-        )
-
-        Registration("")
+        RegistrationFeilds()
     }
 }
 
+
 @Composable
-fun Registration( emailPhone: String) {
+fun RegistrationFeilds(modifier: Modifier = Modifier) {
+
+    Column(
+        modifier= Modifier.fillMaxSize()
+            .padding(Dimensions.padding)
+    ) {
+        Text(
+            modifier = Modifier.padding(bottom = Dimensions.padding8),
+            text = "First Name",
+            style = TypographyMedium.titleSmall
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            placeholder = { Text(text = "Enter email or phone number") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = Dimensions.padding32),
+            leadingIcon = {
+                Icon(painter = painterResource(
+                    id = R.drawable.shape),
+                    contentDescription = "Email Icon",
+                    tint = Color.Blue,
+                )
+            }
+        )
+
+        RegistrationFooter("")
+
+    }
+    
+}
+@Composable
+fun RegistrationFooter( emailPhone: String) {
 
     var emailOrPhone by remember { mutableStateOf(value = emailPhone) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimensions.padding)
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding),
@@ -135,9 +160,11 @@ fun Registration( emailPhone: String) {
 
 @Preview
 @Composable
-fun RegistrationScreenPreview() {
+fun RegistrationDetailsScreenPreview() {
 
     MaterialTheme {
-        RegistrationCodeScreen()
+        RegistrationDetailsScreen()
     }
+
 }
+

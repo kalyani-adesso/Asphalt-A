@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,7 +30,7 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 
 @Composable
-fun RegistrationCodeScreen(modifier: Modifier = Modifier) {
+fun RegistrationPasswordScreen(modifier: Modifier = Modifier) {
 
     Scaffold(modifier = modifier
         .fillMaxSize()
@@ -40,71 +39,64 @@ fun RegistrationCodeScreen(modifier: Modifier = Modifier) {
         Column(
             modifier = modifier.padding(paddingValues),
         ) {
-            RegistrationHeader()
+            PasswordHeader()
         }
     }
 }
 
 @Composable
-private fun RegistrationHeader() {
+private fun PasswordHeader() {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Dimensions.padding, vertical = Dimensions.padding50),
+            .padding(horizontal = Dimensions.padding,
+                vertical = Dimensions.padding50),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+
+        Image(painter = painterResource(
+            id = com.asphalt.commonui.R.drawable.ic_password),
+            contentDescription = "App Logo"
+        )
+
         Text(
             modifier = Modifier.padding(vertical = Dimensions.padding),
-            text = "Create Your Account",
+            text = "Confirm Your Email",
             style = TypographyMedium.labelLarge
         )
 
         Text(
-            modifier = Modifier.padding(bottom = Dimensions.padding24),
-            text = "Create your account to get started",
+            modifier = Modifier.padding(bottom = Dimensions.padding),
+            text = "We’ve sent 5 digits verification code to hello@abc.com",
             style = Typography.titleSmall
         )
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_app_icon),
-            contentDescription = "App Logo"
-        )
-        Text(
-            modifier = Modifier.padding(vertical = Dimensions.padding32),
-            text = "adesso Rider's Club",
-            style = TypographyMedium.labelLarge
-        )
 
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_email),
-            contentDescription = "App Logo"
-        )
-
-        Registration("")
+        Password("")
     }
 }
 
 @Composable
-fun Registration( emailPhone: String) {
+fun Password( password: String) {
 
-    var emailOrPhone by remember { mutableStateOf(value = emailPhone) }
+    var password by remember { mutableStateOf(value = password) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(Dimensions.padding)
+            .padding(all = Dimensions.padding)
     ) {
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding),
-            text = "Email or Phone Number",
+            text = "Enter Verification Code",
             style = TypographyMedium.titleSmall
         )
 
         OutlinedTextField(
             value = "",
             onValueChange = {},
-            placeholder = { Text(text = "Enter email or phone number") },
+            placeholder = { Text(text = "Enter verification code") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding32),
@@ -128,16 +120,17 @@ fun Registration( emailPhone: String) {
             startColor = PrimaryBrighterLightW75,
             endColor = PrimaryDarkerLightB50,
             onClick = {},
-            buttonText = "CONTINUE"
+            buttonText = "Verify Account"
         )
     }
 }
 
 @Preview
 @Composable
-fun RegistrationScreenPreview() {
+fun RegistrationPasswordScreenPreview() {
 
     MaterialTheme {
-        RegistrationCodeScreen()
+        RegistrationPasswordScreen()
     }
+
 }
