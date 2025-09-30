@@ -15,7 +15,6 @@ class AsphaltApplication : Application() {
             androidContext(androidContext = this@AsphaltApplication)
             //First start Koin with all modules including shared components
             modules(
-
             )
         }
     }
