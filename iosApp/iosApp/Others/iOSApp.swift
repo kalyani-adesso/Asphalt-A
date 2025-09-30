@@ -2,9 +2,17 @@ import SwiftUI
 
 @main
 struct iOSApp: App {
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if hasSeenOnboarding {
+                NavigationStack {
+                    SignInView()
+                }
+            } else {
+                WelcomeScreen()
+            }
         }
+        
     }
 }
