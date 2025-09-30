@@ -7,10 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.AsphaltTheme
-import com.asphalt.login.LoginScreen
-import com.asphalt.login.LoginSuccessScreen
+import com.asphalt.login.ui.LoginScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.asphalt.commonui.theme.AsphaltTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
