@@ -1,5 +1,6 @@
 package com.asphalt.welcome.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.asphalt.commonui.R
@@ -31,7 +35,11 @@ import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.sealedclasses.Carousels
 
 @Composable
-fun GetStartedScreen() {
+fun GetStartedScreen(
+    onNavigateToRegister: () -> Unit = {}
+) {
+    //val context = LocalContext.current
+
     val carouselItems = listOf(
         Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
         Carousels.RideTogetherCarousel.carouselItem
@@ -84,9 +92,8 @@ fun GetStartedScreen() {
                         GradientButton(
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
-                            {
-                                //TODO: Handle button click for get started
-                            },
+                            onClick = onNavigateToRegister,
+                               // Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()
                             buttonText = stringResource(R.string.get_started).uppercase(),
                             showArrow = true
                         )
@@ -95,6 +102,7 @@ fun GetStartedScreen() {
                 Spacer(Modifier.weight(1f))
 
             }
+
         }
     }
 }

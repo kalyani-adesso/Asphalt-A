@@ -49,7 +49,7 @@ fun GradientButton(
 
     ) {
         Button(
-            onClick = { onClick },
+            onClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
                 .height(buttonHeight)

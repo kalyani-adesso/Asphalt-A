@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -13,15 +15,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
@@ -31,7 +30,6 @@ import com.asphalt.commonui.ui.GradientButton
 
 @Composable
 fun RegistrationDetailsScreen(modifier: Modifier = Modifier) {
-
 
     Scaffold(modifier = modifier
         .fillMaxSize()
@@ -51,14 +49,14 @@ private fun RegistrationDetailsHeader() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Dimensions.padding, vertical = Dimensions.padding50),
+            .padding(horizontal = Dimensions.padding, vertical = Dimensions.padding32),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             modifier = Modifier.padding(vertical = Dimensions.padding),
             text = "Create Your Account",
-            style = TypographyMedium.labelLarge
+            style = TypographyMedium.bodyLarge
         )
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding24),
@@ -72,7 +70,7 @@ private fun RegistrationDetailsHeader() {
         Text(
             modifier = Modifier.padding(vertical = Dimensions.spacing20),
             text = "adesso Rider's Club",
-            style = TypographyMedium.labelLarge
+            style = TypographyMedium.bodyMedium
         )
         RegistrationFeilds()
     }
@@ -94,10 +92,10 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = "",
             onValueChange = {},
-            placeholder = { Text(text = "Enter email or phone number") },
+            placeholder = { Text(text = "First Name") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = Dimensions.padding32),
+                .padding(bottom = Dimensions.padding),
             leadingIcon = {
                 Icon(painter = painterResource(
                     id = R.drawable.shape),
@@ -107,55 +105,79 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
             }
         )
 
-        RegistrationFooter("")
-
-    }
-    
-}
-@Composable
-fun RegistrationFooter( emailPhone: String) {
-
-    var emailOrPhone by remember { mutableStateOf(value = emailPhone) }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
         Text(
-            modifier = Modifier.padding(bottom = Dimensions.padding),
-            text = "Email or Phone Number",
+            modifier = Modifier.padding(bottom = Dimensions.padding8),
+            text = "Last Name",
             style = TypographyMedium.titleSmall
         )
-
         OutlinedTextField(
             value = "",
             onValueChange = {},
-            placeholder = { Text(text = "Enter email or phone number") },
+            placeholder = { Text(text = "Last Name") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = Dimensions.padding32),
+                .padding(bottom = Dimensions.padding),
             leadingIcon = {
                 Icon(painter = painterResource(
                     id = R.drawable.shape),
                     contentDescription = "Email Icon",
                     tint = Color.Blue,
                 )
-            },
-            trailingIcon = {
+            }
+        )
+
+        Text(
+            modifier = Modifier.padding(bottom = Dimensions.padding8),
+            text = "Password",
+            style = TypographyMedium.titleSmall
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            placeholder = { Text(text = "Password") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = Dimensions.padding),
+            leadingIcon = {
                 Icon(painter = painterResource(
-                    id = R.drawable.ic_correct),
+                    id = R.drawable.shape),
                     contentDescription = "Email Icon",
-                    tint = Color.Green,
+                    tint = Color.Blue,
                 )
             }
         )
 
+        Text(
+            modifier = Modifier.padding(bottom = Dimensions.padding8),
+            text = "Confirm Password",
+            style = TypographyMedium.titleSmall
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            placeholder = { Text(text = "Confirm Password") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = Dimensions.padding),
+            leadingIcon = {
+                Icon(painter = painterResource(
+                    id = R.drawable.shape),
+                    contentDescription = "Email Icon",
+                    tint = Color.Blue,
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(30.dp))
         GradientButton(
             startColor = PrimaryBrighterLightW75,
             endColor = PrimaryDarkerLightB50,
             onClick = {},
-            buttonText = "CONTINUE"
+            buttonText = "CREATE ACCOUNT"
         )
+
+
     }
+
 }
 
 @Preview
