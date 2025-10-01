@@ -43,7 +43,7 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
         ) {
             Text(
                 data,
-                fontSize = Dimensions.textSize18,
+                fontSize = Dimensions.textSize17,
                 color = NeutralWhite,
                 lineHeight = Dimensions.lineSpacing5,
                 style = TypographyBlack.headlineLarge
@@ -51,7 +51,7 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
             Spacer(Modifier.height(Dimensions.spacing5))
             Text(
                 description,
-                fontSize = Dimensions.textSize14,
+                fontSize = Dimensions.textSize12pt5,
                 color = NeutralWhite,
                 lineHeight = Dimensions.lineSpacing5,
                 style = Typography.headlineLarge

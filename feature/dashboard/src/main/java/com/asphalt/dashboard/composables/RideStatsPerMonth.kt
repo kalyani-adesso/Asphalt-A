@@ -3,19 +3,15 @@ package com.asphalt.dashboard.composables
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,9 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralGrey30
@@ -37,6 +31,7 @@ import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.utils.Constants
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.PerMonthRideStatistics
@@ -55,7 +50,7 @@ fun RideStatsPerMonth(
         RideStat(RideStatType.TotalKms, perMonthStatistics.totalKms),
     )
     RoundedBox(
-        borderStroke = Dimensions.spacing1,
+        borderStroke = Constants.DEFAULT_BORDER_STROKE,
         borderColor = NeutralGrey30,
         backgroundColor = NeutralLightPaper
     ) {
@@ -115,14 +110,14 @@ fun RideMonthYear(calendarState: MutableState<Calendar>) {
             text = DateFormatSymbols().shortMonths[calendar.get(Calendar.MONTH)],
             style = TypographyBlack.bodyLarge,
             fontWeight = FontWeight.Medium,
-            fontSize = 18.sp
+            fontSize = Dimensions.textSize18
         )
         Spacer(modifier = Modifier.height(Dimensions.spacing5))
 
         Text(
             text = (calendar.get(Calendar.YEAR) % 100).toString(),
             style = TypographyBold.headlineLarge,
-            fontSize = 30.sp
+            fontSize = Dimensions.textSize30,
         )
 
         val arrowIcon: Int =
@@ -148,18 +143,8 @@ fun RideMonthYear(calendarState: MutableState<Calendar>) {
 @Composable
 fun RideStatsPreview() {
     val calendarState = remember { mutableStateOf(Calendar.getInstance()) }
-    Scaffold { paddingValues ->
-        Box(
-            modifier = Modifier.padding(
-                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                end = paddingValues.calculateEndPadding(
-                    LayoutDirection.Ltr
-                ),
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding()
-            )
-        ) {
-            RideStatsPerMonth(calendarState, PerMonthRideStatistics(15, 25, 3000))
-        }
-    }
+
+    RideStatsPerMonth(calendarState, PerMonthRideStatistics(15, 25, 3000))
+
+
 }

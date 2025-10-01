@@ -10,4 +10,6 @@
     <string name="total_rides">Total Rides</string>
     <string name="total_kms">Total Kms</string>
     <string name="locations">Locations</string>
+    <string name="create_ride">Create a Ride</string>
+    <string name="join_ride">Join a Ride</string>
 </resources>

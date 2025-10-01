@@ -40,6 +40,7 @@ object Dimensions {
 
     val spacing54 = 54.dp
     val spacing15pt7 = 15.7.dp
+    val spacing15pt25 = 15.25.dp
     val spacing5 = 5.dp
 
     val size = 24.dp
@@ -61,7 +62,11 @@ object Dimensions {
     val textSize18 = 18.sp
     val textSize17 = 17.sp
     val textSize26 = 26.sp
+    val textSize30 = 30.sp
     val textSize14 = 14.sp
+    val textSize12 = 12.sp
+    val textSize12pt5 = 12.5.sp
+    val textSize13 = 13.sp
     val lineSpacing20 = 20.sp
     val lineSpacing30 = 30.sp
     val lineSpacing5 = 5.sp
