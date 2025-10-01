@@ -80,8 +80,8 @@ dependencies {
     implementation(projects.shared)
     implementation(projects.feature.registration)
     implementation(projects.feature.welcome)
-    implementation(projects.commonui)
     implementation(projects.feature.dashboard)
+    implementation(projects.commonui)
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen

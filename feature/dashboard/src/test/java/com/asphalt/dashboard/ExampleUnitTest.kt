@@ -1,4 +1,4 @@
-package com.example.dashboard
+package com.asphalt.dashboard
 
 import org.junit.Test
 
