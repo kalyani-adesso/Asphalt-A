@@ -25,6 +25,7 @@ navigation3Runtime = "1.0.0-alpha10"
 lifecycleRuntimeKtx = "2.9.4"
 kotlinxSerializationJson = "1.9.0"
 cocoaPods = "2.2.20"
+material = "1.13.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -63,6 +64,7 @@ koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-view
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koinCore" }
 koin-test-junit5 = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinCore" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 
 [plugins]
