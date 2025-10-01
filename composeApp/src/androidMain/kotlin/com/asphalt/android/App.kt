@@ -65,6 +65,6 @@ fun AsphaltApp() {
     if (showSplash) {
         SplashScreen()
     } else {
-        DonutPreview()
+        GetStartedScreen()
     }
 }
