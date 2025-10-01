@@ -25,14 +25,15 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.utils.Constants
 
 @Composable
 fun GradientButton(
     startColor: Color,
     endColor: Color,
     onClick: () -> Unit,
-    buttonHeight: Dp = Dimensions.size60,
-    buttonRadius: Dp = Dimensions.radius15,
+    buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
+    buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
     buttonText: String,
     showArrow: Boolean = false
 ) {
