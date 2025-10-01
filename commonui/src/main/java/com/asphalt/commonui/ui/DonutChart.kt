@@ -86,5 +86,5 @@ fun DonutChart(values: List<Float>) {
 @Preview
 @Composable
 fun DonutPreview() {
-    DonutChart(listOf(26f, 26f, 26f, 12f, 8f))
+    DonutChart(listOf(1f,1f,1f,1f,2f))
 }

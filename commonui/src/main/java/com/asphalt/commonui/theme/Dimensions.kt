@@ -48,6 +48,7 @@ object Dimensions {
     val size296 = 296.dp
     val size307 = 307.dp
     val size185 = 185.dp
+    val size150 = 150.dp
     val radius40 = 40.dp
     val radius15 = 15.dp
     val size60 = 60.dp
