@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
@@ -82,7 +85,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 .verticalScroll(scrollState)
                 .background(Color.White)
         ) {
-            Spacer(modifier = Modifier.height(Dimensions.spacing75))
+            Spacer(modifier = Modifier.height(Dimensions.spacing80))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -117,7 +120,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = Dimensions.padding30, end = Dimensions.padding30),
+                    .padding(start = Dimensions.padding, end = Dimensions.padding),
             ) {
                 Text(
                     text = stringResource(string.email_phone),
@@ -177,7 +180,8 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_email_blue_icon),
-                                contentDescription = "Email icon", tint = Color.Unspecified
+                                contentDescription = "Email icon",
+                                tint = Color.Unspecified
 
                             )
                         },
@@ -185,7 +189,8 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                             if (isValidEmail.value) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_tick_green),
-                                    contentDescription = "Email icon", tint = Color.Unspecified
+                                    contentDescription = "Email icon",
+                                    tint = Color.Unspecified
 
                                 )
                             }
@@ -244,6 +249,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                                 text = stringResource(string.enter_password),
                                 style = Typography.bodySmall,
                                 color = NeutralDarkGrey
+
                             )
                         },
                         modifier = Modifier
@@ -299,26 +305,35 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(Dimensions.size14))
+                Spacer(modifier = Modifier.height(Dimensions.spacing18))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                     ) {
-                        Checkbox(
-                            modifier = Modifier,
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = PrimaryDarkerLightB75,
-                                uncheckedColor = NeutralMidGrey,
-                                checkmarkColor = Color.White
-                            ),
-                            checked = checked, onCheckedChange = { checked = it })
+                        Box(
+                            modifier = Modifier.size(20.dp) // smaller than 48.dp to reduce visual padding
+
+                        ) {
+
+                            Checkbox(
+                                modifier = Modifier.padding(start = 0.dp, end = 0.dp),
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = PrimaryDarkerLightB75,
+                                    uncheckedColor = NeutralMidGrey,
+                                    checkmarkColor = Color.White
+                                ),
+                                checked = checked,
+                                onCheckedChange = { checked = it })
+                        }
+                        Spacer(modifier = Modifier.width(Dimensions.padding8))
                         Text(
                             text = stringResource(string.keep_signed_in),
-                            style = Typography.bodySmall
+                            style = Typography.bodySmall,
+                            color = NeutralDarkGrey
                         )
                     }
                     Text(
@@ -327,7 +342,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                         color = PrimaryDarkerLightB75
                     )
                 }
-                Spacer(modifier = Modifier.height(Dimensions.spacing16))
+                Spacer(modifier = Modifier.height(Dimensions.spacing27))
                 GradientButton(
                     PrimaryDarkerLightB75,
                     PrimaryDarkerLightB50,
@@ -359,7 +374,9 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = Dimensions.padding8),
-                        maxLines = 1, style = Typography.labelSmall, color = NeutralDarkGrey
+                        maxLines = 1,
+                        style = Typography.labelSmall,
+                        color = NeutralDarkGrey
                     )
                     Divider(
                         color = NeutralMidGrey,
@@ -370,28 +387,23 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing16))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_facebook),
-                        contentDescription = ""
+                        painter = painterResource(R.drawable.ic_facebook), contentDescription = ""
                     )
                     Spacer(modifier = Modifier.width(Dimensions.spacing10))
                     Image(
-                        painter = painterResource(R.drawable.ic_google),
-                        contentDescription = ""
+                        painter = painterResource(R.drawable.ic_google), contentDescription = ""
                     )
                     Spacer(modifier = Modifier.width(Dimensions.spacing10))
                     Image(
-                        painter = painterResource(R.drawable.ic_apple),
-                        contentDescription = ""
+                        painter = painterResource(R.drawable.ic_apple), contentDescription = ""
                     )
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing30))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = stringResource(string.dont_have_account),
@@ -412,7 +424,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
 @Preview
 @Composable
 fun LoginPreview() {
-    var viewModel:LoginScreenViewModel= viewModel()
+    var viewModel: LoginScreenViewModel = viewModel()
     LoginScreen(viewModel)
 }
 
