@@ -30,11 +30,11 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceEvenly
+            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceAround
     ) {
         GradientButton(endColor = PrimaryDeepBlue, onClick = { onCreateRideClick() }) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(painter = painterResource(R.drawable.ic_path), null)
                 Spacer(Modifier.width(Dimensions.spacing10))

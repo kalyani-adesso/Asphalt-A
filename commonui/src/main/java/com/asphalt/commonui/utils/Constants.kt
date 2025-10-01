@@ -13,4 +13,5 @@ object Constants {
     val DEFAULT_BUTTON_HEIGHT = Dimensions.size60
     const val SPLASH_TIMER: Long = 2000
     val DEFAULT_BORDER_STROKE = Dimensions.spacing1
+    val DEFAULT_SCREEN_HORIZONTAL_PADDING = Dimensions.spacing15
 }

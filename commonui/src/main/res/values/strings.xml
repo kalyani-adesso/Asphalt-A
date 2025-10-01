@@ -12,4 +12,6 @@
     <string name="locations">Locations</string>
     <string name="create_ride">Create a Ride</string>
     <string name="join_ride">Join a Ride</string>
+    <string name="upcoming_ride">Upcoming Ride</string>
+    <string name="view_all">View All</string>
 </resources>

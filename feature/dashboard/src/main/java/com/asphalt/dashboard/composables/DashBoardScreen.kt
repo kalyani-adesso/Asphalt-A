@@ -11,8 +11,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.utils.Constants
 
 @Composable
 fun DashBoardScreen() {
@@ -24,14 +24,16 @@ fun DashBoardScreen() {
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding(),
-                    start = 15.dp,
-                    end = 15.dp
+                    start = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING,
+                    end = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING
                 )
                 .verticalScroll(rememberScrollState())
         ) {
             CreateOrJoinRide({}, {})
             Spacer(Modifier.height(Dimensions.spacing20))
             RideStatsPreview()
+            Spacer(Modifier.height(Dimensions.spacing20))
+            UpcomingRide()
         }
 
     }

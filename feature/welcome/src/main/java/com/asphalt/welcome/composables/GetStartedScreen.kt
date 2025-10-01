@@ -90,7 +90,7 @@ fun GetStartedScreen() {
                         GradientButton(
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
-                            {
+                            onClick = {
                                 //TODO: Handle button click for get started
                             },
 

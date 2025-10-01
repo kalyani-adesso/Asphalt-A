@@ -3,7 +3,6 @@ package com.asphalt.commonui.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,12 +19,13 @@ import com.asphalt.commonui.utils.Constants
 
 @Composable
 fun GradientButton(
+    modifier: Modifier = Modifier,
     startColor: Color = PrimaryDarkerLightB75,
     endColor: Color = PrimaryDarkerLightB50,
     onClick: () -> Unit,
     buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
     buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     val gradient = Brush.horizontalGradient(
         listOf(
@@ -34,13 +34,13 @@ fun GradientButton(
         )
     )
     Box(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentSize()
             .background(gradient, RoundedCornerShape(buttonRadius))
 
     ) {
         Button(
-            onClick = onClick ,
+            onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
                 .height(buttonHeight),

@@ -15,6 +15,7 @@ import com.asphalt.commonui.utils.Constants
 
 @Composable
 fun BorderedButton(
+    modifier: Modifier = Modifier,
     borderColor: Color = PrimaryDarkerLightB75,
     onClick: () -> Unit,
     buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
@@ -25,7 +26,7 @@ fun BorderedButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        modifier = Modifier
+        modifier = modifier
             .height(buttonHeight)
             .border(
                 width = borderStroke,
