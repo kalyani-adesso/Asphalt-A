@@ -17,7 +17,7 @@ struct SignUpView: View {
                 subtitle: AppStrings.SignUpLabel.welcomeSubtitle.rawValue
             )
 
-            Image("createAccountBg")
+            AppImage.SignUp.createAccountBg
                 .frame(width: 240, height: 240)
                 .padding(.bottom, 30)
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateAccount: View {
-
+    
     @State private var firstName: String = ""
     @State private var lastName: String = ""
     @State private var password: String = ""
@@ -17,7 +17,8 @@ struct CreateAccount: View {
     @State private var isConfirmPasswordEntering: Bool = false
     @State private var showPassword: Bool = false
     @State private var showConfirmPassword: Bool = false
-
+    @State private var errorMessage: String = ""
+    
     var body: some View {
         VStack {
             // Header
@@ -25,7 +26,7 @@ struct CreateAccount: View {
                 title: AppStrings.SignUpLabel.welcome.rawValue,
                 subtitle: AppStrings.SignUpLabel.welcomeSubtitle.rawValue
             )
-
+            
             // Form fields
             VStack(spacing: 25) {
                 EmailFormFieldView(
@@ -42,13 +43,16 @@ struct CreateAccount: View {
                     emailOrPhone: $lastName,
                     isValidEmail: .constant(false)
                 )
-
+                
                 PasswordFormField(
                     label: AppStrings.CreateAccountLabel.password.rawValue,
                     icon: AppIcon.Login.password,
                     placeholder: AppStrings.SignUpPlaceholder.password.rawValue,
                     password: $password
                 )
+                .onChange(of: password) { _ in
+                    validatePasswords()
+                }
                 PasswordFormField(
                     label: AppStrings.CreateAccountLabel.confirmPassword
                         .rawValue,
@@ -57,7 +61,16 @@ struct CreateAccount: View {
                         .rawValue,
                     password: $confirmPassword
                 )
-
+                .onChange(of: confirmPassword) { _ in
+                    validatePasswords()
+                }
+                if !errorMessage.isEmpty {
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .padding(.top, -8)
+                }
+                
                 // Continue button (navigates to Verification)
                 ButtonView(
                     title: AppStrings.SignUpLabel.continueButton.rawValue
@@ -68,6 +81,13 @@ struct CreateAccount: View {
         }
         .padding()
         .padding(.horizontal, 24)
+    }
+    private func validatePasswords() {
+        if !confirmPassword.isEmpty && password != confirmPassword {
+            errorMessage = "Passwords do not match"
+        } else {
+            errorMessage = ""
+        }
     }
 }
 
