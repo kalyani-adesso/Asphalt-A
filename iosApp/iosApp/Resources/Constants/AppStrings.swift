@@ -40,7 +40,6 @@ public struct AppStrings{
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
     
-    
     enum CreateAccountLabel: String {
         case createTitle = "CREATE ACCOUNT"
         case firstName = "First Name"
@@ -62,10 +61,7 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
-    
- 
-    
+
     enum SignInLabel: String {
         case signInTitle = "SIGN IN"
         case welcome = "Welcome"
@@ -100,8 +96,7 @@ public struct AppStrings{
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
-   
+
     enum SignInSucessView: String {
         case loginSuccessTitle = "Yey! Login Successfull"
         case loginSuccessSubtitle = "You will be moved to home screen right now. Enjoy the features!"
@@ -109,7 +104,6 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-
 
 }
 

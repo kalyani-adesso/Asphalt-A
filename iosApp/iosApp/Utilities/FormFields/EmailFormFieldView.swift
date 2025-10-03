@@ -12,7 +12,7 @@ struct EmailFormFieldView: View {
     let icon : Image
     let placeholder: String
     @Binding var emailOrPhone: String
-     @Binding var isValidEmail: Bool
+    @Binding var isValidEmail: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

@@ -52,7 +52,7 @@ public struct WelcomeScreen: View {
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                     Button(action: {
-                        hasSeenOnboarding = true 
+                        hasSeenOnboarding = true
                         showSignin = true
                     }) {
                         HStack {

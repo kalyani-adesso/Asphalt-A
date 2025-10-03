@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CE9EBE652E86A8CC00CEC3E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */; };
+		CEC51B212E8BED24008519C2 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CEC51B202E8BED24008519C2 /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEC51B212E8BED24008519C2 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +101,7 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				CEC51B202E8BED24008519C2 /* FirebaseAuth */,
 			);
 			productName = iosApp;
 			productReference = A6B0AEC11295E356AF3912F7 /* AsphaltA.app */;
@@ -129,6 +132,7 @@
 			mainGroup = 79C58F19043067806ED0F2DE;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				CEC51B1F2E8BECE5008519C2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0657DC9FC4DDAC98975E3C11 /* Products */;
@@ -391,6 +395,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CEC51B1F2E8BECE5008519C2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CEC51B202E8BED24008519C2 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEC51B1F2E8BECE5008519C2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2B673DBDE9E5B856F5716F00 /* Project object */;
 }
