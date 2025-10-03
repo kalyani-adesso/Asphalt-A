@@ -36,7 +36,9 @@ fun DonutChart(values: List<Float>) {
         val strokeWidth = Constants.DONUT_STROKE_WIDTH
         val outerRadius = size.minDimension / 2 - strokeWidth / 2 - Constants.DONUT_RADIUS_OFFSET
         val innerRadius = outerRadius - strokeWidth
-        val gap = Constants.DONUT_SEGMENT_GAP
+        val gapOffset = Constants.DONUT_SEGMENT_GAP_OFFSET
+        val gap = (strokeWidth / (2 * Math.PI * outerRadius) * 360f).toFloat() + gapOffset
+
         val sweepOffset = Constants.DONUT_SWEEP_OFFSET
 
         values.forEachIndexed { index, value ->
@@ -86,5 +88,5 @@ fun DonutChart(values: List<Float>) {
 @Preview
 @Composable
 fun DonutPreview() {
-    DonutChart(listOf(1f,1f,1f,1f,2f))
+    DonutChart(listOf(1f,1f,2f,2f,2f))
 }
