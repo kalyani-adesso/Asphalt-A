@@ -1,4 +1,4 @@
-package com.asphalt.dashboard.composables
+package com.asphalt.dashboard.composables.screens.sections
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,7 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.dashboard.composables.components.RideInvites
 
 @Composable
 fun UpcomingRide() {
@@ -40,7 +41,3 @@ fun UpcomingRide() {
     }
 }
 
-@Composable
-fun RideInvites() {
-
-}

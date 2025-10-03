@@ -1,4 +1,4 @@
-package com.asphalt.dashboard.composables
+package com.asphalt.dashboard.composables.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.utils.Constants
+import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
+import com.asphalt.dashboard.composables.screens.sections.RideStatsPreview
+import com.asphalt.dashboard.composables.screens.sections.UpcomingRide
 
 @Composable
 fun DashBoardScreen() {

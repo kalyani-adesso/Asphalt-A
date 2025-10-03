@@ -21,9 +21,7 @@ import androidx.compose.ui.Modifier
 import asphalta.composeapp.generated.resources.Res
 import asphalta.composeapp.generated.resources.compose_multiplatform
 import com.asphalt.commonui.utils.Constants
-import com.asphalt.dashboard.composables.DashBoardScreen
-import com.asphalt.dashboard.composables.RidePreview
-import com.asphalt.welcome.composables.GetStartedScreen
+import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
