@@ -2,7 +2,6 @@
 // https://docs.swift.org/swift-book
 import SwiftUI
 
-
 struct HomeScreen : View {
         var body: some View {
         Text("Hello, World!")

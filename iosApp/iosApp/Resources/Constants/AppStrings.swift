@@ -104,6 +104,16 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+    enum ValidationMessage: String {
+        case validatePassword = "Please enter a password"
+        case validateEmail = "Please enter a valid email"
+    }
+    
+    enum userdefaultKeys: String {
+        case rememberMeData = "com.adesso.rider.club.rememberMeData"
+        case hasSeenOnboarding = "com.adesso.rider.club.hasSeenOnboarding"
+    }
 
 }
 

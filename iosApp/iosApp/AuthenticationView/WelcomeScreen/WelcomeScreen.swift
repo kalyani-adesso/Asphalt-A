@@ -1,8 +1,6 @@
 import SwiftUI
 
 public struct WelcomeScreen: View {
-    
-    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @State private var currentPage = 0
     private let totalPages = 3
     @State private var showSignin: Bool = false
@@ -52,7 +50,7 @@ public struct WelcomeScreen: View {
                     }
                     .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                     Button(action: {
-                        hasSeenOnboarding = true
+                        MBUserDefaults.hasSeenOnboardingStatic = true
                         showSignin = true
                     }) {
                         HStack {

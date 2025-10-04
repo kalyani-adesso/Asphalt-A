@@ -13,7 +13,7 @@ struct Verification: View {
     @State private var timeRemaining = 180
     @State private var timer: Timer? = nil
     @State private var canResend = false
-
+    @State private var isPresented: Bool = false
     func startTimer() {
         timer?.invalidate()  // stop previous timer if any
         timeRemaining = 180
@@ -31,13 +31,13 @@ struct Verification: View {
         // Call API to resend the OTP here
         startTimer()  // restart the timer after resend
     }
-
+    
     var formattedTime: String {
         let minutes = timeRemaining / 60
         let seconds = timeRemaining % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
-
+    
     var body: some View {
         VStack {
             AppImage.SignUp.confirmOtp
@@ -48,14 +48,14 @@ struct Verification: View {
                 .font(KlavikaFont.bold.font(size: 24))
                 .padding(.bottom, 11)
                 .foregroundStyle(AppColor.black)
-
+            
             formattedConfirmationText
                 .font(KlavikaFont.medium.font(size: 16))
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
-
+            
             Spacer().frame(height: 100)
-
+            
             VStack(spacing: 21) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(AppStrings.VerificationLabel.verifyTitle.rawValue)
@@ -84,43 +84,42 @@ struct Verification: View {
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .foregroundStyle(AppColor.stoneGray)
                         }
-
+                        
                     }
                     .padding()
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
                 }
-
                 // Continue button (navigates to Verification)
-                ButtonView(
-                    title: AppStrings.SignUpLabel.continueButton.rawValue
-                ) {
+                ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
+                        isPresented = true
+                    }
+                ).navigationDestination(isPresented: $isPresented, destination: {
                     CreateAccount()
-                }
-
+                })
             }
         }
         .padding(.horizontal, 24)
         .onAppear {
             startTimer()
         }
-
+        
     }
     private var formattedConfirmationText: Text {
         let parts = AppStrings.VerificationLabel.confirmationText.rawValue
             .components(separatedBy: "%@")
         let prefix = parts.first ?? ""
         let suffix = parts.count > 1 ? parts.last! : ""
-
+        
         return Text(prefix)
             .foregroundColor(AppColor.stoneGray)
-            + Text(email)
+        + Text(email)
             .foregroundColor(AppColor.celticBlue)
             .fontWeight(.semibold)
-            + Text(suffix)
+        + Text(suffix)
             .foregroundColor(AppColor.stoneGray)
     }
-
+    
 }
 
 #Preview {

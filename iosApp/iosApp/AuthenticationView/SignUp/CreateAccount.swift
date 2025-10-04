@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct CreateAccount: View {
 
@@ -17,7 +18,8 @@ struct CreateAccount: View {
     @State private var isConfirmPasswordEntering: Bool = false
     @State private var showPassword: Bool = false
     @State private var showConfirmPassword: Bool = false
-
+    @StateObject private var signUpViewModel =  SignUpViewModal()
+    @State private var isSignupSuccess: Bool = false
     var body: some View {
         VStack {
             // Header
@@ -28,6 +30,7 @@ struct CreateAccount: View {
 
             // Form fields
             VStack(spacing: 25) {
+                // TODO: Change the order - User name, email , password and confirm password.
                 EmailFormFieldView(
                     label: AppStrings.CreateAccountLabel.firstName.rawValue,
                     icon: AppIcon.SignUp.userDetail,
@@ -59,11 +62,13 @@ struct CreateAccount: View {
                 )
 
                 // Continue button (navigates to Verification)
-                ButtonView(
-                    title: AppStrings.SignUpLabel.continueButton.rawValue
-                ) {
+                ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
+                        isSignupSuccess = true
+                    }
+                )
+                .navigationDestination(isPresented: $isSignupSuccess, destination: {
                     SignInView()
-                }
+                })
             }
         }
         .padding()
