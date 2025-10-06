@@ -21,6 +21,8 @@ class LoginScreenViewModel : ViewModel() {
     val validateState: StateFlow<LoginValidationModel> = _validationMutableState
     val isEmailVaild = MutableStateFlow(false)
 
+    val isValidationSuccess = MutableStateFlow(false)
+
 
     fun updateEmailState(email: String) {
         _emailTextMutableState.value = email
@@ -37,7 +39,7 @@ class LoginScreenViewModel : ViewModel() {
 
     fun callLogin() {
         if (fieldValidation()) {
-
+            isValidationSuccess.value = true
         }
 
     }

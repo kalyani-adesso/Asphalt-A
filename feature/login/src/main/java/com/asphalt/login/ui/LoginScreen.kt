@@ -65,7 +65,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
-fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
+fun LoginScreen(
+    viewModel: LoginScreenViewModel = koinViewModel(),
+    onSignInClick: () -> Unit, onSignUpClick: () -> Unit
+) {
     var checked by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
 
@@ -73,6 +76,10 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
     var isValidEmail = viewModel.isEmailVaild.collectAsState()
     var passwordState = viewModel.passwordTextState.collectAsState()
     var validateState = viewModel.validateState.collectAsState()
+    var isValidationSuccess = viewModel.isValidationSuccess.collectAsState()
+    if (isValidationSuccess.value) {
+        onSignInClick.invoke()
+    }
     val scrollState = rememberScrollState()
     Scaffold() { paddingValues ->
         Column(
@@ -403,8 +410,14 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing30))
                 Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                ) {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onSignUpClick.invoke()
+                        },
+                    horizontalArrangement = Arrangement.Center,
+
+                    ) {
                     Text(
                         text = stringResource(string.dont_have_account),
                         style = TypographyMedium.bodySmall
@@ -425,6 +438,11 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
 @Composable
 fun LoginPreview() {
     var viewModel: LoginScreenViewModel = viewModel()
-    LoginScreen(viewModel)
+    LoginScreen(viewModel, onSignInClick = {
+
+    }, onSignUpClick = {
+
+    })
+
 }
 

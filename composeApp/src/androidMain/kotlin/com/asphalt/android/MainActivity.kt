@@ -40,8 +40,8 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier
                 ) {
-                    LoginScreen()
-                    //NavigationRoot()
+
+                    NavigationRoot()
                 }
             }
 //            AsphaltTheme {

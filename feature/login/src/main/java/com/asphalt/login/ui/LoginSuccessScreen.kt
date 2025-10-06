@@ -43,7 +43,8 @@ fun LoginSuccessScreen() {
             Spacer(Modifier.height(Dimensions.spacing144))
             Column(
                 modifier = Modifier
-                    .fillMaxWidth().weight(1.4f)
+                    .fillMaxWidth()
+                    .weight(1.4f)
                     .padding(
                         start = Dimensions.padding30,
                         end = Dimensions.padding30
@@ -65,8 +66,11 @@ fun LoginSuccessScreen() {
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
-            ) {
-                Text(text = stringResource(string.login_success_ful), style = TypographyBold.headlineSmall)
+                ) {
+                Text(
+                    text = stringResource(string.login_success_ful),
+                    style = TypographyBold.headlineSmall
+                )
                 Spacer(modifier = Modifier.height(Dimensions.spacing16))
                 Text(
                     text = stringResource(string.login_success_msg),

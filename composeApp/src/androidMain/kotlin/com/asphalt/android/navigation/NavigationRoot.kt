@@ -10,6 +10,8 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.StartScreen
+import com.asphalt.login.ui.LoginScreen
+import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
 import com.asphalt.registration.navigation.NavigationRegistrationPassword
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
@@ -37,6 +39,7 @@ fun NavigationRoot() {
                         )
                     )
                 }
+
                 else -> {
                     backStack.removeLastOrNull()
                 }
@@ -76,7 +79,8 @@ fun NavigationRoot() {
             entry<WelcomeFeatureNavKey> { key ->
                 NavigationWelcomeFeature(
                     onNavigateToRegister = {
-                        backStack.add(RegistrationCodeNavKey(id = ""))
+                        backStack.add(LoginScreenNavKey)
+                        //backStack.add(RegistrationCodeNavKey(id = ""))
                     }
                 )
             }
@@ -94,10 +98,22 @@ fun NavigationRoot() {
                 NavigationRegistrationPassword(
                     id = it.id,
                     onNavigationToPostRegistration = { isSuccess ->
-                       // backStack.add(PostRegistrationNavKey(isSuccess = isSuccess))
+                        // backStack.add(PostRegistrationNavKey(isSuccess = isSuccess))
                     },
                     onBackPressed = { onBackPressed() }
                 )
+            }
+
+            entry<LoginScreenNavKey> { key ->
+                LoginScreen(onSignInClick = {
+                    backStack.add(LoginSuccessScreenNavKey)
+                }, onSignUpClick = {
+                    backStack.add(RegistrationCodeNavKey(id = ""))
+                    //backStack.add(LoginSuccessScreenNavKey)
+                })
+            }
+            entry<LoginSuccessScreenNavKey> { key ->
+                LoginSuccessScreen()
             }
         }
     )
@@ -105,3 +121,9 @@ fun NavigationRoot() {
 
 @Serializable
 data object StartScreenNavKey : NavKey
+
+@Serializable
+object LoginScreenNavKey : NavKey
+
+@Serializable
+object LoginSuccessScreenNavKey : NavKey
