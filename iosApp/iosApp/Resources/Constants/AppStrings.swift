@@ -109,6 +109,10 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+    enum AppStorageKey: String {
+        case hasSeenOnboarding
+    }
 
 
 }

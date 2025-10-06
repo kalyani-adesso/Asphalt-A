@@ -29,14 +29,14 @@ struct CreateAccount: View {
             
             // Form fields
             VStack(spacing: 25) {
-                EmailFormFieldView(
+                FormFieldView(
                     label: AppStrings.CreateAccountLabel.firstName.rawValue,
                     icon: AppIcon.SignUp.userDetail,
                     placeholder: AppStrings.SignInPlaceholder.email.rawValue,
                     emailOrPhone: $firstName,
                     isValidEmail: .constant(false)
                 )
-                EmailFormFieldView(
+                FormFieldView(
                     label: AppStrings.CreateAccountLabel.lastName.rawValue,
                     icon: AppIcon.SignUp.userDetail,
                     placeholder: AppStrings.SignUpPlaceholder.lastName.rawValue,
