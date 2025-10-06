@@ -23,7 +23,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -90,11 +89,14 @@ dependencies {
     implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
+
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
     debugImplementation(libs.compose.ui.tooling)
 
     // Koin
@@ -102,5 +104,9 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
+
+    implementation(libs.kotlinx.serialization.core)
+
 }
 

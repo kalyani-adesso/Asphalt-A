@@ -26,7 +26,7 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.R.string
 
@@ -71,7 +71,7 @@ fun LoginSuccessScreen() {
                 Text(
                     text = stringResource(string.login_success_msg),
                     textAlign = TextAlign.Center,
-                    style = TypographyBlack.bodyMedium,
+                    style = TypographyMedium.bodyMedium,
                     color = NeutralDarkGrey,
                     modifier = Modifier.padding(
                         start = Dimensions.padding30,

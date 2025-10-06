@@ -21,10 +21,10 @@ splashscreen = "1.0.1"
 compose = "1.9.2"
 compose-material3 = "1.4.0"
 lifecycleViewmodelNavigation3 = "1.0.0-alpha04"
-navigation3Runtime = "1.0.0-alpha10"
 lifecycleRuntimeKtx = "2.9.4"
 kotlinxSerializationJson = "3.3.0"
 cocoaPods = "2.2.20"
+navigation3Runtime = "1.0.0-alpha06"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

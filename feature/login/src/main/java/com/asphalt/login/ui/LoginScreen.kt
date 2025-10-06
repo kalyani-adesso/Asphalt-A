@@ -57,7 +57,7 @@ import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import com.asphalt.commonui.R.string
@@ -95,7 +95,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 Text(
                     text = stringResource(string.login_explore_continue),
                     modifier = Modifier.padding(top = Dimensions.padding15),
-                    style = TypographyBlack.bodyMedium,
+                    style = TypographyMedium.bodyMedium,
                     color = NeutralDarkGrey
                 )
                 Spacer(Modifier.height(Dimensions.spacing20))
@@ -111,7 +111,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 Text(
                     text = stringResource(string.adesso_rider_club),
                     modifier = Modifier.padding(top = Dimensions.spacing20),
-                    style = TypographyBlack.headlineSmall
+                    style = TypographyMedium.headlineSmall
                 )
 
             }
@@ -338,7 +338,7 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                     }
                     Text(
                         text = stringResource(string.forgot_password),
-                        style = TypographyBlack.bodySmall,
+                        style = TypographyMedium.bodySmall,
                         color = PrimaryDarkerLightB75
                     )
                 }
@@ -407,11 +407,11 @@ fun LoginScreen(viewModel: LoginScreenViewModel = koinViewModel()) {
                 ) {
                     Text(
                         text = stringResource(string.dont_have_account),
-                        style = TypographyBlack.bodySmall
+                        style = TypographyMedium.bodySmall
                     )
                     Text(
                         text = stringResource(string.sign_up_here),
-                        style = TypographyBlack.bodySmall,
+                        style = TypographyMedium.bodySmall,
                         color = PrimaryDarkerLightB75
                     )
                 }
