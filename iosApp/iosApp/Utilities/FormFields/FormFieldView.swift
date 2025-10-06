@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EmailFormFieldView: View {
+struct FormFieldView: View {
     let label: String
     let icon : Image
     let placeholder: String
@@ -42,7 +42,7 @@ struct EmailFormFieldView: View {
 }
 
 #Preview {
-    EmailFormFieldView(
+    FormFieldView(
         label: AppStrings.SignInLabel.emailOrPhone.rawValue,
         icon: AppIcon.Login.email,
         placeholder: AppStrings.SignInPlaceholder.email.rawValue,
