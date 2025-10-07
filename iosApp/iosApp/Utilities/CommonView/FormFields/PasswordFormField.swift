@@ -23,7 +23,7 @@ struct PasswordFormField: View {
                 .foregroundStyle(AppColor.black)
             HStack {
                 if showPassword {
-                   icon
+                    icon
                         .frame(width: 20, height: 20)
                     TextField(placeholder, text: $password)
                         .font(KlavikaFont.regular.font(size: 16))

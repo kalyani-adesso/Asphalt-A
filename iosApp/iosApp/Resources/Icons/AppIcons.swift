@@ -17,11 +17,13 @@ struct AppIcon {
         static let password = Image("password")
         static let rememberLogin = Image("remember-login")
         static let validEmail = Image("vaild-Email")
+        static let invalidPassword = Image("invalid-Password")
     }
     
     struct SignUp {
         static let smsEdit = Image("sms-edit")
         static let userDetail = Image("user-detail")
+        static let snackbar = Image("snackbar")
     }
     
     struct Welcome {

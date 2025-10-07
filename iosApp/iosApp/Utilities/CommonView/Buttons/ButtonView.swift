@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct ButtonView<Destination: View>: View {
-    
+struct ButtonView: View {
     let title: String
-    @ViewBuilder let destination: () -> Destination
-    
+    var onTap: (() -> Void)? = nil
     var body: some View {
-        NavigationLink(destination: destination) {
+        Button(action: {
+            onTap?()
+        }) {
             Text(title)
                 .frame(maxWidth: .infinity)
                 .frame(height: 60)
@@ -33,15 +33,5 @@ struct ButtonView<Destination: View>: View {
                 .font(KlavikaFont.bold.font(size: 18))
                 .padding(.bottom, 21)
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ButtonView(title: "Preview") {
-            Text("Destination")
-                .padding()
-        }
-        .padding()
     }
 }

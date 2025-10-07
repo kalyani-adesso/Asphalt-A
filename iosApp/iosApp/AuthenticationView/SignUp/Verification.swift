@@ -10,8 +10,33 @@ import SwiftUI
 struct Verification: View {
     var email: String
     @State private var otp: String = ""
-    @StateObject var timer = CountdownTimer()
-    @StateObject var formattedText = ConfirmationText()
+    @State private var timeRemaining = 180
+    @State private var timer: Timer? = nil
+    @State private var canResend = false
+    @State private var isPresented: Bool = false
+    func startTimer() {
+        timer?.invalidate()  // stop previous timer if any
+        timeRemaining = 180
+        canResend = false
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+            } else {
+                timer?.invalidate()
+                canResend = true
+            }
+        }
+    }
+    private func resendOTP() {
+        // Call API to resend the OTP here
+        startTimer()  // restart the timer after resend
+    }
+    
+    var formattedTime: String {
+        let minutes = timeRemaining / 60
+        let seconds = timeRemaining % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
     
     var body: some View {
         VStack {
@@ -24,7 +49,7 @@ struct Verification: View {
                 .padding(.bottom, 11)
                 .foregroundStyle(AppColor.black)
             
-            formattedText.formattedConfirmationText
+            formattedConfirmationText
                 .font(KlavikaFont.medium.font(size: 16))
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
@@ -50,17 +75,12 @@ struct Verification: View {
                         .font(KlavikaFont.regular.font(size: 16))
                         .autocapitalization(.none)
                         .foregroundStyle(AppColor.richBlack)
-                        if timer.canResend {
-                            Button {
-                                timer.resendOTP()
-                            } label: {
-                                Text("Resend")
-                                    .font(KlavikaFont.regular.font(size: 16))
-                                    .foregroundStyle(AppColor.celticBlue)
-                            }
-                        }
-                        else {
-                            Text("Resend in \(timer.formattedTime)")
+                        if canResend {
+                            Text("Resend")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.celticBlue)
+                        } else {
+                            Text("Resend in \(formattedTime)")
                                 .font(KlavikaFont.regular.font(size: 16))
                                 .foregroundStyle(AppColor.stoneGray)
                         }
@@ -70,22 +90,34 @@ struct Verification: View {
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
                 }
-                
                 // Continue button (navigates to Verification)
-                ButtonView(
-                    title: AppStrings.SignUpLabel.continueButton.rawValue
-                ) {
+                ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
+                        isPresented = true
+                    }
+                ).navigationDestination(isPresented: $isPresented, destination: {
                     CreateAccount()
-                }
-                
+                })
             }
         }
         .padding(.horizontal, 24)
         .onAppear {
-            formattedText.email = email
-            timer.startTimer()
+            startTimer()
         }
         
+    }
+    private var formattedConfirmationText: Text {
+        let parts = AppStrings.VerificationLabel.confirmationText.rawValue
+            .components(separatedBy: "%@")
+        let prefix = parts.first ?? ""
+        let suffix = parts.count > 1 ? parts.last! : ""
+        
+        return Text(prefix)
+            .foregroundColor(AppColor.stoneGray)
+        + Text(email)
+            .foregroundColor(AppColor.celticBlue)
+            .fontWeight(.semibold)
+        + Text(suffix)
+            .foregroundColor(AppColor.stoneGray)
     }
     
 }

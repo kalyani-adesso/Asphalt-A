@@ -1,4 +1,3 @@
-//
 //  FormFieldView.swift
 //  iosApp
 //
@@ -12,7 +11,7 @@ struct FormFieldView: View {
     let icon : Image
     let placeholder: String
     @Binding var emailOrPhone: String
-     @Binding var isValidEmail: Bool
+    @Binding var isValidEmail: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -35,7 +34,14 @@ struct FormFieldView: View {
                 }
             }
             .padding()
-            .background(AppColor.backgroundLight)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(AppColor.backgroundLight) // plain background always
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isValidEmail ? AppColor.celticBlue : .clear, lineWidth: 1.5) // border only when valid
+            )
             .cornerRadius(10)
         }
     }
