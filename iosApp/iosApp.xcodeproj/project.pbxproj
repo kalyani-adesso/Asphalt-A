@@ -23,34 +23,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				"NavigationView/Connected Ride/ConnectedRideView.swift",
-				"NavigationView/Create Ride/CreateRideView.swift",
-				NavigationView/Profile/ProfileView.swift,
-				"NavigationView/Your Rides/YourRidesView.swift",
 			);
 			target = 5E1F3BFF75C627F835CE626C /* iosApp */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		CEC5202A2E90D99E008519C2 /* Exceptions for "iosApp" folder in "Copy Bundle Resources" phase from "iosApp" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = C5954ADC1F5879BB5EB571CF /* Resources */;
-			membershipExceptions = (
-				"NavigationView/Connected Ride/ConnectedRideView.swift",
-				"NavigationView/Create Ride/CreateRideView.swift",
-				NavigationView/Profile/ProfileView.swift,
-				"NavigationView/Your Rides/YourRidesView.swift",
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1F0872E5BAF8F5F17FD4CE84 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				99C354C59404B9E0E879BD59 /* Exceptions for "iosApp" folder in "iosApp" target */,
-				CEC5202A2E90D99E008519C2 /* Exceptions for "iosApp" folder in "Copy Bundle Resources" phase from "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";

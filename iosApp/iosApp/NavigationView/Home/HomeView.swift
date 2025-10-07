@@ -5,6 +5,13 @@ import SwiftUI
 
 struct HomeScreen : View {
         var body: some View {
-        Text("Hello, World!")
+            NavigationLink(destination: NavigationSlideBar()) {
+                Text("Hello, World!")
+            }
+        
     }
+}
+
+#Preview {
+    HomeScreen()
 }
