@@ -134,6 +134,7 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
     enum CreateAccountSnackbarLabel: String {
         case title = "Account Created Successfully!"
        

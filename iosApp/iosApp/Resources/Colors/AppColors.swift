@@ -34,6 +34,9 @@ struct AppColor {
     static let totalrides = Color("TotalRides")
     static let totalKms = Color("Totalkms")
     static let border = Color("Border")
+    static let snackbargradientDark = Color("SuccessGradientGreen")
+    static let snackbargradientLight = Color("SuccessLightGreen")
+    
     
 }
 

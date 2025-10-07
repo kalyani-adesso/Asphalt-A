@@ -25,7 +25,7 @@ struct LoginSucessView: View {
                 .frame(alignment: .center)
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
-            NavigationLink(destination: HomeView()) {
+            NavigationLink(destination: HomeView(showSnackbar: true)) {
                 Text(AppStrings.SignInSucessView.exploreButton.rawValue)
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
