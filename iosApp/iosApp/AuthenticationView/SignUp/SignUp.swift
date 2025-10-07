@@ -24,7 +24,7 @@ struct SignUpView: View {
             
             // Form fields
             VStack(spacing: 21) {
-                EmailFormFieldView(
+                FormFieldView(
                     label: AppStrings.SignInLabel.emailOrPhone.rawValue,
                     icon: AppIcon.Login.email,
                     placeholder: AppStrings.SignInPlaceholder.email.rawValue,

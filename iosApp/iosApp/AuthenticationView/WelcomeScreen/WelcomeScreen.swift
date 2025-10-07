@@ -5,9 +5,9 @@ public struct WelcomeScreen: View {
     private let totalPages = 3
     @State private var showSignin: Bool = false
     private let backgrounds: [Image] = [
-        Image("WelcomeBg"),
-        Image("WelcomeBg2"),
-        Image("WelcomeBg3")
+        AppImage.Welcome.bg,
+        AppImage.Welcome.bg2,
+        AppImage.Welcome.bg3
     ]
     
     public var body: some View {

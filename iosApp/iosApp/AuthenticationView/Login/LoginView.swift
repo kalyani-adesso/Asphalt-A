@@ -20,7 +20,7 @@ struct SignInView: View {
                     subtitle: AppStrings.SignInLabel.welcomeSubtitle.localized
                 )
                 VStack(spacing: 21) {
-                    EmailFormFieldView(
+                    FormFieldView(
                         label: AppStrings.SignInLabel.emailOrPhone.localized,
                         icon: AppIcon.Login.email,
                         placeholder: AppStrings.SignInPlaceholder.email.localized,
@@ -36,7 +36,7 @@ struct SignInView: View {
                 }
                 .padding(.bottom, 18)
                 rememberMeToggle()
-                ButtonView(title: AppStrings.SignUpLabel.continueButton.localized, onTap: {
+                ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
                     viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
                         hasLoggedIn = true
                     })
@@ -120,7 +120,7 @@ extension SignInView {
                 }
             }
             Spacer()
-            NavigationLink(destination: SignUpView()) {
+            NavigationLink(destination: ForgotPassword(email: emailOrPhone )) {
                 Text(AppStrings.SignInAction.forgotPassword.localized)
                     .font(KlavikaFont.medium.font(size: 14))
                     .foregroundColor(.celticBlue)

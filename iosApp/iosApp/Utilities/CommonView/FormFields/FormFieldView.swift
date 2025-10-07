@@ -1,4 +1,3 @@
-//
 //  FormFieldView.swift
 //  iosApp
 //
@@ -7,7 +6,7 @@
 
 import SwiftUI
 
-struct EmailFormFieldView: View {
+struct FormFieldView: View {
     let label: String
     let icon : Image
     let placeholder: String
@@ -35,14 +34,21 @@ struct EmailFormFieldView: View {
                 }
             }
             .padding()
-            .background(AppColor.backgroundLight)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(AppColor.backgroundLight) // plain background always
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isValidEmail ? AppColor.celticBlue : .clear, lineWidth: 1.5) // border only when valid
+            )
             .cornerRadius(10)
         }
     }
 }
 
 #Preview {
-    EmailFormFieldView(
+    FormFieldView(
         label: AppStrings.SignInLabel.emailOrPhone.rawValue,
         icon: AppIcon.Login.email,
         placeholder: AppStrings.SignInPlaceholder.email.rawValue,

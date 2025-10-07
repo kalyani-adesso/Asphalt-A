@@ -10,12 +10,14 @@ import Firebase
 
 struct CreateAccount: View {
 
-    @State private var firstName: String = ""
-    @State private var lastName: String = ""
+    @State private var userName: String = ""
+    @State private var email: String = ""
+    @State private var isValidEmail: Bool = false
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var isPasswordEntering: Bool = false
     @State private var isConfirmPasswordEntering: Bool = false
+    @State private var passwordsMatch: Bool = true
     @State private var showPassword: Bool = false
     @State private var showConfirmPassword: Bool = false
     @StateObject private var signUpViewModel =  SignUpViewModal()
@@ -31,21 +33,21 @@ struct CreateAccount: View {
                 
                 // Form fields
                 VStack(spacing: 25) {
-                    // TODO: Change the order - User name, email , password and confirm password.
-                    EmailFormFieldView(
-                        label: AppStrings.CreateAccountLabel.firstName.rawValue,
+                    FormFieldView(
+                        label: AppStrings.CreateAccountLabel.userName.rawValue,
                         icon: AppIcon.SignUp.userDetail,
-                        placeholder: AppStrings.SignInPlaceholder.email.rawValue,
-                        emailOrPhone: $firstName,
+                        placeholder: AppStrings.SignUpPlaceholder.userName.rawValue,
+                        emailOrPhone: $userName,
                         isValidEmail: .constant(false)
                     )
-                    EmailFormFieldView(
-                        label: AppStrings.CreateAccountLabel.lastName.rawValue,
-                        icon: AppIcon.SignUp.userDetail,
-                        placeholder: AppStrings.SignUpPlaceholder.lastName.rawValue,
-                        emailOrPhone: $lastName,
-                        isValidEmail: .constant(false)
+                    FormFieldView(
+                        label: AppStrings.CreateAccountLabel.email.rawValue,
+                        icon: AppIcon.Login.email,
+                        placeholder: AppStrings.SignUpPlaceholder.email.rawValue,
+                        emailOrPhone: $email,
+                        isValidEmail: $isValidEmail
                     )
+
                     
                     PasswordFormField(
                         label: AppStrings.CreateAccountLabel.password.rawValue,
@@ -53,6 +55,7 @@ struct CreateAccount: View {
                         placeholder: AppStrings.SignUpPlaceholder.password.rawValue,
                         password: $password
                     )
+                   
                     PasswordFormField(
                         label: AppStrings.CreateAccountLabel.confirmPassword
                             .rawValue,
@@ -61,13 +64,24 @@ struct CreateAccount: View {
                             .rawValue,
                         password: $confirmPassword
                     )
+                    .onChange(of: confirmPassword) { _ in validatePasswords() }
+                    
+                    if !passwordsMatch {
+                                           Text("Passwords do not match")
+                                               .font(.system(size: 14))
+                                               .foregroundColor(.red)
+                                               .frame(maxWidth: .infinity, alignment: .leading)
+                                               .padding(.horizontal, 4)
+                                               .transition(.opacity.combined(with: .slide))
+                                               .animation(.easeInOut, value: passwordsMatch)
+                                       }
                     
                     // Continue button (navigates to Verification)
                     ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
                         Task {
-                            let emailExist = await signUpViewModel.checkEmailDomainExists( firstName)
+                            let emailExist = await signUpViewModel.checkEmailDomainExists( email)
                             if emailExist {
-                                signUpViewModel.didTapSignUp(email: firstName, username: lastName, password: confirmPassword, onSuccess: {
+                                signUpViewModel.didTapSignUp(email: email, username: userName, password: confirmPassword, onSuccess: {
                                     isSignupSuccess = true
                                 })
                             }
@@ -86,6 +100,15 @@ struct CreateAccount: View {
         .padding()
         .padding(.horizontal, 24)
     }
+    private func validatePasswords() {
+       
+        if password.isEmpty || confirmPassword.isEmpty {
+            passwordsMatch = true
+            return
+        }
+        passwordsMatch = (password == confirmPassword)
+    }
+
 }
 
 #Preview {
