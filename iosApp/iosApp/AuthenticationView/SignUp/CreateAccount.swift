@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 
 struct CreateAccount: View {
-
+    
     @State private var userName: String = ""
     @State private var email: String = ""
     @State private var isValidEmail: Bool = false
@@ -47,7 +47,7 @@ struct CreateAccount: View {
                         emailOrPhone: $email,
                         isValidEmail: $isValidEmail
                     )
-
+                    
                     
                     PasswordFormField(
                         label: AppStrings.CreateAccountLabel.password.rawValue,
@@ -55,7 +55,7 @@ struct CreateAccount: View {
                         placeholder: AppStrings.SignUpPlaceholder.password.rawValue,
                         password: $password
                     )
-                   
+                    
                     PasswordFormField(
                         label: AppStrings.CreateAccountLabel.confirmPassword
                             .rawValue,
@@ -67,17 +67,17 @@ struct CreateAccount: View {
                     .onChange(of: confirmPassword) { _ in validatePasswords() }
                     
                     if !passwordsMatch {
-                                           Text("Passwords do not match")
-                                               .font(.system(size: 14))
-                                               .foregroundColor(.red)
-                                               .frame(maxWidth: .infinity, alignment: .leading)
-                                               .padding(.horizontal, 4)
-                                               .transition(.opacity.combined(with: .slide))
-                                               .animation(.easeInOut, value: passwordsMatch)
-                                       }
+                        Text("Passwords do not match")
+                            .font(.system(size: 14))
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                            .transition(.opacity.combined(with: .slide))
+                            .animation(.easeInOut, value: passwordsMatch)
+                    }
                     
                     // Continue button (navigates to Verification)
-                    ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
+                    ButtonView( title: AppStrings.CreateAccountLabel.createTitle.rawValue, onTap: {
                         Task {
                             let emailExist = await signUpViewModel.checkEmailDomainExists( email)
                             if emailExist {
@@ -88,6 +88,8 @@ struct CreateAccount: View {
                         }
                     }
                     )
+                    .disabled(!isFormValid)
+                    .opacity(isFormValid ? 1 : 0.5)
                     .navigationDestination(isPresented: $isSignupSuccess, destination: {
                         SignInView()
                     })
@@ -101,14 +103,22 @@ struct CreateAccount: View {
         .padding(.horizontal, 24)
     }
     private func validatePasswords() {
-       
+        
         if password.isEmpty || confirmPassword.isEmpty {
             passwordsMatch = true
             return
         }
         passwordsMatch = (password == confirmPassword)
     }
-
+    var isFormValid: Bool {
+        !userName.trimmingCharacters(in: .whitespaces).isEmpty &&
+        isValidEmail &&
+        !password.isEmpty &&
+        !confirmPassword.isEmpty &&
+        passwordsMatch
+    }
+    
+    
 }
 
 #Preview {

@@ -125,20 +125,47 @@ public struct AppStrings{
         case title = "Forgot Password?"
         case subtitle = "We’ll send you reset instructions"
         case forgotAction = "SEND RESET LINK"
-     
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
     enum ResetSnackbarLabel: String {
         case title = "Reset link sent!"
         case subtitle = "Check your mail for password reset link"
-     
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
     enum CreateAccountSnackbarLabel: String {
         case title = "Account Created Successfully!"
        
+    }
+    enum HomeLabel: String {
+        case createRide = "CREATE A RIDE"
+        case joinRide = "JOIN A RIDE"
+        case rideDetails = "Total Rides"
+        case location = "Locations"
+        case totalKms = "Total Kms"
+        case upcomingRides = "Upcoming Rides"
+        case journey = "Adventure Journey"
+        case chart = "Places Visited In Last 6 Months"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum JourneyChart: String {
+        case rides = "Total Rides"
+        case distance = "Distance Covered"
+        case places = "Places Explored"
+        case groups = "Ride Groups"
+        case invites = "Ride Invites"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+       
+    enum HomeSnackbarLabel: String {
+        case title = "Welcome!"
+        case subtitle = "You have successfully logged into adesso Riders Club."
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
 }
