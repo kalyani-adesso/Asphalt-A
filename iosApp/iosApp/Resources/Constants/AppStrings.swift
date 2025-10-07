@@ -167,6 +167,13 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+    enum HomeButton: String {
+        case accept = "ACCEPT"
+        case decline = "DECLINE"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
 }
 

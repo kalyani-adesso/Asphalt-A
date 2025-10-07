@@ -35,4 +35,10 @@ struct AppImage {
         static let bg2 = Image("WelcomeBg2")
         static let bg3 = Image("WelcomeBg3")
     }
+    
+    struct Profile {
+        static let profile = Image("profile")
+    }
+    
+    
 }

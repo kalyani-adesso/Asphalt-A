@@ -44,6 +44,20 @@ struct AppIcon {
         static let settings = Image("icon_settings")
         static let yourRide = Image("icon_yourRide")
     }
+    
+    struct Home {
+        static let calender = Image("calendar_today")
+        static let chart = Image("chartLogo")
+        static let createRide = Image("createRideLogo")
+        static let group = Image("group")
+        static let location = Image("location")
+        static let message = Image("message")
+        static let nearMe = Image("nearMe")
+        static let snackbar = Image("welcome-snackbar")
+        static let arrow = Image("keyboard_double_arrow_up")
+        static let navigation = Image("navigation")
+               
+    }
 }
 
 
