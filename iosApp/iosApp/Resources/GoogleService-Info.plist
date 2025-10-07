@@ -2,29 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>81829881241-6u7g7tr3t421ge947amkrrpa18jhfvh7.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.81829881241-6u7g7tr3t421ge947amkrrpa18jhfvh7</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCeQoAda2r1xr7cILdjPeh5hYrHzA-oQnA</string>
+	<string>AIzaSyDeMLPzYoixgJFPJXdBF3L0FG9KpRvqV0Y</string>
 	<key>GCM_SENDER_ID</key>
-	<string>735387505735</string>
+	<string>81829881241</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.asphalt.android.AsphaltA</string>
+	<string>com.asphalta.ios</string>
 	<key>PROJECT_ID</key>
-	<string>asphalt-a</string>
+	<string>asphalt-a-d59cb</string>
 	<key>STORAGE_BUCKET</key>
-	<string>asphalt-a.firebasestorage.app</string>
+	<string>asphalt-a-d59cb.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:735387505735:ios:5a9279630787f1a6ee0d62</string>
+	<string>1:81829881241:ios:3e9fbfd101bfeac74e5f08</string>
 </dict>
 </plist>
