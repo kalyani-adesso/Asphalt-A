@@ -8,7 +8,8 @@ struct SignUpView: View {
     @State private var password: String = ""
     @State private var isValidEmail: Bool = false
     @FocusState private var isEmailFieldFocused: Bool
-
+    @StateObject private var signUpViewModel =  SignUpViewModal()
+    @State private var isVerified: Bool = false
     var body: some View {
         VStack {
             // Header
@@ -16,11 +17,11 @@ struct SignUpView: View {
                 title: AppStrings.SignUpLabel.welcome.rawValue,
                 subtitle: AppStrings.SignUpLabel.welcomeSubtitle.rawValue
             )
-
-            AppImage.SignUp.createAccountBg
+            
+            Image("createAccountBg")
                 .frame(width: 240, height: 240)
                 .padding(.bottom, 30)
-
+            
             // Form fields
             VStack(spacing: 21) {
                 FormFieldView(
@@ -30,15 +31,19 @@ struct SignUpView: View {
                     emailOrPhone: $emailOrPhone,
                     isValidEmail: $isValidEmail
                 )
-
+                
                 // Continue button (navigates to Verification)
-                ButtonView(
-                    title: AppStrings.SignUpLabel.continueButton.rawValue
-                ) {
-                    Verification(email: emailOrPhone)
-                }
-                .disabled(!isValidEmail)
-                .opacity(isValidEmail ? 1 : 0.5)
+                ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
+                        isVerified = true
+                    }
+                )
+                .navigationDestination(isPresented: $isVerified, destination: {
+                    if emailOrPhone.isValidEmail {
+                        SignInView()
+                    } else {
+                        Verification(email: emailOrPhone)
+                    }
+                })
             }
         }
         .padding(.horizontal, 24)

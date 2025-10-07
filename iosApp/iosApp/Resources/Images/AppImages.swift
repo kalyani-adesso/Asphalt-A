@@ -26,6 +26,8 @@ struct AppImage {
     struct SignUp {
         static let confirmOtp = Image("confirmOtp")
         static let createAccountBg = Image("createAccountBg")
+        static let forgotPassword = Image("forgotPassword")
+        
     }
     
     struct Welcome {
