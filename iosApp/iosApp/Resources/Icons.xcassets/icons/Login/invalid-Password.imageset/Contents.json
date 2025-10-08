@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "invalid-Password.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
