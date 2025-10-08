@@ -1,4 +1,4 @@
-package com.asphalt.welcome.composables
+package com.asphalt.android
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
