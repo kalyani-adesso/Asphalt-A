@@ -13,8 +13,9 @@ import com.asphalt.android.StartScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
-import com.asphalt.registration.navigation.NavigationRegistrationPassword
+import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
+import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import com.asphalt.welcome.navigation.WelcomeFeatureNavKey
@@ -81,9 +82,11 @@ fun NavigationRoot() {
                     onNavigateToRegister = {
                         backStack.add(LoginScreenNavKey)
                         //backStack.add(RegistrationCodeNavKey(id = ""))
+                        //backStack.add(RegistrationDetailsNavKey)
                     }
                 )
             }
+
 
             entry<RegistrationCodeNavKey> { key ->
                 NavigationRegistrationCode(
@@ -94,11 +97,21 @@ fun NavigationRoot() {
                     }
                 )
             }
-            entry<RegistrationPasswordNavKey> {
-                NavigationRegistrationPassword(
-                    id = it.id,
-                    onNavigationToPostRegistration = { isSuccess ->
-                        // backStack.add(PostRegistrationNavKey(isSuccess = isSuccess))
+//            entry<RegistrationPasswordNavKey> {
+//                NavigationRegistrationPassword(
+//                    id = it.id,
+//                    onNavigationToRegistrationDetails = { password ->
+//                        backStack.add(RegistrationDetailsNavKey(password = password))
+//                    },
+//                    onBackPressed = { onBackPressed() }
+//                )
+//            }
+
+            entry<RegistrationDetailsNavKey> {
+                NavigationRegistrationDetails(
+                    //id = it.password,
+                    onNavigateToDashboard = { //password ->
+                      //  backStack.add(RegistrationDetailsNavKey(password))
                     },
                     onBackPressed = { onBackPressed() }
                 )
@@ -108,7 +121,7 @@ fun NavigationRoot() {
                 LoginScreen(onSignInClick = {
                     backStack.add(LoginSuccessScreenNavKey)
                 }, onSignUpClick = {
-                    backStack.add(RegistrationCodeNavKey(id = ""))
+                    backStack.add(RegistrationDetailsNavKey)
                     //backStack.add(LoginSuccessScreenNavKey)
                 })
             }
@@ -118,6 +131,7 @@ fun NavigationRoot() {
         }
     )
 }
+
 
 @Serializable
 data object StartScreenNavKey : NavKey

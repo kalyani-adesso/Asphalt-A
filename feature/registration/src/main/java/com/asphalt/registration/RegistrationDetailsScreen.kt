@@ -12,24 +12,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.asphalt.android.model.User
+import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun RegistrationDetailsScreen(modifier: Modifier = Modifier) {
+fun RegistrationDetailsScreen(
+    authViewModel: AuthViewModel = koinViewModel(),
+    modifier: Modifier = Modifier,
+    onNavigateToDashboard: () -> Unit = {}) {
 
     Scaffold(modifier = modifier
         .fillMaxSize()
@@ -38,13 +55,14 @@ fun RegistrationDetailsScreen(modifier: Modifier = Modifier) {
         Column(
             modifier = modifier.padding(paddingValues),
         ) {
-            RegistrationDetailsHeader()
+            RegistrationDetailsHeader(authViewModel)
         }
     }
 }
 
 @Composable
-private fun RegistrationDetailsHeader() {
+private fun RegistrationDetailsHeader(
+    viewModel: AuthViewModel) {
 
     Column(
         modifier = Modifier
@@ -72,13 +90,23 @@ private fun RegistrationDetailsHeader() {
             text = "adesso Rider's Club",
             style = TypographyMedium.bodyMedium
         )
-        RegistrationFeilds()
+        RegistrationFeilds(viewModel)
     }
 }
 
 
 @Composable
-fun RegistrationFeilds(modifier: Modifier = Modifier) {
+fun RegistrationFeilds(
+    viewModel: AuthViewModel) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var userName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var resultMessage by remember { mutableStateOf<String?>(value = null) }
 
     Column(
         modifier= Modifier.fillMaxSize()
@@ -86,13 +114,17 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
     ) {
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding8),
-            text = "First Name",
+            text = "Full Name",
             style = TypographyMedium.titleSmall
         )
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            placeholder = { Text(text = "First Name") },
+            value = userName,
+            onValueChange = {userName = it},
+            placeholder = { Text(text = "Full Name") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryDarkerLightB75,
+                unfocusedBorderColor = PrimaryDarkerLightB75
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
@@ -100,20 +132,24 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
                 Icon(painter = painterResource(
                     id = R.drawable.shape),
                     contentDescription = "Email Icon",
-                    tint = Color.Blue,
+                    tint = PrimaryDarkerLightB75,
                 )
             }
         )
 
         Text(
             modifier = Modifier.padding(bottom = Dimensions.padding8),
-            text = "Last Name",
+            text = "Email Id",
             style = TypographyMedium.titleSmall
         )
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            placeholder = { Text(text = "Last Name") },
+            value = email,
+            onValueChange = {email = it},
+            placeholder = { Text(text = "Email Id") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryDarkerLightB75,
+                unfocusedBorderColor = PrimaryDarkerLightB75
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
@@ -121,7 +157,7 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
                 Icon(painter = painterResource(
                     id = R.drawable.shape),
                     contentDescription = "Email Icon",
-                    tint = Color.Blue,
+                    tint = PrimaryDarkerLightB75,
                 )
             }
         )
@@ -132,17 +168,21 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
             style = TypographyMedium.titleSmall
         )
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = password,
+            onValueChange = {password = it},
             placeholder = { Text(text = "Password") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryDarkerLightB75,
+                unfocusedBorderColor = PrimaryDarkerLightB75
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
                 Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                    id = com.asphalt.commonui.R.drawable.ic_lock),
                     contentDescription = "Email Icon",
-                    tint = Color.Blue,
+                    tint = PrimaryDarkerLightB75,
                 )
             }
         )
@@ -153,17 +193,21 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
             style = TypographyMedium.titleSmall
         )
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = confirmPassword,
+            onValueChange = {confirmPassword = it},
             placeholder = { Text(text = "Confirm Password") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryDarkerLightB75,
+                unfocusedBorderColor = PrimaryDarkerLightB75
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
                 Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                    id = com.asphalt.commonui.R.drawable.ic_lock),
                     contentDescription = "Email Icon",
-                    tint = Color.Blue,
+                    tint = PrimaryDarkerLightB75,
                 )
             }
         )
@@ -171,13 +215,31 @@ fun RegistrationFeilds(modifier: Modifier = Modifier) {
         GradientButton(
             startColor = PrimaryBrighterLightW75,
             endColor = PrimaryDarkerLightB50,
-            onClick = {},
+            onClick = {
+                if (email.isNotBlank() && password.isNotBlank()) {
+                    val user = User(email = email,password=password,"","")
+                    loading = true
+                    resultMessage = ""
+
+                    coroutineScope.launch {
+                            // launch coroutine in composble scope
+                            val result = viewModel.SignUp(user)
+                            loading = false
+                            resultMessage = result.fold(
+                                onSuccess = {"Success: $it"},
+                                onFailure = {"Error: ${it.message}"}
+                            )
+                    }
+                }
+            },
             buttonText = "CREATE ACCOUNT"
         )
-
-
     }
-
+    Spacer(modifier = Modifier.height(20.dp))
+    resultMessage?.let {
+        Text(text = it,
+            color = if (resultMessage!!.startsWith("Error")) Color.Red else Color.Green)
+    }
 }
 
 @Preview
@@ -187,6 +249,4 @@ fun RegistrationDetailsScreenPreview() {
     MaterialTheme {
         RegistrationDetailsScreen()
     }
-
 }
-

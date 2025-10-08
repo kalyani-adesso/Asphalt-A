@@ -1,4 +1,4 @@
-package com.asphalt.welcome.navigation
+package com.asphalt.registration.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -9,17 +9,23 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
-import com.asphalt.welcome.composables.GetStartedScreen
+import com.asphalt.registration.RegistrationDetailsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object WelcomeFeatureNavKey : NavKey
+data object RegistrationDetailsNavKey : NavKey
 
 @Composable
-fun NavigationWelcomeFeature(
-    onNavigateToRegister: () -> Unit = {}
+fun NavigationRegistrationDetails(
+    onBackPressed: () -> Unit = {},
+    onNavigateToDashboard: () -> Unit = {}
 ) {
-    val backStack = rememberNavBackStack(WelcomeFeatureNavKey)
+    RegistrationDetailsScreen(
+       // onBackPressed = onBackPressed,
+        onNavigateToDashboard = onNavigateToDashboard
+    )
+
+    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
 
     NavDisplay(
         backStack = backStack,
@@ -30,11 +36,13 @@ fun NavigationWelcomeFeature(
         ),
         sceneStrategy = SinglePaneSceneStrategy(),
         entryProvider = entryProvider {
-            entry<WelcomeFeatureNavKey> {
-                GetStartedScreen(
-                    onNavigateToRegister = onNavigateToRegister
+            entry<RegistrationDetailsNavKey> {
+                RegistrationDetailsScreen(
+                    onNavigateToDashboard = onNavigateToDashboard
                 )
             }
         }
     )
 }
+
+//data class RegistrationDetailsNavKey(val password:String) : NavKey
