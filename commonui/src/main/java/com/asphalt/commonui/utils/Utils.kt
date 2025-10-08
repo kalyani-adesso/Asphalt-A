@@ -1,6 +1,8 @@
 package com.asphalt.commonui.utils
 
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 object Utils {
     fun getCalendarInstanceForMonthYear(month: Int, year: Int) {
@@ -27,5 +29,19 @@ object Utils {
         return (givenYear < currentYear) ||
                 (givenYear == currentYear && givenMonth < currentMonth)
     }
+
+
+    fun formatDateTime(input: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("EEE, dd MMM yyyy - hh:mm a", Locale.getDefault())
+            val date = inputFormat.parse(input)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            input
+        }
+    }
+
 
 }

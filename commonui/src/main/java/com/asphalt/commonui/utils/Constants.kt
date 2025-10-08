@@ -14,4 +14,6 @@ object Constants {
     const val SPLASH_TIMER: Long = 2000
     val DEFAULT_BORDER_STROKE = Dimensions.spacing1
     val DEFAULT_SCREEN_HORIZONTAL_PADDING = Dimensions.spacing15
+    val AVATAR_DEFAULT_SIZE = Dimensions.size73
+    val AVATAR_DEFAULT_BORDER_WIDTH = Dimensions.size4
 }

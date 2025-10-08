@@ -32,7 +32,8 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
+import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
 import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.sealedclasses.Carousels
 
@@ -43,8 +44,15 @@ fun GetStartedScreen() {
         Carousels.RideTogetherCarousel.carouselItem
     )
     val carouselTopPadding =
-        calculateHeightDpForPercentage(GetStartedConstants.CAROUSEL_HEIGHT_RATIO)
-    val cardHeight = calculateHeightDpForPercentage(GetStartedConstants.CARD_HEIGHT_RATIO)
+        getDpForScreenRatio(
+            GetStartedConstants.CAROUSEL_HEIGHT_RATIO,
+            ComposeUtils.getScreenHeight()
+        )
+    val cardHeight =
+        getDpForScreenRatio(
+            GetStartedConstants.CARD_HEIGHT_RATIO,
+            ComposeUtils.getScreenHeight()
+        )
     val pagerState = rememberPagerState(pageCount = {
         carouselItems.size
     })

@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.TypographyBlack
@@ -30,7 +29,7 @@ fun RideMonthYear(calendarState: MutableState<Calendar>) {
 
     Column(
         modifier = Modifier
-            .height(115.dp)
+            .height(Dimensions.size115)
             .width(Dimensions.spacing32),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

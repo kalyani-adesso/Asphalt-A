@@ -1,6 +1,7 @@
 package com.asphalt.commonui.ui
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ fun BorderedButton(
     buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
     buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
     borderStroke: Dp = Constants.DEFAULT_BORDER_STROKE,
+    contentPaddingValues: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
     Button(
@@ -34,6 +36,7 @@ fun BorderedButton(
                 shape = RoundedCornerShape(buttonRadius)
             ),
         shape = RoundedCornerShape(buttonRadius),
+        contentPadding = contentPaddingValues,
         content = content
     )
 }

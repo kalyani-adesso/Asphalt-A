@@ -2,6 +2,7 @@ package com.asphalt.commonui.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
@@ -25,6 +26,7 @@ fun GradientButton(
     onClick: () -> Unit,
     buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
     buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit,
 ) {
     val gradient = Brush.horizontalGradient(
@@ -45,6 +47,7 @@ fun GradientButton(
             modifier = Modifier
                 .height(buttonHeight),
             shape = RoundedCornerShape(buttonRadius),
+            contentPadding = contentPadding,
             content = content
         )
 

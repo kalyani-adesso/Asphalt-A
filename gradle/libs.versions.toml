@@ -26,6 +26,7 @@ lifecycleRuntimeKtx = "2.9.4"
 kotlinxSerializationJson = "3.3.0"
 cocoaPods = "2.2.20"
 material = "1.13.0"
+coil="2.7.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -49,6 +50,7 @@ compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 #Ktor
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

@@ -2,6 +2,7 @@ package com.asphalt.dashboard.composables.screens.sections
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,11 +29,19 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceAround
+            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        GradientButton(endColor = PrimaryDeepBlue, onClick = { onCreateRideClick() }) {
-            Row(
+        GradientButton(
+            modifier = Modifier.weight(1f),
+            endColor = PrimaryDeepBlue,
+            onClick = { onCreateRideClick() },
+            contentPadding = PaddingValues(
+                Dimensions.size0
+            )
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
                 Image(painter = painterResource(R.drawable.ic_path), null)
                 Spacer(Modifier.width(Dimensions.spacing10))
@@ -44,7 +53,13 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
             }
         }
         Spacer(Modifier.width(Dimensions.spacing15pt25))
-        BorderedButton(onClick = { onJoinRideClick() }) {
+        BorderedButton(
+            modifier = Modifier.weight(1f),
+            onClick = { onJoinRideClick() },
+            contentPaddingValues = PaddingValues(
+                Dimensions.size0
+            )
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -34,7 +34,8 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
+import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
 import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.data.CarouselItem
 
@@ -62,8 +63,9 @@ fun Carousel(carouselItems: List<CarouselItem>, carouselTopPadding: Dp, pagerSta
                     painter = painterResource(id = carouselItem.imageRes), null,
                     modifier = Modifier
                         .height(
-                            calculateHeightDpForPercentage(
-                                GetStartedConstants.CAROUSEL_IMAGE_HEIGHT_RATIO
+                            getDpForScreenRatio(
+                                GetStartedConstants.CAROUSEL_IMAGE_HEIGHT_RATIO,
+                                ComposeUtils.getScreenHeight()
                             )
                         )
                         .aspectRatio(GetStartedConstants.CAROUSEL_IMAGE_ASPECT_RATIO)

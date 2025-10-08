@@ -13,11 +13,18 @@ object ComposeUtils {
         val screenHeight = windowInfo.containerSize.height
         return screenHeight
     }
+    @Composable
+    fun getScreenWidth(): Int {
+        val windowInfo = LocalWindowInfo.current
+        val screenWidth = windowInfo.containerSize.width
+        return screenWidth
+    }
 
     @Composable
-    fun calculateHeightDpForPercentage(percentage: Float): Dp {
-        val screenHeight = getScreenHeight()
+    fun getDpForScreenRatio(percentage: Float, screenSize:Int): Dp {
+
         val density = LocalResources.current.displayMetrics.density
-        return ((screenHeight * percentage) / density).dp
+        return ((screenSize * percentage) / density).dp
     }
+
 }

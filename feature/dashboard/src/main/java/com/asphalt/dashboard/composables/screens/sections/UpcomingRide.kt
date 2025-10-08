@@ -15,7 +15,7 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.dashboard.composables.components.RideInvites
+import com.asphalt.dashboard.composables.components.RideInvitePreview
 
 @Composable
 fun UpcomingRide() {
@@ -37,7 +37,7 @@ fun UpcomingRide() {
             )
         }
         Spacer(Modifier.height(Dimensions.spacing19))
-        RideInvites()
+        RideInvitePreview()
     }
 }
 

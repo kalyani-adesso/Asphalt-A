@@ -27,3 +27,5 @@ val BrightTeal = Color(0xFF17C6B9)
 val PrimaryBrighterLightW60 = Color(0xFF1F97F0)
 val PrimaryDeepBlue = Color(0xFF003661)
 val NeutralBlack10 = Color(0x1A000000)
+val VividRed = Color(0xFFF12225)
+

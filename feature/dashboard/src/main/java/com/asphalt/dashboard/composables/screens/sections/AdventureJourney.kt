@@ -1,7 +1,6 @@
 package com.asphalt.dashboard.composables.screens.sections
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,34 +10,28 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBlack
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.DonutPreview
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.dashboard.composables.components.RideGraphLegendUI
+import com.asphalt.dashboard.composables.components.SelectJourneyTimeFrame
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 
 @Composable
@@ -71,7 +64,7 @@ fun AdventureJourney(options: List<String>) {
                     )
 
                 }
-                SelectTimeFrame(selectedItem, options)
+                SelectJourneyTimeFrame(selectedItem, options)
 
 
             }
@@ -101,27 +94,30 @@ fun AdventureJourney(options: List<String>) {
             }
             Spacer(Modifier.height(Dimensions.spacing15))
             Row(
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(
+                    Dimensions.size8,
+                    alignment = Alignment.CenterHorizontally
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.TotalRides)
-                Spacer(Modifier.width(Dimensions.size8))
 
                 RideGraphLegendUI(RideGraphLegend.DistanceCovered)
-                Spacer(Modifier.width(Dimensions.size8))
 
 
                 RideGraphLegendUI(RideGraphLegend.PlacesExplored)
             }
-            Spacer(Modifier.width(Dimensions.size8))
+            Spacer(Modifier.height(Dimensions.size8))
 
 
             Row(
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(
+                    Dimensions.size8,
+                    alignment = Alignment.CenterHorizontally
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.RideGroups)
-                Spacer(Modifier.width(Dimensions.size8))
 
                 RideGraphLegendUI(RideGraphLegend.RideInvites)
             }
@@ -130,57 +126,9 @@ fun AdventureJourney(options: List<String>) {
 
 }
 
-@Composable
-fun SelectTimeFrame(selectedItem: MutableState<String>, items: List<String>) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    RoundedBox(
-        borderColor = NeutralGrey30,
-        modifier = Modifier
-            .clickable {
-                isExpanded = true
-            },
-        cornerRadius = Dimensions.radius5
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(
-                horizontal = Dimensions.padding10,
-                vertical = Dimensions.padding8pt5
-            )
-        ) {
-            Text(
-                text = selectedItem.value,
-                fontSize = Dimensions.textSize12,
-                style = Typography.bodySmall,
-                color = NeutralDarkGrey
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_dropdown_arrow),
-                null,
-                modifier = Modifier.padding(Dimensions.padding5)
-            )
-        }
-        DropdownMenu(expanded = isExpanded, { isExpanded = false }) {
-            items.forEach { item ->
-                DropdownMenuItem(text = {
-                    Text(
-                        item,
-                        fontSize = Dimensions.textSize12,
-                        style = Typography.bodySmall
-                    )
-                }, onClick = {
-                    selectedItem.value = item
-                    isExpanded = false
-                })
-            }
-        }
-    }
-}
 
 @Preview
 @Composable
 fun AdventureJourneyPreview() {
-    AdventureJourney(listOf("Last month", "Last 6 months", "Last 1 year"))
+    AdventureJourney(listOf("Last 4 months", "Last week", "Last year"))
 }

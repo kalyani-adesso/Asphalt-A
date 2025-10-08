@@ -17,9 +17,14 @@
     <string name="adventure">Adventure</string>
     <string name="journey">Journey</string>
     <string name="total_rides_info_chart">Total %1$s Rides</string>
+    <string name="invite_from">Invite from %1$s</string>
+    <string name="start_to_destination">%1$s - %2$s</string>
+    <string name="people_joined">%1$s people joined this ride</string>
     <string name="distance_covered">Distance Covered</string>
     <string name="places_explored">Places Explored</string>
     <string name="ride_groups">Ride Groups</string>
     <string name="ride_invites">Ride Invites</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
 
 </resources>
