@@ -5,17 +5,18 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    //id("co.touchlab.skie") version "0.10.6"
+    alias(libs.plugins.google.gms.google.services)
+    //alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
-    
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
@@ -39,6 +40,10 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
+
+//            implementation(libs.firebase.common) // Or latest version
+//            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth
+//            implementation(libs.firebase.firestore) // Optional: Firestore
         }
 
         androidMain.dependencies {
@@ -53,6 +58,16 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.coroutines)
+
+            //firebase
+          //  implementation(libs.firebase.analytics)
+            implementation(libs.androidx.credentials)
+            implementation(libs.googleid)
+            implementation(libs.firebase.database)
+            implementation(libs.firebase.auth)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.firebase.firestore.ktx)
 
         }
 
@@ -60,6 +75,7 @@ kotlin {
             implementation(libs.ktor.client.darwin)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.core)
+            implementation(libs.ktor.client.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

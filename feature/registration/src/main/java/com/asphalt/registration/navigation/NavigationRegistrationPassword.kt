@@ -9,13 +9,13 @@ import kotlinx.serialization.Serializable
 fun NavigationRegistrationPassword(
     id: String = "",
     onBackPressed: () -> Unit = {},
-    onNavigationToPostRegistration: (Boolean) -> Unit = {}
+    onNavigationToRegistrationDetails: (String) -> Unit = {}
 ) {
     RegistrationPasswordScreen(
-//        id = id,
+        id = id,
 //        code = code,
-//        onBackPressed = onBackPressed,
-//        onNavigationToPostRegistration = onNavigationToPostRegistration
+        onBackPressed = onBackPressed,
+        onNavigateToRegistrationDetails = onNavigationToRegistrationDetails
     )
 }
 

@@ -1,6 +1,5 @@
 package com.asphalt.registration
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NaturalGreen
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
@@ -36,7 +34,6 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.registration.navigation.NavigationRegistrationCodeKey
 import com.asphalt.registration.viewmodel.RegistrationCodeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -115,6 +112,7 @@ fun Registration(
 
     val validEmail by remember { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf(emailPhone) }
+    val isButtonEnabled = email.isNotBlank() // true only when field isn't empty
 
     Column(
         modifier = Modifier
@@ -160,10 +158,25 @@ fun Registration(
         GradientButton(
             startColor = PrimaryBrighterLightW75,
             endColor = PrimaryDarkerLightB50,
-            onClick = { viewModel.onContinueClick(email)},
+            onClick = {
+                if (!email.isBlank()) {
+                    viewModel.onContinueClick(email)}
+
+                },
             buttonText = "CONTINUE"
         )
     }
+}
+
+@Composable
+fun RegistrationFooter(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean) {
+
+
+
+
+    
 }
 
 @Preview

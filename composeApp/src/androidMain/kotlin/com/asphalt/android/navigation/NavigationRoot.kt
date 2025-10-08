@@ -11,8 +11,9 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.StartScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
-import com.asphalt.registration.navigation.NavigationRegistrationPassword
+import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
+import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import com.asphalt.welcome.navigation.WelcomeFeatureNavKey
@@ -76,7 +77,7 @@ fun NavigationRoot() {
             entry<WelcomeFeatureNavKey> { key ->
                 NavigationWelcomeFeature(
                     onNavigateToRegister = {
-                        backStack.add(RegistrationCodeNavKey(id = ""))
+                        backStack.add(RegistrationDetailsNavKey)
                     }
                 )
             }
@@ -90,11 +91,21 @@ fun NavigationRoot() {
                     }
                 )
             }
-            entry<RegistrationPasswordNavKey> {
-                NavigationRegistrationPassword(
-                    id = it.id,
-                    onNavigationToPostRegistration = { isSuccess ->
-                       // backStack.add(PostRegistrationNavKey(isSuccess = isSuccess))
+//            entry<RegistrationPasswordNavKey> {
+//                NavigationRegistrationPassword(
+//                    id = it.id,
+//                    onNavigationToRegistrationDetails = { password ->
+//                        backStack.add(RegistrationDetailsNavKey(password = password))
+//                    },
+//                    onBackPressed = { onBackPressed() }
+//                )
+//            }
+
+            entry<RegistrationDetailsNavKey> {
+                NavigationRegistrationDetails(
+                    //id = it.password,
+                    onNavigateToDashboard = { //password ->
+                      //  backStack.add(RegistrationDetailsNavKey(password))
                     },
                     onBackPressed = { onBackPressed() }
                 )

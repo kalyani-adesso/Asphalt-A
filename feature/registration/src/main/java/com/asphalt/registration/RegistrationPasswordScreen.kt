@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,9 +37,22 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.registration.viewmodel.RegistrationCodeViewModel
+import com.asphalt.registration.viewmodel.RegistrationPasswordViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun RegistrationPasswordScreen(modifier: Modifier = Modifier) {
+fun RegistrationPasswordScreen(
+    id: String,
+    modifier: Modifier = Modifier,
+    onBackPressed: () -> Unit = {},
+    onNavigateToRegistrationDetails: (String) -> Unit = {},
+    viewModel: RegistrationPasswordViewModel = koinViewModel()
+) {
+
+    LaunchedEffect(viewModel) {
+        viewModel.handleNavigation(onBackPressed, onNavigateToRegistrationDetails)
+    }
 
     Scaffold(modifier = modifier
         .fillMaxSize()
@@ -47,13 +61,15 @@ fun RegistrationPasswordScreen(modifier: Modifier = Modifier) {
         Column(
             modifier = modifier.padding(paddingValues),
         ) {
-            PasswordHeader()
+            PasswordHeader(viewModel)
         }
     }
 }
 
 @Composable
-private fun PasswordHeader() {
+private fun PasswordHeader(
+    viewModel: RegistrationPasswordViewModel
+) {
 
     Column(
         modifier = Modifier
@@ -72,7 +88,7 @@ private fun PasswordHeader() {
         Text(
             modifier = Modifier.padding(vertical = Dimensions.padding),
             text = "Confirm Your Email",
-            style = TypographyMedium.bodyLarge
+            style = TypographyMedium.headlineLarge
         )
 
         Text(
@@ -81,14 +97,15 @@ private fun PasswordHeader() {
             style = Typography.titleSmall
         )
 
-        Password("",0)
+        Password(password = "", remainingMs = 0,viewModel)
     }
 }
 
 @Composable
 fun Password(
     password: String,
-    remainingMs: Long) {
+    remainingMs: Long,
+    viewModel: RegistrationPasswordViewModel) {
 
     var password by remember { mutableStateOf(value = password) }
 
@@ -126,7 +143,7 @@ fun Password(
         GradientButton(
             startColor = PrimaryBrighterLightW75,
             endColor = PrimaryDarkerLightB50,
-            onClick = {},
+            onClick = {viewModel.onContinueClick("")},
             buttonText = "VERIFY ACCOUNT"
         )
     }
@@ -145,7 +162,7 @@ fun formatMillis(ms:Long) : String {
 fun RegistrationPasswordScreenPreview() {
 
     MaterialTheme {
-        RegistrationPasswordScreen()
+        RegistrationPasswordScreen(id = "11")
     }
 
 }
