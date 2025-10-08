@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.utils.Utils
 import java.text.DateFormatSymbols
@@ -47,7 +47,7 @@ fun RideMonthYear(calendarState: MutableState<Calendar>) {
 
         Text(
             text = DateFormatSymbols().shortMonths[calendar.get(Calendar.MONTH)],
-            style = TypographyBlack.bodyLarge,
+            style = TypographyMedium.bodyLarge,
             fontWeight = FontWeight.Medium,
             fontSize = Dimensions.textSize18
         )

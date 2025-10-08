@@ -26,7 +26,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.DonutPreview
 import com.asphalt.commonui.ui.RoundedBox
@@ -83,7 +83,7 @@ fun AdventureJourney(options: List<String>) {
                         Text(
                             stringResource(R.string.total_rides_info_chart, totalRidesInfo),
                             fontSize = Dimensions.textSize12,
-                            style = TypographyBlack.bodySmall,
+                            style = TypographyMedium.bodySmall,
                             color = NeutralDarkGrey
                         )
                     }

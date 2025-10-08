@@ -30,7 +30,7 @@ fun GradientButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val gradient = Brush.horizontalGradient(
-        listOf(
+        colors = listOf(
             startColor,
             endColor
         )
@@ -38,7 +38,7 @@ fun GradientButton(
     Box(
         modifier = modifier
             .wrapContentSize()
-            .background(gradient, RoundedCornerShape(buttonRadius))
+            .background(brush = gradient, shape = RoundedCornerShape(size = buttonRadius))
 
     ) {
         Button(
@@ -50,6 +50,7 @@ fun GradientButton(
             contentPadding = contentPadding,
             content = content
         )
+
 
     }
 }

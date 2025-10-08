@@ -43,7 +43,7 @@ import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
@@ -255,7 +255,7 @@ fun AvatarRow(imageUrls: List<String>) {
                     "+$extraCount",
                     color = NeutralWhite,
                     fontSize = Dimensions.textSize12,
-                    style = TypographyBlack.bodySmall,
+                    style = TypographyMedium.bodySmall,
                     fontWeight = FontWeight.Medium
                 )
             }

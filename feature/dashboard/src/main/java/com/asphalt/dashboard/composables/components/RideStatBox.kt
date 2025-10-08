@@ -18,7 +18,7 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.FadingLine
 
 @Composable
@@ -46,7 +46,7 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
                 fontSize = Dimensions.textSize17,
                 color = NeutralWhite,
                 lineHeight = Dimensions.lineSpacing5,
-                style = TypographyBlack.headlineLarge
+                style = TypographyMedium.headlineLarge
             )
             Spacer(Modifier.height(Dimensions.spacing5))
             Text(

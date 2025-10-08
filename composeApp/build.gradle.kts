@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 kotlin {
@@ -23,7 +24,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -37,8 +37,18 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.ktor.client.core)
+          //  implementation(libs.firebase.ios)
 
             implementation(projects.shared)
+
+            //firebase
+            implementation(libs.androidx.credentials)
+            implementation(libs.googleid)
+            implementation(libs.firebase.database)
+            implementation(libs.firebase.auth)
+            implementation(libs.androidx.credentials.play.services.auth)
+          //  implementation(libs.google.firebase.firestore.ktx)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -90,17 +100,25 @@ dependencies {
     implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
+
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
     debugImplementation(libs.compose.ui.tooling)
 
-    // Koin
+    implementation(libs.kotlinx.serialization.core)
+
+    // KOIN
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
+
+
 }
 

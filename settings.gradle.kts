@@ -10,6 +10,7 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -24,12 +25,13 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        google()
         mavenCentral()
     }
 }
 
 include(":composeApp") // Android app module
-include(":shared") // KMP shared module
+include(":app",":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")

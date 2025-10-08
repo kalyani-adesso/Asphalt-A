@@ -28,7 +28,7 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.TypographyBlack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.Constants

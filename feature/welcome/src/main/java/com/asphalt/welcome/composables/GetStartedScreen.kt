@@ -38,7 +38,11 @@ import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.sealedclasses.Carousels
 
 @Composable
-fun GetStartedScreen() {
+fun GetStartedScreen(
+    onNavigateToRegister: () -> Unit = {}
+) {
+    //val context = LocalContext.current
+
     val carouselItems = listOf(
         Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
         Carousels.RideTogetherCarousel.carouselItem
@@ -98,11 +102,9 @@ fun GetStartedScreen() {
                         GradientButton(
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
-                            onClick = {
-                                //TODO: Handle button click for get started
-                            },
+                            onClick = onNavigateToRegister
 
-                            ) {
+                        ) {
                             val buttonText = stringResource(R.string.get_started).uppercase()
                             Row(
                                 horizontalArrangement =
@@ -126,11 +128,13 @@ fun GetStartedScreen() {
                                 )
                             }
                         }
+
                     }
                 }
                 Spacer(Modifier.weight(1f))
 
             }
+
         }
     }
 }
