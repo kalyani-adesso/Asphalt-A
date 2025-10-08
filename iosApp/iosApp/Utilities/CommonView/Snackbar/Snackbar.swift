@@ -11,12 +11,14 @@ struct Snackbar: View {
     
     let message: String
     let subMessage: String
+    var background: LinearGradient? = nil
+    var icon: Image? = nil
     
     var body: some View {
         
         VStack {
             HStack(alignment: .center, spacing: 10) {
-                AppIcon.SignUp.snackbar
+                icon ?? AppIcon.SignUp.snackbar
                 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(message)
@@ -30,6 +32,7 @@ struct Snackbar: View {
             }
             .padding(.all, 15)
             .background(
+                background ??
                 LinearGradient(
                     gradient: Gradient(colors: [
                         AppColor.royalBlue,

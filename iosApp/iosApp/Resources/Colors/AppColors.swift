@@ -30,5 +30,18 @@ struct AppColor {
     static let white = Color("White")
     static let yellow = Color("yellow")
     static let overlay = Color("Overlay")
+    static let location = Color("Location")
+    static let totalrides = Color("TotalRides")
+    static let totalKms = Color("Totalkms")
+    static let border = Color("Border")
+    static let snackbargradientDark = Color("SuccessGradientGreen")
+    static let snackbargradientLight = Color("SuccessLightGreen")
+    static let placesExplored = Color("PlaceExplored")
+    static let rideGroup = Color("RideGroup")
+    static let chartpointer = Color("ChartColor")
+    
+    
+    
+    
 }
 
