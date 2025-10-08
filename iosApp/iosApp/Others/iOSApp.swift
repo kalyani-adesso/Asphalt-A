@@ -12,11 +12,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct iOSApp: App {
-    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
-            if hasSeenOnboarding {
+            if MBUserDefaults.hasSeenOnboardingStatic {
                 NavigationStack {
                     SignInView()
                 }
