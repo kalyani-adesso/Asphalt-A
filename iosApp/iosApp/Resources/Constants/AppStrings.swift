@@ -167,6 +167,12 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-
+    
+    enum Notification : String {
+        case rideReminder = "Ride Reminder"
+        case notifications = "Notifications"
+        case newRiderJoined = "New Rider Joined"
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 }
 

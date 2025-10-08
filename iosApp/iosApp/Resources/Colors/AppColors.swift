@@ -30,5 +30,6 @@ struct AppColor {
     static let white = Color("White")
     static let yellow = Color("yellow")
     static let overlay = Color("Overlay")
+    static let iceBlue: Color = Color("IceBlue")
 }
 

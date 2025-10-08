@@ -24,20 +24,16 @@ struct NavigationSlideBar: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(AppColor.listGray)
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(AppColor.celticBlue.opacity(0.2), lineWidth: 1)
-                )
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
-                .padding()
+                .padding([.leading, .trailing])
             }
             
             ForEach(viewModel.sections) { section in
                 MenuSectionView(section: section)
                     .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)) // Add spacing between sections if needed
+                    .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color.clear)
             }
         }
@@ -56,15 +52,13 @@ struct MenuSectionView: View {
         VStack(spacing: 0) {
             // Section header
             HeaderTitleView(title: section.title)
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 8)
-            
+                .padding([.top,.bottom],25)
+                .padding(.horizontal,16)
             // Section items
             ForEach(section.items) { item in
                 MenuItemRow(item: item)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, 15)
             }
         }
         .frame(maxWidth: .infinity) // Ensure it fills the row width
@@ -146,9 +140,8 @@ struct ProfileHeaderView: View {
                     .font(KlavikaFont.regular.font(size: 16))
                     .foregroundColor(AppColor.black)
                 HStack {
-                    AppIcon.NavigationSlider.call
+                    AppIcon.NavigationSlider.repair
                         .frame(width: 16, height: 16)
-                        .padding(.trailing,6)
                     Text(role)
                         .font(KlavikaFont.regular.font(size: 12))
                 }
@@ -156,6 +149,7 @@ struct ProfileHeaderView: View {
                 .padding([.leading,.trailing],8)
                 .padding([.top, .bottom], 5)
                 .background(AppColor.white)
+                .cornerRadius(5)
             }
             Spacer()
         }
