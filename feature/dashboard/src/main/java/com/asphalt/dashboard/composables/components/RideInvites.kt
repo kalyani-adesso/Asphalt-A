@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
@@ -148,7 +150,7 @@ fun RideInviteUI(rideInvite: RideInvite) {
             }
             Spacer(Modifier.height(Dimensions.size17))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Dimensions.size20),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -253,7 +255,8 @@ fun AvatarRow(imageUrls: List<String>) {
                     "+$extraCount",
                     color = NeutralWhite,
                     fontSize = Dimensions.textSize12,
-                    style = TypographyBlack.bodySmall
+                    style = TypographyBlack.bodySmall,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -279,7 +282,7 @@ fun RideInvitePreview() {
                     "https://picsum.photos/id/5/200/300",
 
                     )
-            ), RideInvite("", "", "", "", "", listOf())
+            ), RideInvite("", "", "", "", "26/10/2025 12:30", listOf())
         )
     )
 }

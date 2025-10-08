@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -19,16 +20,9 @@ import com.asphalt.commonui.theme.PrimaryBrighterLightW90
 import com.asphalt.commonui.utils.Constants
 
 @Composable
-fun DonutChart(values: List<Float>) {
+fun DonutChart(values: List<Float>, colors: List<Color>) {
 
-    val colors = listOf(
-        PrimaryBrighterLightW60,
-        BrightTeal,
-        PrimaryBrighterLightW50,
-        MagentaDeep,
-        PrimaryBrighterLightW90,
-    )
-
+    require(values.size == colors.size)
     val total = values.sum()
     var startAngle = Constants.DONUT_START_ANGLE
 
@@ -88,5 +82,13 @@ fun DonutChart(values: List<Float>) {
 @Preview
 @Composable
 fun DonutPreview() {
-    DonutChart(listOf(1f,1f,2f,2f,2f))
+    DonutChart(
+        listOf(1f, 1f, 2f, 2f, 2f), colors = listOf(
+            PrimaryBrighterLightW60,
+            BrightTeal,
+            PrimaryBrighterLightW50,
+            MagentaDeep,
+            PrimaryBrighterLightW90,
+        )
+    )
 }

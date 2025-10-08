@@ -62,11 +62,8 @@ fun AdventureJourney(options: List<String>) {
                         style = TypographyBold.headlineLarge,
                         fontSize = Dimensions.textSize18
                     )
-
                 }
                 SelectJourneyTimeFrame(selectedItem, options)
-
-
             }
             Text(
                 stringResource(R.string.journey), style = TypographyBold.headlineLarge,
@@ -101,15 +98,10 @@ fun AdventureJourney(options: List<String>) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.TotalRides)
-
                 RideGraphLegendUI(RideGraphLegend.DistanceCovered)
-
-
                 RideGraphLegendUI(RideGraphLegend.PlacesExplored)
             }
             Spacer(Modifier.height(Dimensions.size8))
-
-
             Row(
                 horizontalArrangement = Arrangement.spacedBy(
                     Dimensions.size8,
@@ -118,7 +110,6 @@ fun AdventureJourney(options: List<String>) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.RideGroups)
-
                 RideGraphLegendUI(RideGraphLegend.RideInvites)
             }
         }
