@@ -22,6 +22,7 @@ import asphalta.composeapp.generated.resources.Res
 import asphalta.composeapp.generated.resources.compose_multiplatform
 import com.asphalt.commonui.utils.Constants
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
+import com.asphalt.welcome.composables.SplashScreen
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
