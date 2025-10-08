@@ -1,5 +1,6 @@
 package com.asphalt.android.di
 
+
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.viewmodel.AuthViewModel
 import org.koin.core.module.Module
