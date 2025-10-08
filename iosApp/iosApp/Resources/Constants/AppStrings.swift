@@ -39,12 +39,11 @@ public struct AppStrings{
         case verificationCode = "Code"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
-    
+
     enum CreateAccountLabel: String {
         case createTitle = "CREATE ACCOUNT"
-        case firstName = "First Name"
-        case lastName = "Last Name"
+        case userName = "User Name"
+        case email = "Email Id"
         case password = "Password"
         case confirmPassword = "Confirm Password"
         
@@ -54,6 +53,7 @@ public struct AppStrings{
     enum SignUpPlaceholder: String {
  
         case email = "Enter your email"
+        case userName = "Enter User Name"
         case otp = "Enter your OTP"
         case firstName = "First Name"
         case lastName = "Last Name"
@@ -62,10 +62,7 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
-    
- 
-    
+
     enum SignInLabel: String {
         case signInTitle = "SIGN IN"
         case welcome = "Welcome"
@@ -100,8 +97,7 @@ public struct AppStrings{
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
-   
+
     enum SignInSucessView: String {
         case loginSuccessTitle = "Yey! Login Successfull"
         case loginSuccessSubtitle = "You will be moved to home screen right now. Enjoy the features!"
@@ -110,6 +106,81 @@ public struct AppStrings{
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
+    enum AppStorageKey: String {
+        case hasSeenOnboarding
+    }
+
+
+    enum ValidationMessage: String {
+        case validatePassword = "Please enter a password"
+        case validateEmail = "Please enter a valid email"
+    }
+
+    enum userdefaultKeys: String {
+        case rememberMeData = "com.adesso.rider.club.rememberMeData"
+        case hasSeenOnboarding = "com.adesso.rider.club.hasSeenOnboarding"
+    }
+    
+    enum ForgotPassword: String {
+        case title = "Forgot Password?"
+        case subtitle = "We’ll send you reset instructions"
+        case forgotAction = "SEND RESET LINK"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    enum ResetSnackbarLabel: String {
+        case title = "Reset link sent!"
+        case subtitle = "Check your mail for password reset link"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum CreateAccountSnackbarLabel: String {
+        case title = "Account Created Successfully!"
+       
+    }
+    enum HomeLabel: String {
+        case createRide = "CREATE A RIDE"
+        case joinRide = "JOIN A RIDE"
+        case rideDetails = "Total Rides"
+        case location = "Locations"
+        case totalKms = "Total Kms"
+        case upcomingRides = "Upcoming Rides"
+        case journey = "Adventure Journey"
+        case chart = "Places Visited In Last 6 Months"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum JourneyChart: String {
+        case rides = "Total Rides"
+        case distance = "Distance Covered"
+        case places = "Places Explored"
+        case groups = "Ride Groups"
+        case invites = "Ride Invites"
+        case title = "Adventure\nJourney"
+  
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum Placesvisited: String {
+        case title = "Places Visited In Last 7 Months"
+       
+    }
+       
+    enum HomeSnackbarLabel: String {
+        case title = "Welcome!"
+        case subtitle = "You have successfully logged into adesso Riders Club."
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum HomeButton: String {
+        case accept = "ACCEPT"
+        case decline = "DECLINE"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
 }
 
