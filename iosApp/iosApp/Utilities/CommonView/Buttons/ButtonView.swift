@@ -47,8 +47,7 @@ struct ButtonView: View {
                                        x: 0, y: showShadow ? 2 : 0)
                     .foregroundStyle(foregroundColor)
                     .font(KlavikaFont.bold.font(size: 18))
-                    .padding(.bottom, 21)
-            
+                    .padding(.bottom,20)
             
         }
     }

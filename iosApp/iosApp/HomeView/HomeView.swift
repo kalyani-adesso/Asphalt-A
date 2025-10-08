@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct HomeView: View {
-    
+    @AppStorage("hasSeenHomeSnackbar") private var hasSeenHomeSnackbar: Bool = false
     @State var showSnackbar: Bool = false
     var body: some View {
         NavigationStack {
@@ -18,15 +18,18 @@ struct HomeView: View {
                 ScrollView {
                     VStack{
                         Color.clear.frame(height: 100)
-                        ActionButton()
+                        ActionButtonView()
                         DashboardView()
-                        UpcomingRides()
+                        UpcomingRidesView()
+                        JourneyCardView()
+                        PlacesVisitedView()
  
                     }
                     .padding()
                 }
                 
                 CustomNavBar()
+                
                 if showSnackbar {
                     AppColor.overlay.opacity(0.75)
                         .ignoresSafeArea()
@@ -36,7 +39,7 @@ struct HomeView: View {
                 
                 if showSnackbar {
                     VStack(spacing: 8) {
-                        Spacer().frame(height: 130) // Space from top
+                        Spacer().frame(height: 130) 
                         Snackbar(
                             message: AppStrings.HomeSnackbarLabel.title.rawValue,
                             subMessage: AppStrings.HomeSnackbarLabel.subtitle.rawValue,
@@ -55,10 +58,14 @@ struct HomeView: View {
             .ignoresSafeArea(edges: .top)
             .navigationBarHidden(true)
             .onAppear {
-                showSnackbar = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    withAnimation {
-                        showSnackbar = false
+                if !hasSeenHomeSnackbar {
+                    showSnackbar = true
+                    hasSeenHomeSnackbar = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation {
+                            showSnackbar = false
+
+                        }
                     }
                 }
             }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UpcomingRides: View {
+struct UpcomingRidesView: View {
     @StateObject private var home = HomeViewModel()
     
     var body: some View {
@@ -22,7 +22,7 @@ struct UpcomingRides: View {
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: 25) {
                     ForEach(home.upcomingRides) { ride in
                         UpcomingRideCard(ride: ride)
                     }
@@ -52,7 +52,7 @@ struct UpcomingRideCard: View {
                         .font(KlavikaFont.bold.font(size: 16))
                     Text(ride.route)
                         .font(KlavikaFont.regular.font(size: 12))
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppColor.stoneGray)
                 }
                 Spacer()
                 AppIcon.Home.message
@@ -73,18 +73,24 @@ struct UpcomingRideCard: View {
                         .frame(width: 15, height: 15)
                     Text("5 people joined this ride")
                         .font(KlavikaFont.regular.font(size: 12))
-                    Spacer()
                 }
                 Spacer()
                 HStack{
                     AppImage.Profile.profile.resizable()
-                        .frame(width: 29, height: 29)
+                        .frame(width: 19, height: 19)
+                        .clipShape(Circle())
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 32.5)
+                                .stroke(AppColor.green, lineWidth: 2.5)
+                        )
+                    AppImage.Profile.profile.resizable()
+                        .frame(width: 19, height: 19)
                         .clipShape(Circle())
                     AppImage.Profile.profile.resizable()
-                        .frame(width: 29, height: 29)
+                        .frame(width: 19, height: 19)
                         .clipShape(Circle())
                     AppImage.Profile.profile.resizable()
-                        .frame(width: 29, height: 29)
+                        .frame(width: 19, height: 19)
                         .clipShape(Circle())
                 }
                 
@@ -102,7 +108,7 @@ struct UpcomingRideCard: View {
             }
         }
         .padding()
-        .frame(width: 320)
+        .frame(width: 290)
         .background(AppColor.backgroundLight)
         .cornerRadius(14)
         .overlay(
@@ -118,5 +124,5 @@ struct UpcomingRideCard: View {
 
 
 #Preview {
-    UpcomingRides()
+    UpcomingRidesView()
 }

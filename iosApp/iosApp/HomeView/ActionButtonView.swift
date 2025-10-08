@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ActionButton: View {
+struct ActionButtonView: View {
     var body: some View {
         HStack(spacing: 12) {
             
@@ -32,5 +32,5 @@ struct ActionButton: View {
 
 
 #Preview {
-    ActionButton()
+    ActionButtonView()
 }

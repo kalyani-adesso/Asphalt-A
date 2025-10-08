@@ -12,10 +12,9 @@ struct DashboardView: View {
     @StateObject private var home = HomeViewModel()
     
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .top, spacing: 16) {
+       
+            HStack(alignment: .top, spacing: 15) {
                 
-                // Date box
                 VStack(spacing: 10) {
                     AppIcon.Home.arrow
                     Text("Aug")
@@ -26,30 +25,24 @@ struct DashboardView: View {
                         .rotationEffect(.degrees(180))
                 }
                 .padding(.horizontal, 8)
-                .padding(.vertical, 10)
+                .padding(.vertical, 8)
                 .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-                
-                // Scrollable stats row
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(home.stats) { stat in
-                            StatCardView(stat: stat)
-                        }
+                HStack(spacing: 15) {
+                    ForEach(home.stats) { stat in
+                        StatCardView(stat: stat)
                     }
                 }
             }
+            .frame(width: 345)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(15)
             .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(AppColor.border, lineWidth: 2)
-                    )
-            
-            Spacer()
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppColor.border, lineWidth: 2)
+            )
         }
-    }
+    
 }
 
 struct StatCardView: View {
@@ -74,7 +67,6 @@ struct StatCardView: View {
                     .font(KlavikaFont.regular.font(size: 12))
             }
         }
-        .padding(12)
         .frame(width: 80, height: 114)
         .background(stat.color)
         .cornerRadius(10)

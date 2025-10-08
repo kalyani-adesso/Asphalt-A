@@ -158,8 +158,14 @@ public struct AppStrings{
         case places = "Places Explored"
         case groups = "Ride Groups"
         case invites = "Ride Invites"
-        
+        case title = "Adventure\nJourney"
+  
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum Placesvisited: String {
+        case title = "Places Visited In Last 7 Months"
+       
     }
        
     enum HomeSnackbarLabel: String {

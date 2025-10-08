@@ -18,7 +18,8 @@ struct iOSApp: App {
         WindowGroup {
             if hasSeenOnboarding {
                 NavigationStack {
-                    HomeView(showSnackbar: false)
+               //  SignInView()
+                   HomeView(showSnackbar: false)
                 }
             } else {
                 WelcomeScreen()
