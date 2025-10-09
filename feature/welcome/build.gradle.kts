@@ -52,7 +52,12 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.koin.compose)
+    // Koin
     implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    //DataStore
+    implementation(libs.datastore)
 
 }

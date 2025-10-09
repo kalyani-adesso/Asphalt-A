@@ -99,13 +99,14 @@ struct UpcomingRideCard: View {
             
             
             HStack {
-                ButtonView(title: AppStrings.HomeButton.accept.rawValue)
+                ButtonView(title: AppStrings.HomeButton.accept.rawValue, height: 50)
                 ButtonView(title: AppStrings.HomeButton.decline.rawValue,   background: LinearGradient(
                     gradient: Gradient(colors: [AppColor.red, AppColor.red]),
                     startPoint: .leading,
-                    endPoint: .trailing))
+                    endPoint: .trailing), height: 50)
                 
             }
+            .padding(.bottom,-15)
         }
         .padding()
         .frame(width: 290)

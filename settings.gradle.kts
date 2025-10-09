@@ -35,4 +35,6 @@ include(":app",":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")
+include(":feature:login")
 include(":feature:welcome")
+include(":feature:dashboard")

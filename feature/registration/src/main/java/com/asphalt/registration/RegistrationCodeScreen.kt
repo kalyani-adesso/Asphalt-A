@@ -34,6 +34,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.registration.viewmodel.RegistrationCodeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -45,15 +46,17 @@ fun RegistrationCodeScreen(
     onBackPressed: () -> Unit = {},
     registrationCodeViewModel: RegistrationCodeViewModel = koinViewModel()
 
-    ) {
+) {
 
     LaunchedEffect(registrationCodeViewModel) {
         registrationCodeViewModel.handleNavigation(onBackPressed, onNavigateToRegistrationPassword)
     }
 
-    Scaffold(modifier = modifier
-        .fillMaxSize()
-        .background(color = Color.White))
+    Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+    )
     { paddingValues ->
         Column(
             modifier = modifier.padding(paddingValues),
@@ -86,8 +89,10 @@ private fun RegistrationHeader(
             text = "Create your account to get started",
             style = Typography.titleSmall
         )
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_app_icon),
+        Image(
+            painter = painterResource(
+                id = com.asphalt.commonui.R.drawable.ic_app_icon
+            ),
             contentDescription = "App Logo"
         )
         Text(
@@ -96,19 +101,22 @@ private fun RegistrationHeader(
             style = TypographyMedium.bodyMedium
         )
 
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_email),
+        Image(
+            painter = painterResource(
+                id = com.asphalt.commonui.R.drawable.ic_email
+            ),
             contentDescription = "App Logo"
         )
 
-        Registration("",viewModel)
+        Registration("", viewModel)
     }
 }
 
 @Composable
 fun Registration(
     emailPhone: String,
-    viewModel: RegistrationCodeViewModel) {
+    viewModel: RegistrationCodeViewModel
+) {
 
     val validEmail by remember { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf(emailPhone) }
@@ -127,7 +135,7 @@ fun Registration(
 
         OutlinedTextField(
             value = email,
-            onValueChange = {email = it},
+            onValueChange = { email = it },
             placeholder = { Text(text = "Enter email or phone number") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -138,16 +146,20 @@ fun Registration(
                 .padding(bottom = Dimensions.padding32),
             shape = RoundedCornerShape(size = Dimensions.spacing8),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                Icon(
+                    painter = painterResource(
+                        id = R.drawable.shape
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
             },
             trailingIcon = {
                 if (validEmail) {
-                    Icon(painter = painterResource(
-                        id = R.drawable.ic_correct),
+                    Icon(
+                        painter = painterResource(
+                            id = R.drawable.ic_correct
+                        ),
                         contentDescription = "Success",
                         tint = NaturalGreen,
                     )
@@ -160,23 +172,23 @@ fun Registration(
             endColor = PrimaryDarkerLightB50,
             onClick = {
                 if (!email.isBlank()) {
-                    viewModel.onContinueClick(email)}
+                    viewModel.onContinueClick(email)
+                }
 
-                },
-            buttonText = "CONTINUE"
-        )
+            },
+        ) {
+            ComposeUtils.DefaultButtonContent("CONTINUE")
+        }
     }
 }
 
 @Composable
 fun RegistrationFooter(
     modifier: Modifier = Modifier,
-    isEnabled: Boolean) {
+    isEnabled: Boolean
+) {
 
 
-
-
-    
 }
 
 @Preview

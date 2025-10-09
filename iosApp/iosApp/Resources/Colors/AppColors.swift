@@ -30,7 +30,7 @@ struct AppColor {
     static let white = Color("White")
     static let yellow = Color("yellow")
     static let overlay = Color("Overlay")
-    static let location = Color("Location")
+    static let location = Color("location")
     static let totalrides = Color("TotalRides")
     static let totalKms = Color("Totalkms")
     static let border = Color("Border")

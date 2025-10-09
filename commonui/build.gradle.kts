@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx) // Lifecycle KTX
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.coil)
 
     // Koin
     implementation(libs.koin.android)
