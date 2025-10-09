@@ -73,10 +73,11 @@ struct ForgotPassword: View {
             }
             
             if showSnackbar {
-                Snackbar(
-                    message: AppStrings.ResetSnackbarLabel.title.rawValue,
-                    subMessage: AppStrings.ResetSnackbarLabel.subtitle.rawValue
-                )
+                    Snackbar(
+                        message: AppStrings.ResetSnackbarLabel.title.rawValue,
+                        subMessage: AppStrings.ResetSnackbarLabel.subtitle.rawValue
+                    )
+                
                 .transition(.move(edge: .top).combined(with: .opacity))
                 .zIndex(1)
             }

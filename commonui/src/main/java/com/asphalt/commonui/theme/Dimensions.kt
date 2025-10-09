@@ -22,6 +22,8 @@ object Dimensions {
 
     val padding100 = 100.dp
 
+    val padding20 = 20.dp
+
     val spacing1 = 1.dp
     val spacing4 = 4.dp
     val spacing8 = 8.dp

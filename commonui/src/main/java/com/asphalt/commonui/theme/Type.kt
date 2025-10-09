@@ -84,7 +84,7 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontSize = 20.sp,
         lineHeight = 30.sp,
-        fontFamily = FontFamily(Font(R.font.klavika_regular)),
+        fontFamily = FontFamily(Font(R.font.klavika_bold)),
         fontWeight = FontWeight.Normal,
         color = NeutralBlackGrey,
         letterSpacing = 0.04.sp,
@@ -209,7 +209,7 @@ val TypographyBold = Typography(
     )
 )
 
-val TypographyBlack = Typography(
+val TypographyMedium = Typography(
     bodyLarge = Typography.bodyLarge.copy(
         fontFamily = FontFamily(Font(R.font.klavika_medium)),
         fontWeight = FontWeight.Black,
@@ -267,12 +267,10 @@ val TypographyBlack = Typography(
     ),
     titleSmall = Typography.titleSmall.copy(
         fontFamily = FontFamily(Font(R.font.klavika_medium)),
-        fontWeight = FontWeight.Black,
         letterSpacing = 0.14.sp
     ),
     labelLarge = Typography.labelLarge.copy(
         fontFamily = FontFamily(Font(R.font.klavika_medium)),
-        fontWeight = FontWeight.Black,
         letterSpacing = 0.18.sp
     ),
     labelMedium = Typography.labelMedium.copy(

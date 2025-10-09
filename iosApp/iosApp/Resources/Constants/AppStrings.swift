@@ -110,7 +110,6 @@ public struct AppStrings{
         case hasSeenOnboarding
     }
 
-
     enum ValidationMessage: String {
         case validatePassword = "Please enter a password"
         case validateEmail = "Please enter a valid email"
@@ -128,12 +127,14 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+
     enum ResetSnackbarLabel: String {
         case title = "Reset link sent!"
         case subtitle = "Check your mail for password reset link"
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+
     enum CreateAccountSnackbarLabel: String {
         case title = "Account Created Successfully!"
        
@@ -157,24 +158,36 @@ public struct AppStrings{
         case places = "Places Explored"
         case groups = "Ride Groups"
         case invites = "Ride Invites"
-        
+        case title = "Adventure\nJourney"
+
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-       
+
+    enum Placesvisited: String {
+        case title = "Places Visited In Last 7 Months"
+    }
+
     enum HomeSnackbarLabel: String {
         case title = "Welcome!"
         case subtitle = "You have successfully logged into adesso Riders Club."
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
+
+    enum HomeButton: String {
+        case accept = "ACCEPT"
+        case decline = "DECLINE"
+
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+
     enum Notification : String {
         case rideReminder = "Ride Reminder"
         case notifications = "Notifications"
         case newRiderJoined = "New Rider Joined"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
+
     enum SelectRide {
         static let selectingRide = "Selecting Your Ride"
         static let chooseType = "Choose your perfect motorcycle type"
@@ -213,7 +226,7 @@ public struct AppStrings{
         case scooter = "Scooter"
         case electric = "Electric"
         case other = "Other"
-        
+
         var id: String { rawValue }
     }
 
@@ -263,4 +276,4 @@ public struct AppStrings{
     }
 }
 
-   
+

@@ -37,7 +37,7 @@ fun GradientButton(
     showArrow: Boolean = false
 ) {
     val gradient = Brush.horizontalGradient(
-        listOf(
+        colors = listOf(
             startColor,
             endColor
         )
@@ -45,16 +45,16 @@ fun GradientButton(
     Box(
         modifier = Modifier
             .wrapContentSize()
-            .background(gradient, RoundedCornerShape(buttonRadius))
+            .background(brush = gradient, shape = RoundedCornerShape(size = buttonRadius))
 
     ) {
         Button(
-            onClick = { onClick },
+            onClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
                 .height(buttonHeight)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(buttonRadius)
+            shape = RoundedCornerShape(size = buttonRadius)
 
         ) {
             Row(
@@ -76,7 +76,7 @@ fun GradientButton(
                 )
                 if (showArrow)
                     Icon(
-                        painter = painterResource(R.drawable.ic_arrow),
+                        painter = painterResource(id = R.drawable.ic_arrow),
                         contentDescription = null,
                     )
             }
