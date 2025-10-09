@@ -10,25 +10,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.asphalt.android.model.User
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.theme.Dimensions
@@ -38,7 +40,6 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -90,22 +91,24 @@ private fun RegistrationDetailsHeader(
             text = "adesso Rider's Club",
             style = TypographyMedium.bodyMedium
         )
-        RegistrationFeilds(viewModel)
+        RegistrationForm(viewModel)
     }
 }
 
 
 @Composable
-fun RegistrationFeilds(
+fun RegistrationForm(
     viewModel: AuthViewModel) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    var userName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var userName by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var resultMessage by remember { mutableStateOf<String?>(value = null) }
 
     Column(
@@ -175,6 +178,8 @@ fun RegistrationFeilds(
                 focusedBorderColor = PrimaryDarkerLightB75,
                 unfocusedBorderColor = PrimaryDarkerLightB75
             ),
+            visualTransformation = if (passwordVisible) VisualTransformation.None
+            else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
@@ -184,6 +189,23 @@ fun RegistrationFeilds(
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
+            },
+            trailingIcon = {
+                when {
+                    password.isNotEmpty() -> {
+                        val image = if (passwordVisible) {
+                            R.drawable.ic_eye_closed
+                        } else {
+                            R.drawable.ic_eyy_open
+                        }
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                painter = painterResource(id = image),
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    }
+                }
             }
         )
 
@@ -200,6 +222,8 @@ fun RegistrationFeilds(
                 focusedBorderColor = PrimaryDarkerLightB75,
                 unfocusedBorderColor = PrimaryDarkerLightB75
             ),
+            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None
+            else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
@@ -209,6 +233,23 @@ fun RegistrationFeilds(
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
+            },
+            trailingIcon = {
+                when {
+                    confirmPassword.isNotEmpty() -> {
+                        val image = if (confirmPasswordVisible) {
+                            R.drawable.ic_eye_closed
+                        } else {
+                            R.drawable.ic_eyy_open
+                        }
+                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                            Icon(
+                                painter = painterResource(id = image),
+                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    }
+                }
             }
         )
         Spacer(modifier = Modifier.height(30.dp))
