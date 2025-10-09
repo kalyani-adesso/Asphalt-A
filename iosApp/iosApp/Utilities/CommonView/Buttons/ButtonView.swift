@@ -16,6 +16,7 @@ struct ButtonView: View {
     var borderColor: Color? = nil
     var borderWidth: CGFloat = 1
     var onTap: (() -> Void)? = nil
+    var height: CGFloat? = 60
     var body: some View {
         Button(action: {
             onTap?()
@@ -25,7 +26,7 @@ struct ButtonView: View {
                 Text(title)
             }
                     .frame(maxWidth: .infinity)
-                    .frame(height: 60)
+                    .frame(height: height)
                     .background(
                         background ??
                         LinearGradient(
