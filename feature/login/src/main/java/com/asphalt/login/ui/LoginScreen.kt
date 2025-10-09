@@ -1,6 +1,8 @@
 package com.asphalt.login.ui
 
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +51,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.repository.Authenticator
+import com.asphalt.android.repository.AuthenticatorImpl
+import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -61,6 +68,7 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.ui.LoaderPopup
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -69,16 +77,29 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = koinViewModel(),
     onSignInClick: () -> Unit, onSignUpClick: () -> Unit
 ) {
+    val context = LocalContext.current
     var checked by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
+
 
     var emailState = viewModel.emailTextState.collectAsState()
     var isValidEmail = viewModel.isEmailVaild.collectAsState()
     var passwordState = viewModel.passwordTextState.collectAsState()
     var validateState = viewModel.validateState.collectAsState()
-    var isValidationSuccess = viewModel.isValidationSuccess.collectAsState()
-    if (isValidationSuccess.value) {
+    var isLoginSuccess = viewModel.isLoginSuccess.collectAsState()
+    var showFailureMessage = viewModel.showFailureMessage.collectAsState()
+    var showLoader = viewModel.showLoader.collectAsState()
+    if(showLoader.value){
+        LoaderPopup()
+    }
+    if (isLoginSuccess.value) {
+        viewModel.updateLoader(false)
         onSignInClick.invoke()
+    }
+    if(showFailureMessage.value) {
+        Toast.makeText(context, stringResource(string.user_not_found), Toast.LENGTH_SHORT).show()
+        viewModel.updateMessage(false)
+        viewModel.updateLoader(false)
     }
     val scrollState = rememberScrollState()
     Scaffold() { paddingValues ->
@@ -89,7 +110,7 @@ fun LoginScreen(
                     bottom = paddingValues.calculateBottomPadding(),
                     top = paddingValues.calculateTopPadding()
                 )
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState).imePadding()
                 .background(Color.White)
         ) {
             Spacer(modifier = Modifier.height(Dimensions.spacing80))
@@ -434,10 +455,14 @@ fun LoginScreen(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun LoginPreview() {
-    var viewModel: LoginScreenViewModel = viewModel()
+    var modelauth: AuthViewModel = AuthViewModel(AuthenticatorImpl())
+
+    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth)
+
     LoginScreen(viewModel, onSignInClick = {
 
     }, onSignUpClick = {

@@ -37,7 +37,7 @@ android {
 dependencies {
 
     implementation(projects.commonui)
-
+    implementation(projects.shared)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.compose.material3)

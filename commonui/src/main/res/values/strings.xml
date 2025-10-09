@@ -26,5 +26,6 @@
     <string name="login_success_ful">Yey! Login Successful</string>
     <string name="login_success_msg">You will be moved to home screen right now.Enjoy the features!</string>
     <string name="lets_explore">Lets Explore</string>
+    <string name="user_not_found">User not found</string>
 
 </resources>
