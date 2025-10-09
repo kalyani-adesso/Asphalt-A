@@ -81,8 +81,6 @@ struct AppIcon {
         static let arrow = Image("keyboard_double_arrow_up")
         static let navigation = Image("navigation")
         static let pointer = Image("pointer")
-        
-               
     }
 }
 

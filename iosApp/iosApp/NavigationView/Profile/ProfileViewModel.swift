@@ -74,9 +74,9 @@ final class ProfileViewModel: ObservableObject {
                 
                 items: [
                     ProfileItemModel(icon: AppIcon.Profile.distance, iconColor: AppColor.yellow, title: "2,847 km", subtitle: AppStrings.Profile.distanceCovered, destination: AnyView(ConnectedRideScreen())),
-                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "25 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeScreen())),
+                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "25 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
                     ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "12 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(ConnectedRideScreen())),
-                    ProfileItemModel(icon: AppIcon.Profile.elevation, iconColor: AppColor.skyBlue, title: AppStrings.Profile.elevationGain, subtitle: "12,450 m", destination: AnyView(HomeScreen()))
+                    ProfileItemModel(icon: AppIcon.Profile.elevation, iconColor: AppColor.skyBlue, title: AppStrings.Profile.elevationGain, subtitle: "12,450 m", destination: AnyView(HomeView()))
                 ]
             ),
             ProfileSection(
@@ -84,7 +84,7 @@ final class ProfileViewModel: ObservableObject {
                 subtitle: AppStrings.Profile.badgesDescription,
                 icon: AppIcon.Profile.award,
                 items: [
-                    ProfileItemModel(icon: AppIcon.Profile.trophy, iconColor: AppColor.red, title: AppStrings.Profile.noBadges, subtitle: AppStrings.Profile.earnBadgeTip, destination: AnyView(HomeScreen())),
+                    ProfileItemModel(icon: AppIcon.Profile.trophy, iconColor: AppColor.red, title: AppStrings.Profile.noBadges, subtitle: AppStrings.Profile.earnBadgeTip, destination: AnyView(HomeView())),
                 ]
             )
         ]
