@@ -16,4 +16,5 @@ object Constants {
     val DEFAULT_SCREEN_HORIZONTAL_PADDING = Dimensions.spacing15
     val AVATAR_DEFAULT_SIZE = Dimensions.size73
     val AVATAR_DEFAULT_BORDER_WIDTH = Dimensions.size4
+    const val DATA_STORE_NAME = "asphalt_prefs"
 }

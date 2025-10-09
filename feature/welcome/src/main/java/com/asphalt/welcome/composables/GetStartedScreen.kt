@@ -19,6 +19,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -36,13 +40,23 @@ import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
 import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.sealedclasses.Carousels
+import com.asphalt.welcome.viewmodels.WelcomeViewModel
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+
 
 @Composable
 fun GetStartedScreen(
     onNavigateToRegister: () -> Unit = {}
 ) {
-    //val context = LocalContext.current
-
+    val welcomeViewModel: WelcomeViewModel = koinViewModel()
+    val scope = rememberCoroutineScope()
+    val isFirstTimeUsed by welcomeViewModel.isFirstTimeAppUsed.collectAsState(initial = false)
+    LaunchedEffect(isFirstTimeUsed) {
+        if (isFirstTimeUsed)
+            onNavigateToRegister()
+        //TODO:Navigate to sign in screen as per flow. The above line is navigation to sign up
+    }
     val carouselItems = listOf(
         Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
         Carousels.RideTogetherCarousel.carouselItem
@@ -102,7 +116,11 @@ fun GetStartedScreen(
                         GradientButton(
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
-                            onClick = onNavigateToRegister
+                            onClick = {
+                                scope.launch {
+                                    welcomeViewModel.registerGetStarted()
+                                }
+                            }
 
                         ) {
                             val buttonText = stringResource(R.string.get_started).uppercase()
