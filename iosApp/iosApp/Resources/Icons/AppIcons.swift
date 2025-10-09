@@ -50,6 +50,24 @@ struct AppIcon {
         static let newRider = Image("new-rider")
         static let rideReminder = Image("rider-reminder")
     }
+    
+    struct Profile {
+        static let award = Image("icon-award")
+        static let bike = Image("icon-bike")
+        static let elevation = Image("icon-elevation")
+        static let vehicle = Image("icon-vehicle")
+        static let pin = Image("icon-pin")
+        static let distance = Image("icon-distance")
+        static let path = Image("icon-path")
+        static let trophy = Image("icon-trophy")
+        static let editProfile = Image("icon-editProfile")
+        static let ride = Image("icon-ride")
+        static let leftIcon = Image("icon-left")
+        static let rightIcon = Image("icon-right")
+        static let sportsBike = Image("icon-sportsBike")
+        static let mechanic = Image("icon-mechanic")
+        static let camera = Image("icon-camera")
+    }
 }
 
 
