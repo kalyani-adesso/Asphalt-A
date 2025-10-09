@@ -94,6 +94,7 @@ fun LoginScreen(
     }
     if (isLoginSuccess.value) {
         onSignInClick.invoke()
+        viewModel.resetLogin()
     }
     if(showFailureMessage.value) {
         Toast.makeText(context, stringResource(string.user_not_found), Toast.LENGTH_SHORT).show()

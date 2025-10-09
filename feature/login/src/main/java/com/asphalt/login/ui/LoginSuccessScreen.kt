@@ -31,7 +31,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.R.string
 
 @Composable
-fun LoginSuccessScreen() {
+fun LoginSuccessScreen(exploreClick: () -> Unit) {
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -94,8 +94,9 @@ fun LoginSuccessScreen() {
                     GradientButton(
                         PrimaryDarkerLightB75, PrimaryDarkerLightB50,
                         buttonText = stringResource(string.lets_explore).uppercase(),
-
-                        ) {}
+                    ) {
+                        exploreClick.invoke()
+                    }
                 }
             }
 
@@ -109,5 +110,5 @@ fun LoginSuccessScreen() {
 @Preview
 @Composable
 fun LoginSuccesPreview() {
-    LoginSuccessScreen()
+    LoginSuccessScreen({})
 }

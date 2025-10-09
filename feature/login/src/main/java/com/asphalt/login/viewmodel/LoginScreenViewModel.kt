@@ -38,6 +38,10 @@ class LoginScreenViewModel (val authViewModel: AuthViewModel) : ViewModel() {
     fun updateLoader(boolean: Boolean){
         showLoader.value=boolean
     }
+
+    fun resetLogin(){
+        isLoginSuccess.value =false
+    }
     fun updateEmailState(email: String) {
         _emailTextMutableState.value = email
         isEmailVaild.value = EmailValidator.isValid(email)
