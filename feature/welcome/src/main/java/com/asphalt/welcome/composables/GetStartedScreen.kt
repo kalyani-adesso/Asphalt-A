@@ -51,12 +51,7 @@ fun GetStartedScreen(
 ) {
     val welcomeViewModel: WelcomeViewModel = koinViewModel()
     val scope = rememberCoroutineScope()
-    val isFirstTimeUsed by welcomeViewModel.isFirstTimeAppUsed.collectAsState(initial = false)
-    LaunchedEffect(isFirstTimeUsed) {
-        if (isFirstTimeUsed)
-            onNavigateToRegister()
-        //TODO:Navigate to sign in screen as per flow. The above line is navigation to sign up
-    }
+
     val carouselItems = listOf(
         Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
         Carousels.RideTogetherCarousel.carouselItem
@@ -119,6 +114,7 @@ fun GetStartedScreen(
                             onClick = {
                                 scope.launch {
                                     welcomeViewModel.registerGetStarted()
+                                    onNavigateToRegister()
                                 }
                             }
 

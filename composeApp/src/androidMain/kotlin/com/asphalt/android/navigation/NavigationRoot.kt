@@ -15,14 +15,16 @@ import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
 import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
+import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
+import com.asphalt.welcome.navigation.SplashKey
 import com.asphalt.welcome.navigation.WelcomeFeatureNavKey
 import kotlinx.serialization.Serializable
 
 @Suppress("FunctionName")
 @Composable
 fun NavigationRoot() {
-    val backStack = rememberNavBackStack(WelcomeFeatureNavKey)
+    val backStack = rememberNavBackStack(SplashKey)
 
     fun onBackPressed() {
         println("Back Nav from ${backStack.lastOrNull()}")
@@ -78,8 +80,20 @@ fun NavigationRoot() {
                 NavigationWelcomeFeature(
                     onNavigateToRegister = {
                         backStack.add(RegistrationDetailsNavKey)
+                        backStack.remove(WelcomeFeatureNavKey)
                     }
                 )
+            }
+            entry<SplashKey> { key ->
+                NavigationSplashScreen (
+                    onNavigateToRegister = {
+                        backStack.add(RegistrationDetailsNavKey)
+                    },
+                    onNavigateToWelcome = {
+                        backStack.add(WelcomeFeatureNavKey)
+                    }
+                )
+                backStack.remove(SplashKey)
             }
 
             entry<RegistrationCodeNavKey> { key ->

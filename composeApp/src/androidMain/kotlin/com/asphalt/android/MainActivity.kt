@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            MaterialTheme {
+            AsphaltTheme {
                 Surface(
                     modifier = Modifier
                 ) {

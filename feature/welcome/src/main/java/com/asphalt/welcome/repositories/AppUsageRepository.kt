@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = Constants.DATA_STORE_NAME)
 
 class AppUsageRepository(val context: Context) {
-    val isFirstTimeAppUsed: Flow<Boolean> = context.dataStore.data
+    val isGetStartedDone: Flow<Boolean> = context.dataStore.data
         .map { prefs ->
-            prefs[booleanPreferencesKey(PreferenceKeys.IS_FIRST_TIME_APP_USED)] ?: false
+            prefs[booleanPreferencesKey(PreferenceKeys.IS_GET_STARTED_DONE)] ?: false
         }
 
-    suspend fun setFirstTimeUsed(value: Boolean) {
+    suspend fun registerGetStarted(value: Boolean) {
         context.dataStore.edit { preferences ->
-            preferences[booleanPreferencesKey(PreferenceKeys.IS_FIRST_TIME_APP_USED)] = value
+            preferences[booleanPreferencesKey(PreferenceKeys.IS_GET_STARTED_DONE)] = value
         }
     }
 }
