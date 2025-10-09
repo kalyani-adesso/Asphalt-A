@@ -58,9 +58,11 @@ class LoginScreenViewModel (val authViewModel: AuthViewModel) : ViewModel() {
                var loginresponse =authViewModel.signIn(_emailTextMutableState.value,_passwordTextMutableState.value)
                 if(loginresponse.isSuccess){
                     updateMessage(false)
+                    updateLoader(false)
                     isLoginSuccess.value = true
                 }else{
                     isLoginSuccess.value = false
+                    updateLoader(false)
                     updateMessage(true)
                 }
                 Log.d("Login","${loginresponse.isSuccess}")

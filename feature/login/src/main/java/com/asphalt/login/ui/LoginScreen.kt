@@ -93,13 +93,11 @@ fun LoginScreen(
         LoaderPopup()
     }
     if (isLoginSuccess.value) {
-        viewModel.updateLoader(false)
         onSignInClick.invoke()
     }
     if(showFailureMessage.value) {
         Toast.makeText(context, stringResource(string.user_not_found), Toast.LENGTH_SHORT).show()
         viewModel.updateMessage(false)
-        viewModel.updateLoader(false)
     }
     val scrollState = rememberScrollState()
     Scaffold() { paddingValues ->
