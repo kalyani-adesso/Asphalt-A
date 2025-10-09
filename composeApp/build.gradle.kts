@@ -89,6 +89,7 @@ dependencies {
     // modules
     implementation(projects.shared)
     implementation(projects.feature.registration)
+    implementation(projects.feature.login)
     implementation(projects.feature.welcome)
     implementation(projects.feature.dashboard)
     implementation(projects.commonui)

@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SplashScreen(onNavigateToRegister: () -> Unit, onNavigateToWelcome: () -> Unit) {
+fun SplashScreen(onNavigateToLogin: () -> Unit, onNavigateToWelcome: () -> Unit) {
     val welcomeViewModel: WelcomeViewModel = koinViewModel()
     Column(
         modifier = Modifier
@@ -54,7 +54,7 @@ fun SplashScreen(onNavigateToRegister: () -> Unit, onNavigateToWelcome: () -> Un
     LaunchedEffect(Unit) {
         delay(Constants.SPLASH_TIMER)
         if (isGetStartedDone)
-            onNavigateToRegister()
+            onNavigateToLogin()
         else
             onNavigateToWelcome()
     }

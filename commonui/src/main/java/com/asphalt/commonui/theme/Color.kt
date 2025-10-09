@@ -30,4 +30,6 @@ val NeutralBlack10 = Color(0x1A000000)
 val VividRed = Color(0xFFF12225)
 
 
+val NeutralLightGray25= Color(0xFFF8F7FB)
+val NeutralRed=Color(0XFFFF0000)
 val NaturalGreen = Color(0xFF6FCD38)

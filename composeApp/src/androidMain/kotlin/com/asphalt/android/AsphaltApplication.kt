@@ -1,6 +1,13 @@
 package com.asphalt.android
 
 import android.app.Application
+
+import com.asphalt.android.di.appModule
+import com.asphalt.login.di.loginModule
+
+import com.asphalt.registration.di.registrationModule
+import com.asphalt.welcome.di.welcomeFeatureModule
+
 import com.asphalt.android.di.sharedModule
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.registration.di.registrationModule
@@ -21,9 +28,9 @@ class AsphaltApplication : Application() {
             androidContext(androidContext = this@AsphaltApplication)
             //First start Koin with all modules including shared components
             modules(
-                sharedModule,
-                registrationModule,
-                welcomeFeatureModule,
+                modules = appModule+loginModule+registrationModule+welcomeFeatureModule
+                        +sharedModule,
+
             )
             module {
                 single { AuthenticatorImpl() }

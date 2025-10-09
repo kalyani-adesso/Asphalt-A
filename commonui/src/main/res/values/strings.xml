@@ -28,5 +28,25 @@
     <string name="decline">Decline</string>
     <string name="adesso_riders_club">adesso Rider\'s\nClub</string>
 
+    <string name="welcome">Welcome</string>
+    <string name="login_explore_continue">Let\’s login for explore continues</string>
+    <string name="adesso_rider_club">adesso Rider\'s Club</string>
+    <string name="email_phone">Email or Phone Number</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="keep_signed_in">Keep me signed in</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="you_can_connect">You can connect with</string>
+    <string name="dont_have_account">Don’t have an account?</string>
+    <string name="sign_up_here">Sign Up here</string>
+    <string name="enter_valid_email">Enter a Valid Email</string>
+    <string name="enter_valid_password">Enter a Valid Password</string>
+    <string name="empty_string"> </string>
+    <string name="login_success_ful">Yey! Login Successful</string>
+    <string name="login_success_msg">You will be moved to home screen right now.Enjoy the features!</string>
+    <string name="lets_explore">Lets Explore</string>
+    <string name="user_not_found">User not found</string>
 
 </resources>

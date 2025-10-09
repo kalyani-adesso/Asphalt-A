@@ -17,7 +17,7 @@ data object SplashKey : NavKey
 
 @Composable
 fun NavigationSplashScreen(
-    onNavigateToRegister: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     onNavigateToWelcome: () -> Unit = {}
 ) {
     val backStack = rememberNavBackStack(WelcomeFeatureNavKey)
@@ -32,7 +32,7 @@ fun NavigationSplashScreen(
         sceneStrategy = SinglePaneSceneStrategy(),
         entryProvider = entryProvider {
             entry<WelcomeFeatureNavKey> {
-                SplashScreen(onNavigateToRegister,onNavigateToWelcome)
+                SplashScreen(onNavigateToLogin,onNavigateToWelcome)
             }
         }
     )
