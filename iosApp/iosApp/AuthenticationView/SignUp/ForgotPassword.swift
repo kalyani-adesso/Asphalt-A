@@ -66,7 +66,7 @@ struct ForgotPassword: View {
                 }
             }
             if showSnackbar {
-                AppColor.overlay.opacity(0.75)
+                AppColor.lightGray.opacity(0.75)
                     .ignoresSafeArea()
                     .transition(.opacity)
                     .zIndex(0.5)
