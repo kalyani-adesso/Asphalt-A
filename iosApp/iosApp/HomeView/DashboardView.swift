@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct DashboardView: View {
-    @EnvironmentObject var home: HomeViewModel 
+    @EnvironmentObject var home: HomeViewModel
     @State private var currentDate = Date()
     
     
@@ -23,12 +23,10 @@ struct DashboardView: View {
                     AppIcon.Home.arrow
                 }
                 .buttonStyle(.plain)
-                
                 Text(CalendarFormat().dateFormatter.string(from: currentDate))
                     .font(KlavikaFont.medium.font(size: 18))
                 Text(CalendarFormat().dayFormatter.string(from: currentDate))
                     .font(KlavikaFont.bold.font(size: 30))
-                
                 let isToday = Calendar.current.isDateInToday(currentDate)
                 Button {
                     let nextDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate

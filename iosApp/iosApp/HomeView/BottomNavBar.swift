@@ -19,16 +19,12 @@ struct BottomNavBar: View {
                 case 0:
                     HomeView()
                         .environmentObject(homeViewModel)
-                    
                 case 1:
                     YourRideScreen()
-                    
                 case 2:
                     NavigationSlideBar()
-                    
                 case 3:
                     ProfileScreen()
-                    
                 default:
                     HomeView()
                         .environmentObject(homeViewModel)

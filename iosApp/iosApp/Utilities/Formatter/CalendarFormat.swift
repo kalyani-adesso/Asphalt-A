@@ -20,19 +20,15 @@ class CalendarFormat : ObservableObject{
         return formatter
     }
     
-     func dateRangeText(monthOffset: Int) -> String {
+    func dateRangeText(monthOffset: Int) -> String {
         let calendar = Calendar.current
         let today = Date()
-        
-        // Move end date based on current offset
         guard let endDate = calendar.date(byAdding: .month, value: monthOffset * 7, to: today),
               let startDate = calendar.date(byAdding: .month, value: -7, to: endDate)
         else { return "" }
-        
         let formatter = DateFormatter()
         formatter.dateFormat = "dd MMM YYYY"
-        
         return "\(formatter.string(from: startDate).uppercased()) - \(formatter.string(from: endDate).uppercased())"
     }
-
+    
 }
