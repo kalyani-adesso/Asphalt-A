@@ -6,10 +6,12 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
-    //alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     androidTarget {
         compilerOptions {
@@ -26,6 +28,30 @@ kotlin {
             isStatic = true
         }
     }
+
+//    cocoapods {
+//        version = "1.0"
+//    }
+
+//    cocoapods {
+//        // This is the correct place for pod dependencies
+//        summary = "Some description for the Shared Module"
+//        homepage = "https://github.com/kalyani-adesso/Asphalt-A"
+//        version = "1.0"
+//        ios.deploymentTarget = "16.6"
+//
+//        // The 'name' property is now recommended instead of a framework block here.
+//        // It defines the name of the generated Podspec.
+//        name = "Shared"
+//
+//        // Your pod dependencies are correct
+//        pod("FirebaseCore")
+//        pod("FirebaseAuth")
+//        pod("FirebaseDatabase")
+//        pod("FirebaseFirestore")
+//
+//        // REMOVE the incorrect framework block and the specRepos block
+//    }
     
     sourceSets {
 
