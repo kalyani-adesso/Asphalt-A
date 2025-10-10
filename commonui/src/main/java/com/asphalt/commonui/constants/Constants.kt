@@ -21,4 +21,8 @@ object Constants {
     const val DATE_FORMAT_PLACES_VISITED = "dd MMM"
     const val NO_OF_MONTHS_PLACE_VISITED = 7
 
+    //Firebase Data base
+    const val FIREBASE_DB = "users_android"
+    const val Firebase_user_name = "name"
+    const val Firebase_user_email = "email"
 }

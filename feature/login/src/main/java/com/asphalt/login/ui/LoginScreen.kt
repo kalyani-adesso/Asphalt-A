@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -34,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +50,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.asphalt.android.repository.Authenticator
+import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
+import com.asphalt.commonui.R.string
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
@@ -64,23 +65,26 @@ import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.login.viewmodel.LoginScreenViewModel
-import com.asphalt.commonui.R.string
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.LoaderPopup
+import com.asphalt.login.viewmodel.LoginScreenViewModel
+import org.koin.compose.currentKoinScope
 import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun LoginScreen(
     viewModel: LoginScreenViewModel = koinViewModel(),
-    onSignInClick: () -> Unit, onSignUpClick: () -> Unit
+    onSignInClick: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onDashboardNav: () -> Unit,
+    dataStoreManager: DataStoreManager = currentKoinScope().get()
 ) {
     val context = LocalContext.current
     var checked by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
-
+//    val dataStoreManager : DataStoreManager = koinInject()
 
     var emailState = viewModel.emailTextState.collectAsState()
     var isValidEmail = viewModel.isEmailVaild.collectAsState()
@@ -89,13 +93,23 @@ fun LoginScreen(
     var isLoginSuccess = viewModel.isLoginSuccess.collectAsState()
     var showFailureMessage = viewModel.showFailureMessage.collectAsState()
     var showLoader = viewModel.showLoader.collectAsState()
-    if(showLoader.value){
+
+    if (showLoader.value) {
         LoaderPopup()
     }
-    if (isLoginSuccess.value) {
-        onSignInClick.invoke()
+    LaunchedEffect(isLoginSuccess.value) {
+        if (isLoginSuccess.value) {
+            if (dataStoreManager.getBoolean(PreferenceKeys.IS_LOGGED_IN_BEFORE) ?: false) {
+                onDashboardNav.invoke()
+                viewModel.resetLogin()
+
+            } else {
+                onSignInClick.invoke()
+                viewModel.resetLogin()
+            }
+        }
     }
-    if(showFailureMessage.value) {
+    if (showFailureMessage.value) {
         Toast.makeText(context, stringResource(string.user_not_found), Toast.LENGTH_SHORT).show()
         viewModel.updateMessage(false)
     }
@@ -108,7 +122,8 @@ fun LoginScreen(
                     bottom = paddingValues.calculateBottomPadding(),
                     top = paddingValues.calculateTopPadding()
                 )
-                .verticalScroll(scrollState).imePadding()
+                .verticalScroll(scrollState)
+                .imePadding()
                 .background(Color.White)
         ) {
             Spacer(modifier = Modifier.height(Dimensions.spacing80))
@@ -459,13 +474,17 @@ fun LoginScreen(
 fun LoginPreview() {
     var modelauth: AuthViewModel = AuthViewModel(AuthenticatorImpl())
 
-    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth)
+
+    var dataStoreManager = DataStoreManager(LocalContext.current)
+    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth, dataStoreManager)
 
     LoginScreen(viewModel, onSignInClick = {
 
     }, onSignUpClick = {
 
-    })
+    }, onDashboardNav = {
+
+    }, dataStoreManager)
 
 }
 

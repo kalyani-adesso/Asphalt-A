@@ -74,7 +74,7 @@ struct MenuSectionView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(AppColor.seperatorGray, lineWidth: 1)
+                .stroke(AppColor.whiteGray, lineWidth: 1)
         )
         .padding(.horizontal, 16)
     }
@@ -112,7 +112,7 @@ struct MenuItemRow: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.seperatorGray, lineWidth: 1)
+                .stroke(AppColor.whiteGray, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {

@@ -34,8 +34,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier
                 ) {
-                    DashBoardScreen()
-//                    NavigationRoot()
+                    NavigationRoot()
                 }
             }
 //            AsphaltTheme {

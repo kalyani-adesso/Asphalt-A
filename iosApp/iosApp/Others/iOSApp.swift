@@ -18,7 +18,6 @@ struct iOSApp: App {
             if MBUserDefaults.hasSeenOnboardingStatic {
                 NavigationStack {
                 SignInView()
-//                   HomeView(showSnackbar: false)
                 }
             } else {
                 WelcomeScreen()

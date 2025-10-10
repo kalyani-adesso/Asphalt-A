@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
@@ -29,9 +31,14 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.constants.PreferenceKeys
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
-fun LoginSuccessScreen() {
+fun LoginSuccessScreen(exploreClick: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    val datatore: DataStoreManager = koinInject()
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -94,8 +101,12 @@ fun LoginSuccessScreen() {
                     GradientButton(
                         PrimaryDarkerLightB75, PrimaryDarkerLightB50,
                         buttonText = stringResource(string.lets_explore).uppercase(),
-
-                        ) {}
+                    ) {
+                        scope.launch {
+                            datatore.saveValue(PreferenceKeys.IS_LOGGED_IN_BEFORE,true)
+                        }
+                        exploreClick.invoke()
+                    }
                 }
             }
 
@@ -109,5 +120,5 @@ fun LoginSuccessScreen() {
 @Preview
 @Composable
 fun LoginSuccesPreview() {
-    LoginSuccessScreen()
+    LoginSuccessScreen({})
 }
