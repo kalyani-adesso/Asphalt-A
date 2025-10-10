@@ -10,6 +10,7 @@ import SwiftUI
 struct BottomNavBar: View {
     @State private var selectedTab = 0
     @Namespace private var animation
+    @StateObject private var homeViewModel = HomeViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -17,6 +18,7 @@ struct BottomNavBar: View {
                 switch selectedTab {
                 case 0:
                     HomeView()
+                        .environmentObject(homeViewModel)
                     
                 case 1:
                     YourRideScreen()
@@ -29,6 +31,7 @@ struct BottomNavBar: View {
                     
                 default:
                     HomeView()
+                        .environmentObject(homeViewModel)
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: selectedTab)

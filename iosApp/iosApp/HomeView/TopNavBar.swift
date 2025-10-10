@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TopNavBar: View {
-    @StateObject private var home = HomeViewModel()
+    @EnvironmentObject var home: HomeViewModel 
     
     var body: some View {
         ZStack(alignment: .bottom) {

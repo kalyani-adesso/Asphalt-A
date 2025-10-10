@@ -17,6 +17,14 @@ struct MBUserDefaults {
             UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.hasSeenOnboarding.rawValue)
         }
     }
+    static var hasShownLoginSuccessStatic: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: AppStrings.userdefaultKeys.hasShownLoginSuccess.rawValue)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.hasShownLoginSuccess.rawValue)
+        }
+    }
     
     static var rememberMeDataStatic: Bool {
         get {
