@@ -4,6 +4,7 @@ import android.util.Log
 import com.asphalt.android.model.AuthResultimpl
 import com.asphalt.android.model.LoginResult
 import com.asphalt.android.model.User
+import com.asphalt.commonui.utils.Constants
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -62,13 +63,13 @@ actual class AuthenticatorImpl {
             val id = user?.uid ?: return AuthResultimpl(false, "User ID not found")
 
             val userRef = FirebaseDatabase.getInstance()
-                .getReference("users_android")
+                .getReference(Constants.FIREBASE_DB)
                 .child(id)
 
             val dataSnapshot = userRef.get().await()
             //val userData = dataSnapshot.getValue(User::class.java)
-            val name = dataSnapshot.child("name").getValue(String::class.java)
-            val email = dataSnapshot.child("email").getValue(String::class.java)
+            val name = dataSnapshot.child(Constants.Firebase_user_name).getValue(String::class.java)
+            val email = dataSnapshot.child(Constants.Firebase_user_email).getValue(String::class.java)
 
             //Log.d("name","name ${name}")
 

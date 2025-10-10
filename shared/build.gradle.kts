@@ -40,6 +40,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
+            implementation(projects.commonui)
 
 //            implementation(libs.firebase.common) // Or latest version
 //            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth

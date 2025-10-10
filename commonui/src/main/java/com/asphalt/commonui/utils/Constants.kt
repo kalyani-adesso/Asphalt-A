@@ -17,4 +17,9 @@ object Constants {
     val AVATAR_DEFAULT_SIZE = Dimensions.size73
     val AVATAR_DEFAULT_BORDER_WIDTH = Dimensions.size4
     const val DATA_STORE_NAME = "asphalt_prefs"
+
+    //Firebase Data base
+    const val FIREBASE_DB = "users_android"
+    const val Firebase_user_name = "name"
+    const val Firebase_user_email = "email"
 }
