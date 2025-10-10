@@ -19,7 +19,6 @@ struct iOSApp: App {
             if hasSeenOnboarding {
                 NavigationStack {
                 SignInView()
-//                   HomeView(showSnackbar: false)
                 }
             } else {
                 WelcomeScreen()
