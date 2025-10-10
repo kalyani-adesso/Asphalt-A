@@ -40,7 +40,7 @@ final class NavigationSliderViewModel: ObservableObject {
             MenuSection(
                 title: "Main",
                 items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.home, iconColor: AppColor.purple, title: "Home", subtitle: "Your riding dashboard", destination: AnyView(HomeView(showSnackbar: false))),
+                    MenuItemModel(icon: AppIcon.NavigationSlider.home, iconColor: AppColor.purple, title: "Home", subtitle: "Your riding dashboard", destination: AnyView(HomeView())),
                     MenuItemModel(icon: AppIcon.NavigationSlider.profile, iconColor: AppColor.celticBlue, title: "Profile", subtitle: "Manage your info", destination: AnyView(ProfileScreen())),
                     MenuItemModel(icon: AppIcon.NavigationSlider.yourRide, iconColor: AppColor.orange, title: "Your Rides", subtitle: "Your ride history", destination: AnyView(YourRideScreen())),
                     MenuItemModel(icon: AppIcon.NavigationSlider.createRide, iconColor: AppColor.green, title: "Create Ride", subtitle: "Plan new adventure", destination: AnyView(CreateRideScreen()))
@@ -50,22 +50,22 @@ final class NavigationSliderViewModel: ObservableObject {
                 title: "Community",
                 items: [
                     MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.yellow, title: "Connected Ride", subtitle: "Join group rides", destination: AnyView(ConnectedRideScreen())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.queries, iconColor: AppColor.skyBlue, title: "Queries", subtitle: "Ask & answer", destination: AnyView(HomeView(showSnackbar: false)))
+                    MenuItemModel(icon: AppIcon.NavigationSlider.queries, iconColor: AppColor.skyBlue, title: "Queries", subtitle: "Ask & answer", destination: AnyView(HomeView()))
                 ]
             ),
             MenuSection(
                 title: "Learning",
                 items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.knowledgeCircle, iconColor: AppColor.red, title: "Knowledge Circle", subtitle: "Learn road signs", destination: AnyView(HomeView(showSnackbar: false))),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.motoQuiz, iconColor: AppColor.navyBlue, title: "Moto Quiz", subtitle: "Test your skills", destination: AnyView(HomeView(showSnackbar: false))),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.preRideCheck, iconColor: AppColor.lime, title: "Pre Ride Check", subtitle: "Ask & answer", destination: AnyView(HomeView(showSnackbar: false)))
+                    MenuItemModel(icon: AppIcon.NavigationSlider.knowledgeCircle, iconColor: AppColor.red, title: "Knowledge Circle", subtitle: "Learn road signs", destination: AnyView(HomeView())),
+                    MenuItemModel(icon: AppIcon.NavigationSlider.motoQuiz, iconColor: AppColor.navyBlue, title: "Moto Quiz", subtitle: "Test your skills", destination: AnyView(HomeView())),
+                    MenuItemModel(icon: AppIcon.NavigationSlider.preRideCheck, iconColor: AppColor.lime, title: "Pre Ride Check", subtitle: "Ask & answer", destination: AnyView(HomeView()))
                 ]
             ),
             MenuSection(
                 title: "More",
                 items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.pink, title: "Marketplace", subtitle: "Buy and sell gears", destination: AnyView(HomeView(showSnackbar: false))),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.charcol, title: "Settings", subtitle: "App preferences", destination: AnyView(HomeView(showSnackbar: false)))
+                    MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.pink, title: "Marketplace", subtitle: "Buy and sell gears", destination: AnyView(HomeView())),
+                    MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.charcol, title: "Settings", subtitle: "App preferences", destination: AnyView(HomeView()))
                 ]
             )
         ]

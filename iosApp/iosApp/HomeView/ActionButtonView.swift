@@ -10,7 +10,6 @@ import SwiftUI
 struct ActionButtonView: View {
     var body: some View {
         HStack(spacing: 12) {
-            
             ButtonView( title: AppStrings.HomeLabel.createRide.rawValue,
                         icon: AppIcon.Home.createRide,
                         showShadow: false )
@@ -25,7 +24,6 @@ struct ActionButtonView: View {
                         showShadow: false ,
                         borderColor: AppColor.celticBlue)
         }
-        .padding(.top,20)
     }
 }
 
