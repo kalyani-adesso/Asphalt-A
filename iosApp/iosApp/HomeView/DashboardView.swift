@@ -10,38 +10,57 @@ import SwiftUI
 
 struct DashboardView: View {
     @StateObject private var home = HomeViewModel()
+    @State private var currentDate = Date()
+    
     
     var body: some View {
-       
-            HStack(alignment: .top, spacing: 15) {
-                
-                VStack(spacing: 10) {
+        
+        HStack(alignment: .top, spacing: 15) {
+            VStack(spacing: 10) {
+                Button {
+                    currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+                } label: {
                     AppIcon.Home.arrow
-                    Text("Aug")
-                        .font(KlavikaFont.medium.font(size: 18))
-                    Text("25")
-                        .font(KlavikaFont.bold.font(size: 30))
+                }
+                .buttonStyle(.plain)
+                
+                Text(CalendarFormat().dateFormatter.string(from: currentDate))
+                    .font(KlavikaFont.medium.font(size: 18))
+                Text(CalendarFormat().dayFormatter.string(from: currentDate))
+                    .font(KlavikaFont.bold.font(size: 30))
+                
+                let isToday = Calendar.current.isDateInToday(currentDate)
+                Button {
+                    let nextDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+                    if nextDate <= Date()
+                    {
+                        currentDate = nextDate
+                    }
+                } label: {
                     AppIcon.Home.arrow
                         .rotationEffect(.degrees(180))
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 8)
-                .cornerRadius(12)
-                HStack(spacing: 15) {
-                    ForEach(home.stats) { stat in
-                        StatCardView(stat: stat)
-                    }
+                .buttonStyle(.plain)
+                .disabled(isToday)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .cornerRadius(12)
+            HStack(spacing: 15) {
+                ForEach(home.stats) { stat in
+                    StatCardView(stat: stat)
                 }
             }
-            .frame(width: 345)
-            .padding()
-            .background(AppColor.backgroundLight)
-            .cornerRadius(15)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(AppColor.border, lineWidth: 2)
-            )
         }
+        .frame(width: 345)
+        .padding()
+        .background(AppColor.backgroundLight)
+        .cornerRadius(15)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(AppColor.darkGray, lineWidth: 2)
+        )
+    }
     
 }
 

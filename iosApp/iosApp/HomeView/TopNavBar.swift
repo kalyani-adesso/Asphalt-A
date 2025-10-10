@@ -7,23 +7,21 @@
 
 import SwiftUI
 
-struct CustomNavBar: View {
+struct TopNavBar: View {
     @StateObject private var home = HomeViewModel()
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Background with shadow
             Rectangle()
                 .fill(Color.white)
                 .frame(height: 115)
                 .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 3)
-            
             HStack {
                 NavigationLink(destination: NavigationSlideBar()) {
                     AppIcon.Home.navigation
                 }
+                .navigationBarBackButtonHidden(true)
                 Spacer()
-                
                 VStack(spacing: 2) {
                     Text(home.userName)
                         .font(.system(size: 17, weight: .semibold))
@@ -36,7 +34,6 @@ struct CustomNavBar: View {
                 }
                 
                 Spacer()
-                
                 Button {
                     print("Notifications tapped")
                 } label: {
@@ -54,10 +51,9 @@ struct CustomNavBar: View {
             .padding(.horizontal, 20)
             .padding(.bottom,10)
         }
-        
     }
 }
 
 #Preview {
-    CustomNavBar()
+    TopNavBar()
 }

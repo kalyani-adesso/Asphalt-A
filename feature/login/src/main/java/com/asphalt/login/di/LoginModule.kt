@@ -5,5 +5,5 @@ import com.asphalt.login.viewmodel.LoginScreenViewModel
 import org.koin.dsl.module
 
 val loginModule = module {
-    single { LoginScreenViewModel(get()) }
+    single { LoginScreenViewModel(get(),get()) }
 }

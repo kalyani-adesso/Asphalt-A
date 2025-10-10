@@ -10,10 +10,8 @@ import Charts
 
 struct PlacesVisitedView: View {
     @StateObject private var home = HomeViewModel()
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AppStrings.Placesvisited.title.rawValue)
@@ -23,9 +21,7 @@ struct PlacesVisitedView: View {
                         .font(KlavikaFont.bold.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
                 }
-                
                 Spacer()
-                
                 HStack(spacing: 10) {
                     Button(action: {}) {
                         Image(systemName: "chevron.left")
@@ -35,7 +31,6 @@ struct PlacesVisitedView: View {
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    
                     Button(action: {}) {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .bold))
@@ -46,8 +41,6 @@ struct PlacesVisitedView: View {
                     }
                 }
             }
-            
-            
             Chart {
                 ForEach(home.placesByMonth) { item in
                     let isSelected = home.selectedMonth?.month == item.month
@@ -60,36 +53,34 @@ struct PlacesVisitedView: View {
                     .foregroundStyle(AppColor.celticBlue)
                     
                     if isSelected {
-                                BarMark(
-                                    x: .value("Month", item.month),
-                                    yStart: .value("Base", 0),
-                                    yEnd: .value("Highlight", item.placesCount + 1)
-                                )
-                                .cornerRadius(6)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            AppColor.celticBlue.opacity(0.6),
-                                            AppColor.white.opacity(0.2),
-                                        ],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                                .annotation(position: .top) {
-                                    TooltipView(number: item.placesCount)
-                                }
-                            }
+                        BarMark(
+                            x: .value("Month", item.month),
+                            yStart: .value("Base", 0),
+                            yEnd: .value("Highlight", item.placesCount + 1)
+                        )
+                        .cornerRadius(6)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [
+                                    AppColor.celticBlue.opacity(0.6),
+                                    AppColor.white.opacity(0.2),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .annotation(position: .top) {
+                            TooltipView(number: item.placesCount)
                         }
                     }
-     
+                }
+            }
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 6)) { value in
                     AxisGridLine()
                     AxisValueLabel()
                 }
             }
-            
             .chartXAxis {
                 AxisMarks(values: .automatic) { value in
                     AxisValueLabel()
@@ -110,30 +101,26 @@ struct PlacesVisitedView: View {
                                             }
                                         }
                                     }
-                                    }
                                 }
                             }
                     }
                 }
-                
-                .frame(height: 180)
-                .padding(.top, 4)
-                
             }
-            .padding()
+            
+            .frame(height: 180)
+            .padding(.top, 4)
         }
+        .padding()
     }
+}
 
 struct TooltipView: View {
     var number: Int
     var body: some View {
         ZStack {
-            // Background image for tooltip
             AppIcon.Home.pointer
                 .resizable()
                 .frame(width: 44, height: 24)
-            
-            // Number displayed on top
             Text("\(number)")
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(.white)
@@ -142,8 +129,6 @@ struct TooltipView: View {
 }
 
 
-    
-    
-    #Preview {
-        PlacesVisitedView()
-    }
+#Preview {
+    PlacesVisitedView()
+}

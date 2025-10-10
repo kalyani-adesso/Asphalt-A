@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.StartScreen
+import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -44,7 +45,9 @@ fun NavigationRoot() {
                 }
 
                 else -> {
+                    println("backstack 1 ${backStack.size}")
                     backStack.removeLastOrNull()
+                    println("backstack 2 ${backStack.size}")
                 }
             }
         } else {
@@ -91,7 +94,7 @@ fun NavigationRoot() {
                 )
             }
             entry<SplashKey> { key ->
-                NavigationSplashScreen (
+                NavigationSplashScreen(
                     onNavigateToLogin = {
                         backStack.add(LoginScreenNavKey)
                     },
@@ -126,7 +129,7 @@ fun NavigationRoot() {
                 NavigationRegistrationDetails(
                     //id = it.password,
                     onNavigateToDashboard = { //password ->
-                      //  backStack.add(RegistrationDetailsNavKey(password))
+                        //  backStack.add(RegistrationDetailsNavKey(password))
                     },
                     onBackPressed = { onBackPressed() }
                 )
@@ -135,13 +138,24 @@ fun NavigationRoot() {
             entry<LoginScreenNavKey> { key ->
                 LoginScreen(onSignInClick = {
                     backStack.add(LoginSuccessScreenNavKey)
+                    backStack.remove(LoginScreenNavKey)
                 }, onSignUpClick = {
                     backStack.add(RegistrationDetailsNavKey)
                     //backStack.add(LoginSuccessScreenNavKey)
+                }, onDashboardNav = {
+                    backStack.add(DashboardNavKey)
+                    backStack.remove(LoginScreenNavKey)
                 })
             }
             entry<LoginSuccessScreenNavKey> { key ->
-                LoginSuccessScreen()
+                LoginSuccessScreen(exploreClick = {
+                    backStack.remove(LoginSuccessScreenNavKey)
+                    backStack.add(DashboardNavKey)
+
+                })
+            }
+            entry<DashboardNavKey> { key ->
+                DashBoardScreen()
             }
         }
     )
@@ -156,3 +170,6 @@ object LoginScreenNavKey : NavKey
 
 @Serializable
 object LoginSuccessScreenNavKey : NavKey
+
+@Serializable
+object DashboardNavKey : NavKey

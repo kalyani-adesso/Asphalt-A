@@ -5,16 +5,23 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.model.AuthResultimpl
+import com.asphalt.android.model.CurrentUser
+import com.asphalt.android.model.LoginResult
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.util.EmailValidator
+import com.asphalt.commonui.utils.PreferenceKeys
 import com.asphalt.login.model.LoginValidationModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.koin.compose.viewmodel.koinViewModel
 
-class LoginScreenViewModel (val authViewModel: AuthViewModel) : ViewModel() {
+class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager) :
+    ViewModel() {
 
     private val _emailTextMutableState = MutableStateFlow("")
 
@@ -31,13 +38,18 @@ class LoginScreenViewModel (val authViewModel: AuthViewModel) : ViewModel() {
     val showFailureMessage = MutableStateFlow(false)
     val showLoader = MutableStateFlow(false)
 
-    fun updateMessage(boolean: Boolean){
-        showFailureMessage.value=boolean
+    fun updateMessage(boolean: Boolean) {
+        showFailureMessage.value = boolean
     }
 
-    fun updateLoader(boolean: Boolean){
-        showLoader.value=boolean
+    fun updateLoader(boolean: Boolean) {
+        showLoader.value = boolean
     }
+
+    fun resetLogin() {
+        isLoginSuccess.value = false
+    }
+
     fun updateEmailState(email: String) {
         _emailTextMutableState.value = email
         isEmailVaild.value = EmailValidator.isValid(email)
@@ -55,17 +67,29 @@ class LoginScreenViewModel (val authViewModel: AuthViewModel) : ViewModel() {
         if (fieldValidation()) {
             updateLoader(true)
             viewModelScope.launch {
-               var loginresponse =authViewModel.signIn(_emailTextMutableState.value,_passwordTextMutableState.value)
-                if(loginresponse.isSuccess){
+                var loginresponse = authViewModel.signIn(
+                    _emailTextMutableState.value,
+                    _passwordTextMutableState.value
+                )
+                if (loginresponse.isSuccess) {
+                    var user = with(loginresponse) {
+                        CurrentUser(isSuccess, errorMessage, name, email, uid)
+                    }
+                    val jsonString = Json.encodeToString(user)
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
                     updateMessage(false)
                     updateLoader(false)
                     isLoginSuccess.value = true
-                }else{
+                } else {
                     isLoginSuccess.value = false
                     updateLoader(false)
                     updateMessage(true)
                 }
-                Log.d("Login","${loginresponse.isSuccess}")
+
+                Log.d(
+                    "Login",
+                    "${loginresponse.isSuccess}  ${datastore.getValue(PreferenceKeys.USER_DETAILS)}"
+                )
             }
 
         }
