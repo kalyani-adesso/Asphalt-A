@@ -24,7 +24,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,7 +49,7 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.Constants
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.DashboardInvitesConstants
 import com.asphalt.dashboard.data.RideInvite

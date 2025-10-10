@@ -23,7 +23,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.utils.Constants
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.welcome.viewmodels.WelcomeViewModel
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel

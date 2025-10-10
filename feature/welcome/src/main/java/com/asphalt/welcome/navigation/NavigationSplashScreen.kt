@@ -12,28 +12,12 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.welcome.composables.SplashScreen
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object SplashKey : NavKey
+
 
 @Composable
 fun NavigationSplashScreen(
     onNavigateToLogin: () -> Unit = {},
     onNavigateToWelcome: () -> Unit = {}
 ) {
-    val backStack = rememberNavBackStack(WelcomeFeatureNavKey)
-
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryDecorators = listOf(
-            rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        sceneStrategy = SinglePaneSceneStrategy(),
-        entryProvider = entryProvider {
-            entry<WelcomeFeatureNavKey> {
-                SplashScreen(onNavigateToLogin,onNavigateToWelcome)
-            }
-        }
-    )
+    SplashScreen(onNavigateToLogin,onNavigateToWelcome)
 }

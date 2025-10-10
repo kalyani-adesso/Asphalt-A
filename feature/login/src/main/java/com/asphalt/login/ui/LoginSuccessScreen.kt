@@ -31,7 +31,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.R.string
-import com.asphalt.commonui.utils.PreferenceKeys
+import com.asphalt.commonui.constants.PreferenceKeys
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

@@ -1,14 +1,11 @@
 package com.asphalt.android.repository
 
-import android.util.Log
 import com.asphalt.android.model.AuthResultimpl
 import com.asphalt.android.model.LoginResult
 import com.asphalt.android.model.User
-import com.asphalt.commonui.utils.Constants
-import com.google.firebase.auth.AuthResult
+import com.asphalt.commonui.constants.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 
 actual class AuthenticatorImpl {
@@ -69,7 +66,8 @@ actual class AuthenticatorImpl {
             val dataSnapshot = userRef.get().await()
             //val userData = dataSnapshot.getValue(User::class.java)
             val name = dataSnapshot.child(Constants.Firebase_user_name).getValue(String::class.java)
-            val email = dataSnapshot.child(Constants.Firebase_user_email).getValue(String::class.java)
+            val email =
+                dataSnapshot.child(Constants.Firebase_user_email).getValue(String::class.java)
 
             //Log.d("name","name ${name}")
 

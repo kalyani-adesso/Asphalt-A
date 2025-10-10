@@ -48,5 +48,8 @@
     <string name="login_success_msg">You will be moved to home screen right now.Enjoy the features!</string>
     <string name="lets_explore">Lets Explore</string>
     <string name="user_not_found">User not found</string>
+    <string name="zero">0</string>
+    <string name="no_data">No Data</string>
+    <string name="places_visited_graph_title">Places Visited In Last 7 Months</string>
 
 </resources>

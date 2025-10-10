@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -39,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,12 +50,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.datastore.DataStoreManager
-import com.asphalt.android.repository.Authenticator
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
+import com.asphalt.commonui.R.string
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
@@ -67,15 +65,11 @@ import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.login.viewmodel.LoginScreenViewModel
-import com.asphalt.commonui.R.string
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.LoaderPopup
-import com.asphalt.commonui.utils.PreferenceKeys
-import kotlinx.coroutines.launch
+import com.asphalt.login.viewmodel.LoginScreenViewModel
 import org.koin.compose.currentKoinScope
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -482,7 +476,7 @@ fun LoginPreview() {
 
 
     var dataStoreManager = DataStoreManager(LocalContext.current)
-    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth,dataStoreManager)
+    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth, dataStoreManager)
 
     LoginScreen(viewModel, onSignInClick = {
 

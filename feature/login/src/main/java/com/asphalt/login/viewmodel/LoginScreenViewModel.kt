@@ -1,24 +1,19 @@
 package com.asphalt.login.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.datastore.DataStoreManager
-import com.asphalt.android.model.AuthResultimpl
 import com.asphalt.android.model.CurrentUser
-import com.asphalt.android.model.LoginResult
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.util.EmailValidator
-import com.asphalt.commonui.utils.PreferenceKeys
 import com.asphalt.login.model.LoginValidationModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import org.koin.compose.viewmodel.koinViewModel
 
 class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager) :
     ViewModel() {

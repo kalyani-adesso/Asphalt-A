@@ -20,8 +20,6 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
-import com.asphalt.welcome.navigation.SplashKey
-import com.asphalt.welcome.navigation.WelcomeFeatureNavKey
 import kotlinx.serialization.Serializable
 
 @Suppress("FunctionName")
@@ -172,4 +170,8 @@ object LoginScreenNavKey : NavKey
 object LoginSuccessScreenNavKey : NavKey
 
 @Serializable
+data object WelcomeFeatureNavKey : NavKey
+
+@Serializable
+data object SplashKey : NavKey
 object DashboardNavKey : NavKey
