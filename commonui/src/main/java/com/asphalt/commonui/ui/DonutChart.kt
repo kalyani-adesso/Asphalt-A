@@ -14,10 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.BrightTeal
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.MagentaDeep
-import com.asphalt.commonui.theme.PrimaryBrighterLightW50
 import com.asphalt.commonui.theme.PrimaryBrighterLightW60
 import com.asphalt.commonui.theme.PrimaryBrighterLightW90
-import com.asphalt.commonui.utils.Constants
+import com.asphalt.commonui.constants.Constants
 
 @Composable
 fun DonutChart(values: List<Float>, colors: List<Color>) {
@@ -83,10 +82,9 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
 @Composable
 fun DonutPreview() {
     DonutChart(
-        listOf(1f, 1f, 2f, 2f, 2f), colors = listOf(
+        listOf(1f, 1f, 2f, 2f), colors = listOf(
             PrimaryBrighterLightW60,
             BrightTeal,
-            PrimaryBrighterLightW50,
             MagentaDeep,
             PrimaryBrighterLightW90,
         )

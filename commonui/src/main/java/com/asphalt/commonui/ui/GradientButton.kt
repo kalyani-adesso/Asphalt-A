@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.utils.Constants
+import com.asphalt.commonui.constants.Constants
 
 @Composable
 fun GradientButton(

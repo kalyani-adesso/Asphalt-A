@@ -41,7 +41,8 @@ fun AdventureJourney(options: List<String>) {
     RoundedBox(
         modifier = Modifier.fillMaxWidth(),
         borderColor = NeutralGrey30,
-        backgroundColor = NeutralLightPaper
+        backgroundColor = NeutralLightPaper,
+        borderStroke = Dimensions.padding1
     ) {
         Column(
             modifier = Modifier.padding(
@@ -98,8 +99,10 @@ fun AdventureJourney(options: List<String>) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.TotalRides)
-                RideGraphLegendUI(RideGraphLegend.DistanceCovered)
+//                RideGraphLegendUI(RideGraphLegend.DistanceCovered)
                 RideGraphLegendUI(RideGraphLegend.PlacesExplored)
+                RideGraphLegendUI(RideGraphLegend.RideGroups)
+
             }
             Spacer(Modifier.height(Dimensions.size8))
             Row(
@@ -109,7 +112,6 @@ fun AdventureJourney(options: List<String>) {
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                RideGraphLegendUI(RideGraphLegend.RideGroups)
                 RideGraphLegendUI(RideGraphLegend.RideInvites)
             }
         }

@@ -19,8 +19,6 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
-import com.asphalt.welcome.navigation.SplashKey
-import com.asphalt.welcome.navigation.WelcomeFeatureNavKey
 import kotlinx.serialization.Serializable
 
 @Suppress("FunctionName")
@@ -91,7 +89,7 @@ fun NavigationRoot() {
                 )
             }
             entry<SplashKey> { key ->
-                NavigationSplashScreen (
+                NavigationSplashScreen(
                     onNavigateToLogin = {
                         backStack.add(LoginScreenNavKey)
                     },
@@ -126,7 +124,7 @@ fun NavigationRoot() {
                 NavigationRegistrationDetails(
                     //id = it.password,
                     onNavigateToDashboard = { //password ->
-                      //  backStack.add(RegistrationDetailsNavKey(password))
+                        //  backStack.add(RegistrationDetailsNavKey(password))
                     },
                     onBackPressed = { onBackPressed() }
                 )
@@ -156,3 +154,9 @@ object LoginScreenNavKey : NavKey
 
 @Serializable
 object LoginSuccessScreenNavKey : NavKey
+
+@Serializable
+data object WelcomeFeatureNavKey : NavKey
+
+@Serializable
+data object SplashKey : NavKey

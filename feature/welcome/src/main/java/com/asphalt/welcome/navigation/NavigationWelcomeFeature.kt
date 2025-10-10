@@ -12,29 +12,13 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.welcome.composables.GetStartedScreen
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object WelcomeFeatureNavKey : NavKey
+
 
 @Composable
 fun NavigationWelcomeFeature(
     onNavigateToRegister: () -> Unit = {}
 ) {
-    val backStack = rememberNavBackStack(WelcomeFeatureNavKey)
-
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryDecorators = listOf(
-            rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        sceneStrategy = SinglePaneSceneStrategy(),
-        entryProvider = entryProvider {
-            entry<WelcomeFeatureNavKey> {
-                GetStartedScreen(
-                    onNavigateToRegister = onNavigateToRegister
-                )
-            }
-        }
+    GetStartedScreen(
+        onNavigateToRegister = onNavigateToRegister
     )
 }

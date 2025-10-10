@@ -6,8 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import com.asphalt.commonui.utils.Constants
-import com.asphalt.commonui.utils.PreferenceKeys
+import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.constants.PreferenceKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

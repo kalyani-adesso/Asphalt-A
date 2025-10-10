@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.asphalt.commonui.utils.Constants
+import com.asphalt.commonui.constants.Constants
 
 @Composable
 fun CircularNetworkImage(

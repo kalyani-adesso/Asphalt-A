@@ -42,6 +42,10 @@ object Utils {
             input
         }
     }
+    fun nextMultipleOfFive(value: Int): Int {
+        val remainder = value % 5
+        return (5 - remainder) % 5
+    }
 
 
 }
