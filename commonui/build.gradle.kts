@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx) // Lifecycle KTX
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.coil)
 
     // Koin
     implementation(libs.koin.android)
@@ -60,6 +61,9 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+    //MPChart
+    implementation(libs.mpchart)
 
 
 

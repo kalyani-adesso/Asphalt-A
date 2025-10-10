@@ -1,8 +1,10 @@
 package com.asphalt.welcome.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +15,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -22,23 +30,42 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.utils.ComposeUtils.calculateHeightDpForPercentage
+import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
 import com.asphalt.welcome.GetStartedConstants
 import com.asphalt.welcome.sealedclasses.Carousels
+import com.asphalt.welcome.viewmodels.WelcomeViewModel
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+
 
 @Composable
-fun GetStartedScreen() {
+fun GetStartedScreen(
+    onNavigateToRegister: () -> Unit = {}
+) {
+    val welcomeViewModel: WelcomeViewModel = koinViewModel()
+    val scope = rememberCoroutineScope()
+
     val carouselItems = listOf(
         Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
         Carousels.RideTogetherCarousel.carouselItem
     )
     val carouselTopPadding =
-        calculateHeightDpForPercentage(GetStartedConstants.CAROUSEL_HEIGHT_RATIO)
-    val cardHeight = calculateHeightDpForPercentage(GetStartedConstants.CARD_HEIGHT_RATIO)
+        getDpForScreenRatio(
+            GetStartedConstants.CAROUSEL_HEIGHT_RATIO,
+            ComposeUtils.getScreenHeight()
+        )
+    val cardHeight =
+        getDpForScreenRatio(
+            GetStartedConstants.CARD_HEIGHT_RATIO,
+            ComposeUtils.getScreenHeight()
+        )
     val pagerState = rememberPagerState(pageCount = {
         carouselItems.size
     })
@@ -84,17 +111,44 @@ fun GetStartedScreen() {
                         GradientButton(
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
-                            {
-                                //TODO: Handle button click for get started
-                            },
-                            buttonText = stringResource(R.string.get_started).uppercase(),
-                            showArrow = true
-                        )
+                            onClick = {
+                                scope.launch {
+                                    welcomeViewModel.registerGetStarted()
+                                    onNavigateToRegister()
+                                }
+                            }
+
+                        ) {
+                            val buttonText = stringResource(R.string.get_started).uppercase()
+                            Row(
+                                horizontalArrangement =
+                                    Arrangement.SpaceBetween,
+
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = Dimensions.padding)
+                            ) {
+                                Text(
+                                    buttonText,
+                                    color = NeutralWhite,
+                                    fontSize = Dimensions.textSize18,
+                                    style = TypographyBold.labelLarge,
+                                )
+
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+
                     }
                 }
                 Spacer(Modifier.weight(1f))
 
             }
+
         }
     }
 }

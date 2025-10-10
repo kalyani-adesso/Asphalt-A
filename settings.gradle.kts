@@ -10,8 +10,10 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://jitpack.io")
     }
 }
 
@@ -24,13 +26,17 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
 include(":composeApp") // Android app module
-include(":shared") // KMP shared module
+include(":app",":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")
+include(":feature:login")
 include(":feature:welcome")
+include(":feature:dashboard")

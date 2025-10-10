@@ -34,10 +34,11 @@ android {
 dependencies {
 
     implementation(projects.commonui)
-
+    implementation(projects.shared)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.compose.material3)
+    //implementation(libs.google.firebase.firestore.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.testExt.junit)
@@ -57,7 +58,8 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 
     // ViewModel
-    //implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.firebase.firestore.ktx)
 
     // Navigation
     implementation(libs.androidx.navigation3.runtime)

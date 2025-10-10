@@ -16,7 +16,7 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
-            if hasSeenOnboarding {
+            if MBUserDefaults.hasSeenOnboardingStatic {
                 NavigationStack {
 //                SignInView()
                     BottomNavBar()
