@@ -480,8 +480,9 @@ fun LoginScreen(
 fun LoginPreview() {
     var modelauth: AuthViewModel = AuthViewModel(AuthenticatorImpl())
 
-    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth)
+
     var dataStoreManager = DataStoreManager(LocalContext.current)
+    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth,dataStoreManager)
 
     LoginScreen(viewModel, onSignInClick = {
 

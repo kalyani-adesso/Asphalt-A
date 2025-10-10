@@ -1,5 +1,6 @@
 package com.asphalt.android.repository
 
+import android.util.Log
 import com.asphalt.android.model.AuthResultimpl
 import com.asphalt.android.model.LoginResult
 import com.asphalt.android.model.User
@@ -23,7 +24,7 @@ actual class AuthenticatorImpl {
             val userToSave = User(
                 email = user.email,
                 password = user.password,
-                userName = user.userName,
+                name = user.name,
                 confirmPassword = user.confirmPassword
             )
 
@@ -41,14 +42,46 @@ actual class AuthenticatorImpl {
         }
     }
 
+//    actual suspend fun signIn(email: String, password: String): LoginResult {
+//        val auth: FirebaseAuth = FirebaseAuth.getInstance()
+//        return try {
+//            auth.signInWithEmailAndPassword(email, password).await()
+//            AuthResultimpl(true,"")
+//
+//        } catch (e: Exception) {
+//            AuthResultimpl(false,"User not found")
+//        }
+//    }
+
     actual suspend fun signIn(email: String, password: String): LoginResult {
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-            AuthResultimpl(true,"")
+
+            val user = auth.currentUser
+            val id = user?.uid ?: return AuthResultimpl(false, "User ID not found")
+
+            val userRef = FirebaseDatabase.getInstance()
+                .getReference("users_android")
+                .child(id)
+
+            val dataSnapshot = userRef.get().await()
+            //val userData = dataSnapshot.getValue(User::class.java)
+            val name = dataSnapshot.child("name").getValue(String::class.java)
+            val email = dataSnapshot.child("email").getValue(String::class.java)
+
+            //Log.d("name","name ${name}")
+
+            AuthResultimpl(
+                isSuccess = true,
+                errorMessage = "",
+                name = name,
+                email = email,
+                uid = id
+            )
 
         } catch (e: Exception) {
-            AuthResultimpl(false,"User not found")
+            AuthResultimpl(false, "Authentication failed: ${e.message}")
         }
     }
 }
