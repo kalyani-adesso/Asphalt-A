@@ -204,7 +204,7 @@ fun RegistrationForm(
             endColor = PrimaryDarkerLightB50,
             onClick = {
                 if (email.isNotBlank() && password.isNotBlank()) {
-                    val user = User(email = email,password=password, userName = userName,"")
+                    val user = User(email = email,password=password, name = userName,"")
                     loading = true
                     resultMessage = ""
 
