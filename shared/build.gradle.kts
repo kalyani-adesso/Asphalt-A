@@ -69,6 +69,8 @@ kotlin {
             implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.firebase.firestore.ktx)
 
+            implementation(libs.datastore)
+
         }
 
         iosMain.dependencies {

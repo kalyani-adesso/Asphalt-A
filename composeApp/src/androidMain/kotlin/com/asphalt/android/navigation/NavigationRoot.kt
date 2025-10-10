@@ -142,6 +142,9 @@ fun NavigationRoot() {
                 }, onSignUpClick = {
                     backStack.add(RegistrationDetailsNavKey)
                     //backStack.add(LoginSuccessScreenNavKey)
+                }, onDashboardNav = {
+                    backStack.add(DashboardNavKey)
+                    backStack.remove(LoginScreenNavKey)
                 })
             }
             entry<LoginSuccessScreenNavKey> { key ->
