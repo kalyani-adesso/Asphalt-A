@@ -29,7 +29,7 @@ class SignUpViewModal: ObservableObject {
     }
     
     func didTapSignUp(email: String, username: String, password: String,confirmPassword:String, onSuccess: @escaping () -> Void) {
-        let user = User(email: email, password: password, userName: username, confirmPassword: confirmPassword)
+        let user = User(email: email, password: password, name: username, confirmPassword: confirmPassword)
         AuthenticatorImpl().signUp(user: user, completionHandler: { success, failure in
             if let _ = failure {
                 self.showToast = true

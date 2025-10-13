@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Shared
+import shared
 
 struct NotificationMessage: Identifiable {
     var id: UUID = UUID()

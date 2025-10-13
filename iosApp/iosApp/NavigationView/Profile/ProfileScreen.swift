@@ -84,7 +84,7 @@ struct ProfileSectionView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(AppColor.seperatorGray, lineWidth: 1)
+                .stroke(AppColor.whiteGray, lineWidth: 1)
         )
         .padding(.horizontal, 16)
     }
@@ -120,7 +120,7 @@ struct YourVehicleRow: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.overlay, lineWidth: 1)
+                .stroke(AppColor.listGray, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .fullScreenCover(isPresented:$itemIsSelected , content: {
@@ -149,7 +149,7 @@ struct ProfileGridView: View {
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(AppColor.overlay, lineWidth: 1)
+                                .stroke(AppColor.listGray, lineWidth: 1)
                         )
                         .contentShape(Rectangle())
                 }
@@ -204,7 +204,7 @@ struct AchivementsRow: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.overlay, lineWidth: 1)
+                .stroke(AppColor.listGray, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .navigationDestination(isPresented: $itemIsSelected, destination: {
