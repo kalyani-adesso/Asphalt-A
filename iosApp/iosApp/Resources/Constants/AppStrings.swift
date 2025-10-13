@@ -255,6 +255,8 @@ public struct AppStrings{
         static let profileSubtitle = "Manage your info"
         static let rideHistory = "Your ride history"
         static let planAdventure = "Plan new adventure"
+        static let referFriend = "Refer a friend"
+        static let logout = "Logout"
 
         // Community Section
         static let community = "Community"

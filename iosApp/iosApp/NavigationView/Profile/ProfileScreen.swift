@@ -269,6 +269,46 @@ struct ProfileTitleView:View {
     }
 }
 
+struct ProfileHeaderView: View {
+    let name: String
+    let bike: String
+    let role: String
+    let image: Image
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            image
+                .resizable()
+                .scaledToFill()
+                .frame(width: 73, height: 73)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
+            VStack(alignment: .leading, spacing: 8) {
+                Text(name)
+                    .font(KlavikaFont.bold.font(size: 19))
+                    .foregroundColor(AppColor.black)
+                Text(bike)
+                    .font(KlavikaFont.regular.font(size: 16))
+                    .foregroundColor(AppColor.black)
+                HStack {
+                    AppIcon.NavigationSlider.repair
+                        .frame(width: 16, height: 16)
+                    Text(role)
+                        .font(KlavikaFont.regular.font(size: 12))
+                }
+                .frame(height: 24)
+                .padding([.leading,.trailing],8)
+                .padding([.top, .bottom], 5)
+                .background(AppColor.white)
+                .cornerRadius(5)
+            }
+            Spacer()
+        }
+        .background(.clear)
+        .padding()
+    }
+}
+
 #Preview {
     ProfileScreen()
 }

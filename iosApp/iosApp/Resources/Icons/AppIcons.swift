@@ -32,18 +32,21 @@ struct AppIcon {
     
     struct NavigationSlider {
         static let call = Image("icon-call")
-        static let connectedRide = Image("icon_connectedRide")
         static let createRide = Image("icon_createRide")
         static let home = Image("icon_home")
-        static let knowledgeCircle = Image("icon_knowledgeCircle")
-        static let marketPlace = Image("icon_marketPlace")
         static let motoQuiz = Image("icon_motoQuiz")
         static let preRideCheck = Image("icon_preRideCheck")
         static let profile = Image("icon_profile")
         static let queries = Image("icon_queries")
-        static let settings = Image("icon_settings")
         static let yourRide = Image("icon_yourRide")
         static let repair = Image("icon-repair")
+        
+        static let connectedRide = Image("icon-connectedRide")
+        static let knowledgeCircle = Image("icon-knowledgeCircle")
+        static let marketPlace = Image("icon-marketPlace")
+        static let settings = Image("icon-settings")
+        static let referFriend = Image("icon-referAFriend")
+        static let logout = Image("icon-logout")
     }
 
     struct Notification {

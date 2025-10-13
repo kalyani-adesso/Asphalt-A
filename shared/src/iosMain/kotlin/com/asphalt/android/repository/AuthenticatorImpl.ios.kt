@@ -31,7 +31,7 @@ actual class AuthenticatorImpl actual constructor() {
 
             val userValues = mapOf<Any?, Any?>(
                 "email" to user.email,
-                "userName" to user.userName,
+                "userName" to user.name,
                 "device" to UIDevice.currentDevice.model
             )
 

@@ -8,28 +8,25 @@
 import SwiftUI
 import Combine
 
-struct MenuSection: Identifiable {
-    let id = UUID()
-    let title: String
-    let items: [MenuItemModel]
-}
-
-struct MenuItemModel: Identifiable {
+struct MenuItemModel: Identifiable, Hashable {
     let id = UUID()
     let icon: Image
     let iconColor: Color
     let title: String
-    let subtitle: String
     let destination: AnyView
+
+    static func == (lhs: MenuItemModel, rhs: MenuItemModel) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 @MainActor
 final class NavigationSliderViewModel: ObservableObject {
-    @Published var profileName = "Aromal Sijulal"
-    @Published var bikeType = "Adventure Bike"
-    @Published var role = "Mechanic"
-    @Published var profileImage = AppImage.Welcome.bg
-    @Published var sections: [MenuSection] = []
+    @Published var sections: [MenuItemModel] = []
     
     init() {
         loadData()
@@ -37,37 +34,12 @@ final class NavigationSliderViewModel: ObservableObject {
     
     private func loadData() {
         sections = [
-            MenuSection(
-                title: "Main",
-                items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.home, iconColor: AppColor.purple, title: "Home", subtitle: "Your riding dashboard", destination: AnyView(HomeView())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.profile, iconColor: AppColor.celticBlue, title: "Profile", subtitle: "Manage your info", destination: AnyView(ProfileScreen())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.yourRide, iconColor: AppColor.orange, title: "Your Rides", subtitle: "Your ride history", destination: AnyView(YourRideScreen())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.createRide, iconColor: AppColor.green, title: "Create Ride", subtitle: "Plan new adventure", destination: AnyView(CreateRideScreen()))
-                ]
-            ),
-            MenuSection(
-                title: "Community",
-                items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.yellow, title: "Connected Ride", subtitle: "Join group rides", destination: AnyView(ConnectedRideScreen())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.queries, iconColor: AppColor.skyBlue, title: "Queries", subtitle: "Ask & answer", destination: AnyView(HomeView()))
-                ]
-            ),
-            MenuSection(
-                title: "Learning",
-                items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.knowledgeCircle, iconColor: AppColor.red, title: "Knowledge Circle", subtitle: "Learn road signs", destination: AnyView(HomeView())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.motoQuiz, iconColor: AppColor.navyBlue, title: "Moto Quiz", subtitle: "Test your skills", destination: AnyView(HomeView())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.preRideCheck, iconColor: AppColor.lime, title: "Pre Ride Check", subtitle: "Ask & answer", destination: AnyView(HomeView()))
-                ]
-            ),
-            MenuSection(
-                title: "More",
-                items: [
-                    MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.pink, title: "Marketplace", subtitle: "Buy and sell gears", destination: AnyView(HomeView())),
-                    MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.charcol, title: "Settings", subtitle: "App preferences", destination: AnyView(HomeView()))
-                ]
-            )
+            MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.black, title: AppStrings.NavigationSlider.connectedRide, destination: AnyView(ConnectedRideScreen())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.knowledgeCircle, iconColor: AppColor.black, title: AppStrings.NavigationSlider.knowledgeCircle, destination: AnyView(HomeView())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.black, title: AppStrings.NavigationSlider.marketplace, destination: AnyView(YourRideScreen())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.black, title: AppStrings.NavigationSlider.settings, destination: AnyView(CreateRideScreen())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.referFriend, iconColor: AppColor.black, title: AppStrings.NavigationSlider.referFriend, destination: AnyView(ConnectedRideScreen())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.logout, iconColor: AppColor.red, title: AppStrings.NavigationSlider.logout, destination: AnyView(SignInView()))
         ]
     }
 }
