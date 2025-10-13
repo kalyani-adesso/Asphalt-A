@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -61,6 +63,9 @@ import com.asphalt.dashboard.viewmodel.RidesScreenViewModel
 @Composable
 fun RidesScreen() {
     val ridesScreenViewModel: RidesScreenViewModel = viewModel()
+    LaunchedEffect(Unit) {
+        ridesScreenViewModel.getRides()
+    }
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -73,7 +78,10 @@ fun RidesScreen() {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+                    .padding(
+                        start = Dimensions.padding16,
+                        end = Dimensions.padding16
+                    ), contentPadding = PaddingValues(bottom = Dimensions.size30)
             ) {
                 item {
                     Spacer(Modifier.height(Dimensions.size30))
@@ -83,12 +91,29 @@ fun RidesScreen() {
 //            items(10) { index ->
 //
 //            }
-                item {
-                    UpcomingRides(ridesScreenViewModel)
-                    Spacer(Modifier.height(Dimensions.padding16))
-                    HistoryRides(ridesScreenViewModel)
-                    Spacer(Modifier.height(Dimensions.padding16))
-                    Invites(ridesScreenViewModel)
+                when (ridesScreenViewModel.tabSelectFlow.value) {
+                    RideStatConstants.UPCOMING_RIDE -> {
+                        items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
+                            UpcomingRides(ridesScreenViewModel)
+                            Spacer(Modifier.height(Dimensions.padding16))
+                        }
+
+                    }
+
+                    RideStatConstants.HISTORY_RIDES -> {
+                        items(ridesScreenViewModel.ridesListState.value.history) { history ->
+                            HistoryRides(ridesScreenViewModel)
+                            Spacer(Modifier.height(Dimensions.padding16))
+                        }
+                    }
+
+                    RideStatConstants.INVITES_RIDES -> {
+                        items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
+                            Invites(ridesScreenViewModel)
+                            Spacer(Modifier.height(Dimensions.padding16))
+                        }
+                    }
+
                 }
 
 
@@ -119,7 +144,12 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
                 ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
+                    Text(
+                        "Weekend Coast Ride",
+                        style = TypographyMedium.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
@@ -248,7 +278,12 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                 ColorIconRounded(backColor = GreenDark, resId = R.drawable.ic_location)
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
+                    Text(
+                        "Weekend Coast Ride",
+                        style = TypographyMedium.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
@@ -380,7 +415,12 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Invte From Sooraj", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
+                    Text(
+                        "Invte From Sooraj",
+                        style = TypographyMedium.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
@@ -513,7 +553,8 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                             shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
-                ).clickable{
+                )
+                .clickable {
                     ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
                 }, contentAlignment = Alignment.Center
 
@@ -547,7 +588,8 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                             shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
-                ).clickable{
+                )
+                .clickable {
                     ridesScreenViewModel.updateTab(RideStatConstants.HISTORY_RIDES)
                 }, contentAlignment = Alignment.Center
 
@@ -580,7 +622,8 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                             shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
-                ).clickable{
+                )
+                .clickable {
                     ridesScreenViewModel.updateTab(RideStatConstants.INVITES_RIDES)
                 }, contentAlignment = Alignment.Center
 
