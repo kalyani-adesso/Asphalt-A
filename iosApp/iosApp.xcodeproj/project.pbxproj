@@ -72,7 +72,6 @@
 			children = (
 				31ECD9733CAFFAF08705E2B1 /* Configuration */,
 				1F0872E5BAF8F5F17FD4CE84 /* iosApp */,
-				CE19F5482E8561CC0043D4B5 /* Frameworks */,
 				0657DC9FC4DDAC98975E3C11 /* Products */,
 				CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */,
 				93D2BA06F534C0A190240FD9 /* Pods */,
