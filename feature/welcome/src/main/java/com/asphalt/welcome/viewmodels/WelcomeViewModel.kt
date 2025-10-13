@@ -15,4 +15,7 @@ class WelcomeViewModel(private val appUsageRepository: AppUsageRepository) : Vie
     suspend fun registerGetStarted() {
         appUsageRepository.registerGetStarted(true)
     }
+    suspend fun isRememberUser(): Boolean{
+        return appUsageRepository.getIsRememberUser()
+    }
 }
