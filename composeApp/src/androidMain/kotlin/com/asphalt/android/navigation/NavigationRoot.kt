@@ -93,8 +93,7 @@ fun NavigationRoot() {
             entry<SplashKey> { key ->
                 NavigationSplashScreen(
                     onNavigateToLogin = {
-                        //backStack.add(LoginScreenNavKey)
-                        backStack.add(RidesScreenNav)
+                        backStack.add(LoginScreenNavKey)
                     },
                     onNavigateToWelcome = {
                         backStack.add(WelcomeFeatureNavKey)
@@ -153,7 +152,9 @@ fun NavigationRoot() {
                 })
             }
             entry<DashboardNavKey> { key ->
-                DashBoardScreen()
+                DashBoardScreen(upcomingRideClick = {
+                    backStack.add(RidesScreenNav)
+                })
             }
             entry<RidesScreenNav> { key ->
                 RidesScreen()

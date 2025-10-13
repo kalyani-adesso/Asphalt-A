@@ -17,7 +17,7 @@ import com.asphalt.dashboard.composables.components.PlacesVisitedGraph
 import com.asphalt.dashboard.composables.screens.sections.*
 
 @Composable
-fun DashBoardScreen() {
+fun DashBoardScreen(upcomingRideClick:()->Unit) {
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -34,7 +34,7 @@ fun DashBoardScreen() {
         ) {
             CreateOrJoinRide({}, {})
             RideStatsPreview()
-            UpcomingRide()
+            UpcomingRide(upcomingRideClick)
             AdventureJourneyPreview()
             PlacesVisitedGraph()
         }
