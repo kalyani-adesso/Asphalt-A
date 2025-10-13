@@ -45,6 +45,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
+import com.asphalt.commonui.ui.ActionBarWithBack
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
@@ -55,30 +56,37 @@ import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 @Composable
 fun RidesScreen() {
     AsphaltTheme {
-
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = NeutralWhite)
-                .padding(start = Dimensions.padding16, end = Dimensions.padding16)
         ) {
-            item {
-                Spacer(Modifier.height(Dimensions.size30))
-                ButtonTabs()
-                Spacer(Modifier.height(Dimensions.padding16))
+            ActionBarWithBack("Your Rides"){
+                // Handle back press
             }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+            ) {
+                item {
+                    Spacer(Modifier.height(Dimensions.size30))
+                    ButtonTabs()
+                    Spacer(Modifier.height(Dimensions.padding16))
+                }
 //            items(10) { index ->
 //
 //            }
-            item {
-                UpcomingRides()
-                Spacer(Modifier.height(Dimensions.padding16))
-                HistoryRides()
-                Spacer(Modifier.height(Dimensions.padding16))
-                Invites()
+                item {
+                    UpcomingRides()
+                    Spacer(Modifier.height(Dimensions.padding16))
+                    HistoryRides()
+                    Spacer(Modifier.height(Dimensions.padding16))
+                    Invites()
+                }
+
+
             }
-
-
         }
     }
 }
@@ -174,7 +182,9 @@ fun UpcomingRides() {
 
                 },
                 buttonHeight = Dimensions.size50,
-                modifier = Modifier.weight(1f), contentPadding = PaddingValues(Dimensions.size0), buttonRadius = Dimensions.size10,
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(Dimensions.size0),
+                buttonRadius = Dimensions.size10,
             ) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(
@@ -336,7 +346,7 @@ fun HistoryRides() {
 }
 
 @Composable
-fun Invites(){
+fun Invites() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -360,7 +370,7 @@ fun Invites(){
                         width = Dimensions.size2pt5,
                         color = PrimaryDarkerLightB75,
                         shape = CircleShape
-                    ), size = Dimensions.size32, imageUrl = ""
+                    ), size = Dimensions.size32, imageUrl = "https://picsum.photos/id/1/200/300"
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
@@ -475,18 +485,19 @@ fun ButtonTabs() {
                 NeutralLightPaper,
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(start = Dimensions.padding10, end = Dimensions.padding10),
+            .padding(start = Dimensions.size10, end = Dimensions.size10),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.size10),
 
-    ) {
+        ) {
         Box(
             modifier = Modifier
                 .height(Dimensions.size50)
                 .width(100.dp)
+                .weight(1f)
                 .background(
                     brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(Dimensions.size10)
                 ), contentAlignment = Alignment.Center
 
             // Rounded corners here
@@ -498,9 +509,10 @@ fun ButtonTabs() {
             modifier = Modifier
                 .height(Dimensions.size50)
                 .width(100.dp)
+                .weight(1f)
                 .background(
                     color = NeutralWhite,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(Dimensions.size10)
                 ), contentAlignment = Alignment.Center
 
 
@@ -511,9 +523,10 @@ fun ButtonTabs() {
             modifier = Modifier
                 .height(Dimensions.size50)
                 .width(100.dp)
+                .weight(1f)
                 .background(
                     color = NeutralWhite,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(Dimensions.size10)
                 ), contentAlignment = Alignment.Center
 
 
