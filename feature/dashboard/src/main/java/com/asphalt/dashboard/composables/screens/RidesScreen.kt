@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -36,6 +37,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.MagentaDeep
+import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
@@ -52,16 +54,19 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.viewmodel.RidesScreenViewModel
 
 @Composable
 fun RidesScreen() {
+    val ridesScreenViewModel: RidesScreenViewModel = viewModel()
     AsphaltTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            ActionBarWithBack("Your Rides"){
+            ActionBarWithBack("Your Rides") {
                 // Handle back press
             }
             LazyColumn(
@@ -71,18 +76,18 @@ fun RidesScreen() {
             ) {
                 item {
                     Spacer(Modifier.height(Dimensions.size30))
-                    ButtonTabs()
+                    ButtonTabs(ridesScreenViewModel)
                     Spacer(Modifier.height(Dimensions.padding16))
                 }
 //            items(10) { index ->
 //
 //            }
                 item {
-                    UpcomingRides()
+                    UpcomingRides(ridesScreenViewModel)
                     Spacer(Modifier.height(Dimensions.padding16))
-                    HistoryRides()
+                    HistoryRides(ridesScreenViewModel)
                     Spacer(Modifier.height(Dimensions.padding16))
-                    Invites()
+                    Invites(ridesScreenViewModel)
                 }
 
 
@@ -92,7 +97,7 @@ fun RidesScreen() {
 }
 
 @Composable
-fun UpcomingRides() {
+fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -220,7 +225,7 @@ fun UpcomingRides() {
 }
 
 @Composable
-fun HistoryRides() {
+fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -346,7 +351,7 @@ fun HistoryRides() {
 }
 
 @Composable
-fun Invites() {
+fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -476,7 +481,7 @@ fun Invites() {
 }
 
 @Composable
-fun ButtonTabs() {
+fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -495,43 +500,100 @@ fun ButtonTabs() {
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
-                    shape = RoundedCornerShape(Dimensions.size10)
-                ), contentAlignment = Alignment.Center
+                .then(
+                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                        Modifier.background(
+                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
+                ).clickable{
+                    ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
+                }, contentAlignment = Alignment.Center
 
             // Rounded corners here
 
         ) {
-            Text("Up coming", style = TypographyMedium.titleMedium)
+            Text(
+                "Up coming",
+                style = TypographyMedium.titleMedium,
+                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                    NeutralWhite
+                } else {
+                    NeutralBlack
+                }
+            )
         }
         Box(
             modifier = Modifier
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    color = NeutralWhite,
-                    shape = RoundedCornerShape(Dimensions.size10)
-                ), contentAlignment = Alignment.Center
+                .then(
+                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.HISTORY_RIDES) {
+                        Modifier.background(
+                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
+                ).clickable{
+                    ridesScreenViewModel.updateTab(RideStatConstants.HISTORY_RIDES)
+                }, contentAlignment = Alignment.Center
 
 
         ) {
-            Text("History", style = TypographyMedium.titleMedium)
+            Text(
+                "History",
+                style = TypographyMedium.titleMedium,
+                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.HISTORY_RIDES) {
+                    NeutralWhite
+                } else {
+                    NeutralBlack
+                }
+            )
         }
         Box(
             modifier = Modifier
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    color = NeutralWhite,
-                    shape = RoundedCornerShape(Dimensions.size10)
-                ), contentAlignment = Alignment.Center
+                .then(
+                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                        Modifier.background(
+                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
+                ).clickable{
+                    ridesScreenViewModel.updateTab(RideStatConstants.INVITES_RIDES)
+                }, contentAlignment = Alignment.Center
 
 
         ) {
-            Text("Invite", style = TypographyMedium.titleMedium)
+            Text(
+                "Invite",
+                style = TypographyMedium.titleMedium,
+                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                    NeutralWhite
+                } else {
+                    NeutralBlack
+                }
+            )
         }
     }
 }
