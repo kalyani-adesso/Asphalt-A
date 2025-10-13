@@ -8,6 +8,6 @@ import org.koin.dsl.module
 
 
 val welcomeFeatureModule = module {
-    single { AppUsageRepository(androidContext()) }
+    single { AppUsageRepository(get()) }
     viewModel { WelcomeViewModel(get()) }
 }

@@ -1,4 +1,4 @@
-package com.asphalt.commonui.ui
+package com.asphalt.commonui.ui.barchart
 
 import android.graphics.Canvas
 import android.graphics.Path
@@ -15,7 +15,7 @@ open class RoundedBarChartRenderer(
     chart: BarChart,
     animator: ChartAnimator,
     viewPortHandler: ViewPortHandler,
-    private val cornerRadius: Float = BarChartConstants.BAR_CHART_CORNER_RADIUS // change as needed
+    private val cornerRadius: Float = BarChartConstants.BAR_CHART_CORNER_RADIUS
 ) : BarChartRenderer(chart, animator, viewPortHandler) {
 
     private val barRect = RectF()
@@ -52,9 +52,9 @@ open class RoundedBarChartRenderer(
 
             // Bar rectangle
             val left =
-                (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 - BarChartConstants.BAR_CHART_OFFSET
+                (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 - BarChartConstants.BAR_CHART_BAR_OFFSET
             val right =
-                (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 + BarChartConstants.BAR_CHART_OFFSET
+                (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 + BarChartConstants.BAR_CHART_BAR_OFFSET
             barRect.set(
                 left, buffer.buffer[j + 1],
                 right, buffer.buffer[j + 3]

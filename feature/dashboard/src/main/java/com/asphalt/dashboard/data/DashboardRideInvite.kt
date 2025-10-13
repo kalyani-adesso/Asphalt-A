@@ -1,6 +1,6 @@
 package com.asphalt.dashboard.data
 
-data class RideInvite(
+data class DashboardRideInvite(
     val inviterName: String,
     val inviterProfilePicUrl: String,
     val startPoint: String,

@@ -1,11 +1,8 @@
 package com.asphalt.dashboard.composables.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,11 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack10
 import com.asphalt.commonui.theme.NeutralDarkGrey
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
@@ -52,17 +47,5 @@ fun RideGraphLegendUI(rideGraphLegend: RideGraphLegend) {
                 color = NeutralDarkGrey
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewLegend() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(NeutralLightPaper)
-    ) {
-        RideGraphLegendUI(RideGraphLegend.TotalRides)
     }
 }

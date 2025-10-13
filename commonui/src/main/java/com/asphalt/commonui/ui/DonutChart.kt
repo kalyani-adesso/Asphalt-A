@@ -10,13 +10,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.tooling.preview.Preview
-import com.asphalt.commonui.theme.BrightTeal
-import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.MagentaDeep
-import com.asphalt.commonui.theme.PrimaryBrighterLightW60
-import com.asphalt.commonui.theme.PrimaryBrighterLightW90
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.theme.Dimensions
 
 @Composable
 fun DonutChart(values: List<Float>, colors: List<Color>) {
@@ -76,17 +71,4 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
             startAngle += Constants.DONUT_TOTAL_ANGLE * (value / total)
         }
     }
-}
-
-@Preview
-@Composable
-fun DonutPreview() {
-    DonutChart(
-        listOf(1f, 1f, 2f, 2f), colors = listOf(
-            PrimaryBrighterLightW60,
-            BrightTeal,
-            MagentaDeep,
-            PrimaryBrighterLightW90,
-        )
-    )
 }

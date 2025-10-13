@@ -10,6 +10,7 @@ import com.asphalt.welcome.di.welcomeFeatureModule
 
 import com.asphalt.android.di.sharedModule
 import com.asphalt.android.repository.AuthenticatorImpl
+import com.asphalt.dashboard.di.dashboardModule
 import com.asphalt.registration.di.registrationModule
 import com.asphalt.welcome.di.welcomeFeatureModule
 import com.google.firebase.FirebaseApp
@@ -29,7 +30,7 @@ class AsphaltApplication : Application() {
             //First start Koin with all modules including shared components
             modules(
                 modules = appModule+loginModule+registrationModule+welcomeFeatureModule
-                        +sharedModule,
+                        +sharedModule+ dashboardModule,
 
             )
             module {

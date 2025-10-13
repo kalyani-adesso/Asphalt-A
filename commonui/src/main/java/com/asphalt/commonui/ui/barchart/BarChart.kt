@@ -1,4 +1,4 @@
-package com.asphalt.commonui.ui
+package com.asphalt.commonui.ui.barchart
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.asphalt.commonui.R
@@ -19,6 +18,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDeepBlack
 import com.asphalt.commonui.theme.NeutralPaperGrey
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
+import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.utils.Utils.nextMultipleOfFive
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
@@ -44,9 +44,12 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
             .fillMaxWidth()
             .height(Dimensions.size220),
         factory = { context ->
+            val font = ResourcesCompat.getFont(context, R.font.klavika_regular)
             BarChart(context).apply {
 
                 setNoDataText(context.getString(R.string.no_data))
+                setNoDataTextColor(NeutralDeepBlack.toArgb())
+                setNoDataTextTypeface(font)
                 setTouchEnabled(true)
                 setScaleEnabled(false)
                 setPinchZoom(false)
@@ -56,6 +59,7 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
                 legend.isEnabled = false
                 isHighlightPerTapEnabled = true
                 data?.isHighlightEnabled = false
+                extraTopOffset = BarChartConstants.BAR_CHART_TOP_OFFSET
                 renderer = HighlightRoundedBarRenderer(
                     this,
                     animator,
@@ -68,7 +72,7 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
                     granularity = 1f
                     textColor = NeutralDeepBlack.toArgb()
                     textSize = BarChartConstants.AXIS_LABEL_TEXT_SIZE
-                    typeface = ResourcesCompat.getFont(context, R.font.klavika_regular)
+                    typeface = font
                 }
 
                 axisLeft.apply {
@@ -79,7 +83,7 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
                     setDrawAxisLine(false)
                     textColor = NeutralDeepBlack.toArgb()
                     textSize = BarChartConstants.AXIS_LABEL_TEXT_SIZE
-                    typeface = ResourcesCompat.getFont(context, R.font.klavika_regular)
+                    typeface = font
 
                 }
                 val marker = CustomBubbleMarkerView(context)
@@ -116,7 +120,7 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
             }
             chart.marker = CustomBubbleMarkerView(chart.context)
 
-            chart.data = BarData(dataSet)
+            chart.data = if (entries.isEmpty()) null else BarData(dataSet)
             // --- X Axis (Months) ---
             chart.xAxis.apply {
                 valueFormatter = IndexAxisValueFormatter(xLabels)
@@ -154,17 +158,4 @@ fun CustomBarChart(xLabels: List<String>, values: List<Int>) {
     )
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun BarPreview() {
-    var data by remember {
-        mutableStateOf(listOf(3, 5, 7, 2, 0, 1, 4))
-    }
-    var months by remember {
-        mutableStateOf(listOf("Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"))
-    }
-
-    CustomBarChart(months, data)
-}
 

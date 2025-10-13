@@ -1,4 +1,4 @@
-package com.asphalt.commonui.ui
+package com.asphalt.commonui.ui.barchart
 
 import android.content.Context
 import android.widget.TextView

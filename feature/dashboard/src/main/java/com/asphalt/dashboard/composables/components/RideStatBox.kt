@@ -13,8 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
@@ -58,11 +56,4 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
             )
         }
     }
-}
-
-
-@Preview
-@Composable
-fun RideStatBoxPreview() {
-    RideStatBox(R.drawable.ic_location, "25", "totalKms")
 }
