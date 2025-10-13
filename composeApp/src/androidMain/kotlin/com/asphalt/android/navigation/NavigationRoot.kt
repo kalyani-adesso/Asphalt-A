@@ -11,6 +11,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.StartScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
+import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -43,9 +44,7 @@ fun NavigationRoot() {
                 }
 
                 else -> {
-                    println("backstack 1 ${backStack.size}")
                     backStack.removeLastOrNull()
-                    println("backstack 2 ${backStack.size}")
                 }
             }
         } else {
@@ -153,8 +152,14 @@ fun NavigationRoot() {
                 })
             }
             entry<DashboardNavKey> { key ->
-                DashBoardScreen()
+                DashBoardScreen(upcomingRideClick = {
+                    backStack.add(RidesScreenNav)
+                })
             }
+            entry<RidesScreenNav> { key ->
+                RidesScreen()
+            }
+
         }
     )
 }
@@ -175,3 +180,4 @@ data object WelcomeFeatureNavKey : NavKey
 @Serializable
 data object SplashKey : NavKey
 object DashboardNavKey : NavKey
+object RidesScreenNav : NavKey

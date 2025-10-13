@@ -16,13 +16,15 @@ import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
 import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
 import com.asphalt.dashboard.composables.screens.sections.DashboardUpcomingRide
 import com.asphalt.dashboard.composables.screens.sections.PlacesVisitedGraph
+
 import com.asphalt.dashboard.composables.screens.sections.RideStatsPerMonth
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashBoardScreen(androidUserVM: AndroidUserVM = koinViewModel()) {
+fun DashBoardScreen(upcomingRideClick: () -> Unit, androidUserVM: AndroidUserVM = koinViewModel()) {
     val currentUser = androidUserVM.userState.collectAsState(null)
+
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -44,7 +46,7 @@ fun DashBoardScreen(androidUserVM: AndroidUserVM = koinViewModel()) {
                 //TODO:Join Ride Navigation
             })
             RideStatsPerMonth()
-            DashboardUpcomingRide()
+            DashboardUpcomingRide(upcomingRideClick)
             AdventureJourney()
             PlacesVisitedGraph()
         }

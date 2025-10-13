@@ -40,4 +40,6 @@ val PrimaryBrighterLightB33 = Color(0x33006EC7)
 
 
 
+val GrayDark = Color(0xFF513838)
+val GreenDark = Color(0xFF00A66C)
 

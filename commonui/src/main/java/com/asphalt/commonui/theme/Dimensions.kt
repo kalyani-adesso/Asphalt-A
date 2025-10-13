@@ -106,6 +106,7 @@ object Dimensions {
     val radius2 = 2.dp
     val size60 = 60.dp
     val size18 = 18.dp
+    val size92 = 92.dp
     val textSize18 = 18.sp
     val textSize19 = 19.sp
     val textSize17 = 17.sp
