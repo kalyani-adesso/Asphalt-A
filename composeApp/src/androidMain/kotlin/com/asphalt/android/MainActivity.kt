@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.asphalt.android.navigation.NavigationRoot
 import com.asphalt.commonui.theme.AsphaltTheme
-import com.asphalt.commonui.ui.BarPreview
-import com.asphalt.dashboard.composables.screens.DashBoardScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

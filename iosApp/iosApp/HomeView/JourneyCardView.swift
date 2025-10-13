@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct JourneyCardView: View {
-    @StateObject private var home = HomeViewModel()
+    @EnvironmentObject var home: HomeViewModel 
     @State private var selectedOption = "Last 4 months"
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

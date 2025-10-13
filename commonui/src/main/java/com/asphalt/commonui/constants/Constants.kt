@@ -18,7 +18,7 @@ object Constants {
     val AVATAR_DEFAULT_BORDER_WIDTH = Dimensions.size4
     const val DATA_STORE_NAME = "asphalt_prefs"
 
-    const val DATE_FORMAT_PLACES_VISITED = "dd MMM"
+    const val DATE_FORMAT_PLACES_VISITED = "dd MMM yyyy"
     const val NO_OF_MONTHS_PLACE_VISITED = 7
 
     //Firebase Data base

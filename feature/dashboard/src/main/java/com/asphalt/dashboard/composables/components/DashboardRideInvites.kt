@@ -32,8 +32,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey30
@@ -42,30 +44,41 @@ import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.DashboardInvitesConstants
-import com.asphalt.dashboard.data.RideInvite
+import com.asphalt.dashboard.data.DashboardRideInvite
+import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RideInviteList(rideInvites: List<RideInvite>) {
-    LazyRow {
-        items(rideInvites) {
-            RideInviteUI(it)
-        }
+fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteViewModel = koinViewModel()) {
+    val rideInvites =
+        dashboardRideInviteViewModel.dashboardRideInviteList.collectAsStateWithLifecycle()
+    Box(modifier = Modifier.fillMaxWidth()) {
+        if (rideInvites.value.isEmpty())
+            Text(
+                stringResource(R.string.no_invites),
+                style = TypographyBold.headlineLarge,
+                fontSize = Dimensions.textSize18, modifier = Modifier.align(Alignment.Center)
+            )
+        LazyRow {
+            items(rideInvites.value) {
+                DashboardRideInviteUI(it)
+            }
 
+        }
     }
 }
 
 @Composable
-fun RideInviteUI(rideInvite: RideInvite) {
+fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
     RoundedBox(
         modifier = Modifier
             .width(
@@ -92,36 +105,52 @@ fun RideInviteUI(rideInvite: RideInvite) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     CircularNetworkImage(
                         modifier = Modifier.border(
                             width = Dimensions.size2pt5,
                             color = PrimaryDarkerLightB75,
                             shape = CircleShape
-                        ), size = Dimensions.size32, imageUrl = rideInvite.inviterProfilePicUrl
+                        ),
+                        size = Dimensions.size32,
+                        imageUrl = dashboardRideInvite.inviterProfilePicUrl,
+                        placeholderPainter = painterResource(R.drawable.profile_placeholder)
                     )
                     Spacer(Modifier.width(Dimensions.size10))
                     Column {
                         Text(
-                            stringResource(R.string.invite_from, rideInvite.inviterName),
+                            stringResource(R.string.invite_from, dashboardRideInvite.inviterName),
                             style = TypographyBold.titleMedium,
-                            fontSize = Dimensions.textSize16
+                            fontSize = Dimensions.textSize16,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(end = Dimensions.size10)
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             stringResource(
                                 R.string.start_to_destination,
-                                rideInvite.startPoint,
-                                rideInvite.destination
+                                dashboardRideInvite.startPoint,
+                                dashboardRideInvite.destination
                             ),
                             style = Typography.titleMedium,
                             color = NeutralDarkGrey,
-                            fontSize = Dimensions.textSize12
+                            fontSize = Dimensions.textSize12,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(end = Dimensions.size10)
                         )
                     }
                 }
                 RoundedBox(
-                    modifier = Modifier.size(Dimensions.size30),
+                    modifier = Modifier
+                        .size(Dimensions.size30)
+                        .clickable {
+                            //TODO:Click action for message
+                        },
                     cornerRadius = Dimensions.size10,
                     backgroundColor = PrimaryDarkerLightB75
                 ) {
@@ -129,9 +158,7 @@ fun RideInviteUI(rideInvite: RideInvite) {
                         Image(
                             painter = painterResource(R.drawable.ic_message),
                             null,
-                            modifier = Modifier.clickable {
-                                //TODO:Click action for message
-                            })
+                        )
                     }
                 }
 
@@ -141,7 +168,11 @@ fun RideInviteUI(rideInvite: RideInvite) {
                 Image(painterResource(R.drawable.ic_calendar_blue), null)
                 Spacer(Modifier.width(Dimensions.size5))
                 Text(
-                    text = Utils.formatDateTime(rideInvite.dateTime),
+                    text = Utils.formatDateTime(
+                        dashboardRideInvite.dateTime,
+                        "dd/MM/yyyy HH:mm",
+                        "EEE, dd MMM yyyy - hh:mm a"
+                    ),
                     style = Typography.titleMedium,
                     fontSize = Dimensions.textSize12
                 )
@@ -149,7 +180,9 @@ fun RideInviteUI(rideInvite: RideInvite) {
             }
             Spacer(Modifier.height(Dimensions.size17))
             Row(
-                modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Dimensions.size20),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = Dimensions.size20),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -162,11 +195,11 @@ fun RideInviteUI(rideInvite: RideInvite) {
                     Spacer(Modifier.width(Dimensions.size5))
                     Text(
                         text = stringResource(
-                            R.string.people_joined, rideInvite.inviteesProfilePicUrls.size
+                            R.string.people_joined, dashboardRideInvite.inviteesProfilePicUrls.size
                         ), style = Typography.titleMedium, fontSize = Dimensions.textSize12
                     )
                 }
-                AvatarRow(rideInvite.inviteesProfilePicUrls)
+                AvatarRow(dashboardRideInvite.inviteesProfilePicUrls)
 
 
             }
@@ -236,7 +269,9 @@ fun AvatarRow(imageUrls: List<String>) {
             CircularNetworkImage(
                 imageUrl = imageUrl, size = Dimensions.size20, modifier = Modifier.border(
                     width = Dimensions.size1pt5, shape = CircleShape, color = NeutralMidGrey
-                )
+                ),
+                placeholderPainter = painterResource(R.drawable.profile_placeholder)
+
             )
         }
         if (extraCount > 0) {
@@ -262,26 +297,3 @@ fun AvatarRow(imageUrls: List<String>) {
     }
 }
 
-@Preview
-@Composable
-fun RideInvitePreview() {
-    RideInviteList(
-        listOf(
-            RideInvite(
-                "Name",
-                "https://picsum.photos/id/1/200/300",
-                "Kanyakumari",
-                "Goa",
-                "26/10/2025 12:30",
-                listOf(
-                    "https://picsum.photos/id/1/200/300",
-                    "https://picsum.photos/id/2/200/300",
-                    "https://picsum.photos/id/3/200/300",
-                    "https://picsum.photos/id/4/200/300",
-                    "https://picsum.photos/id/5/200/300",
-
-                    )
-            ), RideInvite("", "", "", "", "26/10/2025 12:30", listOf())
-        )
-    )
-}

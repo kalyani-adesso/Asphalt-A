@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 struct LoginSucessView: View {
+    @State var goToHome : Bool = false
     var body: some View {
         VStack {
             AppImage.Login.loginSuccessBg
@@ -25,7 +26,11 @@ struct LoginSucessView: View {
                 .frame(alignment: .center)
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
-            NavigationLink(destination: BottomNavBar()) {
+            Button(action: {
+                MBUserDefaults.hasShownLoginSuccessStatic = false
+                goToHome = true
+            }) {
+                
                 Text(AppStrings.SignInSucessView.exploreButton.rawValue)
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
@@ -45,6 +50,9 @@ struct LoginSucessView: View {
                     .font(KlavikaFont.bold.font(size: 18))
             }
             .padding(.bottom, 21)
+            .navigationDestination(isPresented: $goToHome, destination: {
+              BottomNavBar()
+            })
         }
         .padding(.horizontal, 24)
         .navigationBarBackButtonHidden(true)

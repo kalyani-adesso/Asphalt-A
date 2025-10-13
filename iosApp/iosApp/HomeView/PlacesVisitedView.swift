@@ -9,7 +9,8 @@ import SwiftUI
 import Charts
 
 struct PlacesVisitedView: View {
-    @StateObject private var home = HomeViewModel()
+    @EnvironmentObject var home: HomeViewModel
+    @State private var monthOffset = 0
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
@@ -17,24 +18,32 @@ struct PlacesVisitedView: View {
                     Text(AppStrings.Placesvisited.title.rawValue)
                         .font(KlavikaFont.bold.font(size: 16))
                     
-                    Text("24 MAR - 24 SEP")
+                    Text(CalendarFormat().dateRangeText(monthOffset: monthOffset))
                         .font(KlavikaFont.bold.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
                 }
                 Spacer()
                 HStack(spacing: 10) {
-                    Button(action: {}) {
+                    Button(action: {
+                        withAnimation { monthOffset -= 1 }
+                    }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.black.opacity(0.8))
+                            .foregroundColor(AppColor.stoneGray)
                             .frame(width: 32, height: 32)
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    Button(action: {}) {
+                    Button(action: {
+                        withAnimation {
+                            if monthOffset < 0 {
+                                monthOffset += 1
+                            }
+                        }
+                    }) {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.black.opacity(0.8))
+                            .foregroundColor(AppColor.stoneGray)
                             .frame(width: 32, height: 32)
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -62,7 +71,7 @@ struct PlacesVisitedView: View {
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
-                                    AppColor.celticBlue.opacity(0.6),
+                                    AppColor.celticBlue.opacity(0.9),
                                     AppColor.white.opacity(0.2),
                                 ],
                                 startPoint: .top,
@@ -113,6 +122,7 @@ struct PlacesVisitedView: View {
         .padding()
     }
 }
+
 
 struct TooltipView: View {
     var number: Int

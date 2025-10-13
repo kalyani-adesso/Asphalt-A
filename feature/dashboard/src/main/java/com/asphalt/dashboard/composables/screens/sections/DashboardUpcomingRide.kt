@@ -15,10 +15,10 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.dashboard.composables.components.RideInvitePreview
+import com.asphalt.dashboard.composables.components.DashboardRideInviteList
 
 @Composable
-fun UpcomingRide(upcomingRideClick:()->Unit) {
+fun DashboardUpcomingRide(upcomingRideClick:()->Unit) {
     Column {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -37,7 +37,7 @@ fun UpcomingRide(upcomingRideClick:()->Unit) {
             )
         }
         Spacer(Modifier.height(Dimensions.spacing19))
-        RideInvitePreview()
+        DashboardRideInviteList()
     }
 }
 
