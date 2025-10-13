@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -114,11 +115,11 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
             )
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(modifier = Modifier) {
+            Row(modifier = Modifier.weight(1f)) {
                 ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium)
+                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
@@ -247,7 +248,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                 ColorIconRounded(backColor = GreenDark, resId = R.drawable.ic_location)
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium)
+                    Text("Weekend Coast Ride", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
@@ -379,7 +380,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
-                    Text("Invte From Sooraj", style = TypographyMedium.titleMedium)
+                    Text("Invte From Sooraj", style = TypographyMedium.titleMedium, maxLines = 1,overflow = TextOverflow.Ellipsis)
                     Text(
                         "Kochi - Kanyakumari",
                         style = Typography.bodySmall,
