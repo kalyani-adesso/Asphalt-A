@@ -59,7 +59,6 @@ fun ProfileSection(
 
                 CircularNetworkImage(
                     modifier = Modifier
-                        .size(Dimensions.size73)
                         .align(Alignment.Center),
                     imageUrl = "https://picsum.photos/id/1/200/300"
                 )
