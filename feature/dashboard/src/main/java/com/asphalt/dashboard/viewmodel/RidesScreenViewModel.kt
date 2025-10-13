@@ -28,21 +28,21 @@ class RidesScreenViewModel : ViewModel() {
             title = "Weekend Coast Ride",
             place = "Kochi - Kanyakumari",
             rideStatus = "Upcoming".uppercase(),
-            date = "Sun, Oct 21 - 09:00 AM", "3"
+            date = "Sun, Oct 21 - 09:00 AM", "3 Riders"
         )
 
         var hirtory = YourRideDataModel(
             title = "Weekend Coast Ride",
             place = "Kochi - Kanyakumari",
             rideStatus = "Completed".uppercase(),
-            date = "Sun, Sep 21", "3"
+            date = "Sun, Jun 21", "3 Riders"
         )
 
         var invites = YourRideDataModel(
             title = "Invite from Sooraj",
             place = "Kochi - Kanyakumari",
             rideStatus = "",
-            date = "Tomorrow - 08:00 AM", "3"
+            date = "Tomorrow - 08:00 AM", "3 Riders"
         )
 
         var upcomiList = ArrayList<YourRideDataModel>()

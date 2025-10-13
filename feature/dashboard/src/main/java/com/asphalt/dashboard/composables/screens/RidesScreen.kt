@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +58,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.viewmodel.RidesScreenViewModel
 
 @Composable
@@ -73,7 +73,7 @@ fun RidesScreen() {
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            ActionBarWithBack(R.drawable.ic_arrow_back,stringResource(R.string.your_rides)) {
+            ActionBarWithBack(R.drawable.ic_arrow_back, stringResource(R.string.your_rides)) {
                 // Handle back press
             }
             LazyColumn(
@@ -95,7 +95,7 @@ fun RidesScreen() {
                 when (ridesScreenViewModel.tabSelectFlow.value) {
                     RideStatConstants.UPCOMING_RIDE -> {
                         items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
-                            UpcomingRides(ridesScreenViewModel)
+                            UpcomingRides(ridesScreenViewModel, upconing)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
 
@@ -103,14 +103,14 @@ fun RidesScreen() {
 
                     RideStatConstants.HISTORY_RIDES -> {
                         items(ridesScreenViewModel.ridesListState.value.history) { history ->
-                            HistoryRides(ridesScreenViewModel)
+                            HistoryRides(ridesScreenViewModel, history)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
                     }
 
                     RideStatConstants.INVITES_RIDES -> {
                         items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
-                            Invites(ridesScreenViewModel)
+                            Invites(ridesScreenViewModel, invites)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
                     }
@@ -124,7 +124,7 @@ fun RidesScreen() {
 }
 
 @Composable
-fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
+fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRideDataModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -146,13 +146,13 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        "Weekend Coast Ride",
+                        text = upconing.title ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        "Kochi - Kanyakumari",
+                        text = upconing.place ?: "",
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey
                     )
@@ -175,7 +175,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
 
             ) {
                 Text(
-                    "UPCOMING", style = TypographyMedium.bodySmall, color = NeutralWhite,
+                    text = upconing.rideStatus ?: "",
+                    style = TypographyMedium.bodySmall,
+                    color = NeutralWhite,
                     modifier = Modifier
                 )
             }
@@ -192,7 +194,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("Sun, Oct 21 - 09:00 AM", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = upconing.date ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
             Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -204,7 +206,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("3 Riders", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = upconing.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
         }
@@ -245,7 +247,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text =stringResource(R.string.view_details).uppercase(),
+                    text = stringResource(R.string.view_details).uppercase(),
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )
@@ -257,7 +259,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel) {
 }
 
 @Composable
-fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
+fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDataModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -280,13 +282,13 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        "Weekend Coast Ride",
+                        text = history.title ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        "Kochi - Kanyakumari",
+                        text = history.place ?: "",
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey
                     )
@@ -309,7 +311,9 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
 
             ) {
                 Text(
-                    text=stringResource(R.string.completed).uppercase(), style = TypographyMedium.bodySmall, color = NeutralWhite,
+                    text = stringResource(R.string.completed).uppercase(),
+                    style = TypographyMedium.bodySmall,
+                    color = NeutralWhite,
                     modifier = Modifier
                 )
             }
@@ -326,7 +330,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("Sun, Oct 21 - 09:00 AM", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = history.date ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
             Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -338,7 +342,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("3 Riders", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = history.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
         }
@@ -359,7 +363,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text=stringResource(R.string.view_photos).uppercase(),
+                    text = stringResource(R.string.view_photos).uppercase(),
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )
@@ -378,7 +382,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text=stringResource(R.string.share_exp).uppercase(),
+                    text = stringResource(R.string.share_exp).uppercase(),
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )
@@ -388,7 +392,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel) {
 }
 
 @Composable
-fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
+fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -417,13 +421,13 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        "Invte From Sooraj",
+                        text = invites.title ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        "Kochi - Kanyakumari",
+                        text = invites.place ?: "",
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey
                     )
@@ -457,7 +461,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("Tomorrow,8 AM", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = invites.date ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
             Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -469,7 +473,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text("3 Riders", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = invites.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
 
             }
         }
