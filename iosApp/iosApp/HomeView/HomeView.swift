@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct HomeView: View {
     @AppStorage("hasSeenHomeSnackbar") private var hasSeenHomeSnackbar: Bool = false
     @State var showSnackbar: Bool = false

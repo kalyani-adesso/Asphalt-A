@@ -143,7 +143,6 @@ struct DonutChartView: View {
     }
 }
 
-
 #Preview {
     JourneyCardView()
 }
