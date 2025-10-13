@@ -1,4 +1,4 @@
-package com.asphalt.dashboard.composables.components
+package com.asphalt.dashboard.composables.screens.sections
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

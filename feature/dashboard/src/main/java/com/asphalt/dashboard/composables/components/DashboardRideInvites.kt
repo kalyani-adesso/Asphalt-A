@@ -79,7 +79,8 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
 
 @Composable
 fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
-    RoundedBox(
+    ComposeUtils.CommonContentBox(
+        isBordered = true,
         modifier = Modifier
             .width(
                 ComposeUtils.run {
@@ -89,9 +90,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                 })
             .wrapContentHeight()
             .padding(end = Dimensions.padding20),
-        backgroundColor = NeutralLightPaper,
-        borderColor = NeutralGrey30,
-        borderStroke = Dimensions.padding1
+
     ) {
         Column(
             modifier = Modifier
