@@ -15,7 +15,25 @@ val NeutralLightGrey = Color(0xFFE5E5E5)
 val NeutralMidGrey = Color(0xFFD6D6D6)
 val NeutralGrey = Color(0xFF999999)
 val NeutralDarkGrey = Color(0xFF887D75)
+val NeutralGrey30 = Color(0x4D9F9F9F)
+val NeutralGrey80 = Color(0xFF838A93)
+
 val NeutralBlackGrey = Color(0xFF262626)
 val NeutralBlack = Color(0xFF000000)
+val NeutralLightPaper = Color(0xFFF8F7FB)
 
+val PrimaryBrighterLightW90 = Color(0xFF8FEAFF)
+val MagentaDeep = Color(0xFFA928CC)
+val PrimaryBrighterLightW50 = Color(0xFF22C6EB)
+val BrightTeal = Color(0xFF17C6B9)
+val PrimaryBrighterLightW60 = Color(0xFF1F97F0)
+val PrimaryDeepBlue = Color(0xFF003661)
+val NeutralBlack10 = Color(0x1A000000)
+val VividRed = Color(0xFFF12225)
+
+
+val NeutralLightGray25= Color(0xFFF8F7FB)
+val NeutralRed=Color(0XFFFF0000)
 val NaturalGreen = Color(0xFF6FCD38)
+val NeutralDeepBlack = Color(0xFF18273B)
+

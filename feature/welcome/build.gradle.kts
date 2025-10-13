@@ -36,6 +36,7 @@ android {
 
 dependencies {
     implementation(projects.commonui)
+    implementation(projects.shared)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
@@ -52,7 +53,12 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.koin.compose)
+    // Koin
     implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    //DataStore
+    implementation(libs.datastore)
 
 }

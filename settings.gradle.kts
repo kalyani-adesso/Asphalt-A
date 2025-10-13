@@ -13,6 +13,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://jitpack.io")
     }
 }
 
@@ -27,6 +28,7 @@ dependencyResolutionManagement {
         }
         google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
@@ -35,4 +37,6 @@ include(":app",":shared") // KMP shared module
 include(":feature")
 include(":feature:registration")
 include(":commonui")
+include(":feature:login")
 include(":feature:welcome")
+include(":feature:dashboard")

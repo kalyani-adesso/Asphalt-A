@@ -9,56 +9,54 @@ import SwiftUI
 import Charts
 
 struct JourneyCardView: View {
-    @StateObject private var home = HomeViewModel()
-    
-    
+    @EnvironmentObject var home: HomeViewModel 
+    @State private var selectedOption = "Last 4 months"
     var body: some View {
-      
-
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(AppStrings.JourneyChart.title.rawValue)
                     .font(KlavikaFont.bold.font(size: 18))
                     .multilineTextAlignment(.leading)
-                    
                 Spacer()
                 ZStack{
                     RoundedRectangle(cornerRadius: 5)
                         .fill(Color.white)
                         .frame(width:111, height: 31)
                         .overlay(
-                                RoundedRectangle(cornerRadius: 5)
+                            RoundedRectangle(cornerRadius: 5)
                                 .stroke(Color.black.opacity(0.10), lineWidth: 1)
-                            )
+                        )
                     Menu {
-                        Button("Last 4 months", action: {})
-                        Button("Last 6 months", action: {})
-                        Button("Last 1 year", action: {})
+                        Button("Last 4 months"){selectedOption = "Last 4 months"}
+                        Button("Last 6 months") {selectedOption = "Last 6 months"}
+                        Button("Last 1 year") {selectedOption = "Last 1 year"}
                     } label: {
-                        Label("Last 4 months", systemImage: "chevron.down")
-                            .font(KlavikaFont.regular.font(size: 12))
-                            .foregroundColor(AppColor.stoneGray)
+                        HStack(spacing: 10) {
+                            Text(selectedOption)
+                            Image(systemName: "chevron.down")
+                                .frame(width: 5, height: 11)
+                        }
+                        .font(KlavikaFont.regular.font(size: 12))
+                        .foregroundColor(AppColor.stoneGray)
                     }
                 }
-               
             }
-
             VStack {
                 DonutChartView(slices: home.journeySlices)
                     .frame(width: 190, height: 190)
-
+                
                 VStack(spacing: 8) {
-                               let chunks = home.journeySlices.chunked(into: 3)
-                               ForEach(chunks.indices, id: \.self) { rowIndex in
-                                   HStack(spacing: 12) {
-                                       ForEach(chunks[rowIndex]) { slice in
-                                           CategoryList(color: slice.color, label: slice.category)
-                                       }
-                                   }
-                               }
-                           }
-               .padding()
-               .frame(maxWidth: .infinity, alignment: .center)
+                    let chunks = home.journeySlices.chunked(into: 3)
+                    ForEach(chunks.indices, id: \.self) { rowIndex in
+                        HStack(spacing: 12) {
+                            ForEach(chunks[rowIndex]) { slice in
+                                CategoryList(color: slice.color, label: slice.category)
+                            }
+                        }
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .padding()
@@ -66,10 +64,9 @@ struct JourneyCardView: View {
         .cornerRadius(15)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-            .stroke(AppColor.border, lineWidth: 2)
-                )
+                .stroke(AppColor.darkGray, lineWidth: 2)
+        )
         .padding(.top,20)
-        
     }
 }
 
@@ -113,11 +110,10 @@ extension Array {
 // MARK: - Donut Chart
 struct DonutChartView: View {
     let slices: [JourneySlice]
-
+    
     var body: some View {
         Chart {
             ForEach(slices) { s in
-                // SectorMark requires iOS 16+; adjust if needed
                 if #available(iOS 17.0, *) {
                     SectorMark(
                         angle: .value("Value", s.value),

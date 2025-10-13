@@ -63,7 +63,7 @@ extension SignInView {
         Text("")
             .frame(maxWidth: .infinity)
             .frame(height: 1.5)
-            .background(AppColor.seperatorGray)
+            .background(AppColor.whiteGray)
     }
     
     @ViewBuilder var socialSignInOptions: some View {

@@ -16,7 +16,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.asphalt.android.model.User
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.theme.Dimensions
@@ -38,7 +36,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
-import kotlinx.coroutines.coroutineScope
+import com.asphalt.commonui.utils.ComposeUtils
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -46,11 +44,14 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RegistrationDetailsScreen(
     authViewModel: AuthViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToDashboard: () -> Unit = {}) {
+    onNavigateToDashboard: () -> Unit = {}
+) {
 
-    Scaffold(modifier = modifier
-        .fillMaxSize()
-        .background(color = Color.White))
+    Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+    )
     { paddingValues ->
         Column(
             modifier = modifier.padding(paddingValues),
@@ -62,7 +63,8 @@ fun RegistrationDetailsScreen(
 
 @Composable
 private fun RegistrationDetailsHeader(
-    viewModel: AuthViewModel) {
+    viewModel: AuthViewModel
+) {
 
     Column(
         modifier = Modifier
@@ -81,8 +83,10 @@ private fun RegistrationDetailsHeader(
             text = "Create your account to get started",
             style = Typography.titleSmall
         )
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_app_icon),
+        Image(
+            painter = painterResource(
+                id = com.asphalt.commonui.R.drawable.ic_app_icon
+            ),
             contentDescription = "App Logo"
         )
         Text(
@@ -97,7 +101,8 @@ private fun RegistrationDetailsHeader(
 
 @Composable
 fun RegistrationFeilds(
-    viewModel: AuthViewModel) {
+    viewModel: AuthViewModel
+) {
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -109,7 +114,8 @@ fun RegistrationFeilds(
     var resultMessage by remember { mutableStateOf<String?>(value = null) }
 
     Column(
-        modifier= Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(Dimensions.padding)
     ) {
         Text(
@@ -119,7 +125,7 @@ fun RegistrationFeilds(
         )
         OutlinedTextField(
             value = userName,
-            onValueChange = {userName = it},
+            onValueChange = { userName = it },
             placeholder = { Text(text = "Full Name") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -129,8 +135,10 @@ fun RegistrationFeilds(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                Icon(
+                    painter = painterResource(
+                        id = R.drawable.shape
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -144,7 +152,7 @@ fun RegistrationFeilds(
         )
         OutlinedTextField(
             value = email,
-            onValueChange = {email = it},
+            onValueChange = { email = it },
             placeholder = { Text(text = "Email Id") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -154,8 +162,10 @@ fun RegistrationFeilds(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                Icon(
+                    painter = painterResource(
+                        id = R.drawable.shape
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -169,7 +179,7 @@ fun RegistrationFeilds(
         )
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = { password = it },
             placeholder = { Text(text = "Password") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -179,8 +189,10 @@ fun RegistrationFeilds(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = com.asphalt.commonui.R.drawable.ic_lock),
+                Icon(
+                    painter = painterResource(
+                        id = com.asphalt.commonui.R.drawable.ic_lock
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -194,7 +206,7 @@ fun RegistrationFeilds(
         )
         OutlinedTextField(
             value = confirmPassword,
-            onValueChange = {confirmPassword = it},
+            onValueChange = { confirmPassword = it },
             placeholder = { Text(text = "Confirm Password") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -204,8 +216,10 @@ fun RegistrationFeilds(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = com.asphalt.commonui.R.drawable.ic_lock),
+                Icon(
+                    painter = painterResource(
+                        id = com.asphalt.commonui.R.drawable.ic_lock
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -217,28 +231,31 @@ fun RegistrationFeilds(
             endColor = PrimaryDarkerLightB50,
             onClick = {
                 if (email.isNotBlank() && password.isNotBlank()) {
-                    val user = User(email = email,password=password,"","")
+                    val user = User(email = email, password = password, "", "")
                     loading = true
                     resultMessage = ""
 
                     coroutineScope.launch {
-                            // launch coroutine in composble scope
-                            val result = viewModel.SignUp(user)
-                            loading = false
-                            resultMessage = result.fold(
-                                onSuccess = {"Success: $it"},
-                                onFailure = {"Error: ${it.message}"}
-                            )
+                        // launch coroutine in composble scope
+                        val result = viewModel.SignUp(user)
+                        loading = false
+                        resultMessage = result.fold(
+                            onSuccess = { "Success: $it" },
+                            onFailure = { "Error: ${it.message}" }
+                        )
                     }
                 }
             },
-            buttonText = "CREATE ACCOUNT"
-        )
+        ) {
+            ComposeUtils.DefaultButtonContent("CREATE ACCOUNT")
+        }
     }
     Spacer(modifier = Modifier.height(20.dp))
     resultMessage?.let {
-        Text(text = it,
-            color = if (resultMessage!!.startsWith("Error")) Color.Red else Color.Green)
+        Text(
+            text = it,
+            color = if (resultMessage!!.startsWith("Error")) Color.Red else Color.Green
+        )
     }
 }
 

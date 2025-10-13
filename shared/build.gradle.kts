@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
+            implementation(projects.commonui)
 
 //            implementation(libs.firebase.common) // Or latest version
 //            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth
@@ -87,6 +88,8 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.firebase.firestore.ktx)
+
+            implementation(libs.datastore)
 
         }
         iosMain.dependencies {

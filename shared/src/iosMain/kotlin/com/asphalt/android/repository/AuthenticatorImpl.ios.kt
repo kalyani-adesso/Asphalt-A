@@ -1,5 +1,7 @@
 package com.asphalt.android.repository
 
+import com.asphalt.android.model.AuthResultimpl
+import com.asphalt.android.model.LoginResult
 import com.asphalt.android.model.User
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseDatabase.FIRDatabase
@@ -41,6 +43,11 @@ actual class AuthenticatorImpl actual constructor() {
                 }
             }
         }
+    }
+
+    actual suspend fun signIn(email: String, password: String): LoginResult {
+
+        return AuthResultimpl(false, "IOs implmentation not done")
     }
 }
 

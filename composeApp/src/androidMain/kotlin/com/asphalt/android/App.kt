@@ -20,7 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import asphalta.composeapp.generated.resources.Res
 import asphalta.composeapp.generated.resources.compose_multiplatform
-import com.asphalt.welcome.composables.GetStartedScreen
+import com.asphalt.commonui.constants.Constants
+import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -58,12 +59,12 @@ fun App() {
 fun AsphaltApp() {
     var showSplash by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(Constants.SPLASH_TIMER)
         showSplash = false
     }
     if (showSplash) {
-        SplashScreen()
+//        SplashScreen(onNavigateToRegister, onNavigateToWelcome)
     } else {
-        GetStartedScreen()
+        DashBoardScreen()
     }
 }
