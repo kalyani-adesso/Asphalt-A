@@ -73,7 +73,7 @@ fun RidesScreen() {
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            ActionBarWithBack(stringResource(R.string.your_rides)) {
+            ActionBarWithBack(R.drawable.ic_arrow_back,stringResource(R.string.your_rides)) {
                 // Handle back press
             }
             LazyColumn(

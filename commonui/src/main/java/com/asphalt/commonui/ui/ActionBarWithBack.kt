@@ -1,5 +1,6 @@
 package com.asphalt.commonui.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,7 +24,7 @@ import com.asphalt.commonui.theme.TypographyBold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActionBarWithBack(title: String, onBackPress: () -> Unit) {
+fun ActionBarWithBack(@DrawableRes icon:Int, title: String, onBackPress: () -> Unit) {
     AsphaltTheme {
         Surface(
             shadowElevation = 8.dp, // Manual shadow elevation
@@ -40,7 +41,7 @@ fun ActionBarWithBack(title: String, onBackPress: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = { onBackPress.invoke() }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back),
+                            painter = painterResource(icon),
                             contentDescription = "Back",
                             tint = Color.Unspecified
                         )
@@ -69,7 +70,7 @@ fun ActionBarWithBack(title: String, onBackPress: () -> Unit) {
 @Preview
 @Composable
 fun ActionPreview() {
-    ActionBarWithBack("Your Riders"){
+    ActionBarWithBack(R.drawable.ic_arrow_back,"Your Riders"){
 
     }
 }
