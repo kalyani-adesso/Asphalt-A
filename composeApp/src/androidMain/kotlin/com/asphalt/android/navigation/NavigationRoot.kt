@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.StartScreen
+import com.asphalt.createride.ui.CreateRideEntry
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.login.ui.LoginScreen
@@ -93,7 +94,8 @@ fun NavigationRoot() {
             entry<SplashKey> { key ->
                 NavigationSplashScreen(
                     onNavigateToLogin = {
-                        backStack.add(LoginScreenNavKey)
+                        //backStack.add(LoginScreenNavKey)
+                        backStack.add(CreateRideNavKey)
                     },
                     onNavigateToWelcome = {
                         backStack.add(WelcomeFeatureNavKey)
@@ -159,6 +161,9 @@ fun NavigationRoot() {
             entry<RidesScreenNav> { key ->
                 RidesScreen()
             }
+            entry<CreateRideNavKey> { key ->
+                CreateRideEntry()
+            }
 
         }
     )
@@ -179,5 +184,11 @@ data object WelcomeFeatureNavKey : NavKey
 
 @Serializable
 data object SplashKey : NavKey
+@Serializable
 object DashboardNavKey : NavKey
+@Serializable
 object RidesScreenNav : NavKey
+@Serializable
+object CreateRideNavKey : NavKey
+
+
