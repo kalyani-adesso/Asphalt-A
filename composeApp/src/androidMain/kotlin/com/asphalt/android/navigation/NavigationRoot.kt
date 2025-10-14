@@ -20,6 +20,7 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
+import java.util.Map.entry
 
 @Suppress("FunctionName")
 @Composable
@@ -28,7 +29,6 @@ fun NavigationRoot(
     val backStack = rememberNavBackStack(NavKey.DashboardNavKey)
 
     val bottomNavITems = listOf(NavKey.DashboardNavKey, NavKey.RidersKey)
-
 
     fun onBackPressed() {
         println("Back Nav from ${backStack.lastOrNull()}")
@@ -44,6 +44,7 @@ fun NavigationRoot(
                         )
                     )
                 }
+
                 else -> {
                     backStack.removeLastOrNull()
                 }
@@ -81,10 +82,10 @@ fun NavigationRoot(
                     onNavigateToWelcome = {
 
                         backStack.add(NavKey.WelcomeFeatureNavKey)
-                        backStack.add(WelcomeFeatureNavKey)
+                        backStack.add(NavKey.WelcomeFeatureNavKey)
                     },
                     onNavigateToDashboard = {
-                        backStack.add(DashboardNavKey)
+                        backStack.add(NavKey.DashboardNavKey)
                     }
                 )
                 backStack.remove(NavKey.SplashKey)
@@ -132,15 +133,15 @@ fun NavigationRoot(
 
             entry<NavKey.DashboardNavKey> { key ->
                 DashBoardScreen()
-            entry<DashboardNavKey> { key ->
-                DashBoardScreen(upcomingRideClick = {
-                    backStack.add(RidesScreenNav)
-                })
+                entry<NavKey.DashboardNavKey> { key ->
+                    DashBoardScreen(upcomingRideClick = {
+                        backStack.add(NavKey.RidesScreenNav)
+                    })
+                }
+                entry<NavKey.RidesScreenNav> { key ->
+                    RidesScreen()
+                }
             }
-            entry<RidesScreenNav> { key ->
-                RidesScreen()
-            }
-
         }
     )
 }

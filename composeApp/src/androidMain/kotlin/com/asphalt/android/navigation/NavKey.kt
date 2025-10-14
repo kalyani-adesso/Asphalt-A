@@ -30,6 +30,9 @@ sealed class NavKey(val route: String) {
     @Serializable
     object ProfileKey : NavKey
 
+    @Serializable
+    object RidesScreenNav : NavKey
+
     companion object {
         fun all() = listOf(DashboardNavKey, RidersKey, QueriesKey, ProfileKey)
     }
