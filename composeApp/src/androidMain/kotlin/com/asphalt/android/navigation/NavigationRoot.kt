@@ -132,8 +132,6 @@ fun NavigationRoot(
             }
 
             entry<NavKey.DashboardNavKey> { key ->
-                DashBoardScreen()
-                entry<NavKey.DashboardNavKey> { key ->
                     DashBoardScreen(upcomingRideClick = {
                         backStack.add(NavKey.RidesScreenNav)
                     })
@@ -141,7 +139,6 @@ fun NavigationRoot(
                 entry<NavKey.RidesScreenNav> { key ->
                     RidesScreen()
                 }
-            }
         }
     )
 }
