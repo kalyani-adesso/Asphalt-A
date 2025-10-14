@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-referAFriend.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
