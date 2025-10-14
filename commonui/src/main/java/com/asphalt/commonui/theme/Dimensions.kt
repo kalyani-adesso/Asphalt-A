@@ -66,6 +66,7 @@ object Dimensions {
     val spacing27 = 27.dp
     val spacing18 = 18.dp
     val spacing80 = 80.dp
+    val spacing250 = 250.dp
 
     val size = 24.dp
     val size2 = 2.dp

@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -33,18 +36,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
+import com.asphalt.commonui.theme.BlueLight
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.GreenLIGHT
+import com.asphalt.commonui.theme.GreenLIGHT10
+import com.asphalt.commonui.theme.GreenLIGHT25
+import com.asphalt.commonui.theme.MagentaDeep
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.OrangeLight
+import com.asphalt.commonui.theme.OrangeLight10
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryDeepBlue
+import com.asphalt.commonui.theme.REDLIGHT
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
@@ -52,24 +65,38 @@ import com.asphalt.commonui.ui.ActionBarWithBack
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
-
+    val scrollState = rememberScrollState()
     AsphaltTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
-                ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
-                TabSelection(viewModel)
-                Spacer(Modifier.height(Dimensions.padding20))
-                DetailsSection()
+                item { ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { } }
+                item { TabSelection(viewModel) }
+                item { Spacer(Modifier.height(Dimensions.padding20)) }
+                if (viewModel.tabSelectState.value == Constants.TAB_DETAILS)
+                    item { DetailsSection(viewModel) }
+                if (viewModel.tabSelectState.value == Constants.TAB_ROUTE)
+                    item { RouteSection(viewModel) }
+                if(viewModel.tabSelectState.value== Constants.TAB_REVIEW)
+                item { ReviewSection() }
+
+//                ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
+//                TabSelection(viewModel)
+//                Spacer(Modifier.height(Dimensions.padding20))
+//                DetailsSection(viewModel)
+//                RouteSection(viewModel)
+
             }
             BottomButtons(viewModel)
             // Fixed bottom button
@@ -79,7 +106,336 @@ fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
 }
 
 @Composable
-fun DetailsSection() {
+fun ReviewSection() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = Dimensions.padding16,
+                end = Dimensions.padding16,
+            )
+            .background(
+                color = NeutralLightPaper, shape = RoundedCornerShape(Dimensions.size10)
+            )
+    ) {
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Text(
+            text = "Review Your Ride",
+            style = TypographyMedium.bodyMedium,
+            color = NeutralBlack,
+            modifier = Modifier.padding(start = Dimensions.padding16)
+        )
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Box(modifier = Modifier.padding(start = Dimensions.padding16,
+            end = Dimensions.padding16),) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.size73)
+                    .background(
+                        color = NeutralWhite,
+                        shape = RoundedCornerShape(Dimensions.size10)
+                    ).padding(start = Dimensions.padding16, end = Dimensions.padding16),
+                horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.weight(1f)) {
+                    ColorIconRounded(backColor = BlueLight, resId = R.drawable.ic_navigate)
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
+                    Column {
+                        Text(
+                            text = "Weekend Ride",
+                            style = TypographyMedium.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Refreshment to  Munnar",
+                            style = Typography.bodySmall,
+                            color = NeutralDarkGrey
+                        )
+                    }
+
+                }
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = GreenLIGHT10,
+                            shape = RoundedCornerShape(Dimensions.size5)
+                        )
+                        .padding(
+                            start = Dimensions.size5,
+                            end = Dimensions.size5,
+                            top = Dimensions.size8,
+                            bottom = Dimensions.size8
+                        ), contentAlignment = Alignment.Center
+
+
+                ) {
+                    Text(
+                        text = "Group ride".uppercase(),
+                        style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
+                        color = GreenLIGHT25,
+                        modifier = Modifier
+                    )
+                }
+
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Box(modifier = Modifier.padding(start = Dimensions.padding16,
+            end = Dimensions.padding16),) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.size73)
+                    .background(
+                        color = NeutralWhite,
+                        shape = RoundedCornerShape(Dimensions.size10)
+                    ).padding(start = Dimensions.padding16, end = Dimensions.padding16),
+                horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    ColorIconRounded(backColor = OrangeLight, resId = R.drawable.ic_calender_white)
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
+                    Column {
+                        Text(
+                            text = "Date and Time",
+                            style = TypographyMedium.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Sun, Oct 21 - 09:00 AM",
+                            style = Typography.bodySmall,
+                            color = NeutralDarkGrey
+                        )
+                    }
+
+                }
+
+
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Box(modifier = Modifier.padding(start = Dimensions.padding16,
+            end = Dimensions.padding16),) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.size73)
+                    .background(
+                        color = NeutralWhite,
+                        shape = RoundedCornerShape(Dimensions.size10)
+                    ).padding(start = Dimensions.padding16, end = Dimensions.padding16),
+                horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_route_white)
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
+                    Column {
+                        Text(
+                            text = "Route",
+                            style = TypographyMedium.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Kochi - Munnarr",
+                            style = Typography.bodySmall,
+                            color = NeutralDarkGrey
+                        )
+                    }
+
+                }
+
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Box(modifier = Modifier.padding(start = Dimensions.padding16,
+            end = Dimensions.padding16),) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.size73)
+                    .background(
+                        color = NeutralWhite,
+                        shape = RoundedCornerShape(Dimensions.size10)
+                    ).padding(start = Dimensions.padding16, end = Dimensions.padding16),
+                horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    ColorIconRounded(backColor = OrangeLight10, resId = R.drawable.ic_group_white)
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
+                    Column {
+                        Text(
+                            text = "Participants",
+                            style = TypographyMedium.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "3 riders  selected",
+                            style = Typography.bodySmall,
+                            color = NeutralDarkGrey
+                        )
+                    }
+
+                }
+
+            }
+        }
+//added adding
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+    }
+}
+
+@Composable
+fun RouteSection(viewModel: CreateRideScreenViewModel) {
+    var text by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = Dimensions.padding16,
+                end = Dimensions.padding16,
+            )
+            .background(
+                color = NeutralLightPaper, shape = RoundedCornerShape(Dimensions.size10)
+            )
+    ) {
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Text(
+            text = "Starting Point",
+            style = TypographyMedium.bodyMedium,
+            color = NeutralBlack,
+            modifier = Modifier.padding(start = Dimensions.padding16)
+        )
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(Dimensions.padding50)
+                .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+                .background(
+                    NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextField(
+                value = if (!text.isEmpty()) {
+                    text
+                } else {
+                    ""
+                },
+                onValueChange = { text = it },
+                placeholder = {
+                    Text(
+                        text = "Enter starting location",
+                        style = Typography.bodyMedium,
+                        color = NeutralDarkGrey,
+
+                        )
+                },
+                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+
+                    ),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_route),
+                        contentDescription = "",
+                        tint = GreenLIGHT
+
+                    )
+                }
+
+            )
+
+        }
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Text(
+            text = "Destination",
+            style = TypographyMedium.bodyMedium,
+            color = NeutralBlack,
+            modifier = Modifier.padding(start = Dimensions.padding16)
+        )
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(Dimensions.padding50)
+                .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+                .background(
+                    NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextField(
+                value = if (!text.isEmpty()) {
+                    text
+                } else {
+                    ""
+                },
+                onValueChange = { text = it },
+                placeholder = {
+                    Text(
+                        text = "Enter destination",
+                        style = Typography.bodyMedium,
+                        color = NeutralDarkGrey,
+
+                        )
+                },
+                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+
+                    ),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_route),
+                        contentDescription = "",
+                        tint = REDLIGHT
+
+                    )
+                }
+
+            )
+
+        }
+//added padding
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+    }
+}
+
+@Composable
+fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     var text by remember { mutableStateOf("") }
     var text2 by remember { mutableStateOf("") }
     Column(
@@ -90,8 +446,7 @@ fun DetailsSection() {
                 end = Dimensions.padding16,
             )
             .background(
-                color = NeutralLightPaper,
-                shape = RoundedCornerShape(Dimensions.size10)
+                color = NeutralLightPaper, shape = RoundedCornerShape(Dimensions.size10)
             )
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
@@ -344,19 +699,16 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
             }
         } else {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
                     Dimensions.spacing20
                 )
             ) {
                 BorderedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
+                    modifier = Modifier.weight(1f), onClick = {
                         if (viewModel.tabSelectState.value > 1) {
                             viewModel.updateTab(-1)
                         }
-                    },
-                    contentPaddingValues = PaddingValues(
+                    }, contentPaddingValues = PaddingValues(
                         Dimensions.size0
                     )
                 ) {
@@ -372,14 +724,11 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                 }
 
                 GradientButton(
-                    modifier = Modifier.weight(1f),
-                    endColor = PrimaryDeepBlue,
-                    onClick = {
+                    modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue, onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             viewModel.updateTab(1)
                         }
-                    },
-                    contentPadding = PaddingValues(
+                    }, contentPadding = PaddingValues(
                         Dimensions.size0
                     )
                 ) {
@@ -411,8 +760,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
         horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
         ) {
             Box(
                 modifier = Modifier
@@ -430,8 +778,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_path),
@@ -461,8 +808,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             )
         }
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
         ) {
             Box(
                 modifier = Modifier
@@ -480,8 +826,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_route),
@@ -496,13 +841,11 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Route",
-                style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                text = "Route", style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
-                },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                }, color = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
@@ -526,8 +869,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_participants),
@@ -552,7 +894,9 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
-                }, maxLines = 1, fontSize = Dimensions.textSize12
+                },
+                maxLines = 1,
+                fontSize = Dimensions.textSize12
             )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
@@ -572,8 +916,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_review),
@@ -598,7 +941,8 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
-                }, fontSize = Dimensions.textSize12
+                },
+                fontSize = Dimensions.textSize12
             )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
@@ -618,8 +962,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                                 shape = RoundedCornerShape(Dimensions.padding10)
                             )
                         }
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_share),
@@ -634,13 +977,11 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Share",
-                style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                text = "Share", style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
-                },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                }, color = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
