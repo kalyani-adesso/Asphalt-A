@@ -37,14 +37,14 @@ struct CreateAccount: View {
                         label: AppStrings.CreateAccountLabel.userName.rawValue,
                         icon: AppIcon.SignUp.userDetail,
                         placeholder: AppStrings.SignUpPlaceholder.userName.rawValue,
-                        emailOrPhone: $userName,
+                        value: $userName,
                         isValidEmail: .constant(false)
                     )
                     FormFieldView(
                         label: AppStrings.CreateAccountLabel.email.rawValue,
                         icon: AppIcon.Login.email,
                         placeholder: AppStrings.SignUpPlaceholder.email.rawValue,
-                        emailOrPhone: $email,
+                        value: $email,
                         isValidEmail: $isValidEmail
                     )
                     

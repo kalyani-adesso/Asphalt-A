@@ -58,8 +58,21 @@ struct AppIcon {
         static let navigation = Image("navigation")
         static let pointer = Image("pointer")
         static let rides = Image("rides")
-        
-               
+    }
+    
+    struct CreateRide {
+        static let review = Image("Review")
+        static let share = Image("Share")
+        static let route = Image("Route")
+        static let calendar_month = Image("calendar_month")
+        static let timePicker = Image("Time_Picker")
+        static let searchLens = Image("Search")
+        static let tools = Image("Tools")
+        static let copy = Image("Copy")
+        static let mail = Image("Mail")
+        static let twitter = Image("Twitter")
+        static let whatsapp = Image("whatsapp")
+        static let facebook = Image("Facebook")
     }
 }
 

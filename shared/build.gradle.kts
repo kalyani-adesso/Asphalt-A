@@ -40,7 +40,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
-            implementation(projects.commonui)
+
 
 //            implementation(libs.firebase.common) // Or latest version
 //            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth
@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.coroutines)
+            implementation(projects.commonui) //as it has only android modules
 
             //firebase
           //  implementation(libs.firebase.analytics)

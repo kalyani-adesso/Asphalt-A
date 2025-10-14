@@ -179,6 +179,17 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+    enum CreateRide: String {
+        
+        case previous = "PREVIOUS"
+        case next = "NEXT"
+        case nextStep = "NEXT STEP"
+        case create = "CREATE RIDE"
+        case done = "DONE"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
 }
 
