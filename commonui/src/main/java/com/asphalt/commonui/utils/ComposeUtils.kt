@@ -27,9 +27,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.RoundedBox
 
@@ -130,5 +132,22 @@ object ComposeUtils {
             }
 
         }
+    }
+
+    @Composable
+    fun SectionTitle(text: String, modifier: Modifier = Modifier) {
+        Text(
+            style = TypographyBold.bodyMedium,
+            fontSize = Dimensions.textSize16, text = text, modifier = modifier
+        )
+    }
+
+    @Composable
+    fun SectionSubtitle(text: String, modifier: Modifier = Modifier) {
+        Text(
+            text = text, style = Typography.bodyMedium,
+            fontSize = Dimensions.textSize12,
+            color = NeutralDarkGrey, modifier = modifier
+        )
     }
 }
