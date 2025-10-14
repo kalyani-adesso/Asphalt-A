@@ -1,4 +1,4 @@
-package com.asphalt.commonui.ui
+package com.asphalt.commonui.ui.barchart
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -45,10 +45,10 @@ class HighlightRoundedBarRenderer(
         val j = entryIndex * 4
         if (j + 3 >= buffer.buffer.size) return
         val left =
-            (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 - BarChartConstants.BAR_CHART_HIGHLIGHT_OFFSET
+            (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 - BarChartConstants.BAR_CHART_HIGHLIGHT_HORIZONTAL_OFFSET
         val right =
-            (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 + BarChartConstants.BAR_CHART_HIGHLIGHT_OFFSET
-        val top = buffer.buffer[j + 1] - 18f
+            (buffer.buffer[j] + buffer.buffer[j + 2]) / 2 + BarChartConstants.BAR_CHART_HIGHLIGHT_HORIZONTAL_OFFSET
+        val top = buffer.buffer[j + 1] - BarChartConstants.BAR_CHART_HIGHLIGHT_VERTICAL_OFFSET
         val bottom = buffer.buffer[j + 3]
 
         val barRect = RectF(left, top, right, bottom)

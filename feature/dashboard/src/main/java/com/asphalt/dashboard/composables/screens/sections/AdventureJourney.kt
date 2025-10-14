@@ -12,37 +12,47 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.ui.DonutPreview
-import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.ui.DonutChart
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.components.RideGraphLegendUI
 import com.asphalt.dashboard.composables.components.SelectJourneyTimeFrame
+import com.asphalt.dashboard.sealedclasses.AdventureJourneyTimeFrameChoices
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
+import com.asphalt.dashboard.viewmodels.AdventureJourneyViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AdventureJourney(options: List<String>) {
+fun AdventureJourney(
+    adventureJourneyViewModel: AdventureJourneyViewModel = koinViewModel()
+) {
+    val options = listOf(
+        AdventureJourneyTimeFrameChoices.LastFourMonths,
+        AdventureJourneyTimeFrameChoices.LastWeek, AdventureJourneyTimeFrameChoices.LastYear
+    )
     val selectedItem = remember { mutableStateOf(options[0]) }
-    val totalRidesInfo by remember { mutableIntStateOf(0) }
-    RoundedBox(
+    LaunchedEffect(selectedItem.value) {
+        adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)
+    }
+    val totalRides = adventureJourneyViewModel.totalRides.collectAsStateWithLifecycle()
+    val colorList = adventureJourneyViewModel.colorList.collectAsStateWithLifecycle()
+    val valueList = adventureJourneyViewModel.valueList.collectAsStateWithLifecycle()
+
+    ComposeUtils.CommonContentBox(
         modifier = Modifier.fillMaxWidth(),
-        borderColor = NeutralGrey30,
-        backgroundColor = NeutralLightPaper,
-        borderStroke = Dimensions.padding1
+        isBordered = true
     ) {
         Column(
             modifier = Modifier.padding(
@@ -73,7 +83,7 @@ fun AdventureJourney(options: List<String>) {
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Box {
-                    DonutPreview()
+                    DonutChart(valueList.value, colorList.value)
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,7 +92,10 @@ fun AdventureJourney(options: List<String>) {
                         Image(painter = painterResource(R.drawable.ic_directions_bike), null)
                         Spacer(Modifier.height(Dimensions.spacing5))
                         Text(
-                            stringResource(R.string.total_rides_info_chart, totalRidesInfo),
+                            stringResource(
+                                R.string.total_rides_info_chart,
+                                totalRides.value
+                            ),
                             fontSize = Dimensions.textSize12,
                             style = TypographyMedium.bodySmall,
                             color = NeutralDarkGrey
@@ -99,7 +112,6 @@ fun AdventureJourney(options: List<String>) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 RideGraphLegendUI(RideGraphLegend.TotalRides)
-//                RideGraphLegendUI(RideGraphLegend.DistanceCovered)
                 RideGraphLegendUI(RideGraphLegend.PlacesExplored)
                 RideGraphLegendUI(RideGraphLegend.RideGroups)
 
@@ -120,8 +132,3 @@ fun AdventureJourney(options: List<String>) {
 }
 
 
-@Preview
-@Composable
-fun AdventureJourneyPreview() {
-    AdventureJourney(listOf("Last 4 months", "Last week", "Last year"))
-}

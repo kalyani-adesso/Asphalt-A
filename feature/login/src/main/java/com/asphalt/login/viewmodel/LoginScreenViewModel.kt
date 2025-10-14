@@ -1,6 +1,7 @@
 package com.asphalt.login.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.datastore.DataStoreManager
@@ -32,6 +33,8 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
     val isLoginSuccess = MutableStateFlow(false)
     val showFailureMessage = MutableStateFlow(false)
     val showLoader = MutableStateFlow(false)
+    val isrememberMe = mutableStateOf(false)
+
 
     fun updateMessage(boolean: Boolean) {
         showFailureMessage.value = boolean
@@ -72,6 +75,11 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
                     }
                     val jsonString = Json.encodeToString(user)
                     datastore.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, isrememberMe.value)
+                    //println("isRemberMe: ${isrememberMe.value}")
+                    _emailTextMutableState.value = ""
+                    _passwordTextMutableState.value = ""
+                    isEmailVaild.value = false
                     updateMessage(false)
                     updateLoader(false)
                     isLoginSuccess.value = true

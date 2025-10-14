@@ -65,6 +65,6 @@ fun AsphaltApp() {
     if (showSplash) {
 //        SplashScreen(onNavigateToRegister, onNavigateToWelcome)
     } else {
-        DashBoardScreen()
+        DashBoardScreen({})
     }
 }

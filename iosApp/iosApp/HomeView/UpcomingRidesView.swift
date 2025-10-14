@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UpcomingRidesView: View {
-    @StateObject private var home = HomeViewModel()
+    @EnvironmentObject var home: HomeViewModel 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {

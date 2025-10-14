@@ -8,40 +8,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.ui.RoundedBox
-import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.components.RideMonthYear
 import com.asphalt.dashboard.composables.components.RideStatBox
 import com.asphalt.dashboard.constants.RideStatConstants
-import com.asphalt.dashboard.data.PerMonthRideStatistics
-import com.asphalt.dashboard.data.RideStat
-import com.asphalt.dashboard.sealedclasses.RideStatType
-import java.util.Calendar
+import com.asphalt.dashboard.viewmodels.PerMonthRideStatsViewModel
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun RideStatsPerMonth(
-    calendarState: MutableState<Calendar>, perMonthStatistics: PerMonthRideStatistics,
+    perMonthRideStatsViewModel: PerMonthRideStatsViewModel = koinViewModel()
 ) {
-    val rideStatsList = listOf(
-        RideStat(RideStatType.TotalRides, perMonthStatistics.totalRides),
-        RideStat(RideStatType.Locations, perMonthStatistics.locations),
-        RideStat(RideStatType.TotalKms, perMonthStatistics.totalKms),
-    )
-    RoundedBox(
-        borderStroke = Constants.DEFAULT_BORDER_STROKE,
-        borderColor = NeutralGrey30,
-        backgroundColor = NeutralLightPaper
-    ) {
+    val perMonthStats = perMonthRideStatsViewModel.perMonthStats.collectAsStateWithLifecycle()
+
+
+    ComposeUtils.CommonContentBox(isBordered = true) {
 
         Row(
             modifier = Modifier
@@ -51,8 +39,8 @@ fun RideStatsPerMonth(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RideMonthYear(calendarState)
-            for (rideStat in rideStatsList) {
+            RideMonthYear(perMonthRideStatsViewModel)
+            for (rideStat in perMonthStats.value) {
                 Spacer(Modifier.weight(RideStatConstants.RIDE_STAT_SPACER_WEIGHT))
                 RoundedBox(
                     modifier = Modifier
@@ -69,16 +57,4 @@ fun RideStatsPerMonth(
             }
         }
     }
-}
-
-
-
-@Preview
-@Composable
-fun RideStatsPreview() {
-    val calendarState = remember { mutableStateOf(Calendar.getInstance()) }
-
-    RideStatsPerMonth(calendarState, PerMonthRideStatistics(15, 25, 3000))
-
-
 }
