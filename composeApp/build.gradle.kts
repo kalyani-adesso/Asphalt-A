@@ -93,6 +93,8 @@ dependencies {
     implementation(projects.feature.welcome)
     implementation(projects.feature.dashboard)
     implementation(projects.commonui)
+    implementation(projects.feature.createride)
+
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen
