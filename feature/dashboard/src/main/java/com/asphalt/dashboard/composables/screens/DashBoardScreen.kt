@@ -10,15 +10,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.ui.BarPreview
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.dashboard.composables.components.PlacesVisitedGraph
 import com.asphalt.dashboard.composables.screens.sections.*
 
 @Composable
 fun DashBoardScreen() {
-    Scaffold { paddingValues ->
+
+    Scaffold(
+
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .wrapContentHeight()
@@ -40,4 +44,13 @@ fun DashBoardScreen() {
         }
 
     }
+}
+
+@Preview
+@Composable
+fun DashBoardScreenPreview(modifier: Modifier = Modifier) {
+    AsphaltTheme {
+        DashBoardScreen()
+    }
+    
 }

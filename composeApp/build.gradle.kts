@@ -22,8 +22,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -110,7 +110,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
     debugImplementation(libs.compose.ui.tooling)
-
+    implementation(libs.androidx.material.icons.extended.android)
     implementation(libs.kotlinx.serialization.core)
 
     // KOIN

@@ -22,27 +22,8 @@ fun NavigationRegistrationDetails(
 ) {
     RegistrationDetailsScreen(
        // onBackPressed = onBackPressed,
-        onNavigateToDashboard = onNavigateToDashboard
-    )
-
-    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
-
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryDecorators = listOf(
-            rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        sceneStrategy = SinglePaneSceneStrategy(),
-        entryProvider = entryProvider {
-            entry<RegistrationDetailsNavKey> {
-                RegistrationDetailsScreen(
-                    onNavigateToDashboard = onNavigateToDashboard
-                )
-            }
-        }
-    )
+        onNavigateToDashboard = onNavigateToDashboard)
 }
 
+// use data class when need to pass the data
 //data class RegistrationDetailsNavKey(val password:String) : NavKey
