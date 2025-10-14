@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
@@ -26,9 +25,9 @@ import org.koin.androidx.compose.koinViewModel
 fun DashBoardScreen(upcomingRideClick: () -> Unit, androidUserVM: AndroidUserVM = koinViewModel()) {
     val currentUser = androidUserVM.userState.collectAsState(null)
 
-
-    Scaffold(topBar = {
-        TopAppBar(title = {
+    Scaffold(
+        topBar = {
+        TopAppBar(title = { Text(text = "Dashboard")
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     currentUser.value?.name ?: ""
@@ -36,6 +35,7 @@ fun DashBoardScreen(upcomingRideClick: () -> Unit, androidUserVM: AndroidUserVM 
             }
         })
     }) { paddingValues ->
+
         ComposeUtils.DefaultColumnRootWithScroll(
             paddingValues.calculateTopPadding(),
             paddingValues.calculateBottomPadding()

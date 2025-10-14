@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 fun NavigationDrawer(modifier: Modifier = Modifier) {
 
     var currentKey by rememberSaveable {
-        mutableStateOf<androidx.navigation3.runtime.NavKey>(value = NavKey.DashboardNavKey)
+        mutableStateOf<androidx.navigation3.runtime.NavKey>(value =DashboardNavKey)
     }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -35,13 +35,13 @@ fun NavigationDrawer(modifier: Modifier = Modifier) {
                 DrawerHeader()
                 DrawerTextItem(
                     label = "Dashboard") {
-                    currentKey = NavKey.DashboardNavKey
+                    currentKey = DashboardNavKey
                     scope.launch { drawerState.close() }
                 }
 
                 DrawerTextItem(
                     label = "Rides") {
-                    currentKey = NavKey.RidersKey
+                    currentKey = RidersKey
                     scope.launch { drawerState.close() }
                 }
             }

@@ -1,4 +1,4 @@
-package com.asphalt.android.navigation
+package com.asphalt.commonui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -12,11 +12,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.asphalt.commonui.R
-import com.asphalt.commonui.theme.NeutralBlackGrey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +31,7 @@ fun NavigationBar(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.headlineMedium
+
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -56,12 +55,12 @@ fun NavigationBar(
     }
 }
 
-@Preview(showBackground = true)
+@Preview()
 @Composable
 private fun NavigationBarPreview() {
     MaterialTheme {
        NavigationBar(
-            title = "Registrierung",
+            title = "Dashboard",
             onBackPressed = {}
         )
     }
