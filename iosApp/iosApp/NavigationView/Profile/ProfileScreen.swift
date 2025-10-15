@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
+    @State var showEditRide: Bool = false
     var body: some View {
         ZStack {
             List {
@@ -30,9 +31,8 @@ struct ProfileScreen: View {
                     .listRowBackground(Color.clear)
                     .padding([.leading, .trailing])
                 }
-                
                 ForEach(viewModel.sections) { section in
-                    ProfileSectionView(section: section)
+                    ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(Color.clear)
@@ -42,7 +42,10 @@ struct ProfileScreen: View {
             .padding(.top, 30)
             .background(AppColor.white)
             if showEditProfile {
-                EditProfileView()
+                EditProfileView(isPresented: $showEditProfile)
+            }
+            if showEditRide {
+                SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
             }
         }
         .navigationTitle(AppStrings.SignInLabel.clubName.localized)
@@ -50,7 +53,7 @@ struct ProfileScreen: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                showEditProfile = true
+                    showEditProfile = true
                 }) {
                     AppIcon.Profile.editProfile
                         .resizable()
@@ -63,14 +66,16 @@ struct ProfileScreen: View {
 
 struct ProfileSectionView: View {
     let section:ProfileSection
+    @Binding var itemSelected: Bool
+    let selectedBikeType:[SelectedBikeType]
+    @ObservedObject var viewModel: ProfileViewModel
     var body: some View {
         VStack(spacing: 0) {
-            
             ProfileTitleView(title: section.title, subtitle: section.subtitle ?? "", icon: section.icon!)
                 .padding([.top,.bottom],21)
                 .padding(.horizontal,16)
             if section.section == 0 {
-                YourVehicleRow(item: section.items[0])
+                YourVehicleRow(item: section.items[0], itemIsSelected: $itemSelected, viewModel: viewModel)
             } else if section.section == 1 {
                 ProfileGridView(items: section.items)
             } else {
@@ -92,42 +97,79 @@ struct ProfileSectionView: View {
 
 struct YourVehicleRow: View {
     let item: ProfileItemModel
-    @State var itemIsSelected: Bool = false
+    @Binding var itemIsSelected: Bool
+    @ObservedObject var viewModel: ProfileViewModel
     var body: some View {
-        VStack(alignment: .center,spacing: 15) {
-            AppIcon.Profile.bike
-                .resizable()
-                .frame(width: 30, height: 17.5)
-                .padding(.bottom,15)
-                .padding(.top,21)
-            ButtonView(title: AppStrings.Profile.addBike, onTap: {
-                itemIsSelected = true
-            })
-            .frame(width: 135)
-            Text(item.title)
-                .font(KlavikaFont.bold.font(size: 16))
-                .foregroundColor(AppColor.black)
-            Text(item.subtitle)
-                .lineLimit(0)
-                .font(KlavikaFont.regular.font(size: 12))
-                .foregroundColor(AppColor.stoneGray)
-                .padding(.bottom,25)
+        if viewModel.selectedBikeType.count > 0 {
+            HStack {
+                Text("\(AppStrings.Profile.yourgarage) (\(viewModel.selectedBikeType.count))")
+                    .font(KlavikaFont.bold.font(size: 16))
+                    .foregroundColor(AppColor.black)
+                Spacer()
+            }
+            .padding()
+            VStack {
+                VStack(alignment: .leading, spacing: 15) {
+                    ForEach(viewModel.selectedBikeType, id: \.self) { bikeType in
+                        AddBikeView(
+                            index: bikeType.index,
+                            viewModel: viewModel,
+                            title: bikeType.make,
+                            subtitle: bikeType.model
+                        )
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(AppColor.white)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(AppColor.listGray, lineWidth: 1)
+                    )
+                }
+                ButtonView(title: AppStrings.Profile.addBike, onTap: {
+                    itemIsSelected = true
+                })
+                .frame(width: 135)
+                .padding(.top,15)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding([.leading, .trailing],16)
+        } else {
+            VStack(alignment: .center,spacing: 15) {
+                AppIcon.Profile.bike
+                    .resizable()
+                    .frame(width: 30, height: 17.5)
+                    .padding(.bottom,15)
+                    .padding(.top,21)
+                ButtonView(title: AppStrings.Profile.addBike, onTap: {
+                    itemIsSelected = true
+                })
+                .frame(width: 135)
+                Text(item.title)
+                    .font(KlavikaFont.bold.font(size: 16))
+                    .foregroundColor(AppColor.black)
+                Text(item.subtitle)
+                    .lineLimit(0)
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(AppColor.stoneGray)
+                    .padding(.bottom,25)
+            }
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(AppColor.white)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppColor.listGray, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+            .padding([.leading, .trailing],16)
+            .padding(.bottom,21)
         }
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(AppColor.white)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.listGray, lineWidth: 1)
-        )
-        .contentShape(Rectangle())
-        .fullScreenCover(isPresented:$itemIsSelected , content: {
-            item.destination
-        })
-        .padding([.leading, .trailing],16)
-        .padding(.bottom,21)
     }
 }
 
@@ -159,7 +201,6 @@ struct ProfileGridView: View {
         }
     }
 }
-
 
 struct AchivementsRow: View {
     let item: ProfileItemModel

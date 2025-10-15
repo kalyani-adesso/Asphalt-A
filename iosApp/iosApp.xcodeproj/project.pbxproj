@@ -40,8 +40,6 @@
 		};
 		31ECD9733CAFFAF08705E2B1 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -75,6 +73,7 @@
 				0657DC9FC4DDAC98975E3C11 /* Products */,
 				CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */,
 				93D2BA06F534C0A190240FD9 /* Pods */,
+				CEE428692E9E00D5000D8712 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -84,16 +83,15 @@
 				2F402863BA0E8889AAD9DCE7 /* Pods-iosApp.debug.xcconfig */,
 				C9525B69890082EB51477929 /* Pods-iosApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		CE19F5482E8561CC0043D4B5 /* Frameworks */ = {
+		CEE428692E9E00D5000D8712 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
 				18CB09E40A3C3DD71DFE4C5A /* Pods_iosApp.framework */,
 			);
-			name = Frameworks;
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -186,7 +184,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n";
-
 		};
 		93C1A10C6C2FC70A8D005841 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -253,6 +250,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow Asphalt-A to access your camera.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow Asphalt-A to access your Photo Library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -411,6 +410,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow Asphalt-A to access your camera.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow Asphalt-A to access your Photo Library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

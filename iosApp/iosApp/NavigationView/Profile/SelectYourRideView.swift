@@ -11,27 +11,34 @@ struct SelectYourRideView: View {
     @State var make: String = ""
     @State var model: String = ""
     @State private var currentPage = 0
+    @Binding var isPresented: Bool
+    
     private let totalPages = 8
+    @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
         VStack {
-            VStack {
-                Group {
-                    ProfileTitleView(title:AppStrings.SelectRide.selectingRide, subtitle: AppStrings.SelectRide.chooseType, icon: AppIcon.Profile.ride)
-                        .padding(.horizontal,15)
-                        .padding(.top,20)
-                    SelectBikeTabView(image:AppIcon.Profile.sportsBike , title: AppStrings.VehicleType.sportBike.rawValue, subtitle: AppStrings.SelectRide.sportBikeDesc, currentPage:$currentPage , totalPages: totalPages)
-                    AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
-                    AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $make)
-                    ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
-                        
-                    })
+            ScrollView {
+                VStack {
+                    Group {
+                        ProfileTitleView(title:AppStrings.SelectRide.selectingRide, subtitle: AppStrings.SelectRide.chooseType, icon: AppIcon.Profile.ride)
+                            .padding(.horizontal,15)
+                            .padding(.top,20)
+                        SelectBikeTabView(image:AppIcon.Profile.sportsBike ,vehicleArray: viewModel.vehicleArray,  currentPage:$currentPage , totalPages: totalPages)
+                        AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
+                        AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
+                        ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
+                            isPresented = false
+                            viewModel.getBikeType(model: model, make: make, type: viewModel.vehicleArray[currentPage].rawValue)
+                        })
+                        .disabled(viewModel.validateMake(make: make, moodel: model))
+                    }
+                    .padding()
                 }
-                .padding()
+                .frame(maxWidth: .infinity,maxHeight: .infinity)
+                .background(AppColor.listGray)
+                .cornerRadius(10)
+                .padding(EdgeInsets(top: 15, leading: 15, bottom: 50, trailing: 15))
             }
-            .frame(maxWidth: .infinity,maxHeight: .infinity)
-            .background(AppColor.listGray)
-            .cornerRadius(10)
-            .padding(EdgeInsets(top: 50, leading: 15, bottom: 0, trailing: 15))
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .background(AppColor.darkgray)
@@ -69,10 +76,19 @@ struct AddBikeFieldView: View {
 
 private struct SelectBikeTabView: View {
     let image: Image
-    let title: String
-    let subtitle: String
+    let vehicleArray: [AppStrings.VehicleType]
     @Binding var currentPage: Int
     let totalPages: Int
+    
+    private var title: String {
+        guard currentPage < vehicleArray.count else { return "" }
+        return vehicleArray[currentPage].rawValue
+    }
+    
+    private var subtitle: String {
+        guard currentPage < vehicleArray.count else { return "" }
+        return vehicleArray[currentPage].subtitle ?? ""
+    }
     
     public var body: some View {
         VStack(spacing: 16) {
@@ -134,6 +150,32 @@ private struct SelectBikeTabView: View {
     }
 }
 
-#Preview {
-    SelectYourRideView()
+struct AddBikeView: View {
+    let index:Int
+    let viewModel:ProfileViewModel
+    let title:String
+    let subtitle:String
+    var body: some View {
+        HStack(spacing: 20) {
+            AppIcon.Profile.addBike
+                .resizable()
+                .frame(width: 30, height: 30)
+            VStack(alignment: .leading,spacing: 5) {
+                Text(title)
+                    .font(KlavikaFont.bold.font(size: 16))
+                    .foregroundColor(AppColor.black)
+                Text(subtitle)
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(.stoneGray)
+            }
+            Spacer()
+            Button(action: {
+              //  viewModel.deleteSelectedBikeType(at: index)
+            }) {
+                AppIcon.Profile.deleteBike
+                    .resizable()
+                    .frame(width: 30,height: 30)
+            }
+        }
+    }
 }

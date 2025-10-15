@@ -200,6 +200,7 @@ public struct AppStrings{
         static let model = "Model"
         static let selectModel = "Select model"
         static let addVehicle = "ADD VEHICLE"
+        
     }
 
     enum Profile {
@@ -218,6 +219,7 @@ public struct AppStrings{
         static let noBadges = "No badges earned yet"
         static let earnBadgeTip = "Complete quizzes and participate in the community to earn your first badge!"
         static let startEarnBadge = "Start earning badges"
+        static let yourgarage = "Your Garage"
     }
 
     enum VehicleType: String, CaseIterable, Identifiable {
@@ -231,7 +233,17 @@ public struct AppStrings{
         case other = "Other"
 
         var id: String { rawValue }
+
+        var subtitle: String? {
+            switch self {
+            case .sportBike:
+                return "High-performance racing bikes"
+            default:
+                return nil
+            }
+        }
     }
+
 
     enum EditProfile {
         static let editProfile = "Edit Profile"
