@@ -18,8 +18,8 @@ struct iOSApp: App {
         WindowGroup {
             if MBUserDefaults.hasSeenOnboardingStatic {
                 NavigationStack {
-//                SignInView()
-                 CreateRideView()
+               SignInView()
+//                CreateRideView()
                 }
             } else {
                 WelcomeScreen()

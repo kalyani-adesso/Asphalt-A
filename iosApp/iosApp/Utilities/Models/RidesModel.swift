@@ -10,7 +10,7 @@ import Foundation
 
 struct Ride: Identifiable {
     let id = UUID()
-    var type: RideType = .none
+    var type: RideType? = nil
     var title: String = ""
     var description: String = ""
     var date: Date?

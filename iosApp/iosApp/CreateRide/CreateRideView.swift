@@ -11,21 +11,29 @@ struct CreateRideView: View {
     @StateObject private var viewModel = CreateRideViewModel()
     var body: some View {
         NavigationStack {
-            switch viewModel.currentStep {
-            case 1: DetailsView(viewModel: viewModel)
-            case 2: RouteView(viewModel: viewModel)
-            case 3: ParticipantsView(viewModel: viewModel)
-            case 4: ReviewView(viewModel: viewModel)
-            case 5: ShareView(viewModel: viewModel)
-            default:
-                Text("Coming Soon...")
-                    .font(.title)
+            Header(viewModel: viewModel)
+            Group {
+                switch viewModel.currentStep {
+                case 1:
+                    DetailsView(viewModel: viewModel)
+                case 2:
+                    RouteView(viewModel: viewModel)
+                case 3:
+                    ParticipantsView(viewModel: viewModel)
+                case 4:
+                    ReviewView(viewModel: viewModel)
+                case 5:
+                    ShareView(viewModel: viewModel)
+                default:
+                    Text("Coming Soon...")
+                        .font(.title)
+                }
             }
-            
+            .animation(.easeInOut, value: viewModel.currentStep)
         }
-        .navigationTitle("Create a Ride")
+        .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
-        .animation(.easeInOut, value: viewModel.currentStep)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 

@@ -12,35 +12,35 @@ struct StepIndicator: View {
     let title: String
     var isActive: Bool = false
     var isCurrentPage: Bool = false
-
+    
     var body: some View {
         VStack {
-           icon
+            icon
                 .renderingMode(.template)
                 .foregroundColor(isActive ? AppColor.white: AppColor.stoneGray)
                 .font(.system(size: 20))
                 .padding(10)
                 .background(
                     isActive
-                           ? LinearGradient(
-                               gradient: Gradient(colors: [
-                                   AppColor.royalBlue,
-                                   AppColor.pursianBlue
-                               ]),
-                               startPoint: .leading,
-                               endPoint: .trailing
-                             )
-                           : LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.clear,
-                                Color.clear,
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                          )
+                    ? LinearGradient(
+                        gradient: Gradient(colors: [
+                            AppColor.royalBlue,
+                            AppColor.pursianBlue
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    : LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.clear,
+                            Color.clear,
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-
+            
             Text(title)
                 .font(isCurrentPage ? KlavikaFont.bold.font(size: 12) : KlavikaFont.regular.font(size: 12))
                 .foregroundColor(isCurrentPage ? AppColor.black : AppColor.stoneGray)

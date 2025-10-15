@@ -12,9 +12,7 @@ struct DetailsView: View {
     @ObservedObject var viewModel: CreateRideViewModel
     @State private var showDatePicker = false
     @State private var showTimePicker = false
-    @State private var isPresented: Bool = false
-    @State private var selectedTime : Date? = nil
-    @State private var selectedDate : Date? = nil
+
     
     var body: some View {
         VStack(spacing: 20) {
@@ -26,7 +24,7 @@ struct DetailsView: View {
                         Text("Ride Type")
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
-
+                        
                         Menu {
                             ForEach(RideType.allCases) { type in
                                 Button(action: {
@@ -34,13 +32,13 @@ struct DetailsView: View {
                                 }) {
                                     Text(type.rawValue)
                                         .font(KlavikaFont.regular.font(size: 14))
-                                        .foregroundColor(AppColor.stoneGray)
+                                        .foregroundColor(AppColor.richBlack)
                                 }
                             }
                         } label: {
                             HStack {
-                                Text(viewModel.ride.type.rawValue.isEmpty ? "Select ride type" : viewModel.ride.type.rawValue)
-                                    .foregroundColor(viewModel.ride.type.rawValue.isEmpty ? AppColor.stoneGray : AppColor.stoneGray)
+                                Text(viewModel.ride.type?.rawValue ?? "Select ride type")
+                                    .foregroundColor( viewModel.ride.type == nil ? Color(.placeholderText) : AppColor.richBlack)
                                     .font(KlavikaFont.regular.font(size: 16))
                                 Spacer()
                                 Image(systemName: "chevron.down")
@@ -53,28 +51,27 @@ struct DetailsView: View {
                             .cornerRadius(10)
                         }
                     }
-
-
+                    
+                    
                     Text("Ride Title").font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
                     TextField("Enter ride name...", text: $viewModel.ride.title)
                         .font(KlavikaFont.regular.font(size: 16))
-                        .foregroundColor(AppColor.stoneGray)
+                        .foregroundColor(AppColor.richBlack)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(10)
-
                     Text("Description").font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
                     TextField("Describe the vibe...", text: $viewModel.ride.description, axis: .vertical)
                         .font(KlavikaFont.regular.font(size: 16))
-                        .foregroundColor(AppColor.stoneGray)
+                        .foregroundColor(AppColor.richBlack)
                         .padding()
                         .padding(.bottom,50)
                         .frame(height: 100)
                         .background(Color.white)
                         .cornerRadius(10)
-
+                    
                     HStack {
                         VStack(alignment: .leading) {
                             Text("Date").font(KlavikaFont.medium.font(size: 16))
@@ -85,11 +82,11 @@ struct DetailsView: View {
                                 HStack{
                                     AppIcon.CreateRide.calendar_month
                                         .renderingMode(.template)
-                                        .foregroundColor(AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedDate != nil ? AppColor.richBlack : AppColor.stoneGray)
                                         .frame(width: 24, height: 24)
-                                    Text(selectedDate != nil ? DateFormatter.displayDate.string(from: selectedDate!): "Pick date")
-                                        .font(KlavikaFont.medium.font(size: 14))
-                                            .foregroundColor(AppColor.stoneGray)
+                                    Text(viewModel.selectedDate != nil ? DateFormatter.displayDate.string(from: viewModel.selectedDate!): "Pick date")
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(viewModel.selectedDate != nil ? AppColor.richBlack : AppColor.stoneGray)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -106,11 +103,11 @@ struct DetailsView: View {
                                 HStack{
                                     AppIcon.CreateRide.timePicker
                                         .renderingMode(.template)
-                                        .foregroundColor(AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedTime != nil ? AppColor.richBlack : AppColor.stoneGray)
                                         .frame(width: 24, height: 24)
-                                    Text(selectedTime != nil ? DateFormatter.displayTime.string(from: selectedTime!): "Pick time")
-                                        .font(KlavikaFont.medium.font(size: 14))
-                                            .foregroundColor(AppColor.stoneGray)
+                                    Text(viewModel.selectedTime != nil ? DateFormatter.displayTime.string(from: viewModel.selectedTime!): "Pick time")
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(viewModel.selectedTime != nil ? AppColor.richBlack : AppColor.stoneGray)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -120,7 +117,7 @@ struct DetailsView: View {
                         }
                     }
                 }
-                .frame(width: 343, height: 452)
+                .frame(width: 343, height: 440)
                 .padding()
                 .background(AppColor.backgroundLight)
                 .cornerRadius(10)
@@ -129,42 +126,34 @@ struct DetailsView: View {
             Spacer()
             ButtonView( title: AppStrings.CreateRide.nextStep.rawValue,
                         showShadow: false , onTap: {
-                if viewModel.isStep1Valid() {
-                    viewModel.nextStep()
-                }
-                    isPresented = true
-                }
-            ).navigationDestination(isPresented: $isPresented, destination: {
-                RouteView(viewModel: viewModel)
-            })
+                viewModel.nextStep()
+            }
+            )
             .padding()
         }
         
         .sheet(isPresented: $showDatePicker) {
-        CustomDatePicker(selectedDate: Binding(
-            get: { selectedDate ?? Date() },
-            set: { selectedDate = $0 }), onDismiss:
-                            {
-            if selectedDate == nil {
-                selectedDate = Date()
-            }
+            CustomDatePicker(selectedDate: Binding(
+                get: { viewModel.selectedDate ?? Date() },
+                set: { viewModel.selectedDate = $0 }), onDismiss:
+                                {
+                if viewModel.selectedDate == nil {
+                    viewModel.selectedDate = Date()
+                }
                 showDatePicker = false
             })
         }
         .sheet(isPresented: $showTimePicker) {
             CustomTimePicker(selectedTime: Binding(
-                get: { selectedTime ?? Date() },
-                set: { selectedTime = $0 }), onDismiss:
+                get: { viewModel.selectedTime ?? Date() },
+                set: { viewModel.selectedTime = $0 }), onDismiss:
                                 {
-                if selectedTime == nil {
-                    selectedTime = Date()
-                }
                 showTimePicker = false
-                })
+            })
         }
     }
-
-
+    
+    
     private var stepIndicator: some View {
         HStack(spacing: 32) {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: true)
@@ -182,7 +171,7 @@ extension DateFormatter {
         df.dateStyle = .medium
         return df
     }()
-
+    
     static let displayTime: DateFormatter = {
         let df = DateFormatter()
         df.dateFormat = "hh:mm a"

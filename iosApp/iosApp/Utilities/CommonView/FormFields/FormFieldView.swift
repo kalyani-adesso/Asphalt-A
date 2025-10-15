@@ -24,8 +24,8 @@ struct FormFieldView: View {
                 .foregroundStyle(AppColor.black)
             HStack {
                 icon
-                    .renderingMode(.template)
-                    .foregroundColor(iconColor)
+                    .renderingMode(iconColor == nil ? .original : .template)
+                    .foregroundColor(iconColor ?? .primary)
                     .frame(width: 20, height: 20)
                 TextField(placeholder, text: $value)
                     .onChange(of: value) { value in

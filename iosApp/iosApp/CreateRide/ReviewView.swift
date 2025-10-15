@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ReviewView: View {
     @ObservedObject var viewModel: CreateRideViewModel
-    @State private var isPresented: Bool = false
+
     var body: some View {
         VStack(spacing: 20) {
             stepIndicator
@@ -60,13 +60,9 @@ struct ReviewView: View {
             
             ButtonView( title: AppStrings.CreateRide.create.rawValue,
                         showShadow: false , onTap: {
-                isPresented = true
                 viewModel.nextStep()
             }
-            ).navigationDestination(isPresented: $isPresented, destination: {
-                ShareView(viewModel: viewModel)
-            })
-            
+            )
         }
         .padding()
     }

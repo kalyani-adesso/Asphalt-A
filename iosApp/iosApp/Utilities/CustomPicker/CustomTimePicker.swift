@@ -32,14 +32,14 @@ struct CustomTimePicker: View {
                 VStack {
                     Button("PM") {
                         isAM = false
-                        onDismiss?()
+                       
                     }
                     .font(KlavikaFont.bold.font(size: 20))
                     .foregroundColor(!isAM ? AppColor.black : AppColor.black)
                     .buttonStyle(ModeButtonStyle(selected: !isAM))
                     Button("AM") {
                         isAM = true
-                        onDismiss?()
+                      
                     }
                     .font(KlavikaFont.bold.font(size: 20))
                     .foregroundColor(isAM ? AppColor.black : AppColor.black)
@@ -51,6 +51,29 @@ struct CustomTimePicker: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(AppColor.backgroundLight, lineWidth: 2)
             )
+
+            HStack(spacing: 30) {
+                Button("Cancel") { onDismiss?() }
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(AppColor.celticBlue)
+                Button("OK") {
+                    var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+                    var hour = hours % 12
+                    if !isAM { hour += 12 }
+                    components.hour = hour
+                    components.minute = minutes
+                    
+                    if let newDate = Calendar.current.date(from: components) {
+                        selectedTime = newDate
+                    }
+                    onDismiss?()
+                }
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(AppColor.celticBlue)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.horizontal)
+           
             
         }
         .frame(width: 342, height: 233)

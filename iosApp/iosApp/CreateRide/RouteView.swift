@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RouteView: View {
     @ObservedObject var viewModel: CreateRideViewModel
-    @State private var isPresented: Bool = false
     var body: some View {
         
         VStack(spacing: 20) {
@@ -49,20 +48,17 @@ struct RouteView: View {
                             endPoint: .trailing),
                         foregroundColor: AppColor.celticBlue,
                         showShadow: false ,
-                        borderColor: AppColor.celticBlue , onTap: {
+                        borderColor: AppColor.celticBlue ,
+            onTap: {
                 viewModel.previousStep()
             })
             
             ButtonView( title: AppStrings.CreateRide.next.rawValue,
-                        showShadow: false , onTap: {
-                isPresented = true
+                        showShadow: false ,
+            onTap: {
                 viewModel.nextStep()
             }
-            ).navigationDestination(isPresented: $isPresented, destination: {
-                ParticipantsView(viewModel: viewModel)
-            })
-            
-            
+            )
         }
         .padding()
     }

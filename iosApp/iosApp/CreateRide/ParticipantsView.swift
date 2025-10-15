@@ -10,29 +10,28 @@ import SwiftUI
 struct ParticipantsView: View {
     @State private var searchText = ""
     @ObservedObject var viewModel: CreateRideViewModel
-    @State private var isPresented: Bool = false
     
     var body: some View {
         VStack(spacing: 20) {
             stepIndicator
             VStack(alignment: .leading, spacing: 20) {
                 
-                    HStack {
-                        Text("Invite Contacts")
-                            .font(KlavikaFont.medium.font(size: 16))
-                        Spacer()
-                        Text("\(viewModel.selectedParticipants.count) selected")
-                            .font(KlavikaFont.regular.font(size: 14))
-                            .foregroundColor(.gray)
-                    }
-                    FormFieldView(
-                        label: " ",
-                        icon:  AppIcon.CreateRide.searchLens,
-                        placeholder:"Search by name ,number or bike type...",
-                        iconColor: AppColor.celticBlue,
-                        value: $searchText,
-                        isValidEmail: .constant(false),
-                        backgroundColor: AppColor.white)
+                HStack {
+                    Text("Invite Contacts")
+                        .font(KlavikaFont.medium.font(size: 16))
+                    Spacer()
+                    Text("\(viewModel.selectedParticipants.count) selected")
+                        .font(KlavikaFont.regular.font(size: 14))
+                        .foregroundColor(.gray)
+                }
+                FormFieldView(
+                    label: " ",
+                    icon:  AppIcon.CreateRide.searchLens,
+                    placeholder:"Search by name ,number or bike type...",
+                    iconColor: AppColor.celticBlue,
+                    value: $searchText,
+                    isValidEmail: .constant(false),
+                    backgroundColor: AppColor.white)
                 
                 
                 
@@ -56,7 +55,7 @@ struct ParticipantsView: View {
                     }
                 }
             }
-            .frame(width: 343, height: 432)
+            .frame(width: 343, height: 472)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(10)
@@ -76,27 +75,24 @@ struct ParticipantsView: View {
             
             ButtonView( title: AppStrings.CreateRide.next.rawValue,
                         showShadow: false , onTap: {
-                isPresented = true
+                viewModel.nextStep()
             }
-            ).navigationDestination(isPresented: $isPresented, destination: {
-                ReviewView(viewModel: viewModel)
-            })
-            
+            )
             
         }
         .padding()
     }
     var filteredParticipants: [Participant] {
-          if searchText.isEmpty {
-              return viewModel.participants
-          } else {
-              return viewModel.participants.filter {
-                  $0.name.localizedCaseInsensitiveContains(searchText) ||
-                  $0.bike.localizedCaseInsensitiveContains(searchText)
-              }
-          }
-      }
-
+        if searchText.isEmpty {
+            return viewModel.participants
+        } else {
+            return viewModel.participants.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.bike.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+    
     
     var stepIndicator: some View {
         HStack(spacing: 32) {

@@ -72,11 +72,19 @@ struct ParticipantsRow: View {
             Button {
                 isSelected.toggle()
             } label: {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(isSelected ? AppColor.celticBlue : .gray.opacity(0.4))
+                ZStack {
+                    Circle()
+                        .stroke(AppColor.stoneGray, lineWidth: 1)
+                        .frame(width: 24, height: 24)
+                    
+                    if isSelected {
+                        Circle()
+                            .stroke(AppColor.celticBlue, lineWidth: 8)
+                            .frame(width: 20, height: 20)
+                    }
+                }
             }
+            
         }
         .padding()
         .background(Color.white)
