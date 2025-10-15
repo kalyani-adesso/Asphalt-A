@@ -67,4 +67,5 @@ var vehicleList = listOf<VehicleData>(
 //    VehicleData("Royal Enfield","Bullet 500"),
 //    VehicleData("Yamaha","FZ"),
 )
+val statsData = StatsData(14,12)
 

@@ -39,7 +39,8 @@ val NeutralDeepBlack = Color(0xFF18273B)
 val PrimaryBrighterLightB33 = Color(0x33006EC7)
 
 
-
+val VividOrange = Color(0xFFFF650C)
 val GrayDark = Color(0xFF513838)
 val GreenDark = Color(0xFF00A66C)
-
+val BrightYellow = Color(0xFFFFD13C)
+val SemiTransparentDarkGray = Color(0x4D171717)

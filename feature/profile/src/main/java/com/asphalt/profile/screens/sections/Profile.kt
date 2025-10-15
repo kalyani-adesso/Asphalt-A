@@ -38,7 +38,7 @@ fun ProfileSection(
     val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
     ComposeUtils.CommonContentBox(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
 
     ) {
         Row(

@@ -64,5 +64,32 @@
     <string name="last_four_months">Last 4 months</string>
     <string name="last_week">Last week</string>
     <string name="last_year">Last year</string>
+    <string name="your_garage">Your Garage (%1$d)</string>
+    <string name="no_vehicles_added_yet">No vehicles added yet</string>
+    <string name="add_your_motorcycle">Add your motorcycle to get started!</string>
+    <string name="add_bike">Add Bike</string>
+    <string name="rides">Rides</string>
+    <string name="cities">Cities</string>
+    <string name="total_statistics">Total Statistics</string>
+    <string name="your_vehicles">Your Vehicles</string>
+    <string name="motorcycles_you_own_or_ride">Motorcycles you own or ride</string>
+
+    <string name="no_badges_earned_yet">No badges earned yet</string>
+    <string name="complete_quizzes">Complete quizzes and participate in the community</string>
+    <string name="to_earn_your_first_badge">to earn your first badge!</string>
+    <string name="achievements">Achievements</string>
+    <string name="badges_earned">Badges earned through community participation</string>
+    <string name="start_earning_badges">Start Earning Badges</string>
+    <string name="selecting_your_ride">Selecting Your Ride</string>
+    <string name="choose_motorcycle_type">Choose your perfect motorcycle type</string>
+    <string name="make">Make</string>
+    <string name="type_make">Type make..</string>
+    <string name="make_cannot_be_empty">Make cannot be empty</string>
+    <string name="model">Model</string>
+    <string name="type_model">Type model..</string>
+    <string name="model_cannot_be_empty">Model cannot be empty</string>
+    <string name="add_vehicle">Add Vehicle</string>
+
+
 
 </resources>

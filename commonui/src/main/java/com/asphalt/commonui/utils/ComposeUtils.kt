@@ -1,5 +1,6 @@
 package com.asphalt.commonui.utils
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,8 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
@@ -97,12 +102,14 @@ object ComposeUtils {
     fun CommonContentBox(
         modifier: Modifier = Modifier,
         isBordered: Boolean = false,
+        radius: Dp = Dimensions.size10,
         content: @Composable BoxScope.() -> Unit
     ) {
         RoundedBox(
             modifier = modifier,
             borderColor = if (isBordered) NeutralGrey30 else null,
             backgroundColor = NeutralLightPaper,
+            cornerRadius = radius,
             borderStroke = if (isBordered) Constants.DEFAULT_BORDER_STROKE else null,
         ) {
             content()
@@ -135,6 +142,29 @@ object ComposeUtils {
     }
 
     @Composable
+    fun RoundedIconWithHeaderComponent(
+        iconColor: Color,
+        iconRes: Int,
+        title: String,
+        subtitle: String,
+        @SuppressLint("ModifierParameter") titleModifier: Modifier = Modifier,
+        subtitleModifier: Modifier = Modifier,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(
+                Dimensions.spacing10
+            )
+        ) {
+            ColorIconRounded(iconColor, resId = iconRes)
+            Column(verticalArrangement = Arrangement.spacedBy(Dimensions.size3)) {
+                SectionTitle(title, titleModifier)
+                SectionSubtitle(subtitle, subtitleModifier)
+            }
+        }
+    }
+
+    @Composable
     fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         Text(
             style = TypographyBold.bodyMedium,
@@ -143,11 +173,51 @@ object ComposeUtils {
     }
 
     @Composable
-    fun SectionSubtitle(text: String, modifier: Modifier = Modifier) {
+    fun SectionSubtitle(
+        text: String,
+        modifier: Modifier = Modifier,
+        color: Color = NeutralDarkGrey
+    ) {
         Text(
             text = text, style = Typography.bodyMedium,
             fontSize = Dimensions.textSize12,
-            color = NeutralDarkGrey, modifier = modifier
+            color = color, modifier = modifier
         )
     }
+
+    @Composable
+    fun CustomTextField(value: String, onValueChanged: (String) -> Unit, placeHolderText: String) {
+        RoundedBox(
+            modifier = Modifier.height(Dimensions.size50),
+            cornerRadius = Dimensions.size10
+        ) {
+            TextField(
+                value = value,
+                onValueChange = { onValueChanged(it) },
+                placeholder = {
+                    Text(
+                        placeHolderText,
+                        style = Typography.bodyMedium,
+                        fontSize = Dimensions.textSize14
+                    )
+                },
+                textStyle = Typography.bodyMedium,
+
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent
+                ),
+            )
+        }
+    }
 }
+

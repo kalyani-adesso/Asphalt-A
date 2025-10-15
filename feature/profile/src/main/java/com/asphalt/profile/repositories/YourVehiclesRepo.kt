@@ -17,7 +17,7 @@ class YourVehiclesRepo {
 
     suspend fun deleteVehicle(vehicleData: VehicleData) {
         delay(200)
-        vehicleList.minus(vehicleData)
+        vehicleList = vehicleList.minus(vehicleData)
     }
 
 }

@@ -86,6 +86,7 @@ object Dimensions {
 
     val size14 = 14.dp
     val size20 = 20.dp
+    val size22 = 22.dp
     val size25 = 25.dp
     val size17 = 17.dp
     val size30 = 30.dp
@@ -94,12 +95,17 @@ object Dimensions {
     val size73 = 73.dp
     val size81 = 81.dp
     val size220 = 220.dp
+    val size200 = 200.dp
+    val size210 = 210.dp
     val size313 = 313.dp
     val size278 = 278.dp
 
     val size296 = 296.dp
     val size307 = 307.dp
     val size185 = 185.dp
+    val size180 = 180.dp
+    val size190 = 190.dp
+    val size175 = 175.dp
     val size150 = 150.dp
     val size115 = 115.dp
     val radius40 = 40.dp

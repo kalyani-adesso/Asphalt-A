@@ -17,9 +17,11 @@ class YourVehiclesVM(val yourVehiclesRepo: YourVehiclesRepo) : ViewModel() {
     }
 
     fun addVehicle(data: VehicleData) {
-        viewModelScope.launch {
-            yourVehiclesRepo.addVehicle(data)
-            updateList()
+        data.let {
+            viewModelScope.launch {
+                yourVehiclesRepo.addVehicle(data)
+                updateList()
+            }
         }
     }
 

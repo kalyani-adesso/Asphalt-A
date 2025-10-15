@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
@@ -29,7 +30,7 @@ fun RideStatsPerMonth(
     val perMonthStats = perMonthRideStatsViewModel.perMonthStats.collectAsStateWithLifecycle()
 
 
-    ComposeUtils.CommonContentBox(isBordered = true) {
+    ComposeUtils.CommonContentBox(isBordered = true, radius = Constants.DEFAULT_CORNER_RADIUS) {
 
         Row(
             modifier = Modifier

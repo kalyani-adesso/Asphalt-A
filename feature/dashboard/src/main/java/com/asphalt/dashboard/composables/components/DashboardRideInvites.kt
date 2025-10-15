@@ -81,6 +81,7 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
 fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
     ComposeUtils.CommonContentBox(
         isBordered = true,
+        radius = Constants.DEFAULT_CORNER_RADIUS,
         modifier = Modifier
             .width(
                 ComposeUtils.run {
