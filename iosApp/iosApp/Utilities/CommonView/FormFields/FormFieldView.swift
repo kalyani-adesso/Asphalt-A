@@ -10,8 +10,12 @@ struct FormFieldView: View {
     let label: String
     let icon : Image
     let placeholder: String
-    @Binding var emailOrPhone: String
+    var iconColor: Color? = nil
+   
+    @Binding var value: String
     @Binding var isValidEmail: Bool
+    
+    var backgroundColor: Color = AppColor.backgroundLight
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -20,9 +24,11 @@ struct FormFieldView: View {
                 .foregroundStyle(AppColor.black)
             HStack {
                 icon
+                    .renderingMode(iconColor == nil ? .original : .template)
+                    .foregroundColor(iconColor ?? .primary)
                     .frame(width: 20, height: 20)
-                TextField(placeholder, text: $emailOrPhone)
-                    .onChange(of: emailOrPhone) { value in
+                TextField(placeholder, text: $value)
+                    .onChange(of: value) { value in
                         isValidEmail = value.isValidEmail
                     }
                     .font(KlavikaFont.regular.font(size: 16))
@@ -36,7 +42,7 @@ struct FormFieldView: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.backgroundLight) // plain background always
+                    .fill(backgroundColor)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
@@ -52,7 +58,8 @@ struct FormFieldView: View {
         label: AppStrings.SignInLabel.emailOrPhone.rawValue,
         icon: AppIcon.Login.email,
         placeholder: AppStrings.SignInPlaceholder.email.rawValue,
-        emailOrPhone: .constant(""),
+        iconColor: AppColor.stoneGray,
+        value: .constant(""),
         isValidEmail: .constant(false)
     )
 }
