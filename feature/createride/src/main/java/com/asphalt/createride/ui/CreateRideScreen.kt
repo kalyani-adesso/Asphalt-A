@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -85,7 +86,7 @@ fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
                 .background(color = NeutralWhite)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
                 /* item { ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { } }
