@@ -86,7 +86,9 @@ fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
                 .background(color = NeutralWhite)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
                 /* item { ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { } }
@@ -108,13 +110,123 @@ fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
                     RouteSection(viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_REVIEW)
                     ReviewSection()
-                if(viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT)
-                ParticipantSection(mod = Modifier.weight(1f))
+                if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT)
+                    ParticipantSection(mod = Modifier.weight(1f))
+                if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
+                    ShareSection()
             }
             BottomButtons(viewModel)
             // Fixed bottom button
 
         }
+    }
+}
+
+@Composable
+fun ShareSection() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = Dimensions.padding16,
+                end = Dimensions.padding16,
+            )
+            .background(
+                color = NeutralLightPaper, shape = RoundedCornerShape(Dimensions.size10)
+            )
+    ) {
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(Dimensions.size200)
+                .padding(start = Dimensions.padding16, end = Dimensions.padding16),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White // or use NeutralWhite
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        ) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_tick_green_10),
+                    contentDescription = "",
+                    modifier = Modifier.size(Dimensions.padding100),
+
+                    )
+                Spacer(Modifier.height(Dimensions.padding16))
+                Text(text = "Ride Created!", style = TypographyBold.bodyMedium)
+                Spacer(Modifier.height(Dimensions.padding16))
+                Text(
+                    text = "Share your ride with friends",
+                    style = Typography.bodySmall,
+                    color = NeutralDarkGrey
+                )
+            }
+
+        }
+        Spacer(Modifier.height(Dimensions.padding16))
+        Column(
+            modifier = Modifier.padding(
+                start = Dimensions.padding16,
+                end = Dimensions.padding16
+            )
+        ) {
+            Text(text = "Share Link", style = TypographyBold.bodyMedium)
+            Spacer(Modifier.height(Dimensions.padding16))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.padding50)
+                    .background(
+                        NeutralWhite, shape = RoundedCornerShape(Dimensions.size5)
+                    )
+                    .padding(start = Dimensions.size10, end = Dimensions.size10),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "https://adessoriderclub.app/12121312", style = Typography.bodySmall,
+                    color = NeutralDarkGrey, modifier = Modifier.weight(1f),
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+                Image(painter = painterResource(R.drawable.ic_copy_icon), contentDescription = "")
+            }
+            Spacer(Modifier.height(Dimensions.padding16))
+            Text(text = "Share Via", style = TypographyBold.bodyMedium)
+            Spacer(Modifier.height(Dimensions.padding16))
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
+                    Dimensions.size10
+                )
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_whats_app_gradient),
+                    contentDescription = "", modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_face_book_gradient),
+                    contentDescription = "",
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_twit_gradient),
+                    contentDescription = "",
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_mail_gradient),
+                    contentDescription = "",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+//Adding space
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
     }
 }
 
@@ -946,14 +1058,28 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                 end = Dimensions.padding16
             )
     ) {
-        if (viewModel.tabSelectState.value == Constants.TAB_DETAILS) {//viewModel.tabSelectState.value == Constants.TAB_DETAILS
+        if (viewModel.tabSelectState.value == Constants.TAB_DETAILS ||
+            viewModel.tabSelectState.value == Constants.TAB_SHARE
+        ) {//viewModel.tabSelectState.value == Constants.TAB_DETAILS
 
             GradientButton(
                 onClick = {
-                    viewModel.updateTab(1)
+                    if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+
+                    } else {
+                        viewModel.updateTab(1)
+                    }
+
                 },
             ) {
-                ComposeUtils.DefaultButtonContent("Next Step".uppercase())
+                ComposeUtils.DefaultButtonContent(
+                    if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                        "Done".uppercase()
+
+                    } else {
+                        "Next Step".uppercase()
+                    }
+                )
             }
         } else {
             Row(
@@ -982,7 +1108,8 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                 }
 
                 GradientButton(
-                    modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue, onClick = {
+                    modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue,
+                    onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             viewModel.updateTab(1)
                         }
@@ -996,7 +1123,12 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            "Next".uppercase(),
+                            if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
+                                "CREATE RIDE".uppercase()
+
+                            } else {
+                                "Next".uppercase()
+                            },
                             color = NeutralWhite,
                             style = TypographyBold.bodyMedium
                         )

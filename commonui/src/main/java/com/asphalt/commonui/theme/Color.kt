@@ -52,4 +52,5 @@ val OrangeLight10 = Color(0xFFFE8D01)
 
 val BrightYellow = Color(0xFFFFD13C)
 val GrayLight10 = Color(0xFFEBEBED)
+val GreenLight20 = Color(0xFF34C779)
 val SemiTransparentDarkGray = Color(0x4D171717)
