@@ -27,8 +27,8 @@ struct SelectYourRideView: View {
                         AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
                         AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
                         ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
-                            isPresented = false
                             viewModel.getBikeType(model: model, make: make, type: viewModel.vehicleArray[currentPage].rawValue)
+                            isPresented = false
                         })
                         .disabled(viewModel.validateMake(make: make, moodel: model))
                     }
@@ -151,7 +151,7 @@ private struct SelectBikeTabView: View {
 }
 
 struct AddBikeView: View {
-    let index:Int
+    let bikeId: UUID
     let viewModel:ProfileViewModel
     let title:String
     let subtitle:String
@@ -170,12 +170,14 @@ struct AddBikeView: View {
             }
             Spacer()
             Button(action: {
-              //  viewModel.deleteSelectedBikeType(at: index)
+                viewModel.deleteSelectedBikeType(id: bikeId)
             }) {
                 AppIcon.Profile.deleteBike
                     .resizable()
                     .frame(width: 30,height: 30)
             }
+            .buttonStyle(.plain)
+            .contentShape(Rectangle())
         }
     }
 }

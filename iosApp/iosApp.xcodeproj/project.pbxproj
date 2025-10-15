@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		CE9EBE652E86A8CC00CEC3E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */; };
+		D8A51FD1AFFDDB2291C729FC /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58AEEEC4B5C45248741C194F /* Pods_iosApp.framework */; };
 		F8378D20BFB6B9E5BE77D17F /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18CB09E40A3C3DD71DFE4C5A /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		18CB09E40A3C3DD71DFE4C5A /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F402863BA0E8889AAD9DCE7 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
+		58AEEEC4B5C45248741C194F /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B0AEC11295E356AF3912F7 /* AsphaltA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AsphaltA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9525B69890082EB51477929 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 		CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -40,6 +42,8 @@
 		};
 		31ECD9733CAFFAF08705E2B1 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -51,6 +55,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8378D20BFB6B9E5BE77D17F /* Pods_iosApp.framework in Frameworks */,
+				D8A51FD1AFFDDB2291C729FC /* Pods_iosApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		240F4BD8DD2A9D187629FCD8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				58AEEEC4B5C45248741C194F /* Pods_iosApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		79C58F19043067806ED0F2DE = {
 			isa = PBXGroup;
 			children = (
@@ -74,6 +87,7 @@
 				CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */,
 				93D2BA06F534C0A190240FD9 /* Pods */,
 				CEE428692E9E00D5000D8712 /* Recovered References */,
+				240F4BD8DD2A9D187629FCD8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

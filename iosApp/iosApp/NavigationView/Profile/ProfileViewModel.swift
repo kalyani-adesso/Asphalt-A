@@ -47,7 +47,6 @@ struct SelectedBikeType: Identifiable,Hashable {
     let model: String
     let make: String
     let type: String
-    let index: Int
 }
 
 @MainActor
@@ -105,10 +104,13 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func getBikeType(model:String,make:String,type:String) {
-        selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type, index: selectBikeType.count - 1))
+        selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type))
     }
     
-    func deleteSelectedBikeType(at index: Int) {
-        selectedBikeType.remove(at: index)
+    func deleteSelectedBikeType(id: UUID) {
+        if let index = selectedBikeType.firstIndex(where: { $0.id == id }) {
+            selectedBikeType.remove(at: index)
+        }
+        
     }
 }

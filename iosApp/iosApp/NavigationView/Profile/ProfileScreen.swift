@@ -41,11 +41,13 @@ struct ProfileScreen: View {
             .listStyle(.plain)
             .padding(.top, 30)
             .background(AppColor.white)
+            .sheet(isPresented: $showEditRide, onDismiss: {
+                showEditRide = false
+            }) {
+                SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
+            }
             if showEditProfile {
                 EditProfileView(isPresented: $showEditProfile)
-            }
-            if showEditRide {
-                SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
             }
         }
         .navigationTitle(AppStrings.SignInLabel.clubName.localized)
@@ -110,9 +112,9 @@ struct YourVehicleRow: View {
             .padding()
             VStack {
                 VStack(alignment: .leading, spacing: 15) {
-                    ForEach(viewModel.selectedBikeType, id: \.self) { bikeType in
+                    ForEach(viewModel.selectedBikeType, id: \.id) { bikeType in
                         AddBikeView(
-                            index: bikeType.index,
+                            bikeId: bikeType.id,
                             viewModel: viewModel,
                             title: bikeType.make,
                             subtitle: bikeType.model
@@ -135,7 +137,6 @@ struct YourVehicleRow: View {
                 .padding(.top,15)
             }
             .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
             .padding([.leading, .trailing],16)
         } else {
             VStack(alignment: .center,spacing: 15) {
@@ -166,7 +167,6 @@ struct YourVehicleRow: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(AppColor.listGray, lineWidth: 1)
             )
-            .contentShape(Rectangle())
             .padding([.leading, .trailing],16)
             .padding(.bottom,21)
         }
