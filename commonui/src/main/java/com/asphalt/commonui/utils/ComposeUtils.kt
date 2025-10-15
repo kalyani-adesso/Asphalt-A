@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +36,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
+import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
@@ -186,7 +188,12 @@ object ComposeUtils {
     }
 
     @Composable
-    fun CustomTextField(value: String, onValueChanged: (String) -> Unit, placeHolderText: String) {
+    fun CustomTextField(
+        value: String,
+        onValueChanged: (String) -> Unit,
+        placeHolderText: String,
+        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+    ) {
         RoundedBox(
             modifier = Modifier.height(Dimensions.size50),
             cornerRadius = Dimensions.size10
@@ -204,7 +211,7 @@ object ComposeUtils {
                 textStyle = Typography.bodyMedium,
 
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                keyboardOptions = keyboardOptions,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
@@ -219,5 +226,42 @@ object ComposeUtils {
             )
         }
     }
+
+    @Composable
+    fun ArrowView(
+        modifier: Modifier = Modifier,
+        backColor: Color = NeutralLightPaper,
+        boxContent: @Composable BoxScope.() -> Unit
+    ) {
+        RoundedBox(
+            contentAlignment = Alignment.Center,
+            modifier = modifier.size(Dimensions.size32),
+            backgroundColor = backColor, cornerRadius = Dimensions.size8
+        ) {
+            Box(
+                modifier = Modifier.arrowPadding()
+            ) {
+                boxContent()
+            }
+        }
+    }
+
+    @Composable
+    fun TexFieldError(error: Boolean, errorText: String) {
+        if (error)
+            Text(
+                text = errorText,
+                Modifier.padding(top = Dimensions.size4),
+                style = Typography.bodySmall,
+                color = NeutralRed
+            )
+    }
+
+    private fun Modifier.arrowPadding(): Modifier = this.then(
+        Modifier.padding(
+            start = Dimensions.padding13,
+            end = Dimensions.padding9pt25,
+        )
+    )
 }
 
