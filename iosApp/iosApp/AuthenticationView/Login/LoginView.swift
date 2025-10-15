@@ -37,9 +37,9 @@ struct SignInView: View {
                 .padding(.bottom, 18)
                 rememberMeToggle()
                 ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
-                    viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
-                        hasLoggedIn = true
-                    })
+//                    viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
+//                        hasLoggedIn = true
+//                    })
                 })
                 socialSignInOptions
                 signUpLink()

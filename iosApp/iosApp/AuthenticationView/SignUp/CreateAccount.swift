@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Firebase
 
 struct CreateAccount: View {
     
@@ -81,7 +80,7 @@ struct CreateAccount: View {
                         Task {
                             let emailExist = await signUpViewModel.checkEmailDomainExists( email)
                             if emailExist {
-                                signUpViewModel.didTapSignUp(email: email, username: userName, password: confirmPassword, onSuccess: {
+                                signUpViewModel.didTapSignUp(email: email, username: userName, password: confirmPassword, confirmPassword: confirmPassword, onSuccess: {
                                     isSignupSuccess = true
                                 })
                             }
@@ -117,8 +116,6 @@ struct CreateAccount: View {
         !confirmPassword.isEmpty &&
         passwordsMatch
     }
-    
-    
 }
 
 #Preview {

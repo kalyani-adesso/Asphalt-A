@@ -31,18 +31,45 @@ struct AppIcon {
     }
     
     struct NavigationSlider {
-        static let call = Image("call")
-        static let connectedRide = Image("icon_connectedRide")
+        static let call = Image("icon-call")
         static let createRide = Image("icon_createRide")
         static let home = Image("icon_home")
-        static let knowledgeCircle = Image("icon_knowledgeCircle")
-        static let marketPlace = Image("icon_marketPlace")
         static let motoQuiz = Image("icon_motoQuiz")
         static let preRideCheck = Image("icon_preRideCheck")
         static let profile = Image("icon_profile")
         static let queries = Image("icon_queries")
-        static let settings = Image("icon_settings")
         static let yourRide = Image("icon_yourRide")
+        static let repair = Image("icon-repair")
+        
+        static let connectedRide = Image("icon-connectedRide")
+        static let knowledgeCircle = Image("icon-knowledgeCircle")
+        static let marketPlace = Image("icon-marketPlace")
+        static let settings = Image("icon-settings")
+        static let referFriend = Image("icon-referAFriend")
+        static let logout = Image("icon-logout")
+    }
+
+    struct Notification {
+        static let newRider = Image("new-rider")
+        static let rideReminder = Image("rider-reminder")
+    }
+
+    struct Profile {
+        static let award = Image("icon-award")
+        static let bike = Image("icon-bike")
+        static let elevation = Image("icon-elevation")
+        static let vehicle = Image("icon-vehicle")
+        static let pin = Image("icon-pin")
+        static let distance = Image("icon-distance")
+        static let path = Image("icon-path")
+        static let trophy = Image("icon-trophy")
+        static let editProfile = Image("icon-editProfile")
+        static let ride = Image("icon-ride")
+        static let leftIcon = Image("icon-left")
+        static let rightIcon = Image("icon-right")
+        static let sportsBike = Image("icon-sportsBike")
+        static let mechanic = Image("icon-mechanic")
+        static let camera = Image("icon-camera")
     }
     
     struct Home {
@@ -58,7 +85,7 @@ struct AppIcon {
         static let navigation = Image("navigation")
         static let pointer = Image("pointer")
         static let rides = Image("rides")
-        
+
                
     }
 }
