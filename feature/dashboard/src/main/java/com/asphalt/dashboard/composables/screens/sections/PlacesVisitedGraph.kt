@@ -3,8 +3,6 @@ package com.asphalt.dashboard.composables.screens.sections
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,10 +18,9 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralGrey80
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.ui.barchart.CustomBarChart
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.viewmodels.PlacesVisitedGraphViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -71,15 +68,17 @@ fun PlacesVisitedGraph(placesVisitedGraphViewModel: PlacesVisitedGraphViewModel 
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.size5)) {
-                ArrowView {
+                ComposeUtils.ArrowView(modifier = Modifier.clickable {
+                    placesVisitedGraphViewModel.fetchDataPreviousDateRange()
+                }) {
                     Image(
                         painter = painterResource(R.drawable.ic_prev_enabled),
                         null,
-                        modifier = Modifier.clickable {
-                            placesVisitedGraphViewModel.fetchDataPreviousDateRange()
-                        })
+                    )
                 }
-                ArrowView {
+                ComposeUtils.ArrowView(modifier = Modifier.clickable(enabled = isArrowEnabled.value) {
+                    placesVisitedGraphViewModel.fetchDataNextDateRange()
+                }) {
                     val arrowIcon: Int =
                         if (isArrowEnabled.value)
                             R.drawable.ic_next_enabled
@@ -88,9 +87,7 @@ fun PlacesVisitedGraph(placesVisitedGraphViewModel: PlacesVisitedGraphViewModel 
                     Image(
                         painter = painterResource(arrowIcon),
                         null,
-                        modifier = Modifier.clickable(enabled = isArrowEnabled.value) {
-                            placesVisitedGraphViewModel.fetchDataNextDateRange()
-                        })
+                    )
                 }
             }
         }
@@ -98,26 +95,4 @@ fun PlacesVisitedGraph(placesVisitedGraphViewModel: PlacesVisitedGraphViewModel 
     }
 }
 
-@Composable
-private fun ArrowView(
-    boxContent: @Composable BoxScope.() -> Unit,
-) {
-    RoundedBox(
-        backgroundColor = NeutralLightPaper, cornerRadius = Dimensions.size8
-    ) {
-        Box(
-            modifier = Modifier.arrowPadding()
-        ) {
-            boxContent()
-        }
-    }
-}
 
-private fun Modifier.arrowPadding(): Modifier = this.then(
-    Modifier.padding(
-        start = Dimensions.padding13,
-        end = Dimensions.padding9pt25,
-        top = Dimensions.padding9pt25,
-        bottom = Dimensions.padding9pt25
-    )
-)

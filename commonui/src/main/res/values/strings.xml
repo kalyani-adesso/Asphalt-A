@@ -89,6 +89,24 @@
     <string name="type_model">Type model..</string>
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
+    <string name="bike_type_sport_bike">Sport Bike</string>
+    <string name="bike_type_naked_bike">Naked Bike</string>
+    <string name="bike_type_adventure_bike">Adventure Bike</string>
+    <string name="bike_type_cruiser">Cruiser</string>
+    <string name="bike_type_touring_bike">Touring Bike</string>
+    <string name="bike_type_scooter">Scooter</string>
+    <string name="bike_type_electric">Electric</string>
+    <string name="bike_type_other">Other</string>
+    <string name="sports_bike_description">High-performance racing bikes</string>
+    <string name="naked_bike_description">Exposed engine, upright street use.</string>
+    <string name="adventure_bike_description">Long-distance, on/off-road capability.</string>
+    <string name="cruiser_description">Low seat, relaxed riding posture.</string>
+    <string name="touring_bike_description">Comfortable for long road trips.</string>
+    <string name="scooter_description">Step-through frame, floorboard.</string>
+    <string name="electric_description">Battery-powered, instant torque.</string>
+    <string name="other_description">Other categories.</string>
+    <string name="of">%1$d of %2$d</string>
+
 
 
 
