@@ -36,6 +36,10 @@ val NeutralLightGray25= Color(0xFFF8F7FB)
 val NeutralRed=Color(0XFFFF0000)
 val NaturalGreen = Color(0xFF6FCD38)
 val NeutralDeepBlack = Color(0xFF18273B)
+val PrimaryBrighterLightB33 = Color(0x33006EC7)
+
+
+val VividOrange = Color(0xFFFF650C)
 val GrayDark = Color(0xFF513838)
 val GreenDark = Color(0xFF00A66C)
 val GreenLIGHT = Color(0xFF00C950)
@@ -46,3 +50,5 @@ val BlueLight = Color(0xFF3779FF)
 val OrangeLight = Color(0xFFFF650C)
 val OrangeLight10 = Color(0xFFFE8D01)
 
+val BrightYellow = Color(0xFFFFD13C)
+val SemiTransparentDarkGray = Color(0x4D171717)

@@ -22,6 +22,7 @@ fun RoundedBox(
     cornerRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
     borderStroke: Dp? = null,
     borderColor: Color? = null,
+    contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -32,6 +33,7 @@ fun RoundedBox(
                 shape = RoundedCornerShape(cornerRadius),
                 color = borderColor ?: Color.Transparent
             ),
+        contentAlignment = contentAlignment,
         content = content
     )
 }

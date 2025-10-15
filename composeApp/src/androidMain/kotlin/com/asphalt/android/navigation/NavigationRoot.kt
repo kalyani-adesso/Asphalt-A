@@ -99,6 +99,9 @@ fun NavigationRoot() {
                     },
                     onNavigateToWelcome = {
                         backStack.add(WelcomeFeatureNavKey)
+                    },
+                    onNavigateToDashboard = {
+                        backStack.add(DashboardNavKey)
                     }
                 )
                 backStack.remove(SplashKey)

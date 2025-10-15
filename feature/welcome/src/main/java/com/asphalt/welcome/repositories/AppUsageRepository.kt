@@ -16,4 +16,8 @@ class AppUsageRepository(val dataStoreManager: DataStoreManager) {
     suspend fun registerGetStarted(value: Boolean) {
         dataStoreManager.saveValue(PreferenceKeys.IS_GET_STARTED_DONE, value)
     }
+
+    suspend fun getIsRememberUser(): Boolean {
+        return dataStoreManager.getBoolean(PreferenceKeys.REMEMBER_ME) ?: false
+    }
 }

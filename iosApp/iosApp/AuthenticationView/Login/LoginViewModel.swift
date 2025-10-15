@@ -7,27 +7,27 @@
 
 import Foundation
 import SwiftUI
-import FirebaseAuth
+
 
 class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showToast: Bool = false
     func didTapLogin(email: String, password: String, completion: @escaping ()->()) {
-        Auth.auth().signIn(withEmail: email, password: password) {result,error in
-            if self.isValidEmailAndPassword(email: email, password: password) {
-                if let result = result {
-                    print("User Signed In: \(result)")
-                    if !result.user.uid.isEmpty {
-                        completion()
-                    }
-                }
-                if let error = error {
-                    print("Error Signing In: \(error)")
-                    self.errorMessage = error.localizedDescription
-                    self.showToast = true
-                }
-            }
-        }
+//        Auth.auth().signIn(withEmail: email, password: password) {result,error in
+//            if self.isValidEmailAndPassword(email: email, password: password) {
+//                if let result = result {
+//                    print("User Signed In: \(result)")
+//                    if !result.user.uid.isEmpty {
+//                        completion()
+//                    }
+//                }
+//                if let error = error {
+//                    print("Error Signing In: \(error)")
+//                    self.errorMessage = error.localizedDescription
+//                    self.showToast = true
+//                }
+//            }
+//        }
     }
     
     func isValidPassword(_ password: String) -> Bool {

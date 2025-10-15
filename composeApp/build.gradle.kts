@@ -92,6 +92,7 @@ dependencies {
     implementation(projects.feature.login)
     implementation(projects.feature.welcome)
     implementation(projects.feature.dashboard)
+    implementation(projects.feature.profile)
     implementation(projects.commonui)
     implementation(projects.feature.createride)
 
