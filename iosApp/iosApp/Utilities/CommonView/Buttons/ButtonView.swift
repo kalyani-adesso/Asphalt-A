@@ -51,6 +51,8 @@ struct ButtonView: View {
                     .padding(.bottom,20)
             
         }
+        .buttonStyle(.plain)
+        .containerShape(Rectangle())
     }
 }
 
