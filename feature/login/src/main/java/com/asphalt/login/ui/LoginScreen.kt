@@ -82,7 +82,7 @@ fun LoginScreen(
     dataStoreManager: DataStoreManager = currentKoinScope().get()
 ) {
     val context = LocalContext.current
-    var checked by remember { mutableStateOf(false) }
+    //var checked by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
 //    val dataStoreManager : DataStoreManager = koinInject()
 
@@ -367,8 +367,8 @@ fun LoginScreen(
                                     uncheckedColor = NeutralMidGrey,
                                     checkmarkColor = Color.White
                                 ),
-                                checked = checked,
-                                onCheckedChange = { checked = it })
+                                checked = viewModel.isrememberMe.value,
+                                onCheckedChange = { viewModel.isrememberMe.value = it })
                         }
                         Spacer(modifier = Modifier.width(Dimensions.padding8))
                         Text(

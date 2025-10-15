@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                 ) {
                     NavigationRoot()
+//                    ProfileScreen()
                 }
             }
 //            AsphaltTheme {

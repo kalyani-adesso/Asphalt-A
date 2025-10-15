@@ -23,12 +23,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.DonutChart
-import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.components.RideGraphLegendUI
 import com.asphalt.dashboard.composables.components.SelectJourneyTimeFrame
 import com.asphalt.dashboard.sealedclasses.AdventureJourneyTimeFrameChoices
@@ -52,11 +50,9 @@ fun AdventureJourney(
     val colorList = adventureJourneyViewModel.colorList.collectAsStateWithLifecycle()
     val valueList = adventureJourneyViewModel.valueList.collectAsStateWithLifecycle()
 
-    RoundedBox(
+    ComposeUtils.CommonContentBox(
         modifier = Modifier.fillMaxWidth(),
-        borderColor = NeutralGrey30,
-        backgroundColor = NeutralLightPaper,
-        borderStroke = Dimensions.padding1
+        isBordered = true
     ) {
         Column(
             modifier = Modifier.padding(

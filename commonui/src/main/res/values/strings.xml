@@ -51,6 +51,15 @@
     <string name="zero">0</string>
     <string name="no_data">No Data</string>
     <string name="places_visited_graph_title">Places Visited In Last 7 Months</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="history">History</string>
+    <string name="invite">Invite</string>
+    <string name="your_rides">Your Rides</string>
+    <string name="share">Share</string>
+    <string name="view_details">VIEW DETAILS</string>
+    <string name="completed">Completed</string>
+    <string name="view_photos">View Photos</string>
+    <string name="share_exp">Share Experience</string>
     <string name="no_invites">No Invites</string>
     <string name="last_four_months">Last 4 months</string>
     <string name="last_week">Last week</string>
