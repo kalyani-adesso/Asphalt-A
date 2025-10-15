@@ -54,17 +54,3 @@ fun App() {
         }
     }
 }
-
-@Composable
-fun AsphaltApp() {
-    var showSplash by remember { mutableStateOf(true) }
-    LaunchedEffect(Unit) {
-        delay(Constants.SPLASH_TIMER)
-        showSplash = false
-    }
-    if (showSplash) {
-//        SplashScreen(onNavigateToRegister, onNavigateToWelcome)
-    } else {
-        DashBoardScreen({})
-    }
-}
