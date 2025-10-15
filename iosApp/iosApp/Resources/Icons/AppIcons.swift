@@ -70,6 +70,8 @@ struct AppIcon {
         static let sportsBike = Image("icon-sportsBike")
         static let mechanic = Image("icon-mechanic")
         static let camera = Image("icon-camera")
+        static let addBike = Image("icon-addBike")
+        static let deleteBike = Image("icon-delete")
     }
     
     struct Home {
@@ -103,6 +105,8 @@ struct AppIcon {
         static let whatsapp = Image("whatsapp")
         static let facebook = Image("Facebook")
         static let backButton = Image("BackArrow")
+
+
     }
 }
 

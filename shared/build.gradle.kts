@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.google.gms.google.services)
-    //alias(libs.plugins.kotlinCocoapods)
+     alias(libs.plugins.google.gms.google.services)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
@@ -22,13 +22,33 @@ kotlin {
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Shared"
+            baseName = "shared"
             isStatic = true
         }
     }
-    
-    sourceSets {
 
+    cocoapods {
+        summary = "Shared module for Asphalt-A project"
+        homepage = "https://github.com/kalyani-adesso/Asphalt-A"
+        version = "1.0.0"
+        ios.deploymentTarget = "13"
+       name = "shared"
+        val fmodules = listOf("-compiler-option", "-fmodules")
+        pod("FirebaseCore") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseDatabase") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseFirestore") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseAuth") {
+            extraOpts += fmodules
+        }
+    }
+
+    sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
             api(libs.koin.core)
@@ -46,7 +66,6 @@ kotlin {
 //            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth
 //            implementation(libs.firebase.firestore) // Optional: Firestore
         }
-
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.client.core)
@@ -60,7 +79,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.coroutines)
-            implementation(projects.commonui) //as it has only android modules
+            implementation(projects.commonui)
 
             //firebase
           //  implementation(libs.firebase.analytics)
@@ -74,7 +93,6 @@ kotlin {
             implementation(libs.datastore)
 
         }
-
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.kotlinx.serialization.json)

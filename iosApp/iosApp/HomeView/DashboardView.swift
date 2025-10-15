@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct DashboardView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var currentDate = Date()

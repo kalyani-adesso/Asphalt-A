@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.NeutralWhite
@@ -20,6 +22,7 @@ fun RoundedBox(
     cornerRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
     borderStroke: Dp? = null,
     borderColor: Color? = null,
+    contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -30,6 +33,7 @@ fun RoundedBox(
                 shape = RoundedCornerShape(cornerRadius),
                 color = borderColor ?: Color.Transparent
             ),
+        contentAlignment = contentAlignment,
         content = content
     )
 }

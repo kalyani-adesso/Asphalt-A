@@ -14,9 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.components.RideMonthYear
 import com.asphalt.dashboard.composables.components.RideStatBox
 import com.asphalt.dashboard.constants.RideStatConstants
@@ -31,11 +30,7 @@ fun RideStatsPerMonth(
     val perMonthStats = perMonthRideStatsViewModel.perMonthStats.collectAsStateWithLifecycle()
 
 
-    RoundedBox(
-        borderStroke = Constants.DEFAULT_BORDER_STROKE,
-        borderColor = NeutralGrey30,
-        backgroundColor = NeutralLightPaper
-    ) {
+    ComposeUtils.CommonContentBox(isBordered = true, radius = Constants.DEFAULT_CORNER_RADIUS) {
 
         Row(
             modifier = Modifier

@@ -18,7 +18,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.dashboard.composables.components.DashboardRideInviteList
 
 @Composable
-fun DashboardUpcomingRide() {
+fun DashboardUpcomingRide(upcomingRideClick:()->Unit) {
     Column {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -32,7 +32,7 @@ fun DashboardUpcomingRide() {
                 style = TypographyBold.headlineLarge,
                 fontSize = Dimensions.textSize14,
                 modifier = Modifier.clickable {
-
+                    upcomingRideClick.invoke()
                 }
             )
         }

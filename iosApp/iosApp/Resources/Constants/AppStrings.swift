@@ -107,11 +107,15 @@ public struct AppStrings{
     }
 
 
+    enum AppStorageKey: String {
+        case hasSeenOnboarding
+    }
+
     enum ValidationMessage: String {
         case validatePassword = "Please enter a password"
         case validateEmail = "Please enter a valid email"
     }
-    
+
 
     enum userdefaultKeys: String {
         case rememberMeData = "com.adesso.rider.club.rememberMeData"
@@ -126,13 +130,14 @@ public struct AppStrings{
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+
     enum ResetSnackbarLabel: String {
         case title = "Reset link sent!"
         case subtitle = "Check your mail for password reset link"
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
+
     enum CreateAccountSnackbarLabel: String {
         case title = "Account Created Successfully!"
        
@@ -157,26 +162,25 @@ public struct AppStrings{
         case groups = "Ride Groups"
         case invites = "Ride Invites"
         case title = "Adventure\nJourney"
-  
+
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
+
     enum Placesvisited: String {
         case title = "Places Visited In Last 7 Months"
-       
     }
-       
+
     enum HomeSnackbarLabel: String {
         case title = "Welcome!"
         case subtitle = "You have successfully logged into adesso Riders Club."
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
-    
+
     enum HomeButton: String {
         case accept = "ACCEPT"
         case decline = "DECLINE"
-        
+
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
     
@@ -191,5 +195,113 @@ public struct AppStrings{
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
+    enum Notification : String {
+        case rideReminder = "Ride Reminder"
+        case notifications = "Notifications"
+        case newRiderJoined = "New Rider Joined"
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+
+    enum SelectRide {
+        static let selectingRide = "Selecting Your Ride"
+        static let chooseType = "Choose your perfect motorcycle type"
+        static let sportBikeDesc = "High-performance racing bikes"
+        static let make = "Make"
+        static let selectMake = "Select motorcycle"
+        static let model = "Model"
+        static let selectModel = "Select model"
+        static let addVehicle = "ADD VEHICLE"
+        
+    }
+
+    enum Profile {
+        static let addBike = "+ ADD BIKE"
+        static let yourVehicles = "Your Vehicles"
+        static let description = "Motorcycles your own or ride"
+        static let noVehicles = "No Vehicles added yet"
+        static let addPrompt = "Add your motorcycle to get started!"
+        static let totalStats = "Total Statistics"
+        static let distanceCovered = "Distance Covered"
+        static let totalRides = "Total Rides"
+        static let placesExplored = "Places Explored"
+        static let elevationGain = "Elevation Gain"
+        static let achievements = "Achievements"
+        static let badgesDescription = "Badges earned through community participation"
+        static let noBadges = "No badges earned yet"
+        static let earnBadgeTip = "Complete quizzes and participate in the community to earn your first badge!"
+        static let startEarnBadge = "Start earning badges"
+        static let yourgarage = "Your Garage"
+    }
+
+    enum VehicleType: String, CaseIterable, Identifiable {
+        case sportBike = "Sport Bike"
+        case nakedBike = "Naked Bike"
+        case touringBike = "Touring Bike"
+        case cruiser = "Cruiser"
+        case adventureBike = "Adventure Bike"
+        case scooter = "Scooter"
+        case electric = "Electric"
+        case other = "Other"
+
+        var id: String { rawValue }
+
+        var subtitle: String? {
+            switch self {
+            case .sportBike:
+                return "High-performance racing bikes"
+            default:
+                return nil
+            }
+        }
+    }
+
+
+    enum EditProfile {
+        static let editProfile = "Edit Profile"
+        static let updateProfileInfo = "Update your profile information & preferences"
+        static let enterPhoneNumber = "Enter Phone number"
+        static let enterNumber = "Enter number"
+        static let emergencyContact = "Emergeny contact number"
+        static let drivingLicense = "Driving license number"
+        static let markAsMechanic = "Mark as mechanic"
+        static let responseHighlight = "Your response will be highlighted"
+        static let cancel = "Cancel"
+        static let saveChanges = "Save changes"
+    }
+
+    enum NavigationSlider {
+        // Main Section
+        static let main = "Main"
+        static let home = "Home"
+        static let homeSubtitle = "Your riding dashboard"
+        static let profile = "Profile"
+        static let profileSubtitle = "Manage your info"
+        static let rideHistory = "Your ride history"
+        static let planAdventure = "Plan new adventure"
+        static let referFriend = "Refer a friend"
+        static let logout = "Logout"
+
+        // Community Section
+        static let community = "Community"
+        static let connectedRide = "Connected Ride"
+        static let joinGroupRides = "Join group rides"
+        static let askAnswer = "Ask & answer"
+        static let queries = "Queries"
+
+        // Learning Section
+        static let learning = "Learning"
+        static let knowledgeCircle = "Knowledge Circle"
+        static let learnRoadSigns = "Learn road signs"
+        static let testSkills = "Test your skills"
+        static let preRideCheck = "Pre Ride Check"
+
+        // More Section
+        static let more = "More"
+        static let marketplace = "Marketplace"
+        static let buySellGears = "Buy and sell gears"
+        static let settings = "Settings"
+        static let appPreferences = "App preferences"
+    }
 }
+
 
