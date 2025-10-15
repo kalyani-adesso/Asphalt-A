@@ -1,14 +1,22 @@
 package com.asphalt.profile.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.asphalt.profile.repositories.ProfileSectionRepo
+import androidx.lifecycle.viewModelScope
+import com.asphalt.profile.data.ProfileData
+import com.asphalt.profile.repositories.ProfilesSectionRepo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class ProfileSectionVM(
-    profileSectionRepo: ProfileSectionRepo,
-) :
+class ProfileSectionVM(val profilesSectionRepo: ProfilesSectionRepo) :
     ViewModel() {
-    suspend fun getProfileData(uid: String?) {
-
+    private val _profileData = MutableStateFlow<ProfileData?>(null)
+    val profileData: StateFlow<ProfileData?> = _profileData
+    fun getProfileData(uid: String?) {
+        viewModelScope.launch {
+            _profileData.value = profilesSectionRepo.getProfileData(uid)
+        }
     }
+
 
 }

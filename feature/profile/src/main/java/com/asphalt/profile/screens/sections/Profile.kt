@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.android.model.CurrentUser
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightB33
@@ -29,16 +29,16 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileSection(
+    user: CurrentUser?,
     profileSectionVM: ProfileSectionVM = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
-    val user = androidUserVM.userState.collectAsStateWithLifecycle()
     LaunchedEffect(user) {
-        profileSectionVM.getProfileData(user.value?.uid)
+        profileSectionVM.getProfileData(user?.uid)
     }
+    val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
     ComposeUtils.CommonContentBox(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
 
     ) {
         Row(
@@ -60,26 +60,25 @@ fun ProfileSection(
                 CircularNetworkImage(
                     modifier = Modifier
                         .align(Alignment.Center),
-                    imageUrl = "https://picsum.photos/id/1/200/300"
+                    imageUrl = profileData.value?.profilePicUrl ?: ""
                 )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing5)) {
                 Text(
-                    user.value?.name.toString(), style = TypographyBold.bodyMedium,
+                    profileData.value?.username ?: "", style = TypographyBold.bodyMedium,
                     fontSize = Dimensions.textSize19
                 )
                 Text(
-                    user.value?.email.toString(),
+                    profileData.value?.userEmail ?: "",
                     style = Typography.bodyMedium,
                     fontSize = Dimensions.textSize16
                 )
-//                        Spacer(Modifier.height(Dimensions.padding5))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing15)) {
-
-                    ProfileLabel(R.drawable.ic_spanner, "Mechanic")
-                    ProfileLabel(R.drawable.ic_call, "999999999")
+                    if (profileData.value?.isMechanic == true)
+                        ProfileLabel(R.drawable.ic_spanner, "Mechanic")
+                    ProfileLabel(R.drawable.ic_call, profileData.value?.phoneNumber ?: "")
 
                 }
             }
