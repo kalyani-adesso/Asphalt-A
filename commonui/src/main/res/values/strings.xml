@@ -89,6 +89,9 @@
     <string name="type_model">Type model..</string>
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
+    <string name="solo_ride">Solo Ride</string>
+    <string name="group_ride">Group Ride</string>
+    <string name="open_event">Open Event</string>
 
 
 

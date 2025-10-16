@@ -2,7 +2,9 @@ package com.asphalt.createride.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -25,6 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,8 +47,13 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun DetailsSection(viewModel: CreateRideScreenViewModel) {
+    var context = LocalContext.current
     var text by remember { mutableStateOf("") }
     var text2 by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var anchorWidth by remember { mutableStateOf(0) }
+    val rideType = viewModel.getRideType(context)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,28 +73,59 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             modifier = Modifier.padding(start = Dimensions.padding16)
         )
         Spacer(modifier = Modifier.height(Dimensions.size8))
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(Dimensions.padding50)
                 .padding(start = Dimensions.padding16, end = Dimensions.padding16)
-                .background(
-                    NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "Select ride type",
-                style = Typography.bodyMedium,
-                color = NeutralDarkGrey,
-                modifier = Modifier.padding(start = Dimensions.padding16)
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_dropdown_arrow),
-                contentDescription = "",
-                modifier = Modifier.padding(end = Dimensions.padding16)
-            )
+                .onGloballyPositioned { coordinates ->
+                    anchorWidth = coordinates.size.width
+                }) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.padding50)
+                    //.padding(start = Dimensions.padding16, end = Dimensions.padding16)
+                    .background(
+                        NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
+                    )
+                    .clickable {
+                        expanded = true
+                    }
+                    .onGloballyPositioned { coordinates ->
+                        anchorWidth = coordinates.size.width // capture width in pixels
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Select ride type",
+                    style = Typography.bodyMedium,
+                    color = NeutralDarkGrey,
+                    modifier = Modifier.padding(start = Dimensions.padding16)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_dropdown_arrow),
+                    contentDescription = "",
+                    modifier = Modifier.padding(end = Dimensions.padding16)
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .width(with(LocalDensity.current) { anchorWidth.toDp() })
+                    .background(NeutralWhite)
+            ) {
+                rideType.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option.rideType) },
+                        onClick = {
+                            text = option.rideType
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(

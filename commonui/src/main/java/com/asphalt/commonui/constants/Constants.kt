@@ -34,5 +34,10 @@ object Constants {
     const val TAB_REVIEW = 4
     const val TAB_SHARE = 5
 
+    //Ride Type
+    const val SOLO_RIDE = 1
+    const val GROUP_RIDE = 2
+    const val OPEN_EVENT = 3
+
 
 }
