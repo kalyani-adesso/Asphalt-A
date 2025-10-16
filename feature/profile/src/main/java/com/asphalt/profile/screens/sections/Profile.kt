@@ -1,5 +1,6 @@
 package com.asphalt.profile.screens.sections
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -77,7 +78,7 @@ fun ProfileSection(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing15)) {
                     if (profileData.value?.isMechanic == true)
-                        ProfileLabel(R.drawable.ic_spanner, "Mechanic")
+                        ProfileLabel(R.drawable.ic_spanner_orange, "Mechanic")
                     ProfileLabel(R.drawable.ic_call, profileData.value?.phoneNumber ?: "")
 
                 }
