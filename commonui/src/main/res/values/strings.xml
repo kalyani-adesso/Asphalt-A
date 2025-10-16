@@ -132,6 +132,9 @@
     <string name="solo_ride">Solo Ride</string>
     <string name="group_ride">Group Ride</string>
     <string name="open_event">Open Event</string>
+    <string name="ok">OK</string>
+    <string name="select_date">Select date</string>
+
 
 
 </resources>
