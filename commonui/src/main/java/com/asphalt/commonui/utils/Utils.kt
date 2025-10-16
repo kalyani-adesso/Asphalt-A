@@ -54,5 +54,16 @@ object Utils {
         return (5 - remainder) % 5
     }
 
+    fun convertMillisToFormattedDate(
+        millis: Long?,
+        pattern: String = "MMM dd, yyyy"
+    ): String {
+        if (millis == null || millis <= 0) return ""
+
+        // Pattern: MMM = abbreviated month name (Sep), dd = day, yyyy = 4-digit year
+        val format = SimpleDateFormat(pattern, Locale.getDefault())
+
+        return format.format(Date(millis))
+    }
 
 }

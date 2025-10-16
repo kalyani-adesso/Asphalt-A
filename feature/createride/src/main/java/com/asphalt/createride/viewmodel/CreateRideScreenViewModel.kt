@@ -12,11 +12,16 @@ import com.asphalt.createride.model.RideType
 class CreateRideScreenViewModel : ViewModel() {
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
+    val show_datePicker= mutableStateOf(false)
 
 
     fun updateTab(tab: Int) {
 
         _tabSelectMutableState.value += tab
+    }
+
+    fun showDatePicker(isShow: Boolean){
+        show_datePicker.value=isShow
     }
 
     fun getRideType(context: Context): ArrayList<RideType> {
