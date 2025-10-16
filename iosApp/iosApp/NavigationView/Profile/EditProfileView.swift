@@ -42,7 +42,7 @@ struct EditProfileView: View {
                         }
                     }
                     ZStack(alignment: .bottomTrailing) {
-                        Image(uiImage: (selectedImage ?? UIImage(systemName: "person.circle")!))
+                        Image(uiImage: ((selectedImage ?? UIImage(named:"icon-profile"))!))
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 92, height: 73)
@@ -85,7 +85,8 @@ struct EditProfileView: View {
                             }
                             .padding(.bottom, 21)
                             ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                
+                                profileViewModel.updateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL:drivingLicenseNumber , machanic:enableMechanic)
+                                isPresented = false
                             }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber))
                         }
                     }
