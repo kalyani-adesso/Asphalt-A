@@ -118,7 +118,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             ) {
                 rideType.forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option.rideType) },
+                        text = { Text(option.rideType, style = Typography.bodySmall) },
                         onClick = {
                             text = option.rideType
                             expanded = false
