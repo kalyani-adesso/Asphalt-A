@@ -26,12 +26,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Rider/Feature/Home/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
-				Rider/Feature/Login/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
-				Rider/Feature/SignUp/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
-				Rider/Feature/WelocmePage/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
-				Rider/Service/LoginService/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
-				Shared/Feature/DesignSystem/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
 			);
 			target = 5E1F3BFF75C627F835CE626C /* iosApp */;
 		};
