@@ -55,11 +55,12 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
-    debugImplementation(libs.compose.ui.tooling)
-
-    // Navigation
-    implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.androidx.material.icons.extended.android)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     //MPChart

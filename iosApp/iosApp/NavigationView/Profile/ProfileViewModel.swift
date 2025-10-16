@@ -51,9 +51,11 @@ struct SelectedBikeType: Identifiable,Hashable {
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
+    //TODO: Static data - update this with actual data once login sucess.
     @Published var profileName = "Aromal Sijulal"
-    @Published var bikeType = "Adventure Bike"
+    @Published var email = "email@example.com"
     @Published var role = "Mechanic"
+    @Published var phoneNumber = "+91 9876543210"
     @Published var profileImage = AppImage.Welcome.bg
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
@@ -112,5 +114,12 @@ final class ProfileViewModel: ObservableObject {
             selectedBikeType.remove(at: index)
         }
         
+    }
+    
+    func updateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String,machanic:Bool) {
+        self.profileName = fullName
+        self.email = email
+        self.phoneNumber = phoneNumber
+        self.role = machanic ? "Mechanic" : ""
     }
 }

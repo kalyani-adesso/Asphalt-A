@@ -26,6 +26,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Rider/Feature/Home/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
+				Rider/Feature/Login/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
+				Rider/Feature/SignUp/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
+				Rider/Feature/WelocmePage/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
+				Rider/Service/LoginService/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
+				Shared/Feature/DesignSystem/.swiftpm/xcode/xcuserdata/kalyani.ausekar.xcuserdatad/xcschemes/xcschememanagement.plist,
 			);
 			target = 5E1F3BFF75C627F835CE626C /* iosApp */;
 		};
@@ -42,8 +48,6 @@
 		};
 		31ECD9733CAFFAF08705E2B1 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -229,9 +233,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
