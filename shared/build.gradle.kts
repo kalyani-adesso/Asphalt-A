@@ -75,7 +75,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.kotlinx.coroutines.android)
+           // implementation(libs.kotlinx.coroutines.android)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.coroutines)
