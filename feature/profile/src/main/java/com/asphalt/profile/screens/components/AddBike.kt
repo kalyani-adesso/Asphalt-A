@@ -1,6 +1,5 @@
 package com.asphalt.profile.screens.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,21 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.theme.SemiTransparentDarkGray
-import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
@@ -42,12 +40,16 @@ fun AddBikePopup(
     val modelError = addBikesVM.modelError.collectAsStateWithLifecycle()
     val makeError = addBikesVM.makeError.collectAsStateWithLifecycle()
 
-    Popup(properties = PopupProperties(focusable = true)) {
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(SemiTransparentDarkGray) // translucent overlay
-                .clickable(onClick = { onDismiss() }), // click outside to dismiss
+                .clickable(onClick = { onDismiss() })
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopStart
         ) {
             ComposeUtils.CommonContentBox(
@@ -58,6 +60,7 @@ fun AddBikePopup(
                         start = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING,
                         end = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING
                     )
+                    .clickable(enabled = false) {}
             ) {
                 Column(
                     modifier = Modifier.padding(
@@ -72,6 +75,8 @@ fun AddBikePopup(
                         stringResource(R.string.choose_motorcycle_type)
                     )
                     Spacer(Modifier.height(Dimensions.size25))
+                    BikeCarousel()
+                    Spacer(Modifier.height(Dimensions.size25))
                     Text(
                         stringResource(R.string.make),
                         style = TypographyMedium.bodyMedium,
@@ -82,14 +87,10 @@ fun AddBikePopup(
                     ComposeUtils.CustomTextField(make.value, {
                         addBikesVM.updateMake(it)
                     }, stringResource(R.string.type_make))
-                    if (makeError.value)
-                        Text(
-                            text = stringResource(R.string.make_cannot_be_empty),
-                            Modifier.padding(top = Dimensions.size4),
-                            style = Typography.bodySmall,
-                            color = NeutralRed
-                        )
-
+                    ComposeUtils.TexFieldError(
+                        makeError.value,
+                        stringResource(R.string.make_cannot_be_empty)
+                    )
                     Spacer(Modifier.height(Dimensions.padding20))
                     Text(
                         stringResource(R.string.model),
@@ -103,13 +104,10 @@ fun AddBikePopup(
                         onValueChanged = { addBikesVM.updateModel(it) },
                         placeHolderText = stringResource(R.string.type_model)
                     )
-                    if (modelError.value)
-                        Text(
-                            text = stringResource(R.string.model_cannot_be_empty),
-                            Modifier.padding(top = Dimensions.size4),
-                            style = Typography.bodySmall,
-                            color = NeutralRed
-                        )
+                    ComposeUtils.TexFieldError(
+                        modelError.value,
+                        stringResource(R.string.model_cannot_be_empty)
+                    )
                     Spacer(Modifier.height(Dimensions.padding20))
                     GradientButton(onClick = {
                         addBikesVM.addBike()?.let {

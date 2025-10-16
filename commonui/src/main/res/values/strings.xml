@@ -81,6 +81,8 @@
     <string name="badges_earned">Badges earned through community participation</string>
     <string name="start_earning_badges">Start Earning Badges</string>
     <string name="selecting_your_ride">Selecting Your Ride</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="update_profile_desc">Update your profile information &amp; preferences</string>
     <string name="choose_motorcycle_type">Choose your perfect motorcycle type</string>
     <string name="make">Make</string>
     <string name="type_make">Type make..</string>
@@ -89,10 +91,47 @@
     <string name="type_model">Type model..</string>
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
+
+    <string name="bike_type_sport_bike">Sport Bike</string>
+    <string name="bike_type_naked_bike">Naked Bike</string>
+    <string name="bike_type_adventure_bike">Adventure Bike</string>
+    <string name="bike_type_cruiser">Cruiser</string>
+    <string name="bike_type_touring_bike">Touring Bike</string>
+    <string name="bike_type_scooter">Scooter</string>
+    <string name="bike_type_electric">Electric</string>
+    <string name="bike_type_other">Other</string>
+    <string name="sports_bike_description">High-performance racing bikes</string>
+    <string name="naked_bike_description">Exposed engine, upright street use.</string>
+    <string name="adventure_bike_description">Long-distance, on/off-road capability.</string>
+    <string name="cruiser_description">Low seat, relaxed riding posture.</string>
+    <string name="touring_bike_description">Comfortable for long road trips.</string>
+    <string name="scooter_description">Step-through frame, floorboard.</string>
+    <string name="electric_description">Battery-powered, instant torque.</string>
+    <string name="other_description">Other categories.</string>
+    <string name="of">%1$d of %2$d</string>
+    <string name="mark_as_mechanic">Mark as mechanic</string>
+    <string name="your_response_will_be_highlighted">Your response will be highlighted</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="emergency_contact_cannot_be_empty">Emergency contact cannot be empty</string>
+    <string name="enter_emergency_number">Enter Emergency Number</string>
+    <string name="emergency_contact_number">Emergency Contact Number</string>
+    <string name="enter_license_number">Enter License Number</string>
+    <string name="license_number_error">License number cannot be empty</string>
+    <string name="driving_license_number">Driving License Number</string>
+    <string name="full_name">Full Name</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="full_name_cannot_be_empty">Full name cannot be empty</string>
+    <string name="email">Email</string>
+    <string name="enter_email_placeholder">Enter Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="phone_number_error">Phone number cannot be empty</string>
+
+
     <string name="solo_ride">Solo Ride</string>
     <string name="group_ride">Group Ride</string>
     <string name="open_event">Open Event</string>
-
-
+   
 
 </resources>

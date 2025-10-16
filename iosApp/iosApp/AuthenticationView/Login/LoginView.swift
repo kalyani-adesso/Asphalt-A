@@ -24,7 +24,7 @@ struct SignInView: View {
                         label: AppStrings.SignInLabel.emailOrPhone.localized,
                         icon: AppIcon.Login.email,
                         placeholder: AppStrings.SignInPlaceholder.email.localized,
-                        emailOrPhone: $emailOrPhone,
+                        value: $emailOrPhone,
                         isValidEmail: $isValidEmail
                     )
                     PasswordFormField(
@@ -37,9 +37,9 @@ struct SignInView: View {
                 .padding(.bottom, 18)
                 rememberMeToggle()
                 ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
-//                    viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
-//                        hasLoggedIn = true
-//                    })
+                    viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
+                        hasLoggedIn = true
+                    })
                 })
                 socialSignInOptions
                 signUpLink()

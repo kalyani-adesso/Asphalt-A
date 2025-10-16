@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TopNavBar: View {
     @EnvironmentObject var home: HomeViewModel 
-    
+    @State var showNotification: Bool = false
     var body: some View {
         ZStack(alignment: .bottom) {
             Rectangle()
@@ -35,7 +35,7 @@ struct TopNavBar: View {
                 
                 Spacer()
                 Button {
-                    print("Notifications tapped")
+                    self.showNotification = true
                 } label: {
                     ZStack(alignment: .topTrailing) {
                         Image(systemName: "bell")
@@ -51,6 +51,9 @@ struct TopNavBar: View {
             .padding(.horizontal, 20)
             .padding(.bottom,10)
         }
+        .navigationDestination(isPresented: $showNotification, destination: {
+            NotificationView()
+        })
     }
 }
 

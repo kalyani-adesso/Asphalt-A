@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -32,9 +36,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.GreenDark
+import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
+import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralGrey30
 import com.asphalt.commonui.theme.NeutralLightPaper
+import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
@@ -63,12 +71,12 @@ object ComposeUtils {
     }
 
     @Composable
-    fun DefaultButtonContent(buttonText: String) {
+    fun DefaultButtonContent(buttonText: String,color: Color=NeutralWhite) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 
             Text(
                 buttonText,
-                color = NeutralWhite,
+                color = color,
                 fontSize = Dimensions.textSize18,
                 style = TypographyBold.labelLarge,
             )
@@ -118,6 +126,7 @@ object ComposeUtils {
 
     @Composable
     fun ColorIconRounded(
+        modifier: Modifier = Modifier,
         backColor: Color,
         size: Dp = Dimensions.size30,
         radius: Dp = Dimensions.size5,
@@ -125,7 +134,7 @@ object ComposeUtils {
     ) {
         RoundedBox(
             backgroundColor = backColor,
-            modifier = Modifier
+            modifier = modifier
                 .width(size)
                 .height(size),
             cornerRadius = radius,
@@ -149,6 +158,8 @@ object ComposeUtils {
         subtitle: String,
         @SuppressLint("ModifierParameter") titleModifier: Modifier = Modifier,
         subtitleModifier: Modifier = Modifier,
+        titleColor:Color = NeutralBlack,
+        subtitleColor:Color = NeutralDarkGrey
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -156,19 +167,19 @@ object ComposeUtils {
                 Dimensions.spacing10
             )
         ) {
-            ColorIconRounded(iconColor, resId = iconRes)
+            ColorIconRounded(backColor = iconColor, resId = iconRes)
             Column(verticalArrangement = Arrangement.spacedBy(Dimensions.size3)) {
-                SectionTitle(title, titleModifier)
-                SectionSubtitle(subtitle, subtitleModifier)
+                SectionTitle(title, titleModifier, color = titleColor)
+                SectionSubtitle(subtitle, subtitleModifier, color = subtitleColor)
             }
         }
     }
 
     @Composable
-    fun SectionTitle(text: String, modifier: Modifier = Modifier) {
+    fun SectionTitle(text: String, modifier: Modifier = Modifier,color: Color = NeutralBlack) {
         Text(
             style = TypographyBold.bodyMedium,
-            fontSize = Dimensions.textSize16, text = text, modifier = modifier
+            fontSize = Dimensions.textSize16, text = text, modifier = modifier, color = color
         )
     }
 
@@ -186,7 +197,12 @@ object ComposeUtils {
     }
 
     @Composable
-    fun CustomTextField(value: String, onValueChanged: (String) -> Unit, placeHolderText: String) {
+    fun CustomTextField(
+        value: String,
+        onValueChanged: (String) -> Unit,
+        placeHolderText: String,
+        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+    ) {
         RoundedBox(
             modifier = Modifier.height(Dimensions.size50),
             cornerRadius = Dimensions.size10
@@ -198,13 +214,14 @@ object ComposeUtils {
                     Text(
                         placeHolderText,
                         style = Typography.bodyMedium,
-                        fontSize = Dimensions.textSize14
+                        fontSize = Dimensions.textSize14,
+                        color = NeutralDarkGrey
                     )
                 },
                 textStyle = Typography.bodyMedium,
 
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                keyboardOptions = keyboardOptions,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
@@ -219,5 +236,96 @@ object ComposeUtils {
             )
         }
     }
+
+    @Composable
+    fun ArrowView(
+        modifier: Modifier = Modifier,
+        backColor: Color = NeutralLightPaper,
+        boxContent: @Composable BoxScope.() -> Unit
+    ) {
+        RoundedBox(
+            contentAlignment = Alignment.Center,
+            modifier = modifier.size(Dimensions.size32),
+            backgroundColor = backColor, cornerRadius = Dimensions.size8
+        ) {
+            Box(
+                modifier = Modifier.arrowPadding()
+            ) {
+                boxContent()
+            }
+        }
+    }
+
+    @Composable
+    fun TexFieldError(error: Boolean, errorText: String) {
+        if (error)
+            Text(
+                text = errorText,
+                Modifier.padding(top = Dimensions.size4),
+                style = Typography.bodySmall,
+                color = NeutralRed
+            )
+    }
+
+    @Composable
+    fun HeaderWithInputField(
+        title: String,
+        value: String,
+        onValueChanged: (String) -> Unit,
+        placeholder: String,
+        isError: Boolean,
+        errorText: String,
+        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing12)) {
+            SectionTitle(title)
+            CustomTextField(
+                value,
+                { onValueChanged(it) },
+                placeHolderText = placeholder,
+                keyboardOptions = keyboardOptions
+            )
+            TexFieldError(
+                isError,
+                errorText
+            )
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CustomSwitch(switchValue: Boolean, onSwitch: (Boolean) -> Unit) {
+
+        Switch(
+            thumbContent = {
+                RoundedBox(
+                    modifier = Modifier.size(Dimensions.padding21),
+                    cornerRadius = Dimensions.padding21
+                ) {
+                }
+            },
+            checked = switchValue,
+            onCheckedChange = { onSwitch(it) },
+
+            modifier = Modifier
+                .width(Dimensions.size38)
+                .height(Dimensions.padding24),
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = GreenDark,
+                uncheckedThumbColor = Color.White,
+                uncheckedTrackColor = NeutralGrey,
+                uncheckedBorderColor = Color.Transparent,
+                checkedBorderColor = Color.Transparent
+            )
+        )
+    }
+
+    private fun Modifier.arrowPadding(): Modifier = this.then(
+        Modifier.padding(
+            start = Dimensions.padding13,
+            end = Dimensions.padding9pt25,
+        )
+    )
 }
 

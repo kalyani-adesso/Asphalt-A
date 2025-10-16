@@ -183,6 +183,17 @@ public struct AppStrings{
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
+    
+    enum CreateRide: String {
+        
+        case previous = "PREVIOUS"
+        case next = "NEXT"
+        case nextStep = "NEXT STEP"
+        case create = "CREATE RIDE"
+        case done = "DONE"
+        
+        var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
 
     enum Notification : String {
         case rideReminder = "Ride Reminder"
@@ -200,6 +211,7 @@ public struct AppStrings{
         static let model = "Model"
         static let selectModel = "Select model"
         static let addVehicle = "ADD VEHICLE"
+        
     }
 
     enum Profile {
@@ -218,6 +230,7 @@ public struct AppStrings{
         static let noBadges = "No badges earned yet"
         static let earnBadgeTip = "Complete quizzes and participate in the community to earn your first badge!"
         static let startEarnBadge = "Start earning badges"
+        static let yourgarage = "Your Garage"
     }
 
     enum VehicleType: String, CaseIterable, Identifiable {
@@ -231,7 +244,17 @@ public struct AppStrings{
         case other = "Other"
 
         var id: String { rawValue }
+
+        var subtitle: String? {
+            switch self {
+            case .sportBike:
+                return "High-performance racing bikes"
+            default:
+                return nil
+            }
+        }
     }
+
 
     enum EditProfile {
         static let editProfile = "Edit Profile"

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +50,8 @@ fun GetStartedScreen(
     val welcomeViewModel: WelcomeViewModel = koinViewModel()
     val scope = rememberCoroutineScope()
 
-    val carouselItems = listOf(
-        Carousels.JoyRideCarousel.carouselItem, Carousels.CommunityFeatureCarousel.carouselItem,
-        Carousels.RideTogetherCarousel.carouselItem
-    )
+    val carouselItems = Carousels.getAllCarousels()
+
     val carouselTopPadding =
         getDpForScreenRatio(
             GetStartedConstants.CAROUSEL_HEIGHT_RATIO,
@@ -98,8 +94,8 @@ fun GetStartedScreen(
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(
-                            start = Dimensions.padding40,
-                            end = Dimensions.padding40,
+                            start = Dimensions.padding,
+                            end = Dimensions.padding,
                             bottom = innerPadding.calculateBottomPadding()
                         ),
                 ) {
@@ -109,6 +105,7 @@ fun GetStartedScreen(
                         shape = RoundedCornerShape(Dimensions.radius15)
                     ) {
                         GradientButton(
+                            modifier = Modifier.fillMaxWidth(),
                             startColor = PrimaryBrighterLightW75,
                             endColor = PrimaryDarkerLightB50,
                             onClick = {
@@ -116,7 +113,7 @@ fun GetStartedScreen(
                                     welcomeViewModel.registerGetStarted()
                                     onNavigateToRegister()
                                 }
-                            }
+                            }, contentPadding = PaddingValues(Dimensions.size0)
 
                         ) {
                             val buttonText = stringResource(R.string.get_started).uppercase()
@@ -126,7 +123,7 @@ fun GetStartedScreen(
 
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxWidth()
                                     .padding(horizontal = Dimensions.padding)
                             ) {
                                 Text(

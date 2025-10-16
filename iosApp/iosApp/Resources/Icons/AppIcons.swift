@@ -40,7 +40,7 @@ struct AppIcon {
         static let queries = Image("icon_queries")
         static let yourRide = Image("icon_yourRide")
         static let repair = Image("icon-repair")
-        
+
         static let connectedRide = Image("icon-connectedRide")
         static let knowledgeCircle = Image("icon-knowledgeCircle")
         static let marketPlace = Image("icon-marketPlace")
@@ -70,6 +70,8 @@ struct AppIcon {
         static let sportsBike = Image("icon-sportsBike")
         static let mechanic = Image("icon-mechanic")
         static let camera = Image("icon-camera")
+        static let addBike = Image("icon-addBike")
+        static let deleteBike = Image("icon-delete")
     }
     
     struct Home {
@@ -86,7 +88,25 @@ struct AppIcon {
         static let pointer = Image("pointer")
         static let rides = Image("rides")
 
-               
+
+    }
+
+    struct CreateRide {
+        static let review = Image("Review")
+        static let share = Image("Share")
+        static let route = Image("Route")
+        static let calendar_month = Image("calendar_month")
+        static let timePicker = Image("Time_Picker")
+        static let searchLens = Image("Search")
+        static let tools = Image("Tools")
+        static let copy = Image("Copy")
+        static let mail = Image("Mail")
+        static let twitter = Image("Twitter")
+        static let whatsapp = Image("whatsapp")
+        static let facebook = Image("Facebook")
+        static let backButton = Image("BackArrow")
+
+
     }
 }
 

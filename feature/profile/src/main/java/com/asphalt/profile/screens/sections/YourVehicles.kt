@@ -57,7 +57,7 @@ fun YourVehiclesSection(yourVehiclesVM: YourVehiclesVM = koinViewModel()) {
                 AddBikePopup({
                     showPopup = false
                 }, onAddBike = {
-                    Log.d("add_bike_cb",it.toString())
+                    Log.d("add_bike_cb", it.toString())
                     yourVehiclesVM.addVehicle(it)
                 })
             ComposeUtils.RoundedIconWithHeaderComponent(
@@ -93,7 +93,7 @@ fun GarageItem(vehicleData: VehicleData, onDeleteBike: () -> Unit) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(horizontal = Dimensions.padding20, vertical = Dimensions.size22)
+                .padding(horizontal = Dimensions.padding15, vertical = Dimensions.size22)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -113,7 +113,7 @@ fun GarageItem(vehicleData: VehicleData, onDeleteBike: () -> Unit) {
                     }
                     .fillMaxHeight()
             ) {
-                ComposeUtils.ColorIconRounded(VividRed, resId = R.drawable.ic_delete)
+                ComposeUtils.ColorIconRounded(backColor = VividRed, resId = R.drawable.ic_delete)
             }
 
         }

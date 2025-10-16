@@ -84,6 +84,8 @@ object Dimensions {
     val size8 = 8.dp
     val size9 = 9.dp
     val size10 = 10.dp
+    val size38 = 38.dp
+    val size44 = 44.dp
 
     val size14 = 14.dp
     val size20 = 20.dp

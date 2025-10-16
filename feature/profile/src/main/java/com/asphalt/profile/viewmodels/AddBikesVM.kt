@@ -46,5 +46,7 @@ class AddBikesVM : ViewModel() {
     fun clearAll() {
         _model.value = ""
         _make.value = ""
+        _makeError.value = false
+        _modelError.value = false
     }
 }

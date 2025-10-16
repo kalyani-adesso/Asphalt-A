@@ -6,12 +6,22 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct EditProfileView: View {
     @State var userName: String = ""
     @State var email: String = ""
-    @State var model: String = ""
+    @State var phoneNumber: String = ""
+    @State var emargeContact: String = ""
+    @State var drivingLicenseNumber: String = ""
+    @State var enableMechanic: Bool = false
+    @StateObject var profileViewModel = ProfileViewModel()
     @State private var currentPage = 0
+    @State private var showActionSheet: Bool = false
+    @Binding var isPresented: Bool
+    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var selectedImage: UIImage?
+    @State private var isShowingImagePicker = false
     private let totalPages = 8
     var body: some View {
         VStack {
@@ -21,7 +31,9 @@ struct EditProfileView: View {
                         ProfileTitleView(title:AppStrings.EditProfile.editProfile, subtitle: AppStrings.EditProfile.updateProfileInfo, icon: AppIcon.Profile.ride)
                             .padding(.horizontal,15)
                             .padding(.top,20)
-                        Button(action: {}) {
+                        Button(action: {
+                            isPresented = false
+                        }) {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .frame(width: 14,height: 14)
@@ -30,14 +42,16 @@ struct EditProfileView: View {
                         }
                     }
                     ZStack(alignment: .bottomTrailing) {
-                        AppImage.Welcome.bg2
+                        Image(uiImage: (selectedImage ?? UIImage(systemName: "person.circle")!))
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 92, height: 73)
                             .clipShape(Circle())
                             .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
                             .padding([.top, .bottom], 20)
-                        Button(action: {}) {
+                        Button(action: {
+                            showActionSheet = true
+                        }) {
                             AppIcon.Profile.camera
                                 .resizable()
                                 .frame(width: 38,height: 38)
@@ -49,13 +63,13 @@ struct EditProfileView: View {
                     Group {
                         EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $userName, keyboardType: .default)
                         EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $email, keyboardType: .emailAddress)
-                        EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $email, keyboardType: .numberPad)
-                        EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $email, keyboardType: .numberPad)
-                        EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $email, keyboardType: .default)
-                        MechanicView()
+                        EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $phoneNumber, keyboardType: .numberPad)
+                        EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $emargeContact, keyboardType: .numberPad)
+                        EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $drivingLicenseNumber, keyboardType: .default)
+                        MechanicView(isOn: $enableMechanic)
                         HStack(spacing: 19) {
                             Button(action: {
-                                
+                                isPresented = false
                             }) {
                                 Text(AppStrings.EditProfile.cancel.uppercased())
                                     .frame(height: 60)
@@ -72,19 +86,34 @@ struct EditProfileView: View {
                             .padding(.bottom, 21)
                             ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
                                 
-                            })
+                            }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber))
                         }
                     }
                     .padding()
                 }
                 .background(AppColor.listGray)
                 .cornerRadius(10)
-                .padding(EdgeInsets(top: 50, leading: 15, bottom: 150, trailing: 15))
+                .padding(EdgeInsets(top: 15, leading: 15, bottom: 150, trailing: 15))
             }
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .background(AppColor.darkgray)
         .padding(.top,30)
+        // TODO: Actual names are not finalized once get the actuall text to display then i will localize this.
+        .confirmationDialog("Select Photo Source", isPresented: $showActionSheet) {
+            Button("Take Photo") {
+                sourceType = .camera
+                isShowingImagePicker = true
+            }
+            Button("Choose from Gallery") {
+                sourceType = .photoLibrary
+                isShowingImagePicker = true
+            }
+            Button(AppStrings.EditProfile.cancel, role: .cancel) {}
+        }
+        .sheet(isPresented: $isShowingImagePicker) {
+            ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
+        }
     }
 }
 
@@ -119,7 +148,7 @@ struct EditProfileFieldView: View {
 }
 
 struct MechanicView: View {
-    @State var isOn: Bool = false
+    @Binding var isOn: Bool
     var body: some View {
         HStack(spacing: 11) {
             AppIcon.Profile.mechanic
@@ -150,8 +179,4 @@ struct MechanicView: View {
         )
         .contentShape(Rectangle())
     }
-}
-
-#Preview {
-    EditProfileView()
 }
