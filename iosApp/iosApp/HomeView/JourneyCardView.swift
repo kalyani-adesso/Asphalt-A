@@ -11,6 +11,7 @@ import Charts
 struct JourneyCardView: View {
     @EnvironmentObject var home: HomeViewModel 
     @State private var selectedOption = "Last 4 months"
+    @State private var currentSlices: [JourneySlice] = []
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -27,9 +28,11 @@ struct JourneyCardView: View {
                                 .stroke(Color.black.opacity(0.10), lineWidth: 1)
                         )
                     Menu {
+                        Button("This month"){selectedOption = "This month"}
+                        Button("Last month") {selectedOption = "Last month"}
                         Button("Last 4 months"){selectedOption = "Last 4 months"}
                         Button("Last 6 months") {selectedOption = "Last 6 months"}
-                        Button("Last 1 year") {selectedOption = "Last 1 year"}
+                        Button("Last year") {selectedOption = "Last year"}
                     } label: {
                         HStack(spacing: 10) {
                             Text(selectedOption)
@@ -42,7 +45,7 @@ struct JourneyCardView: View {
                 }
             }
             VStack {
-                DonutChartView(slices: home.journeySlices)
+                DonutChartView(slices: currentSlices)
                     .frame(width: 190, height: 190)
                 
                 VStack(spacing: 8) {
@@ -67,6 +70,14 @@ struct JourneyCardView: View {
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
         .padding(.top,20)
+        .onAppear {
+                    currentSlices = home.getJourneySlices(for: selectedOption)
+                }
+                .onChange(of: selectedOption) { newValue in
+                    withAnimation {
+                        currentSlices = home.getJourneySlices(for: newValue)
+                    }
+                }
     }
 }
 
@@ -138,7 +149,6 @@ struct DonutChartView: View {
         )
     }
 }
-
 
 #Preview {
     JourneyCardView()

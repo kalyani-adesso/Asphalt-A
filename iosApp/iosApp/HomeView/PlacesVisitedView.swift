@@ -11,6 +11,7 @@ import Charts
 struct PlacesVisitedView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var monthOffset = 0
+    @State private var visiblePlaces: [PlacesMonth] = []
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
@@ -25,7 +26,10 @@ struct PlacesVisitedView: View {
                 Spacer()
                 HStack(spacing: 10) {
                     Button(action: {
-                        withAnimation { monthOffset -= 1 }
+                        withAnimation {
+                            monthOffset -= 1
+                            updateVisiblePlaces()
+                        }
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 14, weight: .bold))
@@ -38,6 +42,7 @@ struct PlacesVisitedView: View {
                         withAnimation {
                             if monthOffset < 0 {
                                 monthOffset += 1
+                                updateVisiblePlaces()
                             }
                         }
                     }) {
@@ -51,7 +56,7 @@ struct PlacesVisitedView: View {
                 }
             }
             Chart {
-                ForEach(home.placesByMonth) { item in
+                ForEach(visiblePlaces) { item in
                     let isSelected = home.selectedMonth?.month == item.month
                     BarMark(
                         x: .value("Month", item.month),
@@ -119,7 +124,27 @@ struct PlacesVisitedView: View {
             .frame(height: 180)
             .padding(.top, 4)
         }
+        .onAppear {
+            updateVisiblePlaces()
+        }
         .padding()
+    }
+    // MARK: - Dynamic chart update Logic
+    private func updateVisiblePlaces() {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        
+        let baseDate = calendar.date(byAdding: .month, value: monthOffset, to: Date()) ?? Date()
+        
+        visiblePlaces = (0..<6).compactMap { i in
+            if let monthDate = calendar.date(byAdding: .month, value: -i, to: baseDate) {
+                let monthName = formatter.string(from: monthDate)
+                let count = home.placesByMonth.first(where: { $0.month == monthName })?.placesCount ?? Int.random(in: 0...8)
+                return PlacesMonth(month: monthName, placesCount: count)
+            }
+            return nil
+        }.reversed()
     }
 }
 
@@ -137,6 +162,7 @@ struct TooltipView: View {
         }
     }
 }
+
 
 
 #Preview {

@@ -8,11 +8,19 @@
 import SwiftUI
 
 struct ActionButtonView: View {
+    @State private var isPresented: Bool = false
+    
     var body: some View {
         HStack(spacing: 12) {
+            
             ButtonView( title: AppStrings.HomeLabel.createRide.rawValue,
                         icon: AppIcon.Home.createRide,
-                        showShadow: false )
+                        showShadow: false , onTap: {
+                    isPresented = true
+                }
+            ).navigationDestination(isPresented: $isPresented, destination: {
+                CreateRideView()
+            })
             
             ButtonView( title: AppStrings.HomeLabel.joinRide.rawValue,
                         icon: AppIcon.Home.group,

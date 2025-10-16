@@ -28,7 +28,7 @@ struct SignUpView: View {
                     label: AppStrings.SignInLabel.emailOrPhone.rawValue,
                     icon: AppIcon.Login.email,
                     placeholder: AppStrings.SignInPlaceholder.email.rawValue,
-                    emailOrPhone: $emailOrPhone,
+                    value: $emailOrPhone,
                     isValidEmail: $isValidEmail
                 )
                 

@@ -24,7 +24,7 @@ struct SignInView: View {
                         label: AppStrings.SignInLabel.emailOrPhone.localized,
                         icon: AppIcon.Login.email,
                         placeholder: AppStrings.SignInPlaceholder.email.localized,
-                        emailOrPhone: $emailOrPhone,
+                        value: $emailOrPhone,
                         isValidEmail: $isValidEmail
                     )
                     PasswordFormField(

@@ -27,4 +27,14 @@ sealed class Carousels(val carouselItem: CarouselItem) {
             R.string.ride_together_safely_desc
         )
     )
+
+    companion object {
+        fun getAllCarousels(): List<CarouselItem> {
+            return listOf(
+                JoyRideCarousel.carouselItem,
+                CommunityFeatureCarousel.carouselItem,
+                RideTogetherCarousel.carouselItem
+            )
+        }
+    }
 }

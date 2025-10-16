@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.TypographyBold
@@ -52,7 +53,7 @@ fun AdventureJourney(
 
     ComposeUtils.CommonContentBox(
         modifier = Modifier.fillMaxWidth(),
-        isBordered = true
+        isBordered = true, radius = Constants.DEFAULT_CORNER_RADIUS
     ) {
         Column(
             modifier = Modifier.padding(

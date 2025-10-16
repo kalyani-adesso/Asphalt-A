@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+     alias(libs.plugins.google.gms.google.services)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
@@ -20,37 +22,33 @@ kotlin {
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Shared"
+            baseName = "shared"
             isStatic = true
         }
     }
 
-//    cocoapods {
-//        version = "1.0"
-//    }
+    cocoapods {
+        summary = "Shared module for Asphalt-A project"
+        homepage = "https://github.com/kalyani-adesso/Asphalt-A"
+        version = "1.0.0"
+        ios.deploymentTarget = "13"
+       name = "shared"
+        val fmodules = listOf("-compiler-option", "-fmodules")
+        pod("FirebaseCore") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseDatabase") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseFirestore") {
+            extraOpts += fmodules
+        }
+        pod("FirebaseAuth") {
+            extraOpts += fmodules
+        }
+    }
 
-//    cocoapods {
-//        // This is the correct place for pod dependencies
-//        summary = "Some description for the Shared Module"
-//        homepage = "https://github.com/kalyani-adesso/Asphalt-A"
-//        version = "1.0"
-//        ios.deploymentTarget = "16.6"
-//
-//        // The 'name' property is now recommended instead of a framework block here.
-//        // It defines the name of the generated Podspec.
-//        name = "Shared"
-//
-//        // Your pod dependencies are correct
-//        pod("FirebaseCore")
-//        pod("FirebaseAuth")
-//        pod("FirebaseDatabase")
-//        pod("FirebaseFirestore")
-//
-//        // REMOVE the incorrect framework block and the specRepos block
-//    }
-    
     sourceSets {
-
         commonMain.dependencies {
             // put your Multiplatform dependencies here
             api(libs.koin.core)
@@ -63,11 +61,11 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
 
+
 //            implementation(libs.firebase.common) // Or latest version
 //            implementation(libs.gitlive.firebase.auth)    // Optional: Firebase Auth
 //            implementation(libs.firebase.firestore) // Optional: Firestore
         }
-
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.client.core)
@@ -77,9 +75,11 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.kotlinx.coroutines.android)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.coroutines)
+            implementation(projects.commonui)
 
             //firebase
           //  implementation(libs.firebase.analytics)
@@ -91,10 +91,8 @@ kotlin {
             implementation(libs.firebase.firestore.ktx)
 
             implementation(libs.datastore)
-            implementation(projects.commonui)
 
         }
-
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.kotlinx.serialization.json)

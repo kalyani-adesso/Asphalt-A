@@ -36,7 +36,7 @@ struct ForgotPassword: View {
                             label: AppStrings.SignInLabel.emailOrPhone.rawValue,
                             icon: AppIcon.Login.email,
                             placeholder: AppStrings.SignInPlaceholder.email.rawValue,
-                            emailOrPhone: $email,
+                            value: $email,
                             isValidEmail: $isValidEmail
                         )
                         
