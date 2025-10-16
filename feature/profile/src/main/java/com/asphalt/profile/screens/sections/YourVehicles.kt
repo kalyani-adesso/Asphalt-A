@@ -113,7 +113,7 @@ fun GarageItem(vehicleData: VehicleData, onDeleteBike: () -> Unit) {
                     }
                     .fillMaxHeight()
             ) {
-                ComposeUtils.ColorIconRounded(VividRed, resId = R.drawable.ic_delete)
+                ComposeUtils.ColorIconRounded(backColor = VividRed, resId = R.drawable.ic_delete)
             }
 
         }
