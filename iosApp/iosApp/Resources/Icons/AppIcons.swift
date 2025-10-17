@@ -105,6 +105,15 @@ struct AppIcon {
         static let facebook = Image("Facebook")
         static let backButton = Image("BackArrow")
     }
+    
+    struct UpcomingRide {
+        static let calender = Image("icon-calender")
+        static let completRide = Image("icon-completeRide")
+        static let upcomingRide = Image("icon-upcomingRide")
+        static let group = Image("icon-group")
+        static let queueRide = Image("icon-queueRide")
+        static let message = Image("icon-message")
+    }
 }
 
 

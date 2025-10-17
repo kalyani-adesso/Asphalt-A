@@ -20,7 +20,7 @@ struct BottomNavBar: View {
                     HomeView()
                         .environmentObject(homeViewModel)
                 case 1:
-                    YourRideScreen()
+                    UpcomingRideView()
                 case 2:
                     NavigationSlideBar()
                 case 3:

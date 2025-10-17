@@ -16,7 +16,7 @@ struct ButtonView: View {
     var borderColor: Color? = nil
     var borderWidth: CGFloat = 1
     var onTap: (() -> Void)? = nil
-    var height: CGFloat? = 60
+    var height: CGFloat? = 50
     var body: some View {
         Button(action: {
             onTap?()
