@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UpcomingRideView: View {
+    @StateObject private var viewModel = UpcomingRideViewModel()
     @State private var selectedStatus: String? = nil
     
     var body: some View {
