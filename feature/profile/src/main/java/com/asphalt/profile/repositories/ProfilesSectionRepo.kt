@@ -1,6 +1,5 @@
 package com.asphalt.profile.repositories
 
-import android.util.Log
 import com.asphalt.profile.data.ProfileData
 import com.asphalt.profile.data.dummyProfiles
 import kotlinx.coroutines.delay
@@ -13,7 +12,8 @@ class ProfilesSectionRepo {
     suspend fun getProfileData(uid: String?) {
         delay(200)
         uid?.let {
-            _profileData.value = dummyProfiles.find { profileData -> profileData.uid == it }
+            _profileData.value =
+                dummyProfiles.find { profileData -> profileData.uid == it } ?: dummyProfiles.first()
         }
 
     }

@@ -20,8 +20,7 @@ sealed class AppNavKey : NavKey {
     @Serializable
     object DashboardNavKey : AppNavKey()
 
-    @Serializable
-    object RidersKey : AppNavKey()
+
     @Serializable
     object QueriesKey : AppNavKey()
 //object QueriesKey : NavKey, BottomNavItems {
@@ -40,7 +39,7 @@ sealed class AppNavKey : NavKey {
 data class BottomNavItems(
     val key: AppNavKey,
     val title: String,
-    val icon: ImageVector
+    val iconRes: Int
 )
 
 

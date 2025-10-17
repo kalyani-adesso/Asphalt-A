@@ -82,6 +82,7 @@
     <string name="start_earning_badges">Start Earning Badges</string>
     <string name="selecting_your_ride">Selecting Your Ride</string>
     <string name="edit_profile">Edit Profile</string>
+    <string name="profile">Profile</string>
     <string name="update_profile_desc">Update your profile information &amp; preferences</string>
     <string name="choose_motorcycle_type">Choose your perfect motorcycle type</string>
     <string name="make">Make</string>
@@ -126,6 +127,8 @@
     <string name="phone_number">Phone Number</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="phone_number_error">Phone number cannot be empty</string>
+    <string name="hello_user">Hello %1$s</string>
+
 
 
 
