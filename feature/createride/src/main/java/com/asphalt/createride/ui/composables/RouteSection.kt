@@ -84,7 +84,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -147,7 +147,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

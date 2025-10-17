@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
+import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
@@ -62,14 +63,14 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         CustomTimePickerDialog(onDismiss = {
             viewModel.showTimePicker(false)
         }, onTimeSelected = { hr, min, isAm ->
-           var time_text = "$hr : $min ${
+            var time_text = "$hr : $min ${
                 if (isAm) {
                     am
                 } else {
                     pm
                 }
             }"
-        viewModel.updateTime(hr,min,isAm,time_text)
+            viewModel.updateTime(hr, min, isAm, time_text)
             viewModel.showTimePicker(false)
         })
     }
@@ -134,7 +135,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                         "Select ride type"
                     },
                     style = Typography.bodyMedium,
-                    color = NeutralDarkGrey,
+                    color = if (!viewModel.rideDetailsState.value.rideType.isNullOrEmpty())NeutralBlackGrey else NeutralDarkGrey  ,
                     modifier = Modifier.padding(start = Dimensions.padding16)
                 )
                 Image(
@@ -190,11 +191,11 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     Text(
                         text = "Enter ride name...",
                         style = Typography.bodyMedium,
-                        color = NeutralDarkGrey,
+                        color =NeutralDarkGrey ,
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -244,11 +245,11 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     Text(
                         text = "Describe the vibe...",
                         style = Typography.bodyMedium,
-                        color = NeutralDarkGrey,
+                        color =if (!viewModel.rideDetailsState.value.description.isNullOrEmpty()) NeutralBlackGrey else NeutralDarkGrey,
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 maxLines = 3,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -311,7 +312,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                             viewModel.rideDetailsState.value.dateString.toString()
                         },
                         style = Typography.bodyMedium,
-                        color = NeutralDarkGrey,
+                        color = if (viewModel.rideDetailsState.value.dateString.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey,
                         modifier = Modifier
                     )
                 }
@@ -353,7 +354,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                             viewModel.rideDetailsState.value.displayTime.toString()
                         },
                         style = Typography.bodyMedium,
-                        color = NeutralDarkGrey,
+                        color = if (viewModel.rideDetailsState.value.displayTime.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey ,
                         modifier = Modifier
                     )
                 }
