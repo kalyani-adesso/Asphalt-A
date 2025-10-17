@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -85,7 +86,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Refreshment to ${viewModel.rideDetailsState.value.endLocation?:""}",
+                            text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation?:""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -141,7 +142,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Date and Time",
+                            text = stringResource(R.string.date_time),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -182,7 +183,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Route",
+                            text = stringResource(R.string.route),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -222,13 +223,13 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Participants",
+                            text = stringResource(R.string.participants),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "${viewModel.ridersList.value.count{it.isSelect}} riders  selected",
+                            text = "${viewModel.ridersList.value.count{it.isSelect}} ${stringResource(R.string.riders_selected)}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )

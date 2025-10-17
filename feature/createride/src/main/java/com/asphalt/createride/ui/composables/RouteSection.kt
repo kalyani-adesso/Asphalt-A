@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
@@ -52,7 +53,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Starting Point",
+            text = stringResource(R.string.starting_point),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -78,7 +79,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 onValueChange = { viewModel.updateStartLocation(it) },
                 placeholder = {
                     Text(
-                        text = "Enter starting location",
+                        text = stringResource(R.string.enter_start_loc),
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
 
@@ -115,7 +116,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Destination",
+            text = stringResource(R.string.destination),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -141,7 +142,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 onValueChange = { viewModel.updateEnLocation(it) },
                 placeholder = {
                     Text(
-                        text = "Enter destination",
+                        text = stringResource(R.string.enter_destination),
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
 
