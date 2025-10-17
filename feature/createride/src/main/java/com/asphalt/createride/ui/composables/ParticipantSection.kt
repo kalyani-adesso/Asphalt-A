@@ -189,7 +189,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                         shape = CircleShape
                                     ),
                                     size = Dimensions.padding40,
-                                    imageUrl = "https://picsum.photos/id/1/200/300"
+                                    imageUrl = ridersList.imgUrl ?: ""
                                 )
                                 Image(
                                     painter = painterResource(R.drawable.ic_online_icon),
