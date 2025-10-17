@@ -92,6 +92,7 @@
     <string name="type_model">Type model..</string>
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
+
     <string name="bike_type_sport_bike">Sport Bike</string>
     <string name="bike_type_naked_bike">Naked Bike</string>
     <string name="bike_type_adventure_bike">Adventure Bike</string>
@@ -130,6 +131,17 @@
     <string name="hello_user">Hello %1$s</string>
 
 
+
+    <string name="solo_ride">Solo Ride</string>
+    <string name="group_ride">Group Ride</string>
+    <string name="open_event">Open Event</string>
+    <string name="ok">OK</string>
+    <string name="select_date">Select date</string>
+    <string name="select_time">Select Time</string>
+    <string name="hours">Hours</string>
+    <string name="min">Min</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
 
 
 
