@@ -1,0 +1,10 @@
+package com.asphalt.android.data
+
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.runtime.Composable
+
+data class AppBarState(
+    val title: String = "",
+    val isCenterAligned: Boolean = true,
+    val actions: @Composable RowScope.() -> Unit = {}
+)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -187,7 +188,7 @@ object ComposeUtils {
     fun SectionSubtitle(
         text: String,
         modifier: Modifier = Modifier,
-        color: Color = NeutralDarkGrey
+        color: Color = NeutralDarkGrey,
     ) {
         Text(
             text = text, style = Typography.bodyMedium,
