@@ -39,9 +39,22 @@ class CreateRideScreenViewModel : ViewModel() {
             _rideDetailsMutableState.value.copy(dateMils = dateInMills, dateString = dateString)
     }
 
-    fun updateTime(hrs: Int?, min: Int?, isAm: Boolean,time_text: String) {
+    fun updateTime(hrs: Int?, min: Int?, isAm: Boolean, time_text: String) {
         _rideDetailsMutableState.value =
-            _rideDetailsMutableState.value.copy(hour = hrs, mins = min, isAm = isAm, displayTime = time_text)
+            _rideDetailsMutableState.value.copy(
+                hour = hrs,
+                mins = min,
+                isAm = isAm,
+                displayTime = time_text
+            )
+    }
+
+    fun updateStartLocation(loc: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(startLocation = loc)
+    }
+
+    fun updateEnLocation(loc: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(endLocation = loc)
     }
 
     fun updateTab(tab: Int) {

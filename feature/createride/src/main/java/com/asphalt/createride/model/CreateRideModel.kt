@@ -9,5 +9,7 @@ data class CreateRideModel(
     var hour: Int? = null,
     var mins: Int? = null,
     var isAm: Boolean = false,
-    var displayTime: String? = null
+    var displayTime: String? = null,
+    var startLocation: String? = null,
+    var endLocation: String? = null
 )

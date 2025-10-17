@@ -39,7 +39,6 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun RouteSection(viewModel: CreateRideScreenViewModel) {
-    var text by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,12 +70,12 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextField(
-                value = if (!text.isEmpty()) {
-                    text
+                value = if (!viewModel.rideDetailsState.value.startLocation.isNullOrEmpty()) {
+                    viewModel.rideDetailsState.value.startLocation.toString()
                 } else {
                     ""
                 },
-                onValueChange = { text = it },
+                onValueChange = { viewModel.updateStartLocation(it) },
                 placeholder = {
                     Text(
                         text = "Enter starting location",
@@ -134,12 +133,12 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextField(
-                value = if (!text.isEmpty()) {
-                    text
+                value = if (!viewModel.rideDetailsState.value.endLocation.isNullOrEmpty()) {
+                    viewModel.rideDetailsState.value.endLocation.toString()
                 } else {
                     ""
                 },
-                onValueChange = { text = it },
+                onValueChange = { viewModel.updateEnLocation(it) },
                 placeholder = {
                     Text(
                         text = "Enter destination",
