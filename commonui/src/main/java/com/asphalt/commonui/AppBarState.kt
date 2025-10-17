@@ -6,5 +6,6 @@ import androidx.compose.runtime.Composable
 data class AppBarState(
     val title: String = "",
     val isCenterAligned: Boolean = true,
-    val actions: @Composable RowScope.() -> Unit = {}
+    val actions: @Composable RowScope.() -> Unit = {},
+    val subtitle: String = "",
 )

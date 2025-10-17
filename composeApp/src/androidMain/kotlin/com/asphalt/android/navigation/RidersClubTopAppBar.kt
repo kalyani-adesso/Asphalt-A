@@ -1,5 +1,9 @@
 package com.asphalt.android.navigation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -12,11 +16,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.ShamrockGreen
+import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.ui.RoundedBox
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -35,7 +46,7 @@ fun RidersClubTopAppBar(
         if (topAppBarState.isCenterAligned)
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NeutralWhite),
-                title = { Text(topAppBarState.title) },
+                title = { CreateTitle(isDashboard, topAppBarState) },
                 navigationIcon = {
                     SetNavIcon(scope, drawerState, onBack, isDashboard)
                 },
@@ -46,7 +57,7 @@ fun RidersClubTopAppBar(
         else
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NeutralWhite),
-                title = { Text(topAppBarState.title) },
+                title = { CreateTitle(isDashboard, topAppBarState) },
                 navigationIcon = {
                     SetNavIcon(scope, drawerState, onBack, isDashboard)
 
@@ -80,4 +91,49 @@ fun SetNavIcon(
         }) {
             Icon(painter = painterResource(R.drawable.ic_arrow_back), contentDescription = "Back")
         }
+}
+
+@Composable
+fun CreateTitle(isDashboard: Boolean, topAppBarState: AppBarState) {
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(
+            Dimensions.padding2
+        )
+    ) {
+        Text(
+            topAppBarState.title,
+            style = TypographyBold.bodyMedium,
+            fontSize = Dimensions.textSize19,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (topAppBarState.subtitle.isNotEmpty())
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(
+                    Dimensions.spacing5
+                )
+            ) {
+                if (isDashboard) {
+
+                    RoundedBox(
+                        modifier = Modifier.size(Dimensions.size4),
+                        backgroundColor = ShamrockGreen,
+                        cornerRadius = Dimensions.size4
+                    ) { }
+                }
+                Text(
+                    topAppBarState.subtitle,
+                    style = Typography.bodyMedium,
+                    fontSize = Dimensions.textSize14,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+    }
+
+
 }

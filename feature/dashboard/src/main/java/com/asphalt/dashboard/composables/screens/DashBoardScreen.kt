@@ -2,9 +2,6 @@ package com.asphalt.dashboard.composables.screens
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,9 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.asphalt.commonui.AppBarState
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
@@ -30,17 +28,23 @@ fun DashBoardScreen(
     upcomingRideClick: () -> Unit,
     androidUserVM: AndroidUserVM = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    notificationsClick:()-> Unit
+    notificationsClick: () -> Unit
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
-    setTopAppBarState(AppBarState(title = currentUser.value?.name.toString(),
-        actions = {
-            IconButton(onClick = {
-                notificationsClick.invoke()
-            }) {
-                Icon(painter = painterResource(R.drawable.ic_notification),null)
-            }
-        }))
+    setTopAppBarState(
+        AppBarState(
+            title = stringResource(
+                R.string.hello_user,
+                currentUser.value?.name.toString()
+            ), subtitle = "Cochin, Infopark",
+            actions = {
+                IconButton(onClick = {
+                    notificationsClick.invoke()
+                }) {
+                    Icon(painter = painterResource(R.drawable.ic_notification), null)
+                }
+            })
+    )
 
 
     ComposeUtils.DefaultColumnRootWithScroll(

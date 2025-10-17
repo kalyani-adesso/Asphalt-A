@@ -127,6 +127,8 @@
     <string name="phone_number">Phone Number</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="phone_number_error">Phone number cannot be empty</string>
+    <string name="hello_user">Hello %1$s</string>
+
 
 
 
