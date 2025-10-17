@@ -64,7 +64,7 @@ fun CreateRideEntry(
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
 
-                ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
+               // ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
                 TabSelection(viewModel)
                 Spacer(Modifier.height(Dimensions.padding20))
                 if (viewModel.tabSelectState.value == Constants.TAB_DETAILS)

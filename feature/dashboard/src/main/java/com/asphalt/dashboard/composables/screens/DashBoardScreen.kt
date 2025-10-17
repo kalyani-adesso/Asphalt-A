@@ -28,7 +28,7 @@ fun DashBoardScreen(
     upcomingRideClick: () -> Unit,
     androidUserVM: AndroidUserVM = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    notificationsClick: () -> Unit
+    notificationsClick: () -> Unit, creatRideClick: () -> Unit
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
     setTopAppBarState(
@@ -54,7 +54,7 @@ fun DashBoardScreen(
     ) {
         Spacer(modifier = Modifier.height(12.dp))
         CreateOrJoinRide({
-            //TODO:Create Ride Navigation
+            creatRideClick.invoke()
         }, {
             //TODO:Join Ride Navigation
         })
