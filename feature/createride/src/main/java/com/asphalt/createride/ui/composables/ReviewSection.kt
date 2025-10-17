@@ -51,7 +51,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Review Your Ride",
+            text = stringResource(R.string.review_ride),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
