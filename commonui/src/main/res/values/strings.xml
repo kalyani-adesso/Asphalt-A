@@ -148,6 +148,16 @@
     <string name="previous">Previous</string>
     <string name="create_rides">Create Ride</string>
     <string name="next">Next</string>
+    <string name="ride_type">Ride Type</string>
+    <string name="select_ride_type">Select ride type</string>
+    <string name="ride_title">Ride Title</string>
+    <string name="enter_ride_name">Enter ride name…</string>
+    <string name="description">Description</string>
+    <string name="describe_vibe">Describe the vibe…</string>
+    <string name="date">Date</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="time">Time</string>
+    <string name="pick_time">Pick Time</string>
 
 
 

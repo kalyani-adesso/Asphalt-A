@@ -98,7 +98,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Ride Type",
+            text = stringResource(R.string.ride_type),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -132,7 +132,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     text = if (!viewModel.rideDetailsState.value.rideType.isNullOrEmpty()) {
                         viewModel.rideDetailsState.value.rideType.toString()
                     } else {
-                        "Select ride type"
+                        stringResource(R.string.select_ride_type)
                     },
                     style = Typography.bodyMedium,
                     color = if (!viewModel.rideDetailsState.value.rideType.isNullOrEmpty())NeutralBlackGrey else NeutralDarkGrey  ,
@@ -163,7 +163,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Ride Title",
+            text = stringResource(R.string.ride_title),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -189,7 +189,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                 onValueChange = { viewModel.updateRiderTitle(it) },
                 placeholder = {
                     Text(
-                        text = "Enter ride name...",
+                        text = stringResource(R.string.enter_ride_name),
                         style = Typography.bodyMedium,
                         color =NeutralDarkGrey ,
 
@@ -218,7 +218,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Description",
+            text = stringResource(R.string.description),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -243,7 +243,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                 onValueChange = { viewModel.updateRiderDesc(it) },
                 placeholder = {
                     Text(
-                        text = "Describe the vibe...",
+                        text = stringResource(R.string.describe_vibe),
                         style = Typography.bodyMedium,
                         color =if (!viewModel.rideDetailsState.value.description.isNullOrEmpty()) NeutralBlackGrey else NeutralDarkGrey,
 
@@ -279,7 +279,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Date",
+                    text = stringResource(R.string.date),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
                     modifier = Modifier.padding(start = Dimensions.padding16)
@@ -307,7 +307,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(Modifier.width(Dimensions.size10))
                     Text(
                         text = if (viewModel.rideDetailsState.value.dateString.isNullOrEmpty()) {
-                            "Pick Date"
+                            stringResource(R.string.pick_date)
                         } else {
                             viewModel.rideDetailsState.value.dateString.toString()
                         },
@@ -320,7 +320,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Time",
+                    text = stringResource(R.string.time),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
                     modifier = Modifier.padding(start = Dimensions.padding16)
@@ -349,7 +349,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(Modifier.width(Dimensions.size10))
                     Text(
                         text = if (viewModel.rideDetailsState.value.displayTime.isNullOrEmpty()) {
-                            "Pick Time"
+                            stringResource(R.string.pick_time)
                         } else {
                             viewModel.rideDetailsState.value.displayTime.toString()
                         },
