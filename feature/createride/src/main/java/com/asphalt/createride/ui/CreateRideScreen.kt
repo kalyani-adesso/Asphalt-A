@@ -45,7 +45,7 @@ import com.asphalt.createride.ui.composables.TabSelection
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
-fun CreateRideEntry(
+fun CreateRideScreen(
     viewModel: CreateRideScreenViewModel = viewModel(),
     setTopAppBarState: (AppBarState) -> Unit
 ) {
@@ -185,7 +185,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
 @Composable
 @Preview
 fun CreateRidePreview() {
-    CreateRideEntry(setTopAppBarState = {})
+    CreateRideScreen(setTopAppBarState = {})
 
 }
 

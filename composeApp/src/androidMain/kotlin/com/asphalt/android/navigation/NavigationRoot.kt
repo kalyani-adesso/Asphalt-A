@@ -27,7 +27,7 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
-import com.asphalt.createride.ui.CreateRideEntry
+import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.login.ui.LoginScreen
@@ -271,7 +271,7 @@ fun NavigationRoot(
                         ProfileScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.CreateRideNav> { key ->
-                        CreateRideEntry(setTopAppBarState=setTopAppBarState)
+                        CreateRideScreen(setTopAppBarState=setTopAppBarState)
                     }
                 }
             )

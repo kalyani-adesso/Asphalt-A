@@ -30,7 +30,7 @@ import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.createride.ui.CreateRideEntry
+
 
 @Composable
 fun ShareSection() {
