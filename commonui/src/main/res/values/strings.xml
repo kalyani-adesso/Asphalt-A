@@ -142,6 +142,12 @@
     <string name="min">Min</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
+    <string name="create_a_ride">Create a Ride</string>
+    <string name="done">Done</string>
+    <string name="next_step">Next Step</string>
+    <string name="previous">Previous</string>
+    <string name="create_rides">Create Ride</string>
+    <string name="next">Next</string>
 
 
 

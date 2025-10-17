@@ -8,12 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -22,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.AppBarState
+import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
@@ -52,8 +51,7 @@ fun CreateRideScreen(
     val scrollState = rememberScrollState()
     setTopAppBarState(
         AppBarState(
-            title = "Create a Ride",
-
+            title = stringResource(R.string.create_a_ride),
             actions = {
                 Text(
                     text = "${viewModel.tabSelectState.value}/5",
@@ -104,8 +102,9 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
             .align(Alignment.BottomCenter)
             .background(color = NeutralWhite)
             .padding(
-                bottom = WindowInsets.navigationBars.asPaddingValues()
-                    .calculateBottomPadding() + Dimensions.spacing20,
+                /*bottom = WindowInsets.navigationBars.asPaddingValues()
+                    .calculateBottomPadding() + Dimensions.spacing20,*/
+                bottom = Dimensions.spacing20,
                 start = Dimensions.padding16,
                 end = Dimensions.padding16
             )
@@ -126,10 +125,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
             ) {
                 ComposeUtils.DefaultButtonContent(
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
-                        "Done".uppercase()
+                        stringResource(R.string.done).uppercase()
 
                     } else {
-                        "Next Step".uppercase()
+                        stringResource(R.string.next_step).uppercase()
                     }
                 )
             }
@@ -152,7 +151,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Previous".uppercase(),
+                            stringResource(R.string.previous).uppercase(),
                             color = PrimaryDarkerLightB75,
                             style = TypographyBold.bodyMedium
                         )
@@ -176,10 +175,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                     ) {
                         Text(
                             if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
-                                "CREATE RIDE".uppercase()
+                                stringResource(R.string.create_rides).uppercase()
 
                             } else {
-                                "Next".uppercase()
+                                stringResource(R.string.next).uppercase()
                             },
                             color = NeutralWhite,
                             style = TypographyBold.bodyMedium
