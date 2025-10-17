@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.AppBarState
-import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
@@ -32,7 +32,7 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryDeepBlue
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.ui.ActionBarWithBack
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
@@ -50,7 +50,18 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    setTopAppBarState(AppBarState(title = "Create a Ride", actions = {}))
+    setTopAppBarState(
+        AppBarState(
+            title = "Create a Ride",
+
+            actions = {
+                Text(
+                    text = "${viewModel.tabSelectState.value}/5",
+                    style = TypographyMedium.bodyMedium
+                )
+                Spacer(Modifier.width(Dimensions.size4))
+            }
+        ))
     AsphaltTheme {
         Box(
             modifier = Modifier
@@ -64,7 +75,7 @@ fun CreateRideScreen(
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
 
-               // ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
+                // ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
                 TabSelection(viewModel)
                 Spacer(Modifier.height(Dimensions.padding20))
                 if (viewModel.tabSelectState.value == Constants.TAB_DETAILS)
