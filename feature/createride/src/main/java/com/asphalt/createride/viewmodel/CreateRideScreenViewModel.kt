@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.createride.model.CreateRideModel
+
 import com.asphalt.createride.model.RideType
 
 class CreateRideScreenViewModel : ViewModel() {
@@ -15,6 +17,32 @@ class CreateRideScreenViewModel : ViewModel() {
     val show_datePicker = mutableStateOf(false)
 
     val show_timePicker = mutableStateOf(false)
+
+    private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
+    val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
+
+    fun updateRiderType(type: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(rideType = type)
+    }
+
+    fun updateRiderTitle(title: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(rideTitle = title)
+    }
+
+    fun updateRiderDesc(decs: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(description = decs)
+    }
+
+    fun updateDate(dateInMills: Long?, dateString: String) {
+
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(dateMils = dateInMills, dateString = dateString)
+    }
+
+    fun updateTime(hrs: Int?, min: Int?, isAm: Boolean,time_text: String) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(hour = hrs, mins = min, isAm = isAm, displayTime = time_text)
+    }
 
     fun updateTab(tab: Int) {
 
@@ -28,6 +56,7 @@ class CreateRideScreenViewModel : ViewModel() {
     fun showTimePicker(isShow: Boolean) {
         show_timePicker.value = isShow
     }
+
 
     fun getRideType(context: Context): ArrayList<RideType> {
         var type =

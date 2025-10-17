@@ -1,6 +1,5 @@
 package com.asphalt.createride.ui.composables
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,8 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -38,51 +35,41 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.LightGray28
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.util.CustomTimePickerDialog
 import com.asphalt.commonui.util.DatePickerSample
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
-import java.util.Calendar
 
 @Composable
 fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     var context = LocalContext.current
 
-    var rideTtle by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("") }
-    var descrip by remember { mutableStateOf("") }
-    var datepicker by remember { mutableStateOf("") }
-    var time_picker by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var anchorWidth by remember { mutableStateOf(0) }
     val rideType = viewModel.getRideType(context)
-    val am=stringResource(R.string.am)
-    val pm=stringResource(R.string.pm)
+    val am = stringResource(R.string.am)
+    val pm = stringResource(R.string.pm)
     if (viewModel.show_timePicker.value) {
         CustomTimePickerDialog(onDismiss = {
             viewModel.showTimePicker(false)
-        }, onTimeSelected = { hr, min, p ->
-
-            time_picker = "$hr : $min ${
-                if (p) {
+        }, onTimeSelected = { hr, min, isAm ->
+           var time_text = "$hr : $min ${
+                if (isAm) {
                     am
                 } else {
-                   pm
+                    pm
                 }
             }"
+        viewModel.updateTime(hr,min,isAm,time_text)
             viewModel.showTimePicker(false)
         })
     }
@@ -91,7 +78,8 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         DatePickerSample(onCancel = {
             viewModel.showDatePicker(false)
         }, onOkClick = { timeMils ->
-            datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
+            viewModel.updateDate(timeMils, Utils.convertMillisToFormattedDate(timeMils))
+            //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
             viewModel.showDatePicker(false)
         })
     }
@@ -140,8 +128,8 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = if (!type.isEmpty()) {
-                        type
+                    text = if (!viewModel.rideDetailsState.value.rideType.isNullOrEmpty()) {
+                        viewModel.rideDetailsState.value.rideType.toString()
                     } else {
                         "Select ride type"
                     },
@@ -166,7 +154,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     DropdownMenuItem(
                         text = { Text(option.rideType, style = Typography.bodySmall) },
                         onClick = {
-                            type = option.rideType
+                            viewModel.updateRiderType(option.rideType)
                             expanded = false
                         })
                 }
@@ -192,12 +180,12 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextField(
-                value = if (!rideTtle.isEmpty()) {
-                    rideTtle
+                value = if (!viewModel.rideDetailsState.value.rideTitle.isNullOrEmpty()) {
+                    viewModel.rideDetailsState.value.rideTitle.toString()
                 } else {
                     ""
                 },
-                onValueChange = { rideTtle = it },
+                onValueChange = { viewModel.updateRiderTitle(it) },
                 placeholder = {
                     Text(
                         text = "Enter ride name...",
@@ -246,12 +234,12 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextField(
-                value = if (!descrip.isEmpty()) {
-                    descrip
+                value = if (!viewModel.rideDetailsState.value.description.isNullOrEmpty()) {
+                    viewModel.rideDetailsState.value.description.toString()
                 } else {
                     ""
                 },
-                onValueChange = { descrip = it },
+                onValueChange = { viewModel.updateRiderDesc(it) },
                 placeholder = {
                     Text(
                         text = "Describe the vibe...",
@@ -317,10 +305,10 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     )
                     Spacer(Modifier.width(Dimensions.size10))
                     Text(
-                        text = if (datepicker.isEmpty()) {
+                        text = if (viewModel.rideDetailsState.value.dateString.isNullOrEmpty()) {
                             "Pick Date"
                         } else {
-                            datepicker
+                            viewModel.rideDetailsState.value.dateString.toString()
                         },
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
@@ -359,10 +347,10 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     )
                     Spacer(Modifier.width(Dimensions.size10))
                     Text(
-                        text = if (time_picker.isEmpty()) {
+                        text = if (viewModel.rideDetailsState.value.displayTime.isNullOrEmpty()) {
                             "Pick Time"
                         } else {
-                            time_picker
+                            viewModel.rideDetailsState.value.displayTime.toString()
                         },
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
