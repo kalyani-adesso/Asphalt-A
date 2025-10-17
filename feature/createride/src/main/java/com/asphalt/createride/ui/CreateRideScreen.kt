@@ -72,7 +72,7 @@ fun CreateRideEntry(
                 if (viewModel.tabSelectState.value == Constants.TAB_ROUTE)
                     RouteSection(viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_REVIEW)
-                    ReviewSection()
+                    ReviewSection(viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT)
                     ParticipantSection(mod = Modifier.weight(1f), viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_SHARE)

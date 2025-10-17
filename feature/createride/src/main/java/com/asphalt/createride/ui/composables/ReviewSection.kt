@@ -36,7 +36,7 @@ import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
-fun ReviewSection() {
+fun ReviewSection(viewModel: CreateRideScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,13 +79,13 @@ fun ReviewSection() {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Weekend Ride",
+                            text = viewModel.rideDetailsState.value.rideTitle ?: "",
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Refreshment to  Munnar",
+                            text = "Refreshment to ${viewModel.rideDetailsState.value.endLocation?:""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -108,7 +108,7 @@ fun ReviewSection() {
 
                 ) {
                     Text(
-                        text = "Group ride".uppercase(),
+                        text = viewModel.rideDetailsState.value.rideType?.uppercase() ?: "",
                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                         color = GreenLIGHT25,
                         modifier = Modifier
@@ -147,7 +147,7 @@ fun ReviewSection() {
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Sun, Oct 21 - 09:00 AM",
+                            text = viewModel.rideDetailsState.value.dateString ?: "",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -188,7 +188,7 @@ fun ReviewSection() {
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Kochi - Munnarr",
+                            text = "${viewModel.rideDetailsState.value.startLocation ?: ""} - ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -228,7 +228,7 @@ fun ReviewSection() {
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "3 riders  selected",
+                            text = "${viewModel.ridersList.value.count{it.isSelect}} riders  selected",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -246,6 +246,6 @@ fun ReviewSection() {
 @Preview
 @Composable
 fun ReviewPreview() {
-    //var vimodel: CreateRideScreenViewModel = viewModel()
-    ReviewSection()
+    var vimodel: CreateRideScreenViewModel = viewModel()
+    ReviewSection(vimodel)
 }
