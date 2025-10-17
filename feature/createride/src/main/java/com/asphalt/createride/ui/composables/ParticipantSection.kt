@@ -3,6 +3,7 @@ package com.asphalt.createride.ui.composables
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -147,7 +149,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                 }
             }
         }
-        items(5) { it ->
+        items(viewmodel.ridersList.value) { ridersList ->
             Spacer(Modifier.height(Dimensions.padding10))
             Card(
                 modifier = Modifier
@@ -196,11 +198,11 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             Spacer(Modifier.width(Dimensions.size5))
                             Column(modifier = Modifier) {
                                 Row() {
-                                    val originalText = "Sooraj Rajaneeeeeeeeee"
+                                    val originalText = ridersList.name
                                     val maxLength = 20
 
                                     Text(
-                                        text = originalText.take(maxLength),
+                                        text = originalText?.take(maxLength) ?: "",
                                         style = TypographyBold.bodySmall,
                                         color = NeutralBlack,
                                         maxLines = 1,
@@ -231,7 +233,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                         )
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
-                                            text = "Mechanic",
+                                            text = ridersList.job ?: "",
                                             style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                             color = NeutralBlack,
                                             modifier = Modifier,
@@ -251,7 +253,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                     )
                                     Spacer(Modifier.width(Dimensions.size4))
                                     Text(
-                                        text = "Harley Davidson 750",
+                                        text = ridersList.bike ?: "",
                                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                         color = NeutralDarkGrey,
                                         modifier = Modifier,
@@ -261,8 +263,15 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             }
                         }
                         Image(
-                            painter = painterResource(R.drawable.ic_radio_btn_back_gray),
-                            contentDescription = ""
+                            painter = if (ridersList.isSelect) {
+                                painterResource(R.drawable.ic_radio_back_blue)
+                            } else {
+                                painterResource(R.drawable.ic_radio_btn_back_gray)
+
+                            },
+                            contentDescription = "", modifier = Modifier.clickable {
+                                viewmodel.updateUerList(!ridersList.isSelect, ridersList.id)
+                            }
                         )
                     }
                 }
@@ -277,5 +286,5 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
 @Composable
 fun Participantreview() {
     var vimodel: CreateRideScreenViewModel = viewModel()
-    ParticipantSection(mod = Modifier,vimodel)
+    ParticipantSection(mod = Modifier, vimodel)
 }

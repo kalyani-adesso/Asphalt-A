@@ -22,6 +22,10 @@ class CreateRideScreenViewModel : ViewModel() {
     private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
     val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
 
+    private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
+        mutableStateOf(getUsers())
+    val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
+
     fun updateRiderType(type: String) {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(rideType = type)
     }
@@ -82,16 +86,74 @@ class CreateRideScreenViewModel : ViewModel() {
         return type
     }
 
-    fun getUsers() {
+    fun updateUerList(isSelcted: Boolean, id: Int?) {
+        _ridersListMutable.value = ArrayList(_ridersListMutable.value.map { ride ->
+            if (ride.id == id) {
+                ride.copy(isSelect = isSelcted)
+            } else {
+                ride
+            }
+        })
+        // _ridersListMutable.value = _rideDetailsMutableState.value.map { ride -> if (ride) }
+
+
+    }
+
+    fun getUsers(): ArrayList<RidersList> {
         var list = arrayListOf(
 
-            RidersList(id = 1, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 2, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 3, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 4, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 5, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 6, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 7, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false)
+            RidersList(
+                id = 1,
+                name = "Harikumar S",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 2,
+                name = "Sreedev",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 3,
+                name = "Vyshak ",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 4,
+                name = "Jerin John",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 5,
+                name = "Vipin Raj",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 6,
+                name = "Pramod Selvaraj",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            ),
+            RidersList(
+                id = 7,
+                name = "Vinu V John",
+                job = "Software Engineer",
+                bike = "Unicorn",
+                isSelect = false
+            )
         )
+        return list;
+        //_ridersListMutable.value = list
     }
+
 }
