@@ -24,7 +24,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
-import com.asphalt.android.data.AppBarState
+import com.asphalt.commonui.AppBarState
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.R
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
@@ -263,7 +263,7 @@ fun NavigationRoot(
                     entry<AppNavKey.QueriesKey> { key ->
                     }
                     entry<AppNavKey.ProfileKey> { key ->
-                        ProfileScreen()
+                        ProfileScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
             )

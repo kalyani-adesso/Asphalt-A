@@ -1,4 +1,4 @@
-package com.asphalt.android.data
+package com.asphalt.commonui
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable

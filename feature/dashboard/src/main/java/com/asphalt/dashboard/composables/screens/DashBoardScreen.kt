@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,8 +13,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.asphalt.android.data.AppBarState
+import com.asphalt.commonui.AppBarState
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.R
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
 import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
@@ -36,7 +38,7 @@ fun DashBoardScreen(
             IconButton(onClick = {
                 notificationsClick.invoke()
             }) {
-                Icon(Icons.Default.Notifications,null)
+                Icon(painter = painterResource(R.drawable.ic_notification),null)
             }
         }))
 
