@@ -158,6 +158,9 @@
     <string name="pick_date">Pick Date</string>
     <string name="time">Time</string>
     <string name="pick_time">Pick Time</string>
+    <string name="invites_contact">Invite Contacts</string>
+    <string name="_selected">selected</string>
+    <string name="_search_name_number">Search by name ,number or bike type…</string>
 
 
 

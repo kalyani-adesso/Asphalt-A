@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,9 +87,10 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
 
                     ) {
-                    Text("Invite Contacts", style = TypographyMedium.bodyMedium)
                     Text(
-                        "${viewmodel.selectedUserCount.value} selected",
+                        stringResource(R.string.invites_contact), style = TypographyMedium.bodyMedium)
+                    Text(
+                        "${viewmodel.selectedUserCount.value} ${stringResource(R.string._selected)}",
                         style = TypographyMedium.bodySmall,
                         color = NeutralDarkGrey
                     )
@@ -115,7 +117,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                         onValueChange = { text = it },
                         placeholder = {
                             Text(
-                                text = "Search by name ,number or bike type...",
+                                text = stringResource(R.string._search_name_number),
                                 style = Typography.bodyMedium,
                                 color = NeutralDarkGrey,
 
