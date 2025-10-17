@@ -1,8 +1,6 @@
 package com.asphalt.createride.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -12,67 +10,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
-import com.asphalt.commonui.theme.BlueLight
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.GrayLight10
-import com.asphalt.commonui.theme.GreenLIGHT
-import com.asphalt.commonui.theme.GreenLIGHT10
-import com.asphalt.commonui.theme.GreenLIGHT25
-import com.asphalt.commonui.theme.MagentaDeep
-import com.asphalt.commonui.theme.NeutralBlack
-import com.asphalt.commonui.theme.NeutralDarkGrey
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.OrangeLight
-import com.asphalt.commonui.theme.OrangeLight10
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryDeepBlue
-import com.asphalt.commonui.theme.REDLIGHT
-import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.ActionBarWithBack
 import com.asphalt.commonui.ui.BorderedButton
-import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.createride.ui.composables.DetailsSection
@@ -84,8 +45,12 @@ import com.asphalt.createride.ui.composables.TabSelection
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
-fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
+fun CreateRideEntry(
+    viewModel: CreateRideScreenViewModel = viewModel(),
+    setTopAppBarState: (AppBarState) -> Unit
+) {
     val scrollState = rememberScrollState()
+    setTopAppBarState(AppBarState(title = "Create a Ride", actions = {}))
     AsphaltTheme {
         Box(
             modifier = Modifier
@@ -109,7 +74,7 @@ fun CreateRideEntry(viewModel: CreateRideScreenViewModel = viewModel()) {
                 if (viewModel.tabSelectState.value == Constants.TAB_REVIEW)
                     ReviewSection()
                 if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT)
-                    ParticipantSection(mod = Modifier.weight(1f),viewModel)
+                    ParticipantSection(mod = Modifier.weight(1f), viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
                     ShareSection()
             }
@@ -217,15 +182,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
 }
 
 
-
-
-
-
-
 @Composable
 @Preview
 fun CreateRidePreview() {
-    CreateRideEntry()
+    CreateRideEntry(setTopAppBarState = {})
 
 }
 

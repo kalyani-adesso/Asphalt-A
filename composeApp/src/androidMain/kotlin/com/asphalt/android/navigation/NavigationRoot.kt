@@ -24,8 +24,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
-import com.asphalt.commonui.AppBarState
 import com.asphalt.android.navigation.AppNavKey.SplashKey
+import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.createride.ui.CreateRideEntry
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
@@ -60,7 +60,8 @@ fun NavigationRoot(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
-        AppNavKey.ProfileKey
+        AppNavKey.ProfileKey,
+        AppNavKey.CreateRideNav
 
     )
 
@@ -192,7 +193,8 @@ fun NavigationRoot(
                         NavigationSplashScreen(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
-                                backStack.add(AppNavKey.LoginScreenNavKey)
+                                //backStack.add(AppNavKey.LoginScreenNavKey)
+                                backStack.add(AppNavKey.CreateRideNav)
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -267,7 +269,7 @@ fun NavigationRoot(
                         ProfileScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.CreateRideNav> { key ->
-                        CreateRideEntry()
+                        CreateRideEntry(setTopAppBarState=setTopAppBarState)
                     }
                 }
             )
