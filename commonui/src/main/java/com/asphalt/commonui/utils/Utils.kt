@@ -13,6 +13,15 @@ object Utils {
         return month to year
     }
 
+    fun getMonthAbbr(calendar: Calendar): String {
+        val shortMonthList = listOf(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        )
+
+        return shortMonthList[calendar.get(Calendar.MONTH)]
+    }
+
 
     fun isBeforeCurrentMonthAndYear(givenCalendar: Calendar): Boolean {
         val current = Calendar.getInstance()
