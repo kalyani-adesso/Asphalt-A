@@ -53,7 +53,7 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
-fun ParticipantSection(mod: Modifier) {
+fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
     var text by remember { mutableStateOf("") }
 
     LazyColumn(
@@ -277,5 +277,5 @@ fun ParticipantSection(mod: Modifier) {
 @Composable
 fun Participantreview() {
     var vimodel: CreateRideScreenViewModel = viewModel()
-    ParticipantSection(mod= Modifier)
+    ParticipantSection(mod = Modifier,vimodel)
 }

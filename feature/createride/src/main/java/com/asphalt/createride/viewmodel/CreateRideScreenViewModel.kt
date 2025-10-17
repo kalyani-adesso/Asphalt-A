@@ -10,6 +10,7 @@ import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
 
 import com.asphalt.createride.model.RideType
+import com.asphalt.createride.model.RidersList
 
 class CreateRideScreenViewModel : ViewModel() {
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
@@ -79,5 +80,18 @@ class CreateRideScreenViewModel : ViewModel() {
                 RideType(Constants.OPEN_EVENT, context.getString(R.string.open_event))
             )
         return type
+    }
+
+    fun getUsers() {
+        var list = arrayListOf(
+
+            RidersList(id = 1, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 2, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 3, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 4, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 5, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 6, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
+            RidersList(id = 7, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false)
+        )
     }
 }
