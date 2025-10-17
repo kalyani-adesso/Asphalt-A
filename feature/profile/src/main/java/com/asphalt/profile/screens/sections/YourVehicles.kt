@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -139,8 +140,8 @@ fun YourGarage(
                 yourVehiclesList.size
             )
         )
-        LazyColumn(modifier = Modifier.heightIn(max = Dimensions.size220)) {
-            items(yourVehiclesList) {
+        Column (modifier = Modifier.wrapContentHeight()) {
+            yourVehiclesList.forEach {
                 GarageItem(it, onDeleteBike = { onDeleteBike(it) })
                 Spacer(Modifier.height(Dimensions.spacing15))
             }

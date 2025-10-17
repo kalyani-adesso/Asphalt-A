@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -50,7 +51,6 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
-import com.asphalt.commonui.ui.ActionBarWithBack
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
@@ -59,11 +59,12 @@ import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.YourRideDataModel
-import com.asphalt.dashboard.viewmodel.RidesScreenViewModel
+import com.asphalt.dashboard.viewmodels.RidesScreenViewModel
 
 @Composable
-fun RidesScreen() {
+fun RidesScreen(setTopAppBarState: (AppBarState) -> Unit) {
     val ridesScreenViewModel: RidesScreenViewModel = viewModel()
+    setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
         ridesScreenViewModel.getRides()
     }
@@ -73,9 +74,9 @@ fun RidesScreen() {
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            ActionBarWithBack(R.drawable.ic_arrow_back, stringResource(R.string.your_rides)) {
-                // Handle back press
-            }
+//            ActionBarWithBack(R.drawable.ic_arrow_back, stringResource(R.string.your_rides)) {
+//                // Handle back press
+//            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -650,5 +651,5 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
 @Preview
 @Composable
 fun RidesPreview() {
-    RidesScreen()
+    RidesScreen({})
 }

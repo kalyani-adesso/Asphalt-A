@@ -77,6 +77,7 @@ object Dimensions {
     val size2pt5 = 2.5.dp
     val size1pt5 = 1.5.dp
     val size12pt83 = 12.83.dp
+    val size12pt5 = 12.5.dp
     val size9pt33 = 9.33.dp
     val size4 = 4.dp
     val size5 = 5.dp

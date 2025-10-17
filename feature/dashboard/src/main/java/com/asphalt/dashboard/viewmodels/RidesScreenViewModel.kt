@@ -1,4 +1,4 @@
-package com.asphalt.dashboard.viewmodel
+package com.asphalt.dashboard.viewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State

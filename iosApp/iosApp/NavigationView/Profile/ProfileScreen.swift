@@ -15,21 +15,16 @@ struct ProfileScreen: View {
         ZStack {
             List {
                 Section {
-                    ProfileHeaderView(
-                        name: viewModel.profileName,
-                        bike: viewModel.bikeType,
-                        role: viewModel.role,
-                        image: viewModel.profileImage
-                    )
-                    .frame(height: 135)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                    .padding([.leading, .trailing])
+                    ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
+                        .frame(height: 135)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppColor.listGray)
+                        )
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .padding([.leading, .trailing])
                 }
                 ForEach(viewModel.sections) { section in
                     ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
@@ -312,9 +307,10 @@ struct ProfileTitleView:View {
 
 struct ProfileHeaderView: View {
     let name: String
-    let bike: String
+    let email: String
     let role: String
     let image: Image
+    let phoneNumber: String
     
     var body: some View {
         HStack(spacing: 20) {
@@ -328,20 +324,37 @@ struct ProfileHeaderView: View {
                 Text(name)
                     .font(KlavikaFont.bold.font(size: 19))
                     .foregroundColor(AppColor.black)
-                Text(bike)
+                Text(email)
                     .font(KlavikaFont.regular.font(size: 16))
                     .foregroundColor(AppColor.black)
                 HStack {
-                    AppIcon.NavigationSlider.repair
-                        .frame(width: 16, height: 16)
-                    Text(role)
-                        .font(KlavikaFont.regular.font(size: 12))
+                    if !role.isEmpty {
+                        HStack {
+                            AppIcon.NavigationSlider.repair
+                                .frame(width: 16, height: 16)
+                            Text(role)
+                                .font(KlavikaFont.regular.font(size: 12))
+                        }
+                        .frame(height: 24)
+                        .padding([.leading,.trailing],8)
+                        .padding([.top, .bottom], 5)
+                        .background(AppColor.white)
+                        .cornerRadius(5)
+                    }
+                 
+                    HStack {
+                        AppIcon.NavigationSlider.call
+                            .frame(width: 16, height: 16)
+                        Text(phoneNumber)
+                            .font(KlavikaFont.regular.font(size: 12))
+                    }
+                    .frame(height: 24)
+                    .padding([.leading,.trailing],8)
+                    .padding([.top, .bottom], 5)
+                    .background(AppColor.white)
+                    .cornerRadius(5)
                 }
-                .frame(height: 24)
-                .padding([.leading,.trailing],8)
-                .padding([.top, .bottom], 5)
-                .background(AppColor.white)
-                .cornerRadius(5)
+                
             }
             Spacer()
         }

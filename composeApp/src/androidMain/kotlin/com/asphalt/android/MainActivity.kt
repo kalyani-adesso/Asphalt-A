@@ -4,18 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.asphalt.android.navigation.NavigationRoot
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -29,39 +21,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AsphaltTheme {
-
-                Surface(
-                    modifier = Modifier
-                ) {
+                Surface {
                     NavigationRoot()
 //                    ProfileScreen()
                 }
             }
-//            AsphaltTheme {
-//              //  AsphaltApp()
-//              //  RegistrationCodeScreen()
-//
-//            }
-        }
-    }
-}
-
-@Composable
-fun StartScreen(
-    navigateOnRegistrationClick: () -> Unit,
-    navigateOnRegistrationPasswordClick: () -> Unit,
-    navigateOnButtonWelcomeClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
-    ) {
-
-        Button(onClick = navigateOnButtonWelcomeClick) {
-            Text(text = "Get Started")
         }
     }
 }
@@ -69,7 +33,6 @@ fun StartScreen(
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    //App()
     AsphaltTheme {
         // AsphaltApp()
         NavigationRoot()
