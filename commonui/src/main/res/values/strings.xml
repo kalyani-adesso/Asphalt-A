@@ -170,6 +170,12 @@
     <string name="enter_start_loc">Enter starting location</string>
     <string name="destination">Destination</string>
     <string name="enter_destination">Enter destination</string>
+    <string name="ride_created">Ride Created!</string>
+    <string name="share_with_friends">Share your ride with friends</string>
+    <string name="share_link">Share Link</string>
+    <string name="share_via">Share Via</string>
+    <string name="details">Details</string>
+    <string name="review">Review</string>
 
 
 
