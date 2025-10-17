@@ -94,7 +94,11 @@ dependencies {
     implementation(projects.feature.dashboard)
     implementation(projects.feature.profile)
     implementation(projects.commonui)
+
     implementation(projects.feature.joinride)
+
+    implementation(projects.feature.createride)
+
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen

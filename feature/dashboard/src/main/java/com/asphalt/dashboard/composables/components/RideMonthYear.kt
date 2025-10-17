@@ -32,7 +32,7 @@ fun RideMonthYear(viewModel: PerMonthRideStatsViewModel) {
     Column(
         modifier = Modifier
             .height(Dimensions.size115)
-            .width(Dimensions.spacing32),
+            .width(Dimensions.padding33),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -46,17 +46,17 @@ fun RideMonthYear(viewModel: PerMonthRideStatsViewModel) {
         Spacer(modifier = Modifier.height(Dimensions.spacing15pt7))
 
         Text(
-            text = DateFormatSymbols().shortMonths[calendar.value.get(Calendar.MONTH)],
+            text = Utils.getMonthAbbr(calendar.value),
             style = TypographyMedium.bodyLarge,
             fontWeight = FontWeight.Medium,
-            fontSize = Dimensions.textSize18
+            fontSize = Dimensions.textSize17
         )
         Spacer(modifier = Modifier.height(Dimensions.spacing5))
 
         Text(
             text = (calendar.value.get(Calendar.YEAR) % 100).toString(),
             style = TypographyBold.headlineLarge,
-            fontSize = Dimensions.textSize30,
+            fontSize = Dimensions.textSize28,
         )
 
         val arrowIcon: Int =
