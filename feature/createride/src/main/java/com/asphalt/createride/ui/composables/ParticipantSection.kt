@@ -87,7 +87,11 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
 
                     ) {
                     Text("Invite Contacts", style = TypographyMedium.bodyMedium)
-                    Text("0 selected", style = TypographyMedium.bodySmall, color = NeutralDarkGrey)
+                    Text(
+                        "${viewmodel.selectedUserCount.value} selected",
+                        style = TypographyMedium.bodySmall,
+                        color = NeutralDarkGrey
+                    )
                 }
                 Spacer(Modifier.height(Dimensions.padding8))
                 Row(
@@ -271,6 +275,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             },
                             contentDescription = "", modifier = Modifier.clickable {
                                 viewmodel.updateUerList(!ridersList.isSelect, ridersList.id)
+                                viewmodel.getUserCount()
                             }
                         )
                     }

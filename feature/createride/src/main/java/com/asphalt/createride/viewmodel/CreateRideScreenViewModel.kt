@@ -26,6 +26,12 @@ class CreateRideScreenViewModel : ViewModel() {
         mutableStateOf(getUsers())
     val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
 
+    val selectedUserCount = mutableStateOf(0)
+
+    fun getUserCount() {
+        selectedUserCount.value = _ridersListMutable.value.count { it.isSelect }
+    }
+
     fun updateRiderType(type: String) {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(rideType = type)
     }
@@ -98,6 +104,7 @@ class CreateRideScreenViewModel : ViewModel() {
 
 
     }
+
 
     fun getUsers(): ArrayList<RidersList> {
         var list = arrayListOf(
