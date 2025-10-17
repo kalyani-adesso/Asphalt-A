@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
-    namespace = "com.asphalt.profile"
+    namespace = "com.asphalt.joinride"
     compileSdk = 36
 
     defaultConfig {
@@ -32,9 +30,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.commonui)
-    implementation(projects.shared)
 
+    implementation(projects.commonui)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -42,20 +39,30 @@ dependencies {
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Compose
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
-    debugImplementation(libs.compose.ui.tooling)
-
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
-    implementation(libs.koin.compose.androidx)
 
+    // Compose
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.androidx.material.icons.extended.android)
     implementation(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.firebase.firestore.ktx)
+
+    // Navigation
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
 }
