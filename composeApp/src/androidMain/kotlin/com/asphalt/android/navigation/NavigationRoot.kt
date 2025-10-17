@@ -45,7 +45,7 @@ import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.SplashKey)
+    val backStack = rememberNavBackStack(AppNavKey.DashboardNavKey)
 
 //    var showAppBars by remember { mutableStateOf(false) }
 //    var navigationDrawer by remember { mutableStateOf(false) }
