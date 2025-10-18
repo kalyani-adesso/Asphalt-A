@@ -58,6 +58,57 @@ object Utils {
         }
     }
 
+    fun formatRelativeTime(pastTimestamp: String): String {
+        return try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            val pastDate = dateFormat.parse(pastTimestamp)
+
+            val now = Date()
+            val diff = now.time - pastDate!!.time
+
+            if (diff < 0) return SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(
+                pastDate
+            )
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val days = TimeUnit.MILLISECONDS.toDays(diff)
+
+            val weeks = days / 7
+            val months = days / 30 // Approximate month length
+            val years = days / 365 // Approximate year length
+
+
+            return when {
+                seconds < 60 -> formatUnit(seconds, "second")
+                minutes < 60 -> formatUnit(minutes, "minute")
+                hours < 24 -> formatUnit(hours, "hour")
+                days < 7 -> formatUnit(days, "day")
+                weeks < 4 -> formatUnit(weeks, "week")
+
+                months < 1 -> formatUnit(weeks, "week")
+                months < 12 -> formatUnit(months, "month")
+
+                years < 10 -> formatUnit(years, "year")
+                else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(pastDate)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            pastTimestamp
+        }
+    }
+
+    private fun formatUnit(value: Long, unit: String): String {
+        return if (value == 1L) {
+            "$value $unit ago" // Singular: "1 day ago"
+        } else {
+            "$value ${unit}s ago" // Plural: "2 days ago"
+        }
+    }
     fun nextMultipleOfFive(value: Int): Int {
         val remainder = value % 5
         return (5 - remainder) % 5
