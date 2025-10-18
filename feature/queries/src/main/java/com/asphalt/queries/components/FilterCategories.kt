@@ -11,7 +11,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralWhite
@@ -32,17 +34,17 @@ fun FilterCategories(selectedCategory: MutableIntState) {
                 .wrapContentWidth()
         ) {
             LazyRow(
-                modifier = Modifier.padding(vertical = 21.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier.padding(vertical = Dimensions.padding21),
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.size10)
             ) {
-                item { Spacer(Modifier.width(10.dp)) }
+                item { Spacer(Modifier.width(Dimensions.size10)) }
                 item {
-                    CategorySelector(selectedCategory, "All", CATEGORY_ALL_ID)
+                    CategorySelector(selectedCategory, stringResource(R.string.all), CATEGORY_ALL_ID)
                 }
                 items(Categories.getAllCategories()) {
                     CategorySelector(selectedCategory, it.name, it.id)
                 }
-                item { Spacer(Modifier.width(10.dp)) }
+                item { Spacer(Modifier.width(Dimensions.size10)) }
 
             }
 

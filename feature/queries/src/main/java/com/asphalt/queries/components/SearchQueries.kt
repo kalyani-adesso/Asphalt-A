@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
@@ -39,12 +40,11 @@ fun SearchQueries() {
             isActive = true
         },
         placeHolderText =
-            "Search Questions",
+            stringResource(R.string.search_qns),
         backColor = NeutralLightPaper,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
             onSearch = {
-                println("Custom Search Submitted: $searchText")
                 isActive = false
                 keyboardController?.hide()
                 focusManager.clearFocus()

@@ -14,6 +14,7 @@
     <string name="join_ride">Join a Ride</string>
     <string name="upcoming_ride">Upcoming Ride</string>
     <string name="view_all">View All</string>
+    <string name="all">All</string>
     <string name="adventure">Adventure</string>
     <string name="journey">Journey</string>
     <string name="total_rides_info_chart">Total %1$d Rides</string>
@@ -134,6 +135,7 @@
     <string name="answered">Answered</string>
     <string name="answer">Answer</string>
     <string name="mechanic">Mechanic</string>
+    <string name="search_qns">Search Questions</string>
 
 
 
