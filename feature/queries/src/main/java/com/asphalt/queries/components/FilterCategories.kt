@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -39,7 +38,11 @@ fun FilterCategories(selectedCategory: MutableIntState) {
             ) {
                 item { Spacer(Modifier.width(Dimensions.size10)) }
                 item {
-                    CategorySelector(selectedCategory, stringResource(R.string.all), CATEGORY_ALL_ID)
+                    CategorySelector(
+                        selectedCategory,
+                        stringResource(R.string.all),
+                        CATEGORY_ALL_ID
+                    )
                 }
                 items(Categories.getAllCategories()) {
                     CategorySelector(selectedCategory, it.name, it.id)
