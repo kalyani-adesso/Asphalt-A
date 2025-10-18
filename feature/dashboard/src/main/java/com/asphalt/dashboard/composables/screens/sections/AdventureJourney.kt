@@ -84,7 +84,8 @@ fun AdventureJourney(
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Box {
-                    DonutChart(valueList.value, colorList.value)
+                    DonutChart(values = remember(valueList.value) { valueList.value },
+                        colors = remember(colorList.value) { colorList.value })
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally,

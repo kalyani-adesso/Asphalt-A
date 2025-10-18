@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,7 +72,7 @@ object ComposeUtils {
     }
 
     @Composable
-    fun DefaultButtonContent(buttonText: String,color: Color=NeutralWhite) {
+    fun DefaultButtonContent(buttonText: String, color: Color = NeutralWhite) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 
             Text(
@@ -85,23 +85,25 @@ object ComposeUtils {
     }
 
     @Composable
-    fun DefaultColumnRootWithScroll(
+    fun DefaultColumnRoot(
         topPadding: Dp,
         bottomPadding: Dp,
+        isScrollable: Boolean = true,
         content: @Composable ColumnScope.() -> Unit
     ) {
+        val modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth()
+            .padding(
+                top = topPadding,
+                bottom = bottomPadding,
+                start = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING,
+                end = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING
+            )
         Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(
-                    top = topPadding,
-                    bottom = bottomPadding,
-                    start = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING,
-                    end = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING
-                )
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.size20)
+            modifier = if (isScrollable) modifier
+                .verticalScroll(rememberScrollState()) else modifier,
+            verticalArrangement = Arrangement.spacedBy(Dimensions.size20, Alignment.Top)
         ) {
             content()
         }
@@ -159,8 +161,8 @@ object ComposeUtils {
         subtitle: String,
         @SuppressLint("ModifierParameter") titleModifier: Modifier = Modifier,
         subtitleModifier: Modifier = Modifier,
-        titleColor:Color = NeutralBlack,
-        subtitleColor:Color = NeutralDarkGrey
+        titleColor: Color = NeutralBlack,
+        subtitleColor: Color = NeutralDarkGrey
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -177,7 +179,7 @@ object ComposeUtils {
     }
 
     @Composable
-    fun SectionTitle(text: String, modifier: Modifier = Modifier,color: Color = NeutralBlack) {
+    fun SectionTitle(text: String, modifier: Modifier = Modifier, color: Color = NeutralBlack) {
         Text(
             style = TypographyBold.bodyMedium,
             fontSize = Dimensions.textSize16, text = text, modifier = modifier, color = color
@@ -202,13 +204,28 @@ object ComposeUtils {
         value: String,
         onValueChanged: (String) -> Unit,
         placeHolderText: String,
-        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-    ) {
+        keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+        keyboardActions: KeyboardActions = KeyboardActions.Default,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        backColor: Color = NeutralWhite,
+        borderColor: Color? = null,
+        borderStroke: Dp? = null,
+
+        ) {
         RoundedBox(
-            modifier = Modifier.height(Dimensions.size50),
-            cornerRadius = Dimensions.size10
+            modifier = Modifier
+                .height(Dimensions.size50),
+            cornerRadius = Dimensions.size10,
+            backgroundColor = backColor,
+            borderColor = borderColor,
+            borderStroke = borderStroke
         ) {
             TextField(
+
+                keyboardActions = keyboardActions,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
                 value = value,
                 onValueChange = { onValueChanged(it) },
                 placeholder = {
@@ -219,6 +236,7 @@ object ComposeUtils {
                         color = NeutralDarkGrey
                     )
                 },
+
                 textStyle = Typography.bodyMedium,
 
                 singleLine = true,

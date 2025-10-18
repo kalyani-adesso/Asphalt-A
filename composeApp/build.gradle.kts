@@ -95,6 +95,7 @@ dependencies {
     implementation(projects.feature.profile)
     implementation(projects.commonui)
     implementation(projects.feature.createride)
+    implementation(projects.feature.queries)
 
 
     //dependencies

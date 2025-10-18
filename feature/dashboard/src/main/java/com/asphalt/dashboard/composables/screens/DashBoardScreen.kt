@@ -47,7 +47,7 @@ fun DashBoardScreen(
     )
 
 
-    ComposeUtils.DefaultColumnRootWithScroll(
+    ComposeUtils.DefaultColumnRoot(
 
         0.dp,
         0.dp

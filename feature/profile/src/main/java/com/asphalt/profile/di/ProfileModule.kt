@@ -1,6 +1,6 @@
 package com.asphalt.profile.di
 
-import com.asphalt.profile.repositories.ProfilesSectionRepo
+import com.asphalt.profile.repositories.ProfilesDataRepo
 import com.asphalt.profile.repositories.TotalStatsRepo
 import com.asphalt.profile.repositories.YourVehiclesRepo
 import com.asphalt.profile.viewmodels.AddBikesVM
@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val profileModule = module {
     single { YourVehiclesRepo() }
-    single { ProfilesSectionRepo() }
+    single { ProfilesDataRepo() }
     single { TotalStatsRepo() }
     viewModel { ProfileSectionVM(get()) }
     viewModel { YourVehiclesVM(get()) }
