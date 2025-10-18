@@ -129,6 +129,12 @@
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="phone_number_error">Phone number cannot be empty</string>
     <string name="hello_user">Hello %1$s</string>
+    <string name="ask_question">Ask question</string>
+    <string name="queries">Queries</string>
+    <string name="answered">Answered</string>
+    <string name="answer">Answer</string>
+    <string name="mechanic">Mechanic</string>
+
 
 
 
