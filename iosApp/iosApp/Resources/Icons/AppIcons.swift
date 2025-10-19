@@ -114,6 +114,24 @@ struct AppIcon {
         static let queueRide = Image("icon-queueRide")
         static let message = Image("icon-message")
     }
+    
+    struct JoinRide {
+        static let calenderToday = Image("icon-calenderToday")
+        static let joinGroup = Image("icon-joinGroup")
+        static let search = Image("icon-search")
+        static let movedLocation = Image("icon-movedLocation")
+        static let location = Image("icon-location")
+        static let route = Image("icon-route")
+    }
+    
+    struct ConnectedRide {
+        static let checkmark = Image("icon-checkMark")
+        static let rideDistance = Image("icon-rideDistance")
+        static let rideDuration = Image("icon-rideDuration")
+        static let riders = Image("icon-riders")
+        static let rate = Image("icon-rate")
+        static let notRate = Image("icon-notRate")
+    }
 }
 
 

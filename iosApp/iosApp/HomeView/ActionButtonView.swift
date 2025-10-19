@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActionButtonView: View {
     @State private var isPresented: Bool = false
+    @State private var showJoinRide: Bool = false
     
     var body: some View {
         HStack(spacing: 12) {
@@ -18,10 +19,7 @@ struct ActionButtonView: View {
                         showShadow: false , onTap: {
                     isPresented = true
                 }
-            ).navigationDestination(isPresented: $isPresented, destination: {
-                CreateRideView()
-            })
-            
+            )
             ButtonView( title: AppStrings.HomeLabel.joinRide.rawValue,
                         icon: AppIcon.Home.group,
                         background: LinearGradient(
@@ -30,8 +28,16 @@ struct ActionButtonView: View {
                                     endPoint: .trailing),
                         foregroundColor: AppColor.celticBlue,
                         showShadow: false ,
-                        borderColor: AppColor.celticBlue)
+                        borderColor: AppColor.celticBlue,onTap: {
+               showJoinRide = true
+            })
         }
+        .navigationDestination(isPresented: $isPresented, destination: {
+            CreateRideView()
+        })
+        .navigationDestination(isPresented: $showJoinRide, destination: {
+            JoinRideView()
+        })
     }
 }
 

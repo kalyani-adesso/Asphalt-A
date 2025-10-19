@@ -309,6 +309,24 @@ public struct AppStrings{
         static let viewPhotos = "View Photos"
         static let accept = "Accept"
     }
+    
+    enum JoinRide {
+        static let searcRide = "Search rides by location, theme..."
+        static let joinRide = "Join Ride"
+        static let callRider = "Call Rider"
+    }
+    
+    enum ConnectedRide {
+        static let rideCompleted = "Ride successfully completed!"
+        static let startRideTitle = "Starting Connected Ride"
+        static let startRideSubtitle = "Initializing navigation and group cordination"
+        static let completeRideTitle = "Completing Ride"
+        static let completeRideSubtitle = "Saving your ride data and generating summary"
+        static let connectedRide = "Connected Ride"
+        static let rideSucess = "Ride completed sucessfully"
+        static let rideDifficultyLevel = "Ride Difficulty Level"
+        static let rateRide = "Rate This Ride"
+    }
 }
 
 
