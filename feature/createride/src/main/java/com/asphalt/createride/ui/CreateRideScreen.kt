@@ -118,7 +118,8 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
 
                     } else {
-                        viewModel.updateTab(1)
+                        if (viewModel.fieldValidation())
+                            viewModel.updateTab(1)
                     }
 
                 },
@@ -162,6 +163,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                     modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue,
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
+                            if(viewModel.fieldValidation())
                             viewModel.updateTab(1)
                         }
                     }, contentPadding = PaddingValues(

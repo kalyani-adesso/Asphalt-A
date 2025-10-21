@@ -28,6 +28,21 @@ class CreateRideScreenViewModel : ViewModel() {
 
     val selectedUserCount = mutableStateOf(0)
 
+    val _showRideTypeError = mutableStateOf(false)
+    val _showRideTitleError = mutableStateOf(false)
+
+    fun fieldValidation(): Boolean {
+        if (_rideDetailsMutableState.value.rideType.isNullOrEmpty()) {
+            _showRideTypeError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.rideTitle.isNullOrEmpty()) {
+            _showRideTitleError.value = true
+            return false
+        }
+        return true
+    }
+
     fun getUserCount() {
         selectedUserCount.value = _ridersListMutable.value.count { it.isSelect }
     }
