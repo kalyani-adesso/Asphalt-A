@@ -63,8 +63,11 @@
     <string name="share_exp">Share Experience</string>
     <string name="no_invites">No Invites</string>
     <string name="last_four_months">Last 4 months</string>
+    <string name="last_six_months">Last 6 months</string>
     <string name="last_week">Last week</string>
+    <string name="this_month">This month</string>
     <string name="last_year">Last year</string>
+    <string name="last_month">Last month</string>
     <string name="your_garage">Your Garage (%1$d)</string>
     <string name="no_vehicles_added_yet">No vehicles added yet</string>
     <string name="add_your_motorcycle">Add your motorcycle to get started!</string>
