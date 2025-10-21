@@ -184,7 +184,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 1,
                 name = "Harikumar S",
-                job = "Software Engineer",
+                job = "Mechanic",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -192,7 +192,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 2,
                 name = "Sreedev",
-                job = "Software Engineer",
+                job = "",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -201,7 +201,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 3,
                 name = "Vyshak ",
-                job = "Software Engineer",
+                job = "",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -209,7 +209,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 4,
                 name = "Jerin John",
-                job = "Software Engineer",
+                job = "",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -217,7 +217,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 5,
                 name = "Vipin Raj",
-                job = "Software Engineer",
+                job = "Mechanic",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -225,7 +225,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 6,
                 name = "Pramod Selvaraj",
-                job = "Software Engineer",
+                job = "",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"
@@ -233,7 +233,7 @@ class CreateRideScreenViewModel : ViewModel() {
             RidersList(
                 id = 7,
                 name = "Vinu V John",
-                job = "Software Engineer",
+                job = "",
                 bike = "Unicorn",
                 isSelect = false,
                 imgUrl = "https://picsum.photos/id/1/200/300"

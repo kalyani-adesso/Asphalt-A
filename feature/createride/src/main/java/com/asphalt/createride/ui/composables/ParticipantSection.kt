@@ -116,7 +116,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                         } else {
                             ""
                         },
-                        onValueChange = {viewmodel.onSearchQueryChanged(it)},
+                        onValueChange = { viewmodel.onSearchQueryChanged(it) },
                         placeholder = {
                             Text(
                                 text = stringResource(R.string._search_name_number),
@@ -217,36 +217,38 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                         overflow = TextOverflow.Ellipsis,
                                     )
                                     Spacer(Modifier.width(Dimensions.size5))
-                                    Row(
-                                        modifier = Modifier
-                                            .background(
-                                                color = GrayLight10,
-                                                shape = RoundedCornerShape(Dimensions.size5)
-                                            )
-                                            .height(Dimensions.padding16)
-                                            .padding(
-                                                start = Dimensions.size5,
-                                                end = Dimensions.size5,
+                                    if (!ridersList.job.isNullOrEmpty()) {
+                                        Row(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = GrayLight10,
+                                                    shape = RoundedCornerShape(Dimensions.size5)
+                                                )
+                                                .height(Dimensions.padding16)
+                                                .padding(
+                                                    start = Dimensions.size5,
+                                                    end = Dimensions.size5,
 //                                            top = Dimensions.size5,
 //                                             bottom =  Dimensions.size2pt5
-                                            ),
-                                        verticalAlignment = Alignment.CenterVertically,
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically,
 
 
-                                        ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.ic_spanner),
-                                            contentDescription = "",
-                                            colorFilter = ColorFilter.tint(NeutralBlack),
-                                        )
-                                        Spacer(Modifier.width(Dimensions.size4))
-                                        Text(
-                                            text = ridersList.job ?: "",
-                                            style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
-                                            color = NeutralBlack,
-                                            modifier = Modifier,
-
+                                            ) {
+                                            Image(
+                                                painter = painterResource(R.drawable.ic_spanner),
+                                                contentDescription = "",
+                                                colorFilter = ColorFilter.tint(NeutralBlack),
                                             )
+                                            Spacer(Modifier.width(Dimensions.size4))
+                                            Text(
+                                                text = ridersList.job ?: "",
+                                                style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
+                                                color = NeutralBlack,
+                                                modifier = Modifier,
+
+                                                )
+                                        }
                                     }
                                 }
                                 Row() {
@@ -279,7 +281,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             },
                             contentDescription = "", modifier = Modifier.clickable {
                                 viewmodel.updateUerList(!ridersList.isSelect, ridersList.id)
-                               // viewmodel.getUserCount()
+                                // viewmodel.getUserCount()
                             }
                         )
                     }
