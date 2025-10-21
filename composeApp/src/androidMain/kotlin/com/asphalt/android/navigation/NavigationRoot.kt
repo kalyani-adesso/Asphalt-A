@@ -193,8 +193,8 @@ fun NavigationRoot(
                         NavigationSplashScreen(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
-                                //backStack.add(AppNavKey.LoginScreenNavKey)
-                                backStack.add(AppNavKey.CreateRideNav)
+                                backStack.add(AppNavKey.LoginScreenNavKey)
+                                //backStack.add(AppNavKey.CreateRideNav)
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
