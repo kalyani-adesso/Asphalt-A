@@ -160,6 +160,42 @@
     <string name="min">Min</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
+    <string name="create_a_ride">Create a Ride</string>
+    <string name="done">Done</string>
+    <string name="next_step">Next Step</string>
+    <string name="previous">Previous</string>
+    <string name="create_rides">Create Ride</string>
+    <string name="next">Next</string>
+    <string name="ride_type">Ride Type</string>
+    <string name="select_ride_type">Select ride type</string>
+    <string name="ride_title">Ride Title</string>
+    <string name="enter_ride_name">Enter ride name…</string>
+    <string name="description">Description</string>
+    <string name="describe_vibe">Describe the vibe…</string>
+    <string name="date">Date</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="time">Time</string>
+    <string name="pick_time">Pick Time</string>
+    <string name="invites_contact">Invite Contacts</string>
+    <string name="_selected">selected</string>
+    <string name="_search_name_number">Search by name ,number or bike type…</string>
+    <string name="refreshment_to">Refreshment to</string>
+    <string name="date_time">Date and Time</string>
+    <string name="route">Route</string>
+    <string name="participants">Participants</string>
+    <string name="riders_selected">riders selected</string>
+    <string name="starting_point">Starting Point</string>
+    <string name="enter_start_loc">Enter starting location</string>
+    <string name="destination">Destination</string>
+    <string name="enter_destination">Enter destination</string>
+    <string name="ride_created">Ride Created!</string>
+    <string name="share_with_friends">Share your ride with friends</string>
+    <string name="share_link">Share Link</string>
+    <string name="share_via">Share Via</string>
+    <string name="details">Details</string>
+    <string name="review">Review</string>
+    <string name="review_ride">Review Your Ride</string>
+    <string name="check_responses">Check Responses</string>
 
 
 </resources>

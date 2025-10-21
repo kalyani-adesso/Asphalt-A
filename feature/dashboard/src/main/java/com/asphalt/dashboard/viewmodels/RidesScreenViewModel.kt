@@ -30,6 +30,18 @@ class RidesScreenViewModel : ViewModel() {
             rideStatus = "Upcoming".uppercase(),
             date = "Sun, Oct 21 - 09:00 AM", "3 Riders"
         )
+        var upcoming1 = YourRideDataModel(
+            title = "Trip to Moonnar",
+            place = "Kochi - Kanyakumari",
+            rideStatus = "Queue".uppercase(),
+            date = "Sun, Oct 21 - 09:00 AM", "3 Riders"
+        )
+        var upcoming2 = YourRideDataModel(
+            title = "Weekend Coast Ride",
+            place = "Kochi - Kanyakumari",
+            rideStatus = "Upcoming".uppercase(),
+            date = "Sun, Oct 21 - 09:00 AM", "3 Riders"
+        )
 
         var hirtory = YourRideDataModel(
             title = "Weekend Coast Ride",
@@ -47,15 +59,10 @@ class RidesScreenViewModel : ViewModel() {
 
         var upcomiList = ArrayList<YourRideDataModel>()
         upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming)
+        upcomiList.add(upcoming1)
+        upcomiList.add(upcoming2)
+
+
 
         var hirtoryList = ArrayList<YourRideDataModel>()
         hirtoryList.add(hirtory)

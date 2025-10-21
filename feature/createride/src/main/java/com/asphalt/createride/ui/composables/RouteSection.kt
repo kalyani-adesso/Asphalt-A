@@ -1,6 +1,7 @@
 package com.asphalt.createride.ui.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,14 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
@@ -35,6 +33,7 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.REDLIGHT
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividRed
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
@@ -52,7 +51,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Starting Point",
+            text = stringResource(R.string.starting_point),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -65,6 +64,21 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 .padding(start = Dimensions.padding16, end = Dimensions.padding16)
                 .background(
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
+                )
+                .then(
+                    if (viewModel._showRideStartLocError.value) {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = VividRed,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    } else {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    }
                 ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -75,16 +89,19 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 } else {
                     ""
                 },
-                onValueChange = { viewModel.updateStartLocation(it) },
+                onValueChange = {
+                    viewModel.updateStartLocation(it)
+                    viewModel._showRideStartLocError.value = false
+                },
                 placeholder = {
                     Text(
-                        text = "Enter starting location",
+                        text = stringResource(R.string.enter_start_loc),
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -115,7 +132,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Destination",
+            text = stringResource(R.string.destination),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -128,6 +145,21 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 .padding(start = Dimensions.padding16, end = Dimensions.padding16)
                 .background(
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
+                )
+                .then(
+                    if (viewModel._showRideEndLocError.value) {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = VividRed,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    } else {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    }
                 ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -138,16 +170,19 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                 } else {
                     ""
                 },
-                onValueChange = { viewModel.updateEnLocation(it) },
+                onValueChange = {
+                    viewModel.updateEnLocation(it)
+                    viewModel._showRideEndLocError.value = false
+                },
                 placeholder = {
                     Text(
-                        text = "Enter destination",
+                        text = stringResource(R.string.enter_destination),
                         style = Typography.bodyMedium,
                         color = NeutralDarkGrey,
 
                         )
                 },
-                textStyle = Typography.bodyMedium.copy(NeutralDarkGrey),
+                textStyle = Typography.bodyMedium,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
