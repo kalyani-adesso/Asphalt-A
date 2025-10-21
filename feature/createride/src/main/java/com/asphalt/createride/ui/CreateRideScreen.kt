@@ -47,7 +47,8 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 @Composable
 fun CreateRideScreen(
     viewModel: CreateRideScreenViewModel = viewModel(),
-    setTopAppBarState: (AppBarState) -> Unit
+    setTopAppBarState: (AppBarState) -> Unit,
+    clickDone: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     setTopAppBarState(
@@ -88,7 +89,7 @@ fun CreateRideScreen(
                 if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
                     ShareSection()
             }
-            BottomButtons(viewModel)
+            BottomButtons(viewModel, clickDone)
             // Fixed bottom button
 
         }
@@ -97,7 +98,7 @@ fun CreateRideScreen(
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
+fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,7 +119,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
             GradientButton(
                 onClick = {
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
-
+                        clickDone.invoke()
                     } else {
                         if (viewModel.detailsFieldValidation())
                             viewModel.updateTab(1)
@@ -165,8 +166,8 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
                     modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue,
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
-                            if(viewModel.routeFieldValidation())
-                            viewModel.updateTab(1)
+                            if (viewModel.routeFieldValidation())
+                                viewModel.updateTab(1)
                         }
                     }, contentPadding = PaddingValues(
                         Dimensions.size0
@@ -199,7 +200,9 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
 @Composable
 @Preview
 fun CreateRidePreview() {
-    CreateRideScreen(setTopAppBarState = {})
+    CreateRideScreen(setTopAppBarState = {}, clickDone = {
+
+    })
 
 }
 

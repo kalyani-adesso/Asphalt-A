@@ -271,7 +271,10 @@ fun NavigationRoot(
                         ProfileScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.CreateRideNav> { key ->
-                        CreateRideScreen(setTopAppBarState=setTopAppBarState)
+                        CreateRideScreen(setTopAppBarState = setTopAppBarState, clickDone = {
+                            backStack.remove(AppNavKey.CreateRideNav)
+                            backStack.add(AppNavKey.RidesScreenNav)
+                        })
                     }
                 }
             )
