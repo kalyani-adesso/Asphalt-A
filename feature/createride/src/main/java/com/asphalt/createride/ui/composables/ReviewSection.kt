@@ -109,7 +109,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
 
                 ) {
                     Text(
-                        text = viewModel.rideDetailsState.value.rideType?.uppercase() ?: "",
+                        text = viewModel.rideDetailsState.value.rideType ?: "",
                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                         color = GreenLIGHT25,
                         modifier = Modifier
