@@ -88,7 +88,9 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
 
                     ) {
                     Text(
-                        stringResource(R.string.invites_contact), style = TypographyMedium.bodyMedium)
+                        stringResource(R.string.invites_contact),
+                        style = TypographyMedium.bodyMedium
+                    )
                     Text(
                         "${viewmodel.selectedUserCount.value} ${stringResource(R.string._selected)}",
                         style = TypographyMedium.bodySmall,
@@ -109,12 +111,12 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextField(
-                        value = if (!text.isEmpty()) {
-                            text
+                        value = if (!viewmodel.searchQuery.value.isNullOrEmpty()) {
+                            viewmodel.searchQuery.value
                         } else {
                             ""
                         },
-                        onValueChange = { text = it },
+                        onValueChange = {viewmodel.onSearchQueryChanged(it)},
                         placeholder = {
                             Text(
                                 text = stringResource(R.string._search_name_number),
@@ -277,7 +279,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             },
                             contentDescription = "", modifier = Modifier.clickable {
                                 viewmodel.updateUerList(!ridersList.isSelect, ridersList.id)
-                                viewmodel.getUserCount()
+                               // viewmodel.getUserCount()
                             }
                         )
                     }

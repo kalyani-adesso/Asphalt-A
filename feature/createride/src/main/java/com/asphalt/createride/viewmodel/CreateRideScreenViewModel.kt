@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
-
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
 
 class CreateRideScreenViewModel : ViewModel() {
+    //var fullList = getUsers()
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
@@ -21,10 +21,6 @@ class CreateRideScreenViewModel : ViewModel() {
 
     private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
     val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
-
-    private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
-        mutableStateOf(getUsers())
-    val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
 
     val selectedUserCount = mutableStateOf(0)
 
@@ -35,6 +31,53 @@ class CreateRideScreenViewModel : ViewModel() {
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
 
+
+    private val _fullList = mutableStateOf(ArrayList<RidersList>())
+    private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
+        mutableStateOf(arrayListOf())
+    val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
+
+    init {
+        _fullList.value = getUsers()
+        _ridersListMutable.value = _fullList.value
+    }
+
+    val searchQuery = mutableStateOf("")
+
+    fun onSearchQueryChanged(query: String) {
+        searchQuery.value = query
+
+        val q = query.trim().lowercase()
+
+        _ridersListMutable.value = ArrayList(
+            if (q.isEmpty()) {
+                _fullList.value
+            } else {
+                _fullList.value.filter { person ->
+                    (person.name ?: "").lowercase().contains(q) ||
+                            (person.job ?: "").lowercase().contains(q) ||
+                            (person.bike ?: "").lowercase().contains(q)
+                }
+            })
+        getUserCount()
+    }
+
+    fun updateUerList(isSelcted: Boolean, id: Int?) {
+        _fullList.value = ArrayList(_fullList.value.map { rider ->
+            if (rider.id == id) {
+                rider.copy(isSelect = isSelcted)
+            } else {
+                rider
+            }
+        })
+
+        // Re-filter with current query so filtered list reflects changes
+        onSearchQueryChanged(searchQuery.value)
+        getUserCount()
+
+
+
+    }
 
     fun detailsFieldValidation(): Boolean {
         if (_rideDetailsMutableState.value.rideType.isNullOrEmpty()) {
@@ -132,18 +175,7 @@ class CreateRideScreenViewModel : ViewModel() {
         return type
     }
 
-    fun updateUerList(isSelcted: Boolean, id: Int?) {
-        _ridersListMutable.value = ArrayList(_ridersListMutable.value.map { ride ->
-            if (ride.id == id) {
-                ride.copy(isSelect = isSelcted)
-            } else {
-                ride
-            }
-        })
-        // _ridersListMutable.value = _rideDetailsMutableState.value.map { ride -> if (ride) }
 
-
-    }
 
 
     fun getUsers(): ArrayList<RidersList> {

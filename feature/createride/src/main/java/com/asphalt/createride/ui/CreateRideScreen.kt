@@ -1,5 +1,6 @@
 package com.asphalt.createride.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -94,6 +95,7 @@ fun CreateRideScreen(
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel) {
     Box(
