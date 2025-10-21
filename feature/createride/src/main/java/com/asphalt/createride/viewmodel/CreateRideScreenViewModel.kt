@@ -32,9 +32,11 @@ class CreateRideScreenViewModel : ViewModel() {
     val _showRideTitleError = mutableStateOf(false)
     val _showRideDateError = mutableStateOf(false)
     val _showRideTimeError = mutableStateOf(false)
+    val _showRideStartLocError = mutableStateOf(false)
+    val _showRideEndLocError = mutableStateOf(false)
 
 
-    fun fieldValidation(): Boolean {
+    fun detailsFieldValidation(): Boolean {
         if (_rideDetailsMutableState.value.rideType.isNullOrEmpty()) {
             _showRideTypeError.value = true
             return false
@@ -49,6 +51,18 @@ class CreateRideScreenViewModel : ViewModel() {
         }
         if (_rideDetailsMutableState.value.hour == null) {
             _showRideTimeError.value = true
+            return false
+        }
+        return true
+    }
+
+    fun routeFieldValidation(): Boolean {
+        if (_rideDetailsMutableState.value.startLocation.isNullOrEmpty()) {
+            _showRideStartLocError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.endLocation.isNullOrEmpty()) {
+            _showRideEndLocError.value = true
             return false
         }
         return true
