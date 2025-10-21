@@ -144,7 +144,12 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(modifier = Modifier.weight(1f)) {
-                ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
+                if(upconing.rideStatus=="UPCOMING"){
+                    ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
+                }else{
+                    ColorIconRounded(backColor = VividOrangeLight, resId = R.drawable.ic_location)
+                }
+
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
