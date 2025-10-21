@@ -59,7 +59,9 @@ fun AnswerComponent(answer: Answer) {
                     imageUrl = answer.answeredByUrl,
                     size = Dimensions.size38,
                     borderColor = ElectricGreen,
-                    borderWidth = Dimensions.size2pt5
+                    borderWidth = Dimensions.size2pt5,
+                    placeholderPainter = painterResource(R.drawable.profile_placeholder)
+
                 )
                 ComposeUtils.SectionTitle(
                     answer.answeredByName, modifier = Modifier.padding(start = Dimensions.spacing10)

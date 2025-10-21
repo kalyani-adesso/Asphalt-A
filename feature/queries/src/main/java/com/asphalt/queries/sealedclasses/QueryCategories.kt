@@ -1,14 +1,14 @@
 package com.asphalt.queries.sealedclasses
 
-sealed class Categories(val id: Int, val name: String) {
-    object Maintenance : Categories(1, "Maintenance")
-    object Routes : Categories(2, "Routes")
-    object Gear : Categories(3, "Gear")
-    object Safety : Categories(4, "Safety")
-    object Other : Categories(5, "Other")
+sealed class QueryCategories(val id: Int, val name: String) {
+    object Maintenance : QueryCategories(1, "Maintenance")
+    object Routes : QueryCategories(2, "Routes")
+    object Gear : QueryCategories(3, "Gear")
+    object Safety : QueryCategories(4, "Safety")
+    object Other : QueryCategories(5, "Other")
 
     companion object {
-        fun getAllCategories(): List<Categories> {
+        fun getAllCategories(): List<QueryCategories> {
             return listOf(
                 Maintenance, Routes, Gear, Safety, Other
             )

@@ -106,9 +106,9 @@ object Utils {
 
     private fun formatUnit(value: Long, unit: String): String {
         return if (value == 1L) {
-            "$value $unit ago" // Singular: "1 day ago"
+            "$value $unit ago"
         } else {
-            "$value ${unit}s ago" // Plural: "2 days ago"
+            "$value ${unit}s ago"
         }
     }
     fun nextMultipleOfFive(value: Int): Int {
@@ -122,10 +122,29 @@ object Utils {
     ): String {
         if (millis == null || millis <= 0) return ""
 
-        // Pattern: MMM = abbreviated month name (Sep), dd = day, yyyy = 4-digit year
         val format = SimpleDateFormat(pattern, Locale.getDefault())
 
         return format.format(Date(millis))
+    }
+
+    fun formatClientMillisToISO(timestamp: Long): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        return dateFormat.format(Date(timestamp))
+    }
+
+    fun parseISODateToMillis(isoString: String): Long {
+        return try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            dateFormat.parse(isoString)?.time ?: 0L
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0L
+        }
     }
 
 }

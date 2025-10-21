@@ -124,6 +124,8 @@
     <string name="full_name">Full Name</string>
     <string name="enter_name">Enter Name</string>
     <string name="full_name_cannot_be_empty">Full name cannot be empty</string>
+    <string name="question_cannot_be_empty">Question cannot be empty</string>
+    <string name="description_cannot_be_empty">Description cannot be empty</string>
     <string name="email">Email</string>
     <string name="enter_email_placeholder">Enter Email</string>
     <string name="phone_number">Phone Number</string>
@@ -136,8 +138,16 @@
     <string name="answer">Answer</string>
     <string name="mechanic">Mechanic</string>
     <string name="search_qns">Search Questions</string>
+    <string name="ask_a_question">Ask a Question</string>
+    <string name="get_help_from_the_motorcycle_community">Get help from the motorcycle community!</string>
+    <string name="question_title">Question Title</string>
+    <string name="brief_description_of_the_question">Brief Description of the question..</string>
+    <string name="category">Category</string>
+    <string name="select_a_category">Select a category</string>
+    <string name="category_cannot_be_empty">Category cannot be empty</string>
 
-
+    <string name="description">Description</string>
+    <string name="provide_more_details_about_your_question">Provide more details about your question…</string>
 
 
     <string name="solo_ride">Solo Ride</string>
@@ -150,7 +160,6 @@
     <string name="min">Min</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
-
 
 
 </resources>

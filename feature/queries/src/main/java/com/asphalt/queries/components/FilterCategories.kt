@@ -21,7 +21,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.queries.QueryConstants.CATEGORY_ALL_ID
-import com.asphalt.queries.sealedclasses.Categories
+import com.asphalt.queries.sealedclasses.QueryCategories
 
 
 @Composable
@@ -44,7 +44,7 @@ fun FilterCategories(selectedCategory: MutableIntState) {
                         CATEGORY_ALL_ID
                     )
                 }
-                items(Categories.getAllCategories()) {
+                items(QueryCategories.getAllCategories()) {
                     CategorySelector(selectedCategory, it.name, it.id)
                 }
                 item { Spacer(Modifier.width(Dimensions.size10)) }

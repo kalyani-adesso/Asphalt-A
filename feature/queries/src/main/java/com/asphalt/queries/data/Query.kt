@@ -13,7 +13,7 @@ data class Query(
     val answers: List<Answer>
 )
 
-val bikeQueries: List<Query> = listOf(
+var bikeQueries: List<Query> = listOf(
     // ---------------------- 1. Maintenance ----------------------
     Query(
         title = "Best Chain Lube for Dusty Conditions?",

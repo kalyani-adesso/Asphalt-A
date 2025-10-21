@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -211,11 +212,12 @@ object ComposeUtils {
         backColor: Color = NeutralWhite,
         borderColor: Color? = null,
         borderStroke: Dp? = null,
+        isSingleLine: Boolean = true
 
-        ) {
+    ) {
         RoundedBox(
             modifier = Modifier
-                .height(Dimensions.size50),
+                .heightIn(min = Dimensions.size50),
             cornerRadius = Dimensions.size10,
             backgroundColor = backColor,
             borderColor = borderColor,
@@ -239,7 +241,7 @@ object ComposeUtils {
 
                 textStyle = Typography.bodyMedium,
 
-                singleLine = true,
+                singleLine = isSingleLine,
                 keyboardOptions = keyboardOptions,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -294,7 +296,8 @@ object ComposeUtils {
         placeholder: String,
         isError: Boolean,
         errorText: String,
-        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        isSingleLine: Boolean = true
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing12)) {
             SectionTitle(title)
@@ -302,7 +305,7 @@ object ComposeUtils {
                 value,
                 { onValueChanged(it) },
                 placeHolderText = placeholder,
-                keyboardOptions = keyboardOptions
+                keyboardOptions = keyboardOptions, isSingleLine = isSingleLine
             )
             TexFieldError(
                 isError,

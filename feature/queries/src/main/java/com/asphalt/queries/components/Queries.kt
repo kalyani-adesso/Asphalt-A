@@ -36,7 +36,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Query
-import com.asphalt.queries.sealedclasses.Categories
+import com.asphalt.queries.sealedclasses.QueryCategories
 
 @Composable
 fun Queries(queries: List<Query>) {
@@ -63,7 +63,7 @@ fun QueryComponent(query: Query) {
         ComposeUtils.SectionTitle(query.title)
         Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10)) {
 
-            Categories.getCategoryNameById(query.categoryId)
+            QueryCategories.getCategoryNameById(query.categoryId)
                 ?.let { CustomLabel(textColor = SafetyOrange, backColor = PaleOrange, text = it) }
             if (query.isAnswered) CustomLabel(
                 textColor = GreenLIGHT25, backColor = PaleGreen, text =
@@ -81,7 +81,9 @@ fun QueryComponent(query: Query) {
                 imageUrl = query.postedByUrl,
                 size = Dimensions.spacing33,
                 borderColor = PalePink,
-                borderWidth = Dimensions.size3
+                borderWidth = Dimensions.size3,
+                placeholderPainter = painterResource(R.drawable.profile_placeholder)
+
             )
             ComposeUtils.SectionTitle(
                 query.postedByName, modifier = Modifier.padding(start = Dimensions.spacing10)
