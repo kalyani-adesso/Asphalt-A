@@ -50,6 +50,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividOrangeLight
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
@@ -162,10 +163,18 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
             }
             Box(
                 modifier = Modifier
-                    .background(
-                        color = MagentaDeep,
-                        shape = RoundedCornerShape(Dimensions.size10)
-                    )
+                    .then(if(upconing.rideStatus=="UPCOMING"){
+                        Modifier.background(
+                            color = MagentaDeep,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }else{
+                        Modifier.background(
+                            color = VividOrangeLight,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    })
+
                     .padding(
                         start = Dimensions.padding16,
                         end = Dimensions.padding16,
