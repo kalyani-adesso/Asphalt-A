@@ -30,6 +30,9 @@ class CreateRideScreenViewModel : ViewModel() {
 
     val _showRideTypeError = mutableStateOf(false)
     val _showRideTitleError = mutableStateOf(false)
+    val _showRideDateError = mutableStateOf(false)
+    val _showRideTimeError = mutableStateOf(false)
+
 
     fun fieldValidation(): Boolean {
         if (_rideDetailsMutableState.value.rideType.isNullOrEmpty()) {
@@ -38,6 +41,14 @@ class CreateRideScreenViewModel : ViewModel() {
         }
         if (_rideDetailsMutableState.value.rideTitle.isNullOrEmpty()) {
             _showRideTitleError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.dateString == null) {
+            _showRideDateError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.hour == null) {
+            _showRideTimeError.value = true
             return false
         }
         return true

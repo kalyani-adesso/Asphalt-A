@@ -74,6 +74,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             }"
             viewModel.updateTime(hr, min, isAm, time_text)
             viewModel.showTimePicker(false)
+            viewModel._showRideTimeError.value = false
         })
     }
 
@@ -84,6 +85,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             viewModel.updateDate(timeMils, Utils.convertMillisToFormattedDate(timeMils))
             //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
             viewModel.showDatePicker(false)
+            viewModel._showRideDateError.value = false
         })
     }
 
@@ -328,6 +330,21 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                         .background(
                             NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10),
                         )
+                        .then(
+                            if (viewModel._showRideDateError.value) {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = VividRed,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            } else {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = NeutralWhite,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            }
+                        )
                         .clickable { viewModel.showDatePicker(true) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -368,6 +385,20 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                         .fillMaxWidth()
                         .background(
                             NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10),
+                        ).then(
+                            if (viewModel._showRideTimeError.value) {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = VividRed,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            } else {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = NeutralWhite,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            }
                         )
                         .clickable {
                             viewModel.showTimePicker(true)
