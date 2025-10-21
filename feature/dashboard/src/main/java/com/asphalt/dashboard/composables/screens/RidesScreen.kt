@@ -257,7 +257,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.view_details).uppercase(),
+                    text = if(upconing.rideStatus=="UPCOMING"){stringResource(R.string.view_details).uppercase()}else{
+                        stringResource(R.string.check_responses).uppercase()
+                    },
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )
