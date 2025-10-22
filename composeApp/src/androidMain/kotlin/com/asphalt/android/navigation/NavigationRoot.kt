@@ -220,9 +220,10 @@ fun NavigationRoot(
 
                     entry<RegistrationDetailsNavKey> {
                         NavigationRegistrationDetails(
-                            onNavigateToDashboard = { //password ->
+                            onNavigateToLogin = { //password ->
                                 //  backStack.add(RegistrationDetailsNavKey(password))
                                 backStack.remove(SplashKey)
+                                backStack.add(AppNavKey.LoginScreenNavKey)
 
                             },
                             onBackPressed = { onBackPressed() }
