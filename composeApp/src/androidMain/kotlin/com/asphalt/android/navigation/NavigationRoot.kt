@@ -279,6 +279,7 @@ fun NavigationRoot(
                         CreateRideScreen(setTopAppBarState = setTopAppBarState, clickDone = {
                             backStack.remove(AppNavKey.CreateRideNav)
                             backStack.add(AppNavKey.RidesScreenNav)
+                            selectedKey = AppNavKey.RidesScreenNav
                         })
                     }
                     entry<AppNavKey.NotificationNav> { key ->
