@@ -11,9 +11,11 @@ import SwiftUI
 struct ConnectedRideCompleteView: View {
     var viewModel: JoinRideModel
     @StateObject var connectedRideViewModel = ConnectedRideViewModel()
+    @StateObject private var homeViewModel = HomeViewModel()
     @State var rating: Int = 0
     @State var showHome: Bool = false
-    
+    @State var showMapView:Bool = false
+//    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack(spacing: 16) {
             SucessView(title: viewModel.title,
@@ -26,8 +28,23 @@ struct ConnectedRideCompleteView: View {
         .padding(.horizontal,16)
         .navigationDestination(isPresented: $showHome, destination: {
             HomeView()
+                .environmentObject(homeViewModel)
         })
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+                    showMapView = true
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
+        }
+        .navigationDestination(isPresented: $showMapView, destination: {
+            ConnectedRideMapView()
+        })
     }
     
     @ViewBuilder var RideDifficultyLevel: some View {

@@ -10,7 +10,9 @@ import SwiftUI
 struct UpcomingRideView: View {
     @StateObject private var viewModel = UpcomingRideViewModel()
     @State private var selectedStatus: String? = nil
-    
+    @State private var showHomeView:Bool = false
+    @StateObject private var homeViewModel = HomeViewModel()
+//    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             HStack(spacing: 12) {
@@ -47,6 +49,21 @@ struct UpcomingRideView: View {
             }
         }
         .navigationTitle(AppStrings.UpcomingRide.yourRide)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+//                    dismiss()
+                    showHomeView = true
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
+        }
+        .navigationDestination(isPresented: $showHomeView, destination: {
+            HomeView()
+                .environmentObject(homeViewModel)
+        })
         .onAppear {
             selectedStatus = viewModel.rideStatus.first?.rawValue
         }
@@ -169,6 +186,7 @@ struct UpComingView: View {
                         
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
+                    .padding(.bottom,20)
                 }
                 
                 Button(action: {

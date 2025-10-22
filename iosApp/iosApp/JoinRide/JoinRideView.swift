@@ -12,6 +12,9 @@ struct JoinRideView: View {
     @State private var searchQuery: String = ""
     @StateObject private var viewModel = JoinRideViewModel()
     @State private var showConnectedRides: Bool = false
+    @State private var showHomeView:Bool = false
+    @StateObject private var homeViewModel = HomeViewModel()
+//    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             searchBarView
@@ -25,6 +28,22 @@ struct JoinRideView: View {
             Spacer()
         }
         .navigationTitle(AppStrings.HomeLabel.joinRide.localized)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+//                    dismiss()
+                    showHomeView = true
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
+        }
+        .navigationDestination(isPresented: $showHomeView, destination: {
+            HomeView()
+                .environmentObject(homeViewModel)
+        })
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showConnectedRides, destination: {
             ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
                 title: "Weekend Coast Ride",
@@ -39,6 +58,7 @@ struct JoinRideView: View {
                 riderImage: "rider_avatar"
             ))
         })
+        
     }
     @ViewBuilder var searchBarView: some View {
         HStack(spacing: 6) {
@@ -160,6 +180,7 @@ struct JoinRideRow: View {
                     showConnectedRides = true
                 })
                 .frame(maxWidth: .infinity)
+                .padding(.bottom,20)
             }
         }
         .padding([.leading,.trailing,.top],16)

@@ -31,7 +31,7 @@ struct AppIcon {
     }
     
     struct NavigationSlider {
-        static let call = Image("icon-call")
+        static let call = Image("icon-caller")
         static let createRide = Image("icon_createRide")
         static let home = Image("icon_home")
         static let motoQuiz = Image("icon_motoQuiz")
@@ -140,6 +140,7 @@ struct AppIcon {
         static let shareLocation = Image("icon-shareLocation")
         static let groupStatus = Image("icon-groupStatus")
         static let call = Image("icon-call")
+        static let warning = Image("icon-warning")
     }
 }
 

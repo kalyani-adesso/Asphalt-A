@@ -11,6 +11,7 @@ struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         ZStack {
             List {
@@ -47,7 +48,15 @@ struct ProfileScreen: View {
         }
         .navigationTitle(AppStrings.SignInLabel.clubName.localized)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
         .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+                    dismiss()
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showEditProfile = true

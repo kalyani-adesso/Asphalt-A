@@ -12,9 +12,13 @@ struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
     @State private var rideComplted: Bool = false
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
-    
+    @State private var startTrack: Bool = false
+    @State private var showToast: Bool = true
+    //    @Environment(\.dismiss) var dismiss
+    @State var showJoinRideView:Bool = false
     var body: some View {
         List {
+           
             Section {
                 VStack {
                     ZStack(alignment: .topLeading) {
@@ -26,7 +30,9 @@ struct ConnectedRideMapView: View {
                                 HStack {
                                     mapActionButton()
                                 }
-                                showToast(title: AppStrings.ConnectedRide.rideStarted)
+                                if showToast {
+                                    showToast(title: AppStrings.ConnectedRide.rideStarted)
+                                }
                             }
                             Spacer()
                             HStack {
@@ -42,11 +48,15 @@ struct ConnectedRideMapView: View {
             }
             .listRowSeparator(.hidden)
             Section {
+                ConnectedRideOfflineView(title: "Abhishek has been stopped for 5 minutes.", subtitle: "Check if assistance is needed.", image: AppIcon.ConnectedRide.warning)
+            }
+            .listRowSeparator(.hidden)
+            Section {
                 VStack(spacing: 18) {
                     ConnectedRideHeaderView(title: "Ride in Progress", subtitle: "Group navigation active", image: AppIcon.Profile.profile)
                     ForEach(viewModel.activeRider, id: \.id) { rider in
                         // Your view for each rider
-                        ActiveRiderView( title: rider.name, speed: "\(rider.speed) km")
+                        ActiveRiderView( title: rider.name, speed: "\(rider.speed) km", startTrack: $startTrack)
                     }
                     Button(action: {
                         self.rideComplted = true
@@ -61,6 +71,7 @@ struct ConnectedRideMapView: View {
                             )
                     })
                     .padding([.leading,.trailing,.bottom],16)
+                    .buttonStyle(.plain)
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 10)
@@ -158,6 +169,11 @@ struct ConnectedRideMapView: View {
                     riderImage: "rider_avatar"
                 ))
             })
+            .onAppear() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    showToast = false
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     HStack() {
@@ -210,7 +226,7 @@ struct ConnectedRideMapView: View {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     HStack {
                         Button(action: {
-                            
+                            showJoinRideView = true
                         }, label:{
                             AppIcon.CreateRide.backButton
                         })
@@ -227,6 +243,9 @@ struct ConnectedRideMapView: View {
                     }
                 }
             }
+            .navigationDestination(isPresented: $showJoinRideView, destination: {
+                JoinRideView()
+            })
     }
     
     @ViewBuilder func mapActionButton() -> some View {
@@ -344,10 +363,45 @@ struct ConnectedRideHeaderView: View {
     }
 }
 
+struct ConnectedRideOfflineView: View {
+    let title: String
+    let subtitle: String
+    let image: Image
+    
+    var body: some View {
+        HStack(spacing: 11) {
+            image
+                .resizable()
+                .scaledToFill()
+                .frame(width: 32, height: 32)
+            
+            VStack(alignment: .leading, spacing: 5) {
+                Text(title)
+                    .font(KlavikaFont.bold.font(size: 16))
+                    .foregroundColor(AppColor.yellow)
+                Text(subtitle)
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(AppColor.stoneGray)
+            }
+            Spacer()
+        }
+        .padding([.top,.leading,.bottom],16)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.yellow.opacity(0.1))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(AppColor.backgroundLight, lineWidth: 2)
+        )
+    }
+    
+}
+
 struct ActiveRiderView: View {
     let title: String
     let speed: String
-    
+    @Binding var startTrack:Bool
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -373,14 +427,15 @@ struct ActiveRiderView: View {
             Spacer()
             Button(action: {
                 // Your stop tracking action
+                startTrack.toggle()
             }) {
-                Text("STOP TRACKING")
+                Text(!startTrack ? "Stop Tracking".uppercased() : "Start Tracking".uppercased())
                     .font(KlavikaFont.bold.font(size: 12))
                     .foregroundColor(AppColor.white)
                     .frame(width: 120, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.red)
+                            .fill(startTrack ? AppColor.green : AppColor.red)
                     )
             }
             .padding(.trailing, 16)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NavigationSlideBar: View {
     @StateObject private var viewModel = NavigationSliderViewModel()
-    
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             List(viewModel.sections, id: \.self) { item in
@@ -23,8 +23,19 @@ struct NavigationSlideBar: View {
             .cornerRadius(10)
             .padding(16)
         }
+       
         .navigationTitle(AppStrings.SignInLabel.clubName.localized)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+                    dismiss()
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
+        }
     }
 }
 
@@ -36,9 +47,9 @@ struct MenuItemRow: View {
             item.icon
                 .resizable()
                 .frame(width: 30, height: 30)
-                Text(item.title)
+            Text(item.title)
                 .font(KlavikaFont.medium.font(size: 16))
-                    .foregroundColor(item.iconColor)
+                .foregroundColor(item.iconColor)
             Spacer()
             Image(systemName: "chevron.right")
                 .font(KlavikaFont.medium.font(size: 16))
