@@ -44,5 +44,7 @@ object Constants {
     const val RIDE_REMINDER = 1
     const val RIDER_JOINED = 2
 
+    // Drawer Menu click
+    const val LOGOUT_CLICK = 1
 
 }

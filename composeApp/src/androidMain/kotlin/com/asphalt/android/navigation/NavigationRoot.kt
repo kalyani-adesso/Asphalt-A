@@ -24,9 +24,12 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
+import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
@@ -42,6 +45,14 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
@@ -49,6 +60,7 @@ import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 fun NavigationRoot(
 ) {
     val backStack = rememberNavBackStack(SplashKey)
+    val datastore: DataStoreManager = koinInject()
 
 //    var showAppBars by remember { mutableStateOf(false) }
 //    var navigationDrawer by remember { mutableStateOf(false) }
@@ -126,7 +138,21 @@ fun NavigationRoot(
             manageSelectKeyOnBackPress()
         }
     }
-    RidersClubSideMenu(drawerState) {
+    RidersClubSideMenu(drawerState, itemClick = { item ->
+        when (item) {
+            Constants.LOGOUT_CLICK -> {
+                scope.launch {
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()
+
+                }
+            }
+        }
+
+    }) {
 
         Scaffold(
 
