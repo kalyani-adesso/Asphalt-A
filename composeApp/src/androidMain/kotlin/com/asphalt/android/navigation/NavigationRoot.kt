@@ -29,6 +29,7 @@ import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
+import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
@@ -61,7 +62,8 @@ fun NavigationRoot(
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
         AppNavKey.ProfileKey,
-        AppNavKey.CreateRideNav
+        AppNavKey.CreateRideNav,
+        AppNavKey.NotificationNav
 
     )
 
@@ -256,6 +258,7 @@ fun NavigationRoot(
                                 selectedKey = AppNavKey.RidesScreenNav
                             },
                             setTopAppBarState = setTopAppBarState, notificationsClick = {
+                                backStack.add(AppNavKey.NotificationNav)
 
                             }, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
@@ -275,6 +278,9 @@ fun NavigationRoot(
                             backStack.remove(AppNavKey.CreateRideNav)
                             backStack.add(AppNavKey.RidesScreenNav)
                         })
+                    }
+                    entry<AppNavKey.NotificationNav> { key ->
+                        NotificationScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
             )
