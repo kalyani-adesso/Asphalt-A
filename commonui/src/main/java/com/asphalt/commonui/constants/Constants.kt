@@ -40,4 +40,9 @@ object Constants {
     const val OPEN_EVENT = 3
 
 
+    //Notification Type
+    const val RIDE_REMINDER = 1
+    const val RIDER_JOINED = 2
+
+
 }
