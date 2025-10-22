@@ -8,6 +8,7 @@ import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.dashboard.di.dashboardModule
 import com.asphalt.login.di.loginModule
 import com.asphalt.profile.di.profileModule
+import com.asphalt.queries.di.queryModule
 import com.asphalt.registration.di.registrationModule
 import com.asphalt.welcome.di.welcomeFeatureModule
 import com.google.firebase.FirebaseApp
@@ -27,7 +28,7 @@ class AsphaltApplication : Application() {
             //First start Koin with all modules including shared components
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
-                        + sharedModule + dashboardModule + profileModule+ androidSharedModule,
+                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule,
 
                 )
             module {

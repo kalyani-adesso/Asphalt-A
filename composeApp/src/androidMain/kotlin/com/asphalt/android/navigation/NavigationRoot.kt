@@ -34,6 +34,7 @@ import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
+import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
 import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
@@ -47,7 +48,7 @@ import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.SplashKey)
+    val backStack = rememberNavBackStack(SplashKey)
 
 //    var showAppBars by remember { mutableStateOf(false) }
 //    var navigationDrawer by remember { mutableStateOf(false) }
@@ -269,6 +270,7 @@ fun NavigationRoot(
                         RidesScreen(setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
+                        QueriesScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.ProfileKey> { key ->
                         ProfileScreen(setTopAppBarState = setTopAppBarState)

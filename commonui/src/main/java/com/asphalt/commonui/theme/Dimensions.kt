@@ -33,8 +33,8 @@ object Dimensions {
     val padding16 = 16.dp
     val padding85 = 85.dp
     val padding15 = 15.dp
-    val padding80 =80.dp
-    val padding88 =88.dp
+    val padding80 = 80.dp
+    val padding88 = 88.dp
 
     val padding20 = 20.dp
     val padding13 = 13.dp
@@ -56,6 +56,7 @@ object Dimensions {
     val spacing24 = 24.dp
     val spacing30 = 30.dp
     val spacing32 = 32.dp
+    val spacing33 = 33.dp
     val spacing40 = 40.dp
     val spacing48 = 48.dp
 

@@ -2,12 +2,12 @@ package com.asphalt.profile.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.asphalt.commonui.util.EmailValidator
-import com.asphalt.profile.repositories.ProfilesSectionRepo
+import com.asphalt.profile.repositories.ProfilesDataRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class EditProfileVM(val repo: ProfilesSectionRepo) : ViewModel() {
+class EditProfileVM(val repo: ProfilesDataRepo) : ViewModel() {
     val currentProfile = repo.profileData
     private val _editFullName = MutableStateFlow(currentProfile.value?.username ?: "")
     private val _editEmail = MutableStateFlow(currentProfile.value?.userEmail ?: "")

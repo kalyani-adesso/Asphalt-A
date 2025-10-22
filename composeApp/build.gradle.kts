@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -17,7 +15,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -37,7 +35,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.ktor.client.core)
-          //  implementation(libs.firebase.ios)
+            //  implementation(libs.firebase.ios)
 
             implementation(projects.shared)
 
@@ -47,7 +45,7 @@ kotlin {
             implementation(libs.firebase.database)
             implementation(libs.firebase.auth)
             implementation(libs.androidx.credentials.play.services.auth)
-          //  implementation(libs.google.firebase.firestore.ktx)
+            //  implementation(libs.google.firebase.firestore.ktx)
 
         }
         commonTest.dependencies {
@@ -95,6 +93,7 @@ dependencies {
     implementation(projects.feature.profile)
     implementation(projects.commonui)
     implementation(projects.feature.createride)
+    implementation(projects.feature.queries)
 
 
     //dependencies
