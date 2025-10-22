@@ -50,6 +50,7 @@ struct UpcomingRideView: View {
         }
         .navigationTitle(AppStrings.UpcomingRide.yourRide)
         .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
