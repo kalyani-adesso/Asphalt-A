@@ -16,7 +16,7 @@ struct ButtonView: View {
     var borderColor: Color? = nil
     var borderWidth: CGFloat = 1
     var onTap: (() -> Void)? = nil
-    var height: CGFloat? = 60
+    var height: CGFloat? = 50
     var body: some View {
         Button(action: {
             onTap?()
@@ -48,7 +48,6 @@ struct ButtonView: View {
                     x: 0, y: showShadow ? 2 : 0)
             .foregroundStyle(foregroundColor)
             .font(KlavikaFont.bold.font(size: 18))
-            .padding(.bottom,20)
             
         }
         .buttonStyle(.plain)
