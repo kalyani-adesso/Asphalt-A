@@ -21,7 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
+import com.asphalt.commonui.theme.BrightTeal
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayLight15
 import com.asphalt.commonui.theme.NeutralBlackGrey
@@ -37,7 +39,10 @@ import com.asphalt.dashboard.data.NotificationData
 import com.asphalt.dashboard.viewmodels.NotificationViewModel
 
 @Composable
-fun NotificationScreen(setTopAppBarState: (AppBarState) -> Unit,viewModel: NotificationViewModel = viewModel()) {
+fun NotificationScreen(
+    setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: NotificationViewModel = viewModel()
+) {
     setTopAppBarState(AppBarState(title = stringResource(R.string.notifications)))
     val notificationList = viewModel.notificationState.collectAsState()
     AsphaltTheme {
@@ -86,8 +91,14 @@ fun NotificationItem(
                 )
             ) {
                 ColorIconRounded(
-                    backColor = VividOrange,
-                    resId = R.drawable.ic_two_wheeler
+                    backColor = if (notificationItem.notificationType == Constants.RIDE_REMINDER)
+                        VividOrange
+                    else
+                        BrightTeal,
+                    resId = if (notificationItem.notificationType == Constants.RIDE_REMINDER)
+                        R.drawable.ic_two_wheeler
+                    else
+                        R.drawable.ic_group_icon_plus
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(Dimensions.size3)) {
                     Row(

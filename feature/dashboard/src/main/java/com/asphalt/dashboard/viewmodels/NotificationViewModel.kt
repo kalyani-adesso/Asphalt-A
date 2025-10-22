@@ -23,7 +23,7 @@ class NotificationViewModel : ViewModel() {
 
         val notification2 = NotificationData(
             title = "New Rider Joined",
-            description = "Sooraj joined to  \"Weekend Adventure\" ride",
+            description = "Sooraj joined to  \"Weekend Adventure ride\"",
             isRead = false,
             date = "1 hour ago",
             notificationType = Constants.RIDER_JOINED
