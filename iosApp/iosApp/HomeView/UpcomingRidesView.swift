@@ -8,14 +8,17 @@
 import SwiftUI
 
 struct UpcomingRidesView: View {
-    @EnvironmentObject var home: HomeViewModel 
+    @EnvironmentObject var home: HomeViewModel
+    @State private var showAllRides: Bool = false
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
                 Text( AppStrings.HomeLabel.upcomingRides.rawValue)
                     .font(KlavikaFont.bold.font(size: 18))
                 Spacer()
-                Button("View All") { }
+                Button("View All") {
+                    showAllRides = true
+                }
                     .font(KlavikaFont.bold.font(size: 13))
             }
             
@@ -28,6 +31,9 @@ struct UpcomingRidesView: View {
             }
         }
         .padding(.top,20)
+        .navigationDestination(isPresented:$showAllRides , destination: {
+            UpcomingRideView()
+        })
     }
 }
 

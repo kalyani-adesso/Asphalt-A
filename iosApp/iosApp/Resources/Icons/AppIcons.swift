@@ -31,7 +31,7 @@ struct AppIcon {
     }
     
     struct NavigationSlider {
-        static let call = Image("icon-call")
+        static let call = Image("icon-caller")
         static let createRide = Image("icon_createRide")
         static let home = Image("icon_home")
         static let motoQuiz = Image("icon_motoQuiz")
@@ -104,6 +104,43 @@ struct AppIcon {
         static let whatsapp = Image("whatsapp")
         static let facebook = Image("Facebook")
         static let backButton = Image("BackArrow")
+    }
+    
+    struct UpcomingRide {
+        static let calender = Image("icon-calender")
+        static let completRide = Image("icon-completeRide")
+        static let upcomingRide = Image("icon-upcomingRide")
+        static let group = Image("icon-group")
+        static let queueRide = Image("icon-queueRide")
+        static let message = Image("icon-message")
+    }
+    
+    struct JoinRide {
+        static let calenderToday = Image("icon-calenderToday")
+        static let joinGroup = Image("icon-joinGroup")
+        static let search = Image("icon-search")
+        static let movedLocation = Image("icon-movedLocation")
+        static let location = Image("icon-location")
+        static let route = Image("icon-route")
+    }
+    
+    struct ConnectedRide {
+        static let checkmark = Image("icon-checkMark")
+        static let rideDistance = Image("icon-rideDistance")
+        static let rideDuration = Image("icon-rideDuration")
+        static let riders = Image("icon-riders")
+        static let rate = Image("icon-rate")
+        static let notRate = Image("icon-notRate")
+        static let zoom = Image("icon-zoom")
+        static let refresh = Image("icon-refresh")
+        static let nearMe = Image("icon-nearMe")
+        static let speed = Image("icon-speed")
+        static let emergency = Image("icon-emergency")
+        static let sos = Image("icon-sos")
+        static let shareLocation = Image("icon-shareLocation")
+        static let groupStatus = Image("icon-groupStatus")
+        static let call = Image("icon-call")
+        static let warning = Image("icon-warning")
     }
 }
 
