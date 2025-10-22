@@ -141,6 +141,9 @@ struct AppIcon {
         static let groupStatus = Image("icon-groupStatus")
         static let call = Image("icon-call")
         static let warning = Image("icon-warning")
+        static let startLocation = UIImage(named: "icon-startLocation")
+        static let endLocation = UIImage(named: "icon-endLocation")
+        static let intermediate = UIImage(named: "icon-intermediate")
     }
 }
 
