@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import MapKit
 
 struct RideCompleteModel: Identifiable {
     let id = UUID()
@@ -31,6 +32,14 @@ struct Rider: Identifiable {
     let status: RiderStatus
     let timeSinceUpdate: String
 }
+
+
+struct RideStop: Identifiable {
+    let id = UUID()
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+}
+
 
 import Foundation
 

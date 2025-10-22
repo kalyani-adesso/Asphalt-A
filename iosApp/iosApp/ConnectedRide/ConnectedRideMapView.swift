@@ -11,20 +11,29 @@ import MapKit
 struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
     @State private var rideComplted: Bool = false
-    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+//    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var startTrack: Bool = false
     @State private var showToast: Bool = true
     //    @Environment(\.dismiss) var dismiss
     @State var showJoinRideView:Bool = false
+    
+    let rideStops: [RideStop] = [
+           RideStop(name: "Kochi Center", coordinate: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673)),
+           RideStop(name: "Vyttila", coordinate: CLLocationCoordinate2D(latitude: 9.9622, longitude: 76.3185)),
+           RideStop(name: "Edappally", coordinate: CLLocationCoordinate2D(latitude: 10.0280, longitude: 76.3080)),
+           RideStop(name: "Kakkanad", coordinate: CLLocationCoordinate2D(latitude: 10.0158, longitude: 76.3419)),
+           RideStop(name: "Aluva", coordinate: CLLocationCoordinate2D(latitude: 10.1081, longitude: 76.3516))
+       ]
+    
     var body: some View {
         List {
-           
             Section {
                 VStack {
                     ZStack(alignment: .topLeading) {
-                        Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: .constant(.follow))
-                            .frame( height: 534)
-                            .cornerRadius(12)
+                        PolylineMapView(coordinates: rideStops.map { $0.coordinate })
+                                        .frame(height: 534)
+                                        .cornerRadius(12)
+                                        .ignoresSafeArea(edges: .top)
                         VStack {
                             ZStack {
                                 HStack {
@@ -395,7 +404,6 @@ struct ConnectedRideOfflineView: View {
                 .stroke(AppColor.backgroundLight, lineWidth: 2)
         )
     }
-    
 }
 
 struct ActiveRiderView: View {
@@ -453,7 +461,6 @@ struct ActiveRiderView: View {
     }
 }
 
-
 struct GroupRiderView: View {
     let title: String
     let status:String
@@ -507,7 +514,6 @@ struct GroupRiderView: View {
                         AppIcon.Home.message
                     })
                     .buttonStyle(.plain)
-                    
                 }
             }
             Spacer()
