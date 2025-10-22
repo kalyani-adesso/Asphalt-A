@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 extension String {
     var isValidEmail: Bool {
@@ -18,3 +19,4 @@ extension String {
         
     }
 }
+

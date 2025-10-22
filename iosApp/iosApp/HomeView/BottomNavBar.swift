@@ -13,44 +13,46 @@ struct BottomNavBar: View {
     @StateObject private var homeViewModel = HomeViewModel()
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                switch selectedTab {
-                case 0:
-                    HomeView()
-                        .environmentObject(homeViewModel)
-                case 1:
-                    UpcomingRideView()
-                case 2:
-                    NavigationSlideBar()
-                case 3:
-                    ProfileScreen()
-                default:
-                    HomeView()
-                        .environmentObject(homeViewModel)
+        NavigationStack {
+            VStack(spacing: 0) {
+                ZStack {
+                    switch selectedTab {
+                    case 0:
+                        HomeView()
+                            .environmentObject(homeViewModel)
+                    case 1:
+                        UpcomingRideView(onBackToHome: { selectedTab = 0 })
+                    case 2:
+                        QueriesView(onBackToHome: { selectedTab = 0 })
+                    case 3:
+                        ProfileScreen(onBackToHome: { selectedTab = 0 })
+                    default:
+                        HomeView()
+                            .environmentObject(homeViewModel)
+                    }
                 }
+                .animation(.easeInOut(duration: 0.25), value: selectedTab)
+                HStack {
+                    tabItem(index: 0, label: "Home", systemIcon: "house")
+                    Spacer()
+                    tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides)
+                    Spacer()
+                    tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
+                    Spacer()
+                    tabItem(index: 3, label: "Profile", systemIcon: "person")
+                }
+                .padding(.horizontal, 40)
+                .padding(.vertical, 10)
+                .background(Color.white)
+                .overlay(
+                    Rectangle()
+                        .frame(height: 0.5)
+                        .foregroundColor(.gray.opacity(0.2)),
+                    alignment: .top
+                )
             }
-            .animation(.easeInOut(duration: 0.25), value: selectedTab)
-            HStack {
-                tabItem(index: 0, label: "Home", systemIcon: "house")
-                Spacer()
-                tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides)
-                Spacer()
-                tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
-                Spacer()
-                tabItem(index: 3, label: "Profile", systemIcon: "person")
-            }
-            .padding(.horizontal, 40)
-            .padding(.vertical, 10)
-            .background(Color.white)
-            .overlay(
-                Rectangle()
-                    .frame(height: 0.5)
-                    .foregroundColor(.gray.opacity(0.2)),
-                alignment: .top
-            )
+            .ignoresSafeArea(edges: .bottom)
         }
-        .ignoresSafeArea(edges: .bottom)
     }
     
     // MARK: - Tab Item View

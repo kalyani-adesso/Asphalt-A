@@ -142,6 +142,14 @@ struct AppIcon {
         static let call = Image("icon-call")
         static let warning = Image("icon-warning")
     }
+    
+    struct Queries {
+        static let like = Image("thumb_up")
+        static let dislike = Image("thumb_down")
+        static let chat = Image("chat_bubble")
+        static let add = Image("add")
+        static let crisis_alert = Image("crisis_alert")
+    }
 }
 
 

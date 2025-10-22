@@ -8,10 +8,10 @@ import SwiftUI
 
 struct FormFieldView: View {
     let label: String
-    let icon : Image
+    let icon : Image?
     let placeholder: String
     var iconColor: Color? = nil
-   
+    
     @Binding var value: String
     @Binding var isValidEmail: Bool
     
@@ -23,10 +23,12 @@ struct FormFieldView: View {
                 .font(KlavikaFont.medium.font(size: 16))
                 .foregroundStyle(AppColor.black)
             HStack {
-                icon
-                    .renderingMode(iconColor == nil ? .original : .template)
-                    .foregroundColor(iconColor ?? .primary)
-                    .frame(width: 20, height: 20)
+                if let icon = icon {
+                    icon
+                        .renderingMode(iconColor == nil ? .original : .template)
+                        .foregroundColor(iconColor ?? .primary)
+                        .frame(width: 20, height: 20)
+                }
                 TextField(placeholder, text: $value)
                     .onChange(of: value) { value in
                         isValidEmail = value.isValidEmail

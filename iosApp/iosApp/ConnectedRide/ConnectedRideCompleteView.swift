@@ -27,8 +27,7 @@ struct ConnectedRideCompleteView: View {
         }
         .padding(.horizontal,16)
         .navigationDestination(isPresented: $showHome, destination: {
-            HomeView()
-                .environmentObject(homeViewModel)
+            BottomNavBar()
         })
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
         .navigationBarBackButtonHidden()

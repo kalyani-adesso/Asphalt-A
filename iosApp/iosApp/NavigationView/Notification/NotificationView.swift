@@ -11,6 +11,7 @@ struct NotificationView: View {
     @StateObject var viewModel = NotificationViewModel()
     @StateObject var homeViewModel = HomeViewModel()
     @State var showHome: Bool = false
+    @Environment(\.dismiss) private var dismiss
     var body: some View {
         VStack {
             List(viewModel.notifications, id: \.id) { notification in
@@ -52,17 +53,13 @@ struct NotificationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
-//                    dismiss()
-                    showHome = true
+                    dismiss()
                 }, label:{
                     AppIcon.CreateRide.backButton
                 })
             })
         }
-        .navigationDestination(isPresented: $showHome, destination: {
-            HomeView()
-                .environmentObject(homeViewModel)
-        })
+
     }
 }
 
