@@ -12,62 +12,50 @@ struct UpcomingRideView: View {
     @State private var selectedStatus: String? = nil
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
-//    @Environment(\.dismiss) var dismiss
+    var onBackToHome: (() -> Void)? = nil
     var body: some View {
-        VStack {
-            HStack(spacing: 12) {
-                ForEach(viewModel.rideStatus, id: \.self) { status in
-                    let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
-                    SegmentButtonView(
-                        rideStatus: status.rawValue,
-                        isSelected: isSelected
-                    ) {
-                        selectedStatus = status.rawValue
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.listGray)
-            )
-            .padding([.leading, .trailing])
-            .contentShape(Rectangle())
+        NavigationStack {
+            SimpleCustomNavBar(title: "Your Rides", onBackToHome: onBackToHome)
+            
             VStack {
-                List {
-                    ForEach($viewModel.rides.filter { $ride in
-                        ride.rideAction.rawValue == selectedStatus
-                    }, id: \.id) { $ride in
-                        UpComingView(ride: $ride)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                HStack(spacing: 12) {
+                    ForEach(viewModel.rideStatus, id: \.self) { status in
+                        let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
+                        SegmentButtonView(
+                            rideStatus: status.rawValue,
+                            isSelected: isSelected
+                        ) {
+                            selectedStatus = status.rawValue
+                        }
                     }
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(AppColor.listGray)
+                )
+                .padding([.leading, .trailing])
+                .contentShape(Rectangle())
+                VStack {
+                    List {
+                        ForEach($viewModel.rides.filter { $ride in
+                            ride.rideAction.rawValue == selectedStatus
+                        }, id: \.id) { $ride in
+                            UpComingView(ride: $ride)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                        }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .onAppear {
+                selectedStatus = viewModel.rideStatus.first?.rawValue
             }
         }
-        .navigationTitle(AppStrings.UpcomingRide.yourRide)
-        .navigationBarBackButtonHidden()
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading, content: {
-                Button(action: {
-//                    dismiss()
-                    showHomeView = true
-                }, label:{
-                    AppIcon.CreateRide.backButton
-                })
-            })
-        }
-        .navigationDestination(isPresented: $showHomeView, destination: {
-            HomeView()
-                .environmentObject(homeViewModel)
-        })
-        .onAppear {
-            selectedStatus = viewModel.rideStatus.first?.rawValue
-        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

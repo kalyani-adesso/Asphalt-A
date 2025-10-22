@@ -145,6 +145,14 @@ struct AppIcon {
         static let endLocation = UIImage(named: "icon-endLocation")
         static let intermediate = UIImage(named: "icon-intermediate")
     }
+    
+    struct Queries {
+        static let like = Image("thumb_up")
+        static let dislike = Image("thumb_down")
+        static let chat = Image("chat_bubble")
+        static let add = Image("add")
+        static let crisis_alert = Image("crisis_alert")
+    }
 }
 
 
