@@ -96,7 +96,6 @@ struct ConnectedRideCompleteView: View {
                 )
               
             }
-            .padding(.bottom,20)
             .buttonStyle(.plain)
             ButtonView(title: AppStrings.NavigationSlider.home.uppercased(),onTap: {
                showHome = true

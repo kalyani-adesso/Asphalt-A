@@ -131,6 +131,15 @@ struct AppIcon {
         static let riders = Image("icon-riders")
         static let rate = Image("icon-rate")
         static let notRate = Image("icon-notRate")
+        static let zoom = Image("icon-zoom")
+        static let refresh = Image("icon-refresh")
+        static let nearMe = Image("icon-nearMe")
+        static let speed = Image("icon-speed")
+        static let emergency = Image("icon-emergency")
+        static let sos = Image("icon-sos")
+        static let shareLocation = Image("icon-shareLocation")
+        static let groupStatus = Image("icon-groupStatus")
+        static let call = Image("icon-call")
     }
 }
 

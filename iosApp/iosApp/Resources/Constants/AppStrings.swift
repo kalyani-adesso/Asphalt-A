@@ -326,6 +326,8 @@ public struct AppStrings{
         static let rideSucess = "Ride completed sucessfully"
         static let rideDifficultyLevel = "Ride Difficulty Level"
         static let rateRide = "Rate This Ride"
+        static let rideJoined = "Successfully joined the ride!"
+        static let rideStarted = "Ride Started! Navigation active."
     }
 }
 

@@ -354,7 +354,6 @@ struct ProfileHeaderView: View {
                     .background(AppColor.white)
                     .cornerRadius(5)
                 }
-                
             }
             Spacer()
         }

@@ -8,14 +8,17 @@
 import SwiftUI
 
 struct ConnectedRideView: View {
+    let notificationTitle:String
     let title:String
     let subTitle:String
+    let model:JoinRideModel
+    @State var showView = false
     var body: some View {
         VStack {
             HStack(spacing: 10) {
                 AppIcon.ConnectedRide.checkmark
                     .padding(.leading,20)
-                Text(AppStrings.ConnectedRide.rideCompleted)
+                Text(notificationTitle)
                     .font(KlavikaFont.bold.font(size: 14))
                     .foregroundStyle(.spanishGreen)
                 Spacer()
@@ -39,6 +42,18 @@ struct ConnectedRideView: View {
         }
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
         .navigationBarBackButtonHidden()
+        .navigationDestination(isPresented: $showView, destination: {
+            if title == "Completing ride" {
+                ConnectedRideCompleteView(viewModel:model )
+            } else {
+                ConnectedRideMapView()
+            }
+        })
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.showView = true
+            }
+        }
     }
     
     @ViewBuilder var DisplayView: some View {
@@ -59,5 +74,16 @@ struct ConnectedRideView: View {
 }
 
 #Preview {
-    ConnectedRideView(title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle)
+    ConnectedRideView(notificationTitle: AppStrings.ConnectedRide.rideCompleted, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model:JoinRideModel(
+        title: "Weekend Coast Ride",
+        organizer: "Sooraj",
+        description: "Join us for a beautiful sunrise ride along the coastal highway",
+        route: "Kochi - Kanyakumari",
+        distance: "280km",
+        date: "Sun, Oct 21",
+        time: "09:00 AM",
+        ridersCount: "3",
+        maxRiders: "8",
+        riderImage: "rider_avatar"
+    ) )
 }

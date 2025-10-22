@@ -26,7 +26,18 @@ struct JoinRideView: View {
         }
         .navigationTitle(AppStrings.HomeLabel.joinRide.localized)
         .navigationDestination(isPresented: $showConnectedRides, destination: {
-            ConnectedRideView(title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle)
+            ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
+                title: "Weekend Coast Ride",
+                organizer: "Sooraj",
+                description: "Join us for a beautiful sunrise ride along the coastal highway",
+                route: "Kochi - Kanyakumari",
+                distance: "280km",
+                date: "Sun, Oct 21",
+                time: "09:00 AM",
+                ridersCount: "3",
+                maxRiders: "8",
+                riderImage: "rider_avatar"
+            ))
         })
     }
     @ViewBuilder var searchBarView: some View {
