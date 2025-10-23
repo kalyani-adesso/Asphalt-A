@@ -43,6 +43,7 @@ object Dimensions {
 
     val spacing0 = 0.dp
     val spacingNeg4 = (-4).dp
+    val spacingNeg2 = (-2).dp
     val spacingNeg8 = (-8).dp
 
     val spacing1 = 1.dp
@@ -62,6 +63,7 @@ object Dimensions {
 
     val spacing54 = 54.dp
     val spacing15pt7 = 15.7.dp
+    val spacing15pt75 = 15.75.dp
     val spacing15 = 15.dp
     val spacing15pt25 = 15.25.dp
     val spacing5 = 5.dp

@@ -103,7 +103,7 @@ fun QueriesScreen(
             }
         }, onDismiss = {
             showQueryPopup = false
-        },user=user.value)
+        }, user = user.value)
     ComposeUtils.DefaultColumnRoot(
         Dimensions.size0,
         bottomPadding = Dimensions.size0,
@@ -112,7 +112,7 @@ fun QueriesScreen(
         Spacer(Modifier.height(Dimensions.padding20))
         SearchQueries()
         FilterCategories(selectedCategory)
-        Queries(queryList.value)
+        Queries(queryList.value,queriesVM)
 
     }
 

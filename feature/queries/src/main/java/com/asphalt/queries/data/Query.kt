@@ -1,6 +1,7 @@
 package com.asphalt.queries.data
 
 data class Query(
+    val id:Int,
     val title: String,
     val description: String,
     val categoryId: Int,
@@ -10,12 +11,14 @@ data class Query(
     val postedByUrl: String,
     val likeCount: Int,
     val answerCount: Int,
-    val answers: List<Answer>
+    val answers: List<Answer>,
+    val isUserLiked: Boolean = false
 )
 
-var bikeQueries: List<Query> = listOf(
+var bikeQueries: MutableList<Query> = listOf(
     // ---------------------- 1. Maintenance ----------------------
     Query(
+        id = 101, // ID added
         title = "Best Chain Lube for Dusty Conditions?",
         description = "I ride mostly dry, dusty gravel. My current wet lube attracts too much grit. Should I switch to a dry wax-based lube, and if so, any brand recommendations?",
         categoryId = 1, // Maintenance
@@ -27,6 +30,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 2,
         answers = listOf(
             Answer(
+                id = 1011, // ID added
                 answeredByName = "Maria Chen",
                 answeredByUrl = "https://picsum.photos/seed/MC/100/100",
                 answeredOn = "2025-10-15T11:15:00Z", // Server Timestamp
@@ -38,6 +42,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 102, // ID added
         title = "SRAM vs. Shimano Brake Bleeding Kits?",
         description = "Need to bleed my Shimano MT200 brakes for the first time. Can I use a universal bleed kit, or is it better to buy the official Shimano kit? Are the procedures vastly different?",
         categoryId = 1, // Maintenance
@@ -49,6 +54,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 1,
         answers = listOf(
             Answer(
+                id = 1021, // ID added
                 answeredByName = "Timothy Lee",
                 answeredByUrl = "https://picsum.photos/seed/TL/100/100",
                 answeredOn = "2025-10-13T09:05:00Z", // Server Timestamp
@@ -59,6 +65,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 103, // ID added
         title = "How Often Should I Replace Brake Pads?",
         description = "I ride road and put in about 100 miles a week. How do I know when my caliper brake pads are worn out, and is there a brand with better longevity?",
         categoryId = 1, // Maintenance
@@ -70,6 +77,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 2,
         answers = listOf(
             Answer(
+                id = 1031, // ID added
                 answeredByName = "Sarah Smith",
                 answeredByUrl = "https://picsum.photos/seed/SS/100/100",
                 answeredOn = "2025-09-02T08:30:00Z", // Server Timestamp
@@ -84,6 +92,7 @@ var bikeQueries: List<Query> = listOf(
 
     // ---------------------- 2. Routes ----------------------
     Query(
+        id = 201, // ID added
         title = "Paved Multi-Day Cycling Routes near Denver?",
         description = "Looking for a 3-4 day paved cycling route, starting and ending near Denver. Prefer low-traffic roads or dedicated bike paths. Any recommendations for scenic loops?",
         categoryId = 2, // Routes
@@ -96,6 +105,7 @@ var bikeQueries: List<Query> = listOf(
         answers = emptyList()
     ),
     Query(
+        id = 202, // ID added
         title = "Are there any hidden singletrack trails around Lake Tahoe?",
         description = "I've ridden Flume Trail and Tahoe Rim Trail. Looking for something more technical and less crowded on the Nevada side for advanced mountain biking. Private trails or lesser-known loops welcome!",
         categoryId = 2, // Routes
@@ -107,6 +117,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 3,
         answers = listOf(
             Answer(
+                id = 2021, // ID added
                 answeredByName = "Frank Wilson",
                 answeredByUrl = "https://picsum.photos/seed/FW/100/100",
                 answeredOn = "2025-10-09T18:00:00Z", // Server Timestamp
@@ -117,6 +128,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 203, // ID added
         title = "Tips for First Time Bike Packing in the Pacific Northwest?",
         description = "Planning a 5-day bike-packing trip along the Oregon Coast. What specific concerns (weather, water access, bears?) should I prepare for compared to interior US trips?",
         categoryId = 2, // Routes
@@ -128,6 +140,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 2,
         answers = listOf(
             Answer(
+                id = 2031, // ID added
                 answeredByName = "Leonard Green",
                 answeredByUrl = "https://picsum.photos/seed/LG/100/100",
                 answeredOn = "2025-08-21T07:45:00Z", // Server Timestamp
@@ -140,6 +153,7 @@ var bikeQueries: List<Query> = listOf(
 
     // ---------------------- 3. Gear ----------------------
     Query(
+        id = 301, // ID added
         title = "Helmet Ventilation vs. Aerodynamics for Road Racing?",
         description = "I'm buying a new road helmet. Should I prioritize a lightweight helmet with maximum vents, or a more aero helmet for local crits? How much difference does aero really make at 20mph?",
         categoryId = 3, // Gear
@@ -151,6 +165,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 3,
         answers = listOf(
             Answer(
+                id = 3011, // ID added
                 answeredByName = "Daniel Velez",
                 answeredByUrl = "https://picsum.photos/seed/DV/100/100",
                 answeredOn = "2025-10-06T12:00:00Z", // Server Timestamp
@@ -161,6 +176,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 302, // ID added
         title = "Recommendations for Budget-Friendly Power Meter?",
         description = "I want to start training with power but don't want to spend \$1000+. Are there any reliable crank-based or pedal-based power meters under \$500 that you recommend for road cycling?",
         categoryId = 3, // Gear
@@ -172,6 +188,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 4,
         answers = listOf(
             Answer(
+                id = 3021, // ID added
                 answeredByName = "Christopher Hayes",
                 answeredByUrl = "https://picsum.photos/seed/CH/100/100",
                 answeredOn = "2025-10-02T10:10:00Z", // Server Timestamp
@@ -184,6 +201,7 @@ var bikeQueries: List<Query> = listOf(
 
     // ---------------------- 4. Safety ----------------------
     Query(
+        id = 401, // ID added
         title = "Visibility Tips for Night Commuting in Rain",
         description = "I commute late evening and live in a high-rain area. My current rear light isn't cutting it in downpours. What are the best, brightest, and most reliable safety lights for poor weather?",
         categoryId = 4, // Safety
@@ -195,6 +213,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 1,
         answers = listOf(
             Answer(
+                id = 4011, // ID added
                 answeredByName = "Nicholas Wu",
                 answeredByUrl = "https://picsum.photos/seed/NW/100/100",
                 answeredOn = "2025-09-29T06:00:00Z", // Server Timestamp
@@ -205,6 +224,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 402, // ID added
         title = "Easiest Way to Teach Kids Basic Hand Signals?",
         description = "My 7-year-old is starting to ride on the street with me. What's the best way to get them to reliably use turn signals without getting overwhelmed by traffic?",
         categoryId = 4, // Safety
@@ -216,6 +236,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 2,
         answers = listOf(
             Answer(
+                id = 4021, // ID added
                 answeredByName = "Elizabeth Young",
                 answeredByUrl = "https://picsum.photos/seed/EY/100/100",
                 answeredOn = "2025-09-26T14:30:00Z", // Server Timestamp
@@ -228,6 +249,7 @@ var bikeQueries: List<Query> = listOf(
 
     // ---------------------- 5. Other ----------------------
     Query(
+        id = 501, // ID added
         title = "Can I use Mountain Bike Shoes for Indoor Cycling?",
         description = "I bought a Peloton and have MTB shoes (SPD cleats). Can I use these on the Peloton, or do I need to buy dedicated road shoes (Delta cleats)?",
         categoryId = 5, // Other
@@ -239,6 +261,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 2,
         answers = listOf(
             Answer(
+                id = 5011, // ID added
                 answeredByName = "Jacob Harris",
                 answeredByUrl = "https://picsum.photos/seed/JH/100/100",
                 answeredOn = "2025-09-20T12:40:00Z", // Server Timestamp
@@ -249,6 +272,7 @@ var bikeQueries: List<Query> = listOf(
         )
     ),
     Query(
+        id = 502, // ID added
         title = "Best Way to Store Bikes in a Small Apartment?",
         description = "I have three bikes (road, gravel, and folding) and a tiny apartment. Any recommendations for wall mounts or floor stands that are minimalist and space-saving?",
         categoryId = 5, // Other
@@ -260,6 +284,7 @@ var bikeQueries: List<Query> = listOf(
         answerCount = 1,
         answers = listOf(
             Answer(
+                id = 5021, // ID added
                 answeredByName = "Laura White",
                 answeredByUrl = "https://picsum.photos/seed/LW/100/100",
                 answeredOn = "2025-09-16T11:00:00Z", // Server Timestamp
@@ -268,6 +293,7 @@ var bikeQueries: List<Query> = listOf(
                 answer = "Look into tension-pole racks (floor-to-ceiling). They hold two bikes vertically without drilling into the wall, which is perfect for rentals. Keep the folding bike in the closet."
             ),
             Answer(
+                id = 5022, // ID added
                 answeredByName = "Jacob Harris",
                 answeredByUrl = "https://picsum.photos/seed/JH/100/100",
                 answeredOn = "2025-09-20T12:40:00Z", // Server Timestamp
@@ -277,5 +303,5 @@ var bikeQueries: List<Query> = listOf(
             )
         )
     )
-)
+).toMutableList()
 

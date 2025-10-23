@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QueriesVM(val queryRepo: QueryRepo) : ViewModel() {
@@ -41,5 +42,43 @@ class QueriesVM(val queryRepo: QueryRepo) : ViewModel() {
     suspend fun loadQueries() {
         _queryList.value = queryRepo.loadQueryList()
 
+    }
+
+    private fun updateQuery(updatedQuery: Query?) {
+        if (updatedQuery != null) {
+            _queryList.update { currentList ->
+                currentList.map { query ->
+                    if (query.id == updatedQuery.id) {
+                        updatedQuery
+                    } else {
+                        query
+                    }
+                }
+            }
+        }
+    }
+
+    fun likeOrRemoveLikeOfQuestion(id: Int) {
+        viewModelScope.launch {
+
+            val updatedQuery = queryRepo.likeOrRemoveLikeOfQuestion(id)
+            updateQuery(updatedQuery)
+        }
+    }
+
+    fun likeOrRemoveLikeOfAnswer(id: Int) {
+        viewModelScope.launch {
+
+            val updatedQuery = queryRepo.likeOrRemoveLikeOfAnswer(id)
+            updateQuery(updatedQuery)
+        }
+    }
+
+    fun likeOrRemoveDislikeOfAnswer(id: Int) {
+        viewModelScope.launch {
+
+            val updatedQuery = queryRepo.likeOrRemoveDislikeOfAnswer(id)
+            updateQuery(updatedQuery)
+        }
     }
 }

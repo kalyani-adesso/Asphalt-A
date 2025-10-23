@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Query
+import com.asphalt.queries.data.bikeQueries
 import com.asphalt.queries.repositories.QueryRepo
 import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.random.Random
 
 class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
     private val _askQuestion = MutableStateFlow("")
@@ -61,6 +63,7 @@ class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
     suspend fun submitQuestion() {
         queryRepo.addQuery(
             Query(
+                id = Random.nextInt(),
                 title = _askQuestion.value,
                 description = _description.value,
                 isAnswered = false,

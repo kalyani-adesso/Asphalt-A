@@ -1,12 +1,15 @@
 package com.asphalt.queries.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,20 +34,21 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Answer
+import com.asphalt.queries.viewmodels.QueriesVM
 
 @Composable
-fun Answers(answers: List<Answer>) {
+fun Answers(answers: List<Answer>, queriesVM: QueriesVM) {
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
         answers.forEach {
-            AnswerComponent(it)
+            AnswerComponent(it, queriesVM)
         }
         HorizontalDivider(color = LightSilver)
     }
 }
 
 @Composable
-fun AnswerComponent(answer: Answer) {
+fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
     RoundedBox(backgroundColor = PaleMint, modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -90,9 +94,25 @@ fun AnswerComponent(answer: Answer) {
                 horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(R.drawable.ic_thumb_up), null)
+                Image(
+                    painter = painterResource(if (answer.isUserLiked) R.drawable.ic_thumbs_up_filled else R.drawable.ic_thumb_up),
+                    null,
+                    modifier = Modifier
+                        .size(Dimensions.spacing15pt75, Dimensions.spacing15)
+                        .clickable {
+                            queriesVM.likeOrRemoveLikeOfAnswer(answer.id)
+                        }.offset(y = Dimensions.spacingNeg2)
+                )
                 Text(text = answer.likeCount.toString(), style = TypographyMedium.bodySmall)
-                Image(painter = painterResource(R.drawable.ic_thumb_down), null)
+                Image(
+                    painter = painterResource(if (answer.isUserDisliked) R.drawable.ic_thumbs_down_filled else R.drawable.ic_thumb_down),
+                    null,
+                    modifier = Modifier
+                        .size(Dimensions.spacing15pt75, Dimensions.spacing15)
+                        .clickable {
+                            queriesVM.likeOrRemoveDislikeOfAnswer(answer.id)
+                        }
+                )
                 Text(text = answer.dislikeCount.toString(), style = TypographyMedium.bodySmall)
 
             }
