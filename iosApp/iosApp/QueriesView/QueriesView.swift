@@ -75,6 +75,7 @@ struct QueriesView: View {
                     }
             }
         }
+        .navigationBarBackButtonHidden(true)
         
         
     }
