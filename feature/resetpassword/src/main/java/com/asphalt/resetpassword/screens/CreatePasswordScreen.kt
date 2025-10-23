@@ -63,7 +63,8 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                     )
                     .verticalScroll(scrollState)
                     .imePadding(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Spacer(modifier = Modifier.height(Dimensions.spacing54))
                 Column(
