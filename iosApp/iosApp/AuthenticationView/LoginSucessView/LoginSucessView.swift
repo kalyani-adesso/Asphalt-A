@@ -50,13 +50,13 @@ struct LoginSucessView: View {
                     .font(KlavikaFont.bold.font(size: 18))
             }
             .padding(.bottom, 21)
-            .navigationDestination(isPresented: $goToHome, destination: {
-              BottomNavBar()
-            })
         }
         .padding(.horizontal, 24)
         .navigationBarBackButtonHidden(true)
         .padding(.top, 100)
+        .navigationDestination(isPresented: $goToHome, destination: {
+          BottomNavBar()
+        })
     }
 }
 

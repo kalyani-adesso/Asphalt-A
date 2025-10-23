@@ -19,12 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RidersClubSideMenu(drawerState: DrawerState, content: @Composable () -> Unit) {
+fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: @Composable () -> Unit) {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -156,7 +157,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, content: @Composable () -> Unit
                         },
                         label = { Text("Logout", color = Color.Red) },
                         selected = false,
-                        onClick = {}
+                        onClick = {
+                            itemClick.invoke(Constants.LOGOUT_CLICK)
+                        }
                     )
                 }
             }

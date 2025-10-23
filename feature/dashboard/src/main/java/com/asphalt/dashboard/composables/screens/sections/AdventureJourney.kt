@@ -39,10 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AdventureJourney(
     adventureJourneyViewModel: AdventureJourneyViewModel = koinViewModel()
 ) {
-    val options = listOf(
-        AdventureJourneyTimeFrameChoices.LastFourMonths,
-        AdventureJourneyTimeFrameChoices.LastWeek, AdventureJourneyTimeFrameChoices.LastYear
-    )
+    val options = AdventureJourneyTimeFrameChoices.getAllChoices()
     val selectedItem = remember { mutableStateOf(options[0]) }
     LaunchedEffect(selectedItem.value) {
         adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)

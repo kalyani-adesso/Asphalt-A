@@ -1,18 +1,19 @@
 package com.asphalt.registration
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +21,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -40,7 +40,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegistrationForm(
-    viewModel: AuthViewModel) {
+    viewModel: AuthViewModel,navigateToLogin:()->Unit
+) {
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -52,9 +53,19 @@ fun RegistrationForm(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var resultMessage by remember { mutableStateOf<String?>(value = null) }
+    val context = LocalContext.current
+    LaunchedEffect(resultMessage) {
+        if (resultMessage != null)
+            Toast.makeText(
+                context,
+                resultMessage,
+                Toast.LENGTH_SHORT
+            ).show()
+    }
 
     Column(
-        modifier= Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(Dimensions.padding)
     ) {
         Text(
@@ -64,7 +75,7 @@ fun RegistrationForm(
         )
         OutlinedTextField(
             value = userName,
-            onValueChange = {userName = it},
+            onValueChange = { userName = it },
             placeholder = { Text(text = "Full Name") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -75,8 +86,10 @@ fun RegistrationForm(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                Icon(
+                    painter = painterResource(
+                        id = R.drawable.shape
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -90,7 +103,7 @@ fun RegistrationForm(
         )
         OutlinedTextField(
             value = email,
-            onValueChange = {email = it},
+            onValueChange = { email = it },
             placeholder = { Text(text = "Email Id") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -101,8 +114,10 @@ fun RegistrationForm(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = R.drawable.shape),
+                Icon(
+                    painter = painterResource(
+                        id = R.drawable.shape
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -116,7 +131,7 @@ fun RegistrationForm(
         )
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = { password = it },
             placeholder = { Text(text = "Password") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -129,8 +144,10 @@ fun RegistrationForm(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = com.asphalt.commonui.R.drawable.ic_lock),
+                Icon(
+                    painter = painterResource(
+                        id = com.asphalt.commonui.R.drawable.ic_lock
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -161,7 +178,7 @@ fun RegistrationForm(
         )
         OutlinedTextField(
             value = confirmPassword,
-            onValueChange = {confirmPassword = it},
+            onValueChange = { confirmPassword = it },
             placeholder = { Text(text = "Confirm Password") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryDarkerLightB75,
@@ -174,8 +191,10 @@ fun RegistrationForm(
                 .fillMaxWidth()
                 .padding(bottom = Dimensions.padding),
             leadingIcon = {
-                Icon(painter = painterResource(
-                    id = com.asphalt.commonui.R.drawable.ic_lock),
+                Icon(
+                    painter = painterResource(
+                        id = com.asphalt.commonui.R.drawable.ic_lock
+                    ),
                     contentDescription = "Email Icon",
                     tint = PrimaryDarkerLightB75,
                 )
@@ -204,18 +223,21 @@ fun RegistrationForm(
             endColor = PrimaryDarkerLightB50,
             onClick = {
                 if (email.isNotBlank() && password.isNotBlank()) {
-                    val user = User(email = email,password=password, name = userName,"")
+                    val user = User(email = email, password = password, name = userName, "")
                     loading = true
-                    resultMessage = ""
+//                    resultMessage = ""
 
                     coroutineScope.launch {
                         // launch coroutine in composble scope
                         val result = viewModel.SignUp(user)
                         loading = false
                         resultMessage = result.fold(
-                            onSuccess = {"Success: $it"},
-                            onFailure = {"Error: ${it.message}"}
+                            onSuccess = { "Account created" },
+                            onFailure = { "Error: ${it.message}" }
                         )
+                        if (result.isSuccess){
+                            navigateToLogin.invoke()
+                        }
                     }
                 }
             }
@@ -223,8 +245,8 @@ fun RegistrationForm(
         { ComposeUtils.DefaultButtonContent(buttonText = "CREATE ACCOUNT") }
     }
     Spacer(modifier = Modifier.height(20.dp))
-    resultMessage?.let {
-        Text(text = it,
-            color = if (resultMessage!!.startsWith("Error")) Color.Red else Color.Green)
-    }
+//    resultMessage?.let {
+//        Text(text = it,
+//            color = if (resultMessage!!.startsWith("Error")) Color.Red else Color.Green)
+//    }
 }

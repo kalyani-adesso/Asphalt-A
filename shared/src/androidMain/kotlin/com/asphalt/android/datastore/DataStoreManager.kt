@@ -39,4 +39,5 @@ class DataStoreManager(private val context: Context) {
             .map { it[dataStoreKey] }
             .first()
     }
+
 }

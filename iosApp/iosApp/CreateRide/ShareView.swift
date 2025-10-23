@@ -15,33 +15,7 @@ struct ShareView: View {
             stepIndicator
             ScrollView {
                 VStack(spacing: 30) {
-                    
-                    VStack(spacing: 15) {
-                        ZStack {
-                            Circle()
-                                .fill(AppColor.darkCyanLimeGreen)
-                                .frame(width: 100, height: 100)
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 40, weight: .medium))
-                                .foregroundColor(.white)
-                        }
-                        
-                        Text("Ride Created!")
-                            .font(KlavikaFont.medium.font(size: 20))
-                            .foregroundColor(AppColor.black)
-                        
-                        Text("Share your ride with friends")
-                            .font(KlavikaFont.regular.font(size: 14))
-                            .foregroundColor(AppColor.stoneGray)
-                    }
-                    .frame(width:311 ,height: 200)
-                    .padding()
-                    .background(AppColor.white)
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(AppColor.darkGray, lineWidth: 1)
-                    )
+                    SucessView(title:"Ride Created!", subtitle: "Share your ride with friends")
                     VStack(alignment: .leading, spacing: 15) {
                         Text("Share Link")
                             .font(KlavikaFont.medium.font(size: 16))
@@ -64,7 +38,7 @@ struct ShareView: View {
                         .background(Color.white)
                         .cornerRadius(10)
                         Spacer() .frame(height: 0)
-                  
+                        
                         Text("Share Via")
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
@@ -91,22 +65,22 @@ struct ShareView: View {
                     isPresented = true
                 }
                 ).navigationDestination(isPresented: $isPresented, destination: {
-                    YourRideScreen()
+                    UpcomingRideView(showpopup: true)
                 })
                 
             }
             .padding()
         }
     }
-        var stepIndicator: some View {
-            HStack(spacing: 32) {
-                StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.review, title: "Review",isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.share, title: "Share",isActive: true, isCurrentPage: true)
-            }
+    var stepIndicator: some View {
+        HStack(spacing: 32) {
+            StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.review, title: "Review",isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.share, title: "Share",isActive: true, isCurrentPage: true)
         }
+    }
     
 }
 struct ShareIconButton: View {

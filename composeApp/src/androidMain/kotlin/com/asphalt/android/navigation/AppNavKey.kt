@@ -37,6 +37,11 @@ sealed class AppNavKey : NavKey {
     @Serializable
     object CreateRideNav : AppNavKey()
 
+    @Serializable
+    object NotificationNav : AppNavKey()
+
+
+
 }
 
 data class BottomNavItems(

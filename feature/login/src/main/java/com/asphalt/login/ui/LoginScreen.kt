@@ -456,6 +456,7 @@ fun LoginScreen(
                         text = stringResource(string.dont_have_account),
                         style = TypographyMedium.bodySmall
                     )
+                    Spacer(Modifier.width(Dimensions.size3))
                     Text(
                         text = stringResource(string.sign_up_here),
                         style = TypographyMedium.bodySmall,

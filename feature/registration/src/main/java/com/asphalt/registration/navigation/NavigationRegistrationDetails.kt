@@ -11,11 +11,11 @@ data object RegistrationDetailsNavKey : NavKey
 @Composable
 fun NavigationRegistrationDetails(
     onBackPressed: () -> Unit = {},
-    onNavigateToDashboard: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {}
 ) {
     RegistrationDetailsScreen(
         // onBackPressed = onBackPressed,
-        onNavigateToDashboard = onNavigateToDashboard
+        onNavigateToLogin = onNavigateToLogin
     )
 }
 
