@@ -50,10 +50,13 @@ struct NotificationView: View {
         .navigationTitle(AppStrings.Notification.notifications.localized)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showHome, destination: {
+            BottomNavBar()
+        })
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
-                    dismiss()
+                   showHome = true
                 }, label:{
                     AppIcon.CreateRide.backButton
                 })

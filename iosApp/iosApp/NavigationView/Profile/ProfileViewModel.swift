@@ -83,7 +83,7 @@ final class ProfileViewModel: ObservableObject {
                 
                 items: [
                     ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "25 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
-                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "12 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(ConnectedRideScreen())),
+                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "12 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
                 ]
             ),
             ProfileSection(
