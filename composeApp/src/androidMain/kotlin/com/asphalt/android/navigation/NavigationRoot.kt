@@ -43,6 +43,7 @@ import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
 import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
+import com.asphalt.resetpassword.screens.ForgotPasswordScreen
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import kotlinx.coroutines.CoroutineScope
@@ -222,8 +223,9 @@ fun NavigationRoot(
                         NavigationSplashScreen(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
-                                backStack.add(AppNavKey.LoginScreenNavKey)
-                                //backStack.add(AppNavKey.CreateRideNav)
+                                //backStack.add(AppNavKey.LoginScreenNavKey)
+                                backStack.add( AppNavKey.ResetPasswordNav)
+
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -311,6 +313,10 @@ fun NavigationRoot(
                     }
                     entry<AppNavKey.NotificationNav> { key ->
                         NotificationScreen(setTopAppBarState = setTopAppBarState)
+                    }
+
+                    entry<AppNavKey.ResetPasswordNav> { key ->
+                        ForgotPasswordScreen()
                     }
                 }
             )

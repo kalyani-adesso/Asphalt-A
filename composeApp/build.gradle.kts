@@ -94,6 +94,7 @@ dependencies {
     implementation(projects.commonui)
     implementation(projects.feature.createride)
     implementation(projects.feature.queries)
+    implementation(projects.feature.resetpassword)
 
 
     //dependencies

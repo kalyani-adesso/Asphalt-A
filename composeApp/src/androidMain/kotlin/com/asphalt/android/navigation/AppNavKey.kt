@@ -40,6 +40,9 @@ sealed class AppNavKey : NavKey {
     @Serializable
     object NotificationNav : AppNavKey()
 
+    @Serializable
+    object ResetPasswordNav : AppNavKey()
+
 
 
 }

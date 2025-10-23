@@ -199,6 +199,9 @@
     <string name="review_ride">Review Your Ride</string>
     <string name="check_responses">Check Responses</string>
     <string name="notifications">Notifications</string>
+    <string name="send_reset_code">Send reset code</string>
+    <string name="forgot_password_q">Forgot Password?</string>
+    <string name="sent_reset_instruction">We’ll send you reset instructions</string>
 
 
 </resources>
