@@ -2,7 +2,7 @@ package com.asphalt.queries.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asphalt.queries.QueryConstants.CATEGORY_ALL_ID
+import com.asphalt.queries.constants.QueryConstants.CATEGORY_ALL_ID
 import com.asphalt.queries.data.Query
 import com.asphalt.queries.repositories.QueryRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +41,6 @@ class QueriesVM(val queryRepo: QueryRepo) : ViewModel() {
 
     suspend fun loadQueries() {
         _queryList.value = queryRepo.loadQueryList()
-
     }
 
     private fun updateQuery(updatedQuery: Query?) {

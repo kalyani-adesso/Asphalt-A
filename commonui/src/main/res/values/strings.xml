@@ -195,6 +195,12 @@
     <string name="review">Review</string>
     <string name="review_ride">Review Your Ride</string>
     <string name="check_responses">Check Responses</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="routes">Routes</string>
+    <string name="gear">Gear</string>
+    <string name="safety">Safety</string>
+    <string name="other">Other</string>
+
 
 
 </resources>

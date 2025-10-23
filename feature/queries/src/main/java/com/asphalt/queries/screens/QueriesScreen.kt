@@ -37,6 +37,7 @@ import com.asphalt.queries.components.AskQuery
 import com.asphalt.queries.components.FilterCategories
 import com.asphalt.queries.components.Queries
 import com.asphalt.queries.components.SearchQueries
+import com.asphalt.queries.viewmodels.AskQueryVM
 import com.asphalt.queries.viewmodels.QueriesVM
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -48,6 +49,7 @@ fun QueriesScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 
 ) {
+    val askQueryVM: AskQueryVM = koinViewModel()
     var showQueryPopup by remember { mutableStateOf(false) }
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
     setTopAppBarState(
@@ -96,7 +98,7 @@ fun QueriesScreen(
     }
     val scope = rememberCoroutineScope()
     if (showQueryPopup)
-        AskQuery(onSubmit = {
+        AskQuery(askQueryVM = askQueryVM, onSubmit = {
             scope.launch {
                 queriesVM.loadQueries()
                 showQueryPopup = false
@@ -104,6 +106,7 @@ fun QueriesScreen(
         }, onDismiss = {
             showQueryPopup = false
         }, user = user.value)
+    else askQueryVM.clearAll()
     ComposeUtils.DefaultColumnRoot(
         Dimensions.size0,
         bottomPadding = Dimensions.size0,
@@ -112,7 +115,7 @@ fun QueriesScreen(
         Spacer(Modifier.height(Dimensions.padding20))
         SearchQueries()
         FilterCategories(selectedCategory)
-        Queries(queryList.value,queriesVM)
+        Queries(queryList.value, queriesVM)
 
     }
 

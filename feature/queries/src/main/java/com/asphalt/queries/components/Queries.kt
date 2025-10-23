@@ -68,7 +68,7 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM) {
         Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10)) {
 
             QueryCategories.getCategoryNameById(query.categoryId)
-                ?.let { CustomLabel(textColor = SafetyOrange, backColor = PaleOrange, text = it) }
+                ?.let { CustomLabel(textColor = SafetyOrange, backColor = PaleOrange, text = stringResource(it)) }
             if (query.isAnswered) CustomLabel(
                 textColor = GreenLIGHT25, backColor = PaleGreen, text =
                     stringResource(R.string.answered)

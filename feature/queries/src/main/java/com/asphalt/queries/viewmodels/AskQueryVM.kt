@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Query
-import com.asphalt.queries.data.bikeQueries
 import com.asphalt.queries.repositories.QueryRepo
 import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,16 +68,26 @@ class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
                 isAnswered = false,
                 categoryId = _selectedCategory.value?.id ?: 0,
                 postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
-                postedByName = user?.name?:"",
+                postedByName = user?.name ?: "",
                 postedByUrl = "",
                 likeCount = 0,
                 answerCount = 0,
                 answers = emptyList()
             )
         )
+        clearAll()
     }
 
     fun setUser(user: CurrentUser?) {
         this.user = user
+    }
+
+    fun clearAll() {
+        _askQuestion.value = ""
+        _description.value = ""
+        _questionError.value = false
+        _categoryError.value = false
+        _descriptionError.value = false
+        _selectedCategory.value = null
     }
 }
