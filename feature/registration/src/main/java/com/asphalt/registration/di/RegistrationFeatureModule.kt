@@ -12,5 +12,5 @@ val registrationModule = module {
 
     viewModel { RegistrationPasswordViewModel() }
 
-    viewModel { RegistrationDetailsViewModel(authViewModel = get(), datastore = get()) }
+    viewModel { RegistrationDetailsViewModel(authViewModel = get()) }
 }

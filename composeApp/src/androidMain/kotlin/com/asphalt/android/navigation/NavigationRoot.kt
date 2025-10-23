@@ -59,7 +59,7 @@ import org.koin.compose.koinInject
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(SplashKey)
+    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
     val datastore: DataStoreManager = koinInject()
 
 //    var showAppBars by remember { mutableStateOf(false) }
