@@ -13,6 +13,9 @@ struct NotificationView: View {
     @State var showHome: Bool = false
     @Environment(\.dismiss) private var dismiss
     var body: some View {
+        SimpleCustomNavBar(title: "Notification", onBackToHome: {
+            showHome = true
+        } )
         VStack {
             List(viewModel.notifications, id: \.id) { notification in
                 HStack(spacing: 17) {
@@ -47,21 +50,11 @@ struct NotificationView: View {
         .onAppear {
             viewModel.fetchNotifications()
         }
-        .navigationTitle(AppStrings.Notification.notifications.localized)
-        .navigationBarBackButtonHidden()
+        .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showHome, destination: {
             BottomNavBar()
         })
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading, content: {
-                Button(action: {
-                   showHome = true
-                }, label:{
-                    AppIcon.CreateRide.backButton
-                })
-            })
-        }
 
     }
 }
