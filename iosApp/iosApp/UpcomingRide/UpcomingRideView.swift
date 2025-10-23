@@ -12,10 +12,14 @@ struct UpcomingRideView: View {
     @State private var selectedStatus: String? = nil
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
+    @State var showHome: Bool = false
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
         NavigationStack {
-            SimpleCustomNavBar(title: "Your Rides", onBackToHome: onBackToHome)
+            SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
+                onBackToHome?()
+                showHome = true
+            } )
             
             VStack {
                 HStack(spacing: 12) {
@@ -56,6 +60,9 @@ struct UpcomingRideView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $showHome, destination: {
+            BottomNavBar()
+        })
     }
 }
 
