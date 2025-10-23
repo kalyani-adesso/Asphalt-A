@@ -65,7 +65,7 @@ struct ShareView: View {
                     isPresented = true
                 }
                 ).navigationDestination(isPresented: $isPresented, destination: {
-                    UpcomingRideView()
+                    UpcomingRideView(showpopup: true)
                 })
                 
             }
