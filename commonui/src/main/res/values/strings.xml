@@ -206,6 +206,14 @@
     <string name="enter_verification_code">Enter Verification Code</string>
     <string name="enter_code">Enter code</string>
     <string name="verify_code">Verify code</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="update_password">Update password</string>
+    <string name="back_to_sign_in">Back to Sign In</string>
+    <string name="create_new_password">Create New Password</string>
+    <string name="enter_your_password">Enter your new password below.</string>
+    <string name="enter_new_password">Enter New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
 
 
 </resources>
