@@ -202,6 +202,10 @@
     <string name="send_reset_code">Send reset code</string>
     <string name="forgot_password_q">Forgot Password?</string>
     <string name="sent_reset_instruction">We’ll send you reset instructions</string>
+    <string name="check_email">Check Your Email</string>
+    <string name="enter_verification_code">Enter Verification Code</string>
+    <string name="enter_code">Enter code</string>
+    <string name="verify_code">Verify code</string>
 
 
 </resources>

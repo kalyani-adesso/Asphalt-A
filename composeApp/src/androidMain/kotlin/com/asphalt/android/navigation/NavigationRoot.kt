@@ -44,6 +44,7 @@ import com.asphalt.registration.navigation.RegistrationCodeNavKey
 import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.resetpassword.screens.ForgotPasswordScreen
+import com.asphalt.resetpassword.screens.VerifyScreen
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import kotlinx.coroutines.CoroutineScope
@@ -316,7 +317,8 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.ResetPasswordNav> { key ->
-                        ForgotPasswordScreen()
+                        //ForgotPasswordScreen()
+                        VerifyScreen()
                     }
                 }
             )
