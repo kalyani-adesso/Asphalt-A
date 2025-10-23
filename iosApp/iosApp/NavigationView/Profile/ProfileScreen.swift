@@ -11,6 +11,8 @@ struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
+    @Environment(\.dismiss) var dismiss
+    var onBackToHome: (() -> Void)? = nil
     var body: some View {
         ZStack {
             List {
@@ -47,7 +49,15 @@ struct ProfileScreen: View {
         }
         .navigationTitle(AppStrings.SignInLabel.clubName.localized)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
         .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+                    onBackToHome?() 
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     showEditProfile = true
@@ -354,7 +364,6 @@ struct ProfileHeaderView: View {
                     .background(AppColor.white)
                     .cornerRadius(5)
                 }
-                
             }
             Spacer()
         }

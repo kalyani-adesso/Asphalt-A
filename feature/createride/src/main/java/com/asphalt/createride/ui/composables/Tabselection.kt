@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
@@ -74,7 +75,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Details",
+                text = stringResource(R.string.details),
                 style = if (viewModel.tabSelectState.value == Constants.TAB_DETAILS) {
                     TypographyBold.bodySmall
                 } else {
@@ -122,7 +123,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Route", style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                text = stringResource(R.string.route), style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
@@ -165,7 +166,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Participants",
+                text = stringResource(R.string.participants),
                 style = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
                     TypographyBold.bodySmall
                 } else {
@@ -212,7 +213,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Review",
+                text = stringResource(R.string.review),
                 style = if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
                     TypographyBold.bodySmall
                 } else {
@@ -258,7 +259,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = "Share", style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                text = stringResource(R.string.share), style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall

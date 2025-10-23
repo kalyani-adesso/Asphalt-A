@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,7 +37,7 @@ import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
-fun ReviewSection() {
+fun ReviewSection(viewModel: CreateRideScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,7 +51,7 @@ fun ReviewSection() {
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Text(
-            text = "Review Your Ride",
+            text = stringResource(R.string.review_ride),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -79,13 +80,13 @@ fun ReviewSection() {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Weekend Ride",
+                            text = viewModel.rideDetailsState.value.rideTitle ?: "",
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Refreshment to  Munnar",
+                            text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation?:""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -108,7 +109,7 @@ fun ReviewSection() {
 
                 ) {
                     Text(
-                        text = "Group ride".uppercase(),
+                        text = viewModel.rideDetailsState.value.rideType ?: "",
                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                         color = GreenLIGHT25,
                         modifier = Modifier
@@ -141,13 +142,13 @@ fun ReviewSection() {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Date and Time",
+                            text = stringResource(R.string.date_time),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Sun, Oct 21 - 09:00 AM",
+                            text = viewModel.rideDetailsState.value.dateString ?: "",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -182,13 +183,13 @@ fun ReviewSection() {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Route",
+                            text = stringResource(R.string.route),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Kochi - Munnarr",
+                            text = "${viewModel.rideDetailsState.value.startLocation ?: ""} - ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -222,13 +223,13 @@ fun ReviewSection() {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = "Participants",
+                            text = stringResource(R.string.participants),
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "3 riders  selected",
+                            text = "${viewModel.ridersList.value.count{it.isSelect}} ${stringResource(R.string.riders_selected)}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -246,6 +247,6 @@ fun ReviewSection() {
 @Preview
 @Composable
 fun ReviewPreview() {
-    //var vimodel: CreateRideScreenViewModel = viewModel()
-    ReviewSection()
+    var vimodel: CreateRideScreenViewModel = viewModel()
+    ReviewSection(vimodel)
 }

@@ -41,6 +41,7 @@ struct SignInView: View {
                         hasLoggedIn = true
                     })
                 })
+                .padding(.bottom,20)
                 socialSignInOptions
                 signUpLink()
             }

@@ -2,15 +2,15 @@ package com.asphalt.profile.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asphalt.profile.repositories.ProfilesSectionRepo
+import com.asphalt.profile.repositories.ProfilesDataRepo
 import kotlinx.coroutines.launch
 
-class ProfileSectionVM(val profilesSectionRepo: ProfilesSectionRepo) :
+class ProfileSectionVM(val profilesDataRepo: ProfilesDataRepo) :
     ViewModel() {
-    val profileData = profilesSectionRepo.profileData
+    val profileData = profilesDataRepo.profileData
     fun getProfileData(uid: String?) {
         viewModelScope.launch {
-            profilesSectionRepo.getProfileData(uid)
+            profilesDataRepo.getProfileData(uid)
         }
     }
 

@@ -68,26 +68,23 @@ struct EditProfileView: View {
                         EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $drivingLicenseNumber, keyboardType: .default)
                         MechanicView(isOn: $enableMechanic)
                         HStack(spacing: 19) {
-                            Button(action: {
+                            ButtonView( title: "CANCEL",
+                                        background: LinearGradient(
+                                                    gradient: Gradient(colors: [.white, .white]),
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing),
+                                        foregroundColor: AppColor.darkRed,
+                                        showShadow: false ,
+                                        borderColor: AppColor.darkRed,
+                                        onTap: {
                                 isPresented = false
-                            }) {
-                                Text(AppStrings.EditProfile.cancel.uppercased())
-                                    .frame(height: 60)
-                                    .frame(maxWidth: .infinity)
-                                    .background(AppColor.white)
-                                    .foregroundStyle(AppColor.red)
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .cornerRadius(15)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .stroke(AppColor.red, lineWidth: 1)
-                                    )
-                            }
+                            })
                             .padding(.bottom, 21)
                             ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
                                 profileViewModel.updateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL:drivingLicenseNumber , machanic:enableMechanic)
                                 isPresented = false
                             }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber))
+                                .padding(.bottom, 21)
                         }
                     }
                     .padding()

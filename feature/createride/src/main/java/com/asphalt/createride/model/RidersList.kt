@@ -5,5 +5,6 @@ data class RidersList(
     var name: String? = null,
     var job: String? = null,
     var bike: String? = null,
-    var isSelect: Boolean = false
+    var isSelect: Boolean = false,
+    var imgUrl: String? = null
 )

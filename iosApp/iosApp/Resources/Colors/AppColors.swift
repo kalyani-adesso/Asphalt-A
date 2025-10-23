@@ -48,5 +48,15 @@ struct AppColor {
     static let lightGreen = Color("LightGreen")
     static let darkGreen = Color("DarkGreen")
     static let darkCyanLimeGreen = Color("DarkCyanLimeGreen")
+    static let spanishGreen = Color("SpanishGreen")
+    static let mintcream: Color = Color("Mintcream")
+    static let aeroGreen: Color = Color("AeroGreen")
+    static let oldBurgundy: Color = Color("OldBurgandy")
+    static let pastelYellow: Color = Color("PastelYellow")
+    static let blushPink: Color = Color("BlushPink")
+    static let deepOrange: Color = Color("DeepOrange")
+    static let crimsonRed: Color = Color("CrimsonRed")
+    static let paleOrange: Color = Color("PaleOrange")
+    static let darkOrange: Color = Color("DarkOrange")
 }
 

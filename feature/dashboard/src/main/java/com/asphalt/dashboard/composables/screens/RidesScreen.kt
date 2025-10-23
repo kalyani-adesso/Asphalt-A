@@ -50,6 +50,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividOrangeLight
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
@@ -143,7 +144,12 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(modifier = Modifier.weight(1f)) {
-                ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
+                if(upconing.rideStatus=="UPCOMING"){
+                    ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
+                }else{
+                    ColorIconRounded(backColor = VividOrangeLight, resId = R.drawable.ic_location)
+                }
+
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
@@ -162,10 +168,18 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
             }
             Box(
                 modifier = Modifier
-                    .background(
-                        color = MagentaDeep,
-                        shape = RoundedCornerShape(Dimensions.size10)
-                    )
+                    .then(if(upconing.rideStatus=="UPCOMING"){
+                        Modifier.background(
+                            color = MagentaDeep,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }else{
+                        Modifier.background(
+                            color = VividOrangeLight,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    })
+
                     .padding(
                         start = Dimensions.padding16,
                         end = Dimensions.padding16,
@@ -248,7 +262,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.view_details).uppercase(),
+                    text = if(upconing.rideStatus=="UPCOMING"){stringResource(R.string.view_details).uppercase()}else{
+                        stringResource(R.string.check_responses).uppercase()
+                    },
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )

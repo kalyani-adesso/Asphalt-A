@@ -86,7 +86,9 @@ val dummyRideInvites = listOf(
 val adventureJourneyDummyDataList = listOf(
     AdventureTimeFrameChoiceDto(1, AdventureJourneyDto(12, 20, 20, 5)),
     AdventureTimeFrameChoiceDto(2, AdventureJourneyDto(28, 50, 17, 12)),
-    AdventureTimeFrameChoiceDto(3, AdventureJourneyDto(65, 40, 15, 120))
+    AdventureTimeFrameChoiceDto(3, AdventureJourneyDto(65, 40, 15, 120)),
+    AdventureTimeFrameChoiceDto(4, AdventureJourneyDto(44, 12, 4, 20)),
+    AdventureTimeFrameChoiceDto(5, AdventureJourneyDto(78, 21, 14, 24))
 
 )
 

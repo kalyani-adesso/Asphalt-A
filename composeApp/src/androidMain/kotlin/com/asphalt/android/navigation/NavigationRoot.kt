@@ -24,17 +24,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
+import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
-import com.asphalt.createride.ui.CreateRideEntry
+import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.constants.PreferenceKeys
+import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
+import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
-import com.asphalt.joinaride.navigation.JoinRide
-import com.asphalt.joinaride.navigation.JoinRideKey
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
+import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
 import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
@@ -42,13 +45,22 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
+    val backStack = rememberNavBackStack(SplashKey)
+    val datastore: DataStoreManager = koinInject()
 
 //    var showAppBars by remember { mutableStateOf(false) }
 //    var navigationDrawer by remember { mutableStateOf(false) }
@@ -63,7 +75,8 @@ fun NavigationRoot(
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
         AppNavKey.ProfileKey,
-        AppNavKey.CreateRideNav
+        AppNavKey.CreateRideNav,
+        AppNavKey.NotificationNav
 
     )
 
@@ -125,7 +138,21 @@ fun NavigationRoot(
             manageSelectKeyOnBackPress()
         }
     }
-    RidersClubSideMenu(drawerState) {
+    RidersClubSideMenu(drawerState, itemClick = { item ->
+        when (item) {
+            Constants.LOGOUT_CLICK -> {
+                scope.launch {
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()
+
+                }
+            }
+        }
+
+    }) {
 
         Scaffold(
 
@@ -219,13 +246,15 @@ fun NavigationRoot(
                         )
                     }
 
-                    entry<RegistrationDetailsNavKey> { key ->
+                    entry<RegistrationDetailsNavKey> {
                         NavigationRegistrationDetails(
-                           // onBackPressed = { backStack.removeLastOrNull() },
-                            onNavigateToLogin = { 
-                                backStack.add(AppNavKey.LoginScreenNavKey)
+                            onNavigateToLogin = { //password ->
+                                //  backStack.add(RegistrationDetailsNavKey(password))
                                 backStack.remove(SplashKey)
+                                backStack.add(AppNavKey.LoginScreenNavKey)
+
                             },
+                            onBackPressed = { onBackPressed() }
                         )
                     }
 
@@ -257,6 +286,7 @@ fun NavigationRoot(
                                 selectedKey = AppNavKey.RidesScreenNav
                             },
                             setTopAppBarState = setTopAppBarState, notificationsClick = {
+                                backStack.add(AppNavKey.NotificationNav)
 
                             }, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
@@ -267,15 +297,20 @@ fun NavigationRoot(
                         RidesScreen(setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
+                        QueriesScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.ProfileKey> { key ->
                         ProfileScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.CreateRideNav> { key ->
-                        CreateRideEntry(setTopAppBarState=setTopAppBarState)
+                        CreateRideScreen(setTopAppBarState = setTopAppBarState, clickDone = {
+                            backStack.remove(AppNavKey.CreateRideNav)
+                            backStack.add(AppNavKey.RidesScreenNav)
+                            selectedKey = AppNavKey.RidesScreenNav
+                        })
                     }
-                    entry<JoinRideKey> { key ->
-                        JoinRide(setTopAppBarState = setTopAppBarState)
+                    entry<AppNavKey.NotificationNav> { key ->
+                        NotificationScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
             )

@@ -26,7 +26,7 @@ struct ReviewView: View {
                     tag: tagValue)
                 ReviewCard(
                     icon: AppIcon.Home.calender,
-                    iconColor: AppColor.orange,
+                    iconColor: AppColor.darkOrange,
                     title: "Date and Time",
                     subtitle: formattedDateTime)
                 ReviewCard(

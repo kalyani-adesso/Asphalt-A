@@ -14,6 +14,7 @@
     <string name="join_ride">Join a Ride</string>
     <string name="upcoming_ride">Upcoming Ride</string>
     <string name="view_all">View All</string>
+    <string name="all">All</string>
     <string name="adventure">Adventure</string>
     <string name="journey">Journey</string>
     <string name="total_rides_info_chart">Total %1$d Rides</string>
@@ -62,8 +63,11 @@
     <string name="share_exp">Share Experience</string>
     <string name="no_invites">No Invites</string>
     <string name="last_four_months">Last 4 months</string>
+    <string name="last_six_months">Last 6 months</string>
     <string name="last_week">Last week</string>
+    <string name="this_month">This month</string>
     <string name="last_year">Last year</string>
+    <string name="last_month">Last month</string>
     <string name="your_garage">Your Garage (%1$d)</string>
     <string name="no_vehicles_added_yet">No vehicles added yet</string>
     <string name="add_your_motorcycle">Add your motorcycle to get started!</string>
@@ -123,13 +127,29 @@
     <string name="full_name">Full Name</string>
     <string name="enter_name">Enter Name</string>
     <string name="full_name_cannot_be_empty">Full name cannot be empty</string>
+    <string name="question_cannot_be_empty">Question cannot be empty</string>
+    <string name="description_cannot_be_empty">Description cannot be empty</string>
     <string name="email">Email</string>
     <string name="enter_email_placeholder">Enter Email</string>
     <string name="phone_number">Phone Number</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="phone_number_error">Phone number cannot be empty</string>
     <string name="hello_user">Hello %1$s</string>
+    <string name="ask_question">Ask question</string>
+    <string name="queries">Queries</string>
+    <string name="answered">Answered</string>
+    <string name="answer">Answer</string>
+    <string name="mechanic">Mechanic</string>
+    <string name="search_qns">Search Questions</string>
+    <string name="ask_a_question">Ask a Question</string>
+    <string name="get_help_from_the_motorcycle_community">Get help from the motorcycle community!</string>
+    <string name="question_title">Question Title</string>
+    <string name="brief_description_of_the_question">Brief Description of the question..</string>
+    <string name="category">Category</string>
+    <string name="select_a_category">Select a category</string>
+    <string name="category_cannot_be_empty">Category cannot be empty</string>
 
+    <string name="provide_more_details_about_your_question">Provide more details about your question…</string>
 
 
     <string name="solo_ride">Solo Ride</string>
@@ -142,7 +162,43 @@
     <string name="min">Min</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
-
+    <string name="create_a_ride">Create a Ride</string>
+    <string name="done">Done</string>
+    <string name="next_step">Next Step</string>
+    <string name="previous">Previous</string>
+    <string name="create_rides">Create Ride</string>
+    <string name="next">Next</string>
+    <string name="ride_type">Ride Type</string>
+    <string name="select_ride_type">Select ride type</string>
+    <string name="ride_title">Ride Title</string>
+    <string name="enter_ride_name">Enter ride name…</string>
+    <string name="description">Description</string>
+    <string name="describe_vibe">Describe the vibe…</string>
+    <string name="date">Date</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="time">Time</string>
+    <string name="pick_time">Pick Time</string>
+    <string name="invites_contact">Invite Contacts</string>
+    <string name="_selected">selected</string>
+    <string name="_search_name_number">Search by name ,number or bike type…</string>
+    <string name="refreshment_to">Refreshment to</string>
+    <string name="date_time">Date and Time</string>
+    <string name="route">Route</string>
+    <string name="participants">Participants</string>
+    <string name="riders_selected">riders selected</string>
+    <string name="starting_point">Starting Point</string>
+    <string name="enter_start_loc">Enter starting location</string>
+    <string name="destination">Destination</string>
+    <string name="enter_destination">Enter destination</string>
+    <string name="ride_created">Ride Created!</string>
+    <string name="share_with_friends">Share your ride with friends</string>
+    <string name="share_link">Share Link</string>
+    <string name="share_via">Share Via</string>
+    <string name="details">Details</string>
+    <string name="review">Review</string>
+    <string name="review_ride">Review Your Ride</string>
+    <string name="check_responses">Check Responses</string>
+    <string name="notifications">Notifications</string>
 
 
 </resources>

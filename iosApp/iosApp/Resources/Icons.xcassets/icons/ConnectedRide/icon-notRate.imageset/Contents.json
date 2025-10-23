@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-notRate.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

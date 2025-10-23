@@ -6,48 +6,59 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import com.asphalt.android.model.User
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.PrimaryBrighterLightW75
+import com.asphalt.commonui.theme.PrimaryDarkerLightB50
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
-import com.asphalt.registration.viewmodel.RegistrationDetailsViewModel
-import com.asphalt.registration.viewmodel.SignUpUiState
+import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.utils.ComposeUtils
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
-import org.w3c.dom.Text
 
 @Composable
 fun RegistrationDetailsScreen(
-    registrationDetailsVM : RegistrationDetailsViewModel = koinViewModel(),
+    authViewModel: AuthViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit = {},
-    onNavigateToLogin: () -> Unit = {}) {
-
-    LaunchedEffect(registrationDetailsVM) {
-        registrationDetailsVM.handleNavigation(onBackPressed, onNavigateToLogin)
-    }
-
-    val uiState = registrationDetailsVM.signupState.collectAsState()
+    onNavigateToLogin: () -> Unit = {}
+) {
 
     Surface(
         modifier = modifier
@@ -57,27 +68,20 @@ fun RegistrationDetailsScreen(
         BoxWithConstraints(modifier = modifier.fillMaxSize()) {
             val contentMaxWidth = if (maxWidth < 480.dp) maxWidth else 480.dp
 
-            Scaffold(modifier = modifier
-                .fillMaxSize()
-                .background(color = Color.White))
+            Scaffold(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(color = Color.White)
+            )
             { paddingValues ->
                 Column(
-                    modifier = modifier.padding(paddingValues)
+                    modifier = modifier
+                        .padding(paddingValues)
                         .fillMaxWidth()
-                        .width(contentMaxWidth).verticalScroll(state = rememberScrollState()),
+                        .width(contentMaxWidth)
+                        .verticalScroll(rememberScrollState()),
                 ) {
-                    RegistrationDetailsHeader(registrationDetailsVM)
-                    when(val state  = uiState) {
-                        is SignUpUiState.Loading -> {
-                            CircularProgressIndicator()
-                        }
-                        is SignUpUiState.Success -> {
-                            RegistrationDetailsHeader(registrationDetailsVM)
-                        }
-                        is SignUpUiState.Error -> {
-                            Text(text = state.errorMessage.errorTitle)
-                        }
-                    }
+                    RegistrationDetailsHeader(authViewModel, { onNavigateToLogin.invoke() })
                 }
             }
         }
@@ -87,7 +91,9 @@ fun RegistrationDetailsScreen(
 
 @Composable
 private fun RegistrationDetailsHeader(
-    viewModel: RegistrationDetailsViewModel) {
+    viewModel: AuthViewModel,
+    onNavigateToLogin: () -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -107,8 +113,10 @@ private fun RegistrationDetailsHeader(
             text = "Create your account to get started",
             style = Typography.titleSmall
         )
-        Image(painter = painterResource(
-            id = com.asphalt.commonui.R.drawable.ic_app_icon),
+        Image(
+            painter = painterResource(
+                id = com.asphalt.commonui.R.drawable.ic_app_icon
+            ),
             contentDescription = "App Logo"
         )
         Text(
@@ -116,7 +124,9 @@ private fun RegistrationDetailsHeader(
             text = "adesso Rider's Club",
             style = TypographyMedium.bodyMedium
         )
-        RegistrationForm(viewModel)
+        RegistrationForm(viewModel, {
+            onNavigateToLogin.invoke()
+        })
     }
 }
 

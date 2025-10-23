@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
-
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
 
 class CreateRideScreenViewModel : ViewModel() {
+    //var fullList = getUsers()
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
@@ -21,6 +21,99 @@ class CreateRideScreenViewModel : ViewModel() {
 
     private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
     val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
+
+    val selectedUserCount = mutableStateOf(0)
+
+    val _showRideTypeError = mutableStateOf(false)
+    val _showRideTitleError = mutableStateOf(false)
+    val _showRideDateError = mutableStateOf(false)
+    val _showRideTimeError = mutableStateOf(false)
+    val _showRideStartLocError = mutableStateOf(false)
+    val _showRideEndLocError = mutableStateOf(false)
+
+
+    private val _fullList = mutableStateOf(ArrayList<RidersList>())
+    private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
+        mutableStateOf(arrayListOf())
+    val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
+
+    init {
+        _fullList.value = getUsers()
+        _ridersListMutable.value = _fullList.value
+    }
+
+    val searchQuery = mutableStateOf("")
+
+    fun onSearchQueryChanged(query: String) {
+        searchQuery.value = query
+
+        val q = query.trim().lowercase()
+
+        _ridersListMutable.value = ArrayList(
+            if (q.isEmpty()) {
+                _fullList.value
+            } else {
+                _fullList.value.filter { person ->
+                    (person.name ?: "").lowercase().contains(q) ||
+                            (person.job ?: "").lowercase().contains(q) ||
+                            (person.bike ?: "").lowercase().contains(q)
+                }
+            })
+        getUserCount()
+    }
+
+    fun updateUerList(isSelcted: Boolean, id: Int?) {
+        _fullList.value = ArrayList(_fullList.value.map { rider ->
+            if (rider.id == id) {
+                rider.copy(isSelect = isSelcted)
+            } else {
+                rider
+            }
+        })
+
+        // Re-filter with current query so filtered list reflects changes
+        onSearchQueryChanged(searchQuery.value)
+        getUserCount()
+
+
+
+    }
+
+    fun detailsFieldValidation(): Boolean {
+        if (_rideDetailsMutableState.value.rideType.isNullOrEmpty()) {
+            _showRideTypeError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.rideTitle.isNullOrEmpty()) {
+            _showRideTitleError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.dateString == null) {
+            _showRideDateError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.hour == null) {
+            _showRideTimeError.value = true
+            return false
+        }
+        return true
+    }
+
+    fun routeFieldValidation(): Boolean {
+        if (_rideDetailsMutableState.value.startLocation.isNullOrEmpty()) {
+            _showRideStartLocError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.endLocation.isNullOrEmpty()) {
+            _showRideEndLocError.value = true
+            return false
+        }
+        return true
+    }
+
+    fun getUserCount() {
+        selectedUserCount.value = _ridersListMutable.value.count { it.isSelect }
+    }
 
     fun updateRiderType(type: String) {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(rideType = type)
@@ -82,16 +175,72 @@ class CreateRideScreenViewModel : ViewModel() {
         return type
     }
 
-    fun getUsers() {
+
+
+
+    fun getUsers(): ArrayList<RidersList> {
         var list = arrayListOf(
 
-            RidersList(id = 1, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 2, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 3, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 4, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 5, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 6, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false),
-            RidersList(id = 7, name = "Harikumar S", job = "Software Engineer",bike="Unicorn", isSelect = false)
+            RidersList(
+                id = 1,
+                name = "Harikumar S",
+                job = "Mechanic",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            ),
+            RidersList(
+                id = 2,
+                name = "Sreedev",
+                job = "",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+
+            ),
+            RidersList(
+                id = 3,
+                name = "Vyshak ",
+                job = "",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            ),
+            RidersList(
+                id = 4,
+                name = "Jerin John",
+                job = "",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            ),
+            RidersList(
+                id = 5,
+                name = "Vipin Raj",
+                job = "Mechanic",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            ),
+            RidersList(
+                id = 6,
+                name = "Pramod Selvaraj",
+                job = "",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            ),
+            RidersList(
+                id = 7,
+                name = "Vinu V John",
+                job = "",
+                bike = "Unicorn",
+                isSelect = false,
+                imgUrl = "https://picsum.photos/id/1/200/300"
+            )
         )
+        return list;
+        //_ridersListMutable.value = list
     }
+
 }

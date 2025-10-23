@@ -9,6 +9,9 @@ import SwiftUI
 
 struct NotificationView: View {
     @StateObject var viewModel = NotificationViewModel()
+    @StateObject var homeViewModel = HomeViewModel()
+    @State var showHome: Bool = false
+    @Environment(\.dismiss) private var dismiss
     var body: some View {
         VStack {
             List(viewModel.notifications, id: \.id) { notification in
@@ -45,7 +48,18 @@ struct NotificationView: View {
             viewModel.fetchNotifications()
         }
         .navigationTitle(AppStrings.Notification.notifications.localized)
+        .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading, content: {
+                Button(action: {
+                    dismiss()
+                }, label:{
+                    AppIcon.CreateRide.backButton
+                })
+            })
+        }
+
     }
 }
 

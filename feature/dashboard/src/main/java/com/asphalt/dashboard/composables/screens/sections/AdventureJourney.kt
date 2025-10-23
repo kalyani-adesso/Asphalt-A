@@ -39,10 +39,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AdventureJourney(
     adventureJourneyViewModel: AdventureJourneyViewModel = koinViewModel()
 ) {
-    val options = listOf(
-        AdventureJourneyTimeFrameChoices.LastFourMonths,
-        AdventureJourneyTimeFrameChoices.LastWeek, AdventureJourneyTimeFrameChoices.LastYear
-    )
+    val options = AdventureJourneyTimeFrameChoices.getAllChoices()
     val selectedItem = remember { mutableStateOf(options[0]) }
     LaunchedEffect(selectedItem.value) {
         adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)
@@ -84,7 +81,8 @@ fun AdventureJourney(
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Box {
-                    DonutChart(valueList.value, colorList.value)
+                    DonutChart(values = remember(valueList.value) { valueList.value },
+                        colors = remember(colorList.value) { colorList.value })
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally,

@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,7 @@ import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.createride.ui.CreateRideEntry
+
 
 @Composable
 fun ShareSection() {
@@ -68,10 +69,10 @@ fun ShareSection() {
 
                     )
                 Spacer(Modifier.height(Dimensions.padding16))
-                Text(text = "Ride Created!", style = TypographyBold.bodyMedium)
+                Text(text = stringResource(R.string.ride_created), style = TypographyBold.bodyMedium)
                 Spacer(Modifier.height(Dimensions.padding16))
                 Text(
-                    text = "Share your ride with friends",
+                    text = stringResource(R.string.share_with_friends),
                     style = Typography.bodySmall,
                     color = NeutralDarkGrey
                 )
@@ -85,7 +86,7 @@ fun ShareSection() {
                 end = Dimensions.padding16
             )
         ) {
-            Text(text = "Share Link", style = TypographyBold.bodyMedium)
+            Text(text = stringResource(R.string.share_link), style = TypographyBold.bodyMedium)
             Spacer(Modifier.height(Dimensions.padding16))
             Row(
                 modifier = Modifier
@@ -106,7 +107,7 @@ fun ShareSection() {
                 Image(painter = painterResource(R.drawable.ic_copy_icon), contentDescription = "")
             }
             Spacer(Modifier.height(Dimensions.padding16))
-            Text(text = "Share Via", style = TypographyBold.bodyMedium)
+            Text(text = stringResource(R.string.share_via), style = TypographyBold.bodyMedium)
             Spacer(Modifier.height(Dimensions.padding16))
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(

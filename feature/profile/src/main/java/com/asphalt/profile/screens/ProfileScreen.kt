@@ -50,7 +50,7 @@ fun ProfileScreen(
 
     val topPadding = Dimensions.size0
     val bottomPadding = Dimensions.size0
-    ComposeUtils.DefaultColumnRootWithScroll(topPadding, bottomPadding) {
+    ComposeUtils.DefaultColumnRoot(topPadding, bottomPadding) {
         Spacer(Modifier.height(Dimensions.size20))
         ProfileSection(user.value)
         YourVehiclesSection()
