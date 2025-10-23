@@ -13,7 +13,7 @@ struct UpcomingRideView: View {
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
     @State var showHome: Bool = false
-    @State var showpopup: Bool = true
+    @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
         
