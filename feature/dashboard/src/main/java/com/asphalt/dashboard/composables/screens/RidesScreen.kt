@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -158,6 +159,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(Modifier.height(Dimensions.size3))
                     Text(
                         text = upconing.place ?: "",
                         style = Typography.bodySmall,
@@ -167,7 +169,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
 
             }
             Box(
-                modifier = Modifier
+                modifier = Modifier.height(Dimensions.size30)
                     .then(if(upconing.rideStatus=="UPCOMING"){
                         Modifier.background(
                             color = MagentaDeep,
@@ -193,7 +195,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                     text = upconing.rideStatus ?: "",
                     style = TypographyMedium.bodySmall,
                     color = NeutralWhite,
-                    modifier = Modifier
+                    modifier = Modifier.align(alignment = Alignment.Center)
                 )
             }
 
@@ -304,6 +306,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(Modifier.height(Dimensions.size3))
                     Text(
                         text = history.place ?: "",
                         style = Typography.bodySmall,
@@ -313,7 +316,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 
             }
             Box(
-                modifier = Modifier
+                modifier = Modifier.height(Dimensions.size30)
                     .background(
                         color = GreenDark,
                         shape = RoundedCornerShape(Dimensions.size10)
@@ -443,6 +446,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(Modifier.height(Dimensions.size3))
                     Text(
                         text = invites.place ?: "",
                         style = Typography.bodySmall,

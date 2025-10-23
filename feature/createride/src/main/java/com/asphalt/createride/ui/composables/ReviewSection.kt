@@ -85,6 +85,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation?:""}",
                             style = Typography.bodySmall,
@@ -147,6 +148,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = viewModel.rideDetailsState.value.dateString ?: "",
                             style = Typography.bodySmall,
@@ -188,6 +190,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = "${viewModel.rideDetailsState.value.startLocation ?: ""} - ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
@@ -228,6 +231,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = "${viewModel.ridersList.value.count{it.isSelect}} ${stringResource(R.string.riders_selected)}",
                             style = Typography.bodySmall,
