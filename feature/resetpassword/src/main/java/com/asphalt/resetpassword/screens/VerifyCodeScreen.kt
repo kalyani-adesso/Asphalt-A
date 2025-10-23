@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -57,10 +58,10 @@ fun VerifyScreen(onVerifyClick:()->Unit) {
                     .background(color = NeutralWhite)
                     .padding(
                         bottom = paddingValues.calculateBottomPadding(),
-                        top = paddingValues.calculateTopPadding()
+                        //top = paddingValues.calculateTopPadding()
                     ), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(Dimensions.spacing54))
+                Spacer(modifier = Modifier.height(80.dp))
                 Image(
                     painter = painterResource(R.drawable.ic_mail_box),
                     contentDescription = "",

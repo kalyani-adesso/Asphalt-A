@@ -127,7 +127,7 @@ fun LoginScreen(
                 .imePadding()
                 .background(Color.White)
         ) {
-            Spacer(modifier = Modifier.height(Dimensions.spacing80))
+            Spacer(modifier = Modifier.height(Dimensions.spacing54))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally

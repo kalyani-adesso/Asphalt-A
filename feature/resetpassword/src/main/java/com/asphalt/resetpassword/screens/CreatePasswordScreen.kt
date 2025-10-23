@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -53,20 +54,21 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
     val scrollState = rememberScrollState()
     AsphaltTheme {
         Scaffold { paddingValues ->
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = NeutralWhite)
                     .padding(
                         bottom = paddingValues.calculateBottomPadding(),
-                        top = paddingValues.calculateTopPadding()
+                        //top = paddingValues.calculateTopPadding()
                     )
                     .verticalScroll(scrollState)
                     .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Spacer(modifier = Modifier.height(Dimensions.spacing54))
+                Spacer(modifier = Modifier.height(80.dp))
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally

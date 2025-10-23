@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -51,10 +52,10 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                     .background(color = NeutralWhite)
                     .padding(
                         bottom = paddingValues.calculateBottomPadding(),
-                        top = paddingValues.calculateTopPadding()
+                       // top = paddingValues.calculateTopPadding()
                     ), horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(Dimensions.spacing54))
+                Spacer(modifier = Modifier.height(80.dp))
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
