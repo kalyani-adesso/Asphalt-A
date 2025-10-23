@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
-    namespace = "com.asphalt.joinride"
+    namespace = "com.asphalt.joinaride"
     compileSdk = 36
 
     defaultConfig {
@@ -33,19 +35,12 @@ dependencies {
 
     implementation(projects.commonui)
     implementation(projects.shared)
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    // Koin
-    implementation(libs.koin.android)
-    implementation(libs.koin.core)
-    implementation(libs.koin.compose)
-    implementation(libs.koin.compose.viewmodel)
 
     // Compose
     implementation(libs.compose.ui)
@@ -57,14 +52,17 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.material.icons.extended.android)
     implementation(libs.kotlinx.serialization.core)
-
-    // ViewModel
-    implementation(libs.androidx.lifecycle.viewmodelCompose)
-    implementation(libs.firebase.firestore.ktx)
-
-    // Navigation
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.androidx)
+
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 
 }

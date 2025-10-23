@@ -1,4 +1,4 @@
-package com.asphalt.joinride
+package com.asphalt.joinaride
 
 import org.junit.Test
 

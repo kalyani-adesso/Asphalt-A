@@ -30,6 +30,8 @@ import com.asphalt.commonui.R
 import com.asphalt.createride.ui.CreateRideEntry
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
+import com.asphalt.joinaride.navigation.JoinRide
+import com.asphalt.joinaride.navigation.JoinRideKey
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
@@ -46,7 +48,7 @@ import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.DashboardNavKey)
+    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
 
 //    var showAppBars by remember { mutableStateOf(false) }
 //    var navigationDrawer by remember { mutableStateOf(false) }
@@ -217,14 +219,13 @@ fun NavigationRoot(
                         )
                     }
 
-                    entry<RegistrationDetailsNavKey> {
+                    entry<RegistrationDetailsNavKey> { key ->
                         NavigationRegistrationDetails(
-                            onNavigateToDashboard = { //password ->
-                                //  backStack.add(RegistrationDetailsNavKey(password))
+                           // onBackPressed = { backStack.removeLastOrNull() },
+                            onNavigateToLogin = { 
+                                backStack.add(AppNavKey.LoginScreenNavKey)
                                 backStack.remove(SplashKey)
-
                             },
-                            onBackPressed = { onBackPressed() }
                         )
                     }
 
@@ -272,6 +273,9 @@ fun NavigationRoot(
                     }
                     entry<AppNavKey.CreateRideNav> { key ->
                         CreateRideEntry(setTopAppBarState=setTopAppBarState)
+                    }
+                    entry<JoinRideKey> { key ->
+                        JoinRide(setTopAppBarState = setTopAppBarState)
                     }
                 }
             )
