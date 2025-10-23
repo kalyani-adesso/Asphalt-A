@@ -42,7 +42,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 
 @Composable
-fun ForgotPasswordScreen() {
+fun ForgotPasswordScreen(onSendClick:()->Unit) {
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -173,7 +173,7 @@ fun ForgotPasswordScreen() {
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-
+                            onSendClick.invoke()
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
@@ -196,5 +196,5 @@ fun ForgotPasswordScreen() {
 @Preview
 @Composable
 fun ForgotPasswordPreview() {
-    ForgotPasswordScreen()
+    ForgotPasswordScreen({})
 }

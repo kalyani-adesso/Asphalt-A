@@ -26,8 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,7 +49,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 
 @Composable
-fun CreatePasswordScreen() {
+fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
     val scrollState = rememberScrollState()
     AsphaltTheme {
         Scaffold { paddingValues ->
@@ -63,8 +61,8 @@ fun CreatePasswordScreen() {
                         bottom = paddingValues.calculateBottomPadding(),
                         top = paddingValues.calculateTopPadding()
                     )
-                    .verticalScroll(scrollState).imePadding()
-                    ,
+                    .verticalScroll(scrollState)
+                    .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(Dimensions.spacing54))
@@ -106,8 +104,8 @@ fun CreatePasswordScreen() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = Dimensions.padding, end = Dimensions.padding)
-                        , verticalArrangement = Arrangement.Center
+                        .padding(start = Dimensions.padding, end = Dimensions.padding),
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = stringResource(string.email),
@@ -225,7 +223,7 @@ fun CreatePasswordScreen() {
                             ),
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_email_blue_icon),
+                                    painter = painterResource(R.drawable.ic_password_icon_blue),
                                     contentDescription = "Email icon",
                                     tint = Color.Unspecified
 
@@ -294,7 +292,7 @@ fun CreatePasswordScreen() {
                             ),
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_email_blue_icon),
+                                    painter = painterResource(R.drawable.ic_password_icon_blue),
                                     contentDescription = "Email icon",
                                     tint = Color.Unspecified
 
@@ -319,12 +317,16 @@ fun CreatePasswordScreen() {
                 }
 
                 Spacer(modifier = Modifier.height(Dimensions.spacing20))
-                Column(modifier =Modifier.padding(start = Dimensions.padding,
-                    end = Dimensions.padding)) {
+                Column(
+                    modifier = Modifier.padding(
+                        start = Dimensions.padding,
+                        end = Dimensions.padding
+                    )
+                ) {
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-
+                            onUpdateClick.invoke()
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
@@ -336,7 +338,7 @@ fun CreatePasswordScreen() {
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     BorderedButton(
                         onClick = {
-
+                            onBackClick.invoke()
                         },
                         modifier = Modifier
                             .height(Dimensions.size60)
@@ -367,5 +369,9 @@ fun CreatePasswordScreen() {
 @Preview
 @Composable
 fun CreatePasswordReview() {
-    CreatePasswordScreen()
+    CreatePasswordScreen({
+
+    }, {
+
+    })
 }

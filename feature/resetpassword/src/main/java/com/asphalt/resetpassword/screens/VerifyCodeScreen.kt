@@ -48,7 +48,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 
 @Composable
-fun VerifyScreen() {
+fun VerifyScreen(onVerifyClick:()->Unit) {
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -189,7 +189,7 @@ fun VerifyScreen() {
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-
+                            onVerifyClick.invoke()
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
@@ -212,5 +212,5 @@ fun VerifyScreen() {
 @Preview
 @Composable
 fun VerifyScreenPreview() {
-    VerifyScreen()
+    VerifyScreen({})
 }

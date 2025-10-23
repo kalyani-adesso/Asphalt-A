@@ -41,7 +41,11 @@ sealed class AppNavKey : NavKey {
     object NotificationNav : AppNavKey()
 
     @Serializable
-    object ResetPasswordNav : AppNavKey()
+    object ForgotPasswordNav : AppNavKey()
+    @Serializable
+    object VerifyPassCodeNav : AppNavKey()
+    @Serializable
+    object CreatPasswordNav : AppNavKey()
 
 
 
