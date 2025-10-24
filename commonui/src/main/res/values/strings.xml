@@ -215,6 +215,7 @@
     <string name="enter_new_password">Enter New Password</string>
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="enter_valid_verification_code">Enter a valid verification code</string>
+    <string name="password_confirm_password_match">Password and confirm password should match</string>
 
 
 </resources>

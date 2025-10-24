@@ -344,7 +344,7 @@ fun CreatePasswordScreen(
                     }
                     if (state.value.isShowConfirmPasswordError) {
                         Text(
-                            text = stringResource(R.string.enter_valid_password),
+                            text = stringResource(state.value.confirmPasswordError),
                             Modifier.padding(top = Dimensions.size4),
                             style = Typography.bodySmall,
                             color = NeutralRed
@@ -363,6 +363,7 @@ fun CreatePasswordScreen(
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
+                            if(viewModel.createPassword())
                             onUpdateClick.invoke()
                         }
                     ) {
