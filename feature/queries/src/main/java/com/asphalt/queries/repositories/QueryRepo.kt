@@ -83,9 +83,10 @@ class QueryRepo {
 
         return updatedQuery
     }
-    suspend fun postAnswer(answer: String, queryId: Int?, name: String?){
+    // QueryRepo.kt (MODIFIED)
+    suspend fun postAnswer(answer: String, queryId: Int?, name: String?): Query? { // 💡 Return Query?
         if (queryId == null || name.isNullOrBlank()) {
-            return  // Cannot post without a query ID and a name
+            return null // Return null on failure
         }
 
         delay(300)
@@ -93,7 +94,7 @@ class QueryRepo {
         val queryIndex = bikeQueries.indexOfFirst { it.id == queryId }
 
         if (queryIndex == -1) {
-            return
+            return null // Return null if query not found
         }
 
         val originalQuery = bikeQueries[queryIndex]
@@ -104,7 +105,7 @@ class QueryRepo {
         val newAnswer = Answer(
             id = newAnswerId,
             answer = answer,
-            answeredOn = Utils.formatClientMillisToISO(System.currentTimeMillis()), // Current timestamp
+            answeredOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
             answeredByName = name,
             answeredByUrl = "https://example.com/placeholder_profile.jpg",
             likeCount = 0,
@@ -113,7 +114,9 @@ class QueryRepo {
             isUserDisliked = false
         )
 
-        val updatedAnswers = originalQuery.answers + newAnswer
+        // Append the new answer to maintain "newest first" logic from loadQueries
+        val updatedAnswers = originalQuery.answers.toMutableList()
+        updatedAnswers.add(0, newAnswer) // 💡 Add to the front to maintain "newest first" sort logic
 
         val updatedQuery = originalQuery.copy(
             answers = updatedAnswers,
@@ -123,8 +126,7 @@ class QueryRepo {
 
         bikeQueries[queryIndex] = updatedQuery
 
-
-
+        return updatedQuery // 💡 Return the updated query
     }
 
 

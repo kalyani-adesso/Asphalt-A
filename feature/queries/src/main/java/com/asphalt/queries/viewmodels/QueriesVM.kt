@@ -84,8 +84,12 @@ class QueriesVM(val queryRepo: QueryRepo, val androidUserVM: AndroidUserVM) : Vi
     }
 
     suspend fun postAnswer(query: Query?) {
-        queryRepo.postAnswer(_answerToQuery.value, query?.id, androidUserVM.userState.value?.name)
-        loadQueries()
+        val postAnswer = queryRepo.postAnswer(
+            _answerToQuery.value,
+            query?.id,
+            androidUserVM.userState.value?.name
+        )
+        updateQuery(postAnswer)
 
 
     }
