@@ -56,7 +56,6 @@ import com.asphalt.commonui.utils.ComposeUtils.SectionTitle
 import com.asphalt.queries.sealedclasses.QueryCategories
 import com.asphalt.queries.viewmodels.AskQueryVM
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AskQuery(

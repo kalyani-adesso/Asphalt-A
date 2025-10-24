@@ -50,7 +50,7 @@ fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (I
     LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
         items(queries) {
             ComposeUtils.CommonContentBox {
-                QueryComponent(it, queriesVM,selectQueryForAnswer)
+                QueryComponent(it, queriesVM, selectQueryForAnswer)
             }
         }
     }
@@ -58,7 +58,7 @@ fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (I
 
 @Composable
 fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
-val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -138,7 +138,7 @@ val scope = rememberCoroutineScope()
                 borderStroke = Dimensions.padding1, cornerRadius = Dimensions.radius5,
                 modifier = Modifier.clickable {
 
-                   selectQueryForAnswer(query.id)
+                    selectQueryForAnswer(query.id)
                 }
             ) {
                 Row(

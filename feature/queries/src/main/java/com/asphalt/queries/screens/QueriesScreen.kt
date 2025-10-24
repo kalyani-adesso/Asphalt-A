@@ -40,7 +40,6 @@ import com.asphalt.queries.components.AskQuery
 import com.asphalt.queries.components.FilterCategories
 import com.asphalt.queries.components.Queries
 import com.asphalt.queries.components.SearchQueries
-import com.asphalt.queries.data.Query
 import com.asphalt.queries.viewmodels.AskQueryVM
 import com.asphalt.queries.viewmodels.QueriesVM
 import kotlinx.coroutines.launch
@@ -110,7 +109,7 @@ fun QueriesScreen(
             showAnswerPopup = false
             selectedQueryId.value = null
             queriesVM.clearAnswerToQuestion()
-        }, selectedQueryId.value, queriesVM,queryList.value)
+        }, selectedQueryId.value, queriesVM, queryList.value)
     }
     if (showQueryPopup)
         AskQuery(askQueryVM = askQueryVM, onSubmit = {

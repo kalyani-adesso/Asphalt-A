@@ -20,7 +20,7 @@ class QueriesVM(val queryRepo: QueryRepo, val androidUserVM: AndroidUserVM) : Vi
         filterCategory.value = categoryID
     }
 
-    private val _answerToQuery = MutableStateFlow<String>("")
+    private val _answerToQuery = MutableStateFlow("")
     val answerToQuery = _answerToQuery.asStateFlow()
 
     private val _queryList = MutableStateFlow<List<Query>>(emptyList())
@@ -89,7 +89,8 @@ class QueriesVM(val queryRepo: QueryRepo, val androidUserVM: AndroidUserVM) : Vi
 
 
     }
-    fun clearAnswerToQuestion(){
+
+    fun clearAnswerToQuestion() {
         _answerToQuery.value = ""
     }
 }
