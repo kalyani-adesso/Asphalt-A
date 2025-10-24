@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -42,9 +43,11 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.resetpassword.viewmodel.ForgotPasswordViewModel
 
 @Composable
-fun ForgotPasswordScreen(onSendClick:()->Unit) {
+fun ForgotPasswordScreen(onSendClick: () -> Unit) {
+    val viewModel: ForgotPasswordViewModel = viewModel()
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -53,7 +56,7 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                     .background(color = NeutralWhite)
                     .padding(
                         bottom = paddingValues.calculateBottomPadding(),
-                       // top = paddingValues.calculateTopPadding()
+                        // top = paddingValues.calculateTopPadding()
                     ), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
@@ -100,7 +103,8 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = Dimensions.padding, end = Dimensions.padding).weight(1f)
+                        .padding(start = Dimensions.padding, end = Dimensions.padding)
+                        .weight(1f)
 
                 ) {
                     Text(
@@ -125,8 +129,8 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = "",
-                            onValueChange = { },
+                            value = viewModel.emailState.value,
+                            onValueChange = { viewModel.updateEmail(it) },
                             placeholder = {
                                 Text(
                                     text = stringResource(string.enter_email),
@@ -157,31 +161,34 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                                 )
                             },
                             trailingIcon = {
+                                if (viewModel.isShowTick.value) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_tick_green),
+                                        contentDescription = "Email icon",
+                                        tint = Color.Unspecified
 
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_tick_green),
-                                    contentDescription = "Email icon",
-                                    tint = Color.Unspecified
+                                    )
 
-                                )
-
-
+                                }
                             }
 
                         )
 
                     }
-                    Text(
-                        text = stringResource(R.string.enter_valid_password),
-                        Modifier.padding(top = Dimensions.size4),
-                        style = Typography.bodySmall,
-                        color = NeutralRed
-                    )
+                    if (viewModel.isShowError.value) {
+                        Text(
+                            text = stringResource(R.string.enter_valid_password),
+                            Modifier.padding(top = Dimensions.size4),
+                            style = Typography.bodySmall,
+                            color = NeutralRed
+                        )
+                    }
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-                            onSendClick.invoke()
+                            if (viewModel.sendCode())
+                                onSendClick.invoke()
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
