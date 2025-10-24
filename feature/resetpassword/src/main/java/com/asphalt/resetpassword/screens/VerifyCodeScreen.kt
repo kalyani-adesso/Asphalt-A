@@ -50,7 +50,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 
 @Composable
-fun VerifyScreen(onVerifyClick:()->Unit) {
+fun VerifyScreen(email: String, onVerifyClick: () -> Unit) {
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -80,7 +80,7 @@ fun VerifyScreen(onVerifyClick:()->Unit) {
                         append("We’ve sent a 5-digit verification code to ")
 
                         withStyle(style = SpanStyle(color = PrimaryDarkerLightB75)) { // blue color
-                            append("\nhari@test.com")
+                            append("\n${email}")
                         }
                     }
                     Text(
@@ -220,5 +220,5 @@ fun VerifyScreen(onVerifyClick:()->Unit) {
 @Preview
 @Composable
 fun VerifyScreenPreview() {
-    VerifyScreen({})
+    VerifyScreen("test@test.com",{})
 }

@@ -48,7 +48,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ForgotPasswordScreen(
-    onSendClick: () -> Unit,
+    onSendClick: (String) -> Unit,
     viewModel: ForgotPasswordViewModel = koinViewModel()
 ) {
 
@@ -192,7 +192,7 @@ fun ForgotPasswordScreen(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
                             if (viewModel.sendCode())
-                                onSendClick.invoke()
+                                onSendClick.invoke(viewModel.emailState.value)
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
