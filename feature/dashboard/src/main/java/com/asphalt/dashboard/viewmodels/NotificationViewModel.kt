@@ -1,18 +1,30 @@
 package com.asphalt.dashboard.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.dashboard.data.NotificationData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class NotificationViewModel : ViewModel() {
-    private val _notificationMutableStateFlow = MutableStateFlow(getNotification())
-    val notificationState: StateFlow<ArrayList<NotificationData>> = _notificationMutableStateFlow.asStateFlow()
+    private val _notificationMutableStateFlow =
+        MutableStateFlow<ArrayList<NotificationData>>(arrayListOf())
+    val notificationState: StateFlow<ArrayList<NotificationData>> =
+        _notificationMutableStateFlow.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+
+            _notificationMutableStateFlow.value = getNotification()
+        }
+    }
 
 
-    fun getNotification(): ArrayList<NotificationData> {
+    suspend fun getNotification(): ArrayList<NotificationData> {
         var notifcations = ArrayList<NotificationData>()
         val notification1 = NotificationData(
             id = 1,
@@ -33,9 +45,11 @@ class NotificationViewModel : ViewModel() {
         )
         notifcations.add(notification1)
         notifcations.add(notification2)
+        delay(200)
         return notifcations;
 
     }
+
     fun updateReadStatus(id: Int) {
         val currentList = _notificationMutableStateFlow.value
 
