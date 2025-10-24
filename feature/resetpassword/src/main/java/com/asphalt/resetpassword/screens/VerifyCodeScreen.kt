@@ -3,6 +3,7 @@ package com.asphalt.resetpassword.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.util.CustomTimer
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.resetpassword.viewmodel.VerifyCodeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -57,6 +59,7 @@ fun VerifyScreen(
     email: String,
     viewModel: VerifyCodeViewModel = koinViewModel(), onVerifyClick: () -> Unit
 ) {
+viewModel.startTimer()
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -184,10 +187,20 @@ fun VerifyScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Resend in 3:03",
-                                modifier = Modifier.padding(end = Dimensions.size),
+                                text = if (viewModel.showResend.value) {
+                                    "Resend"
+                                } else {
+                                    "Resend in ${viewModel.showTime.value}"
+                                },
+                                modifier = Modifier
+                                    .padding(end = Dimensions.size)
+                                    .clickable {
+                                        if (viewModel.showResend.value) {
+                                            viewModel.startTimer()
+                                        }
+                                    },
                                 style = Typography.bodyLarge,
-                                color = NeutralDarkGrey
+                                color = NeutralDarkGrey,
                             )
                         }
 
@@ -205,8 +218,10 @@ fun VerifyScreen(
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-                            if (viewModel.verifyCode())
+                            if (viewModel.verifyCode()) {
+                                viewModel.cancelTimer()
                                 onVerifyClick.invoke()
+                            }
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
