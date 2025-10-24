@@ -39,6 +39,7 @@ import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightGray25
+import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
@@ -66,7 +67,7 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                     .verticalScroll(scrollState)
                     .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
                 Column(
@@ -178,7 +179,12 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
-
+                    Text(
+                        text = stringResource(R.string.enter_valid_email),
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
                     Text(
                         text = stringResource(string.new_password),
                         modifier = Modifier.padding(top = Dimensions.spacing20),
@@ -247,7 +253,12 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
-
+                    Text(
+                        text = stringResource(R.string.enter_valid_password),
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
                     Text(
                         text = stringResource(string.confirm_password),
                         modifier = Modifier.padding(top = Dimensions.spacing20),
@@ -316,6 +327,12 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
+                    Text(
+                        text = stringResource(R.string.enter_valid_password),
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
                     //Spacer(Modifier.height(Dimensions.spacing10))
                 }
 

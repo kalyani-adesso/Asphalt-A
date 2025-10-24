@@ -33,6 +33,7 @@ import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
+import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
@@ -170,6 +171,12 @@ fun ForgotPasswordScreen(onSendClick:()->Unit) {
                         )
 
                     }
+                    Text(
+                        text = stringResource(R.string.enter_valid_password),
+                        Modifier.padding(top = Dimensions.size4),
+                        style = Typography.bodySmall,
+                        color = NeutralRed
+                    )
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
