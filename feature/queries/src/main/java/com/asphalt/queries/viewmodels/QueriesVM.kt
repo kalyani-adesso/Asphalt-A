@@ -89,4 +89,7 @@ class QueriesVM(val queryRepo: QueryRepo, val androidUserVM: AndroidUserVM) : Vi
 
 
     }
+    fun clearAnswerToQuestion(){
+        _answerToQuery.value = ""
+    }
 }

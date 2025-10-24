@@ -109,6 +109,7 @@ fun QueriesScreen(
         AnswerToQuery({
             showAnswerPopup = false
             selectedQueryId.value = null
+            queriesVM.clearAnswerToQuestion()
         }, selectedQueryId.value, queriesVM,queryList.value)
     }
     if (showQueryPopup)
