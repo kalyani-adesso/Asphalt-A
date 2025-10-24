@@ -266,10 +266,7 @@ fun NavigationRoot(
                             backStack.add(AppNavKey.DashboardNavKey)
                             backStack.remove(AppNavKey.LoginScreenNavKey)
                         }, onForgotClick = {
-                            //backStack.add(AppNavKey.ForgotPasswordNav)
-                           // backStack.add(AppNavKey.CreatPasswordNav)
-                            backStack.add(AppNavKey.VerifyPassCodeNav(""))
-
+                            backStack.add(AppNavKey.ForgotPasswordNav)
                         })
                     }
 
