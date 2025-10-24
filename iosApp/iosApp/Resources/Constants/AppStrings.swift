@@ -328,6 +328,23 @@ public struct AppStrings{
         static let rateRide = "Rate This Ride"
         static let rideJoined = "Successfully joined the ride!"
         static let rideStarted = "Ride Started! Navigation active."
+        static let connectedRideTitle = "Connected Ride"
+        static let rideNameWeekendCoast = "Weekend Coast Ride"
+        static let rideInProgressTitle = "Ride in Progress"
+        static let groupNavigationActiveSubtitle = "Group navigation active"
+        static let groupStatusTitle = "Group Status"
+        static let emergencyActionsTitle = "Emergency Actions"
+        static let offlineAlertTitle = "Abhishek has been stopped for 5 minutes."
+        static let offlineAlertSubtitle = "Check if assistance is needed."
+        static let endRideButton = "END RIDE"
+        static let emergencySOSButton = "Emergency SOS"
+        static let shareLocationButton = "Share Location"
+        static let startTrackingButton = "Start Tracking"
+        static let stopTrackingButton = "Stop Tracking"
+        static let rideCompletedTitle = "Ride successfully completed"
+        static let rideCompletionProgressTitle = "Completing ride"
+        static let rideCompletionProgressSubtitle = "Saving your ride data and generating summary"
+        static let standard = "Standard"
     }
 }
 

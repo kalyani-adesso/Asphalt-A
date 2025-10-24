@@ -11,10 +11,8 @@ import MapKit
 struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
     @State private var rideComplted: Bool = false
-//    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var startTrack: Bool = false
     @State private var showToast: Bool = true
-    //    @Environment(\.dismiss) var dismiss
     @State var showJoinRideView:Bool = false
     
     let rideStops: [RideStop] = [
@@ -62,15 +60,14 @@ struct ConnectedRideMapView: View {
             .listRowSeparator(.hidden)
             Section {
                 VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: "Ride in Progress", subtitle: "Group navigation active", image: AppIcon.Profile.profile)
+                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
                     ForEach(viewModel.activeRider, id: \.id) { rider in
-                        // Your view for each rider
                         ActiveRiderView( title: rider.name, speed: "\(rider.speed) km", startTrack: $startTrack)
                     }
                     Button(action: {
                         self.rideComplted = true
                     }, label: {
-                        Text("END RIDE")
+                        Text(AppStrings.ConnectedRide.endRideButton)
                             .frame(maxWidth: .infinity,minHeight: 60)
                             .font(KlavikaFont.bold.font(size: 18))
                             .foregroundColor(AppColor.white)
@@ -92,9 +89,8 @@ struct ConnectedRideMapView: View {
             
             Section {
                 VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: "Group Status (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
+                    ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
                     ForEach(viewModel.groupRiders, id: \.id) { rider in
-                        // Your view for each rider
                         GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate)
                     }
                 }
@@ -109,14 +105,14 @@ struct ConnectedRideMapView: View {
             
             Section {
                 VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: "Emergency Actions", subtitle: "", image: AppIcon.ConnectedRide.emergency)
+                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.emergencyActionsTitle, subtitle: "", image: AppIcon.ConnectedRide.emergency)
                     HStack(spacing: 16) {
                         Button(action: {
                             
                         }) {
                             HStack(alignment: .center,spacing: 5) {
                                 AppIcon.ConnectedRide.sos
-                                Text("Emergency SOS")
+                                Text(AppStrings.ConnectedRide.emergencySOSButton)
                                     .font(KlavikaFont.bold.font(size: 16))
                                     .foregroundStyle(AppColor.black)
                             }
@@ -136,7 +132,7 @@ struct ConnectedRideMapView: View {
                         }) {
                             HStack(alignment: .center,spacing: 5) {
                                 AppIcon.ConnectedRide.shareLocation
-                                Text("Share Location")
+                                Text(AppStrings.ConnectedRide.shareLocationButton)
                                     .font(KlavikaFont.bold.font(size: 16))
                                     .foregroundStyle(AppColor.black)
                             }
@@ -244,7 +240,7 @@ struct ConnectedRideMapView: View {
                                 .font(KlavikaFont.bold.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             
-                            Text("Weekend Coast Ride")
+                            Text(AppStrings.ConnectedRide.rideNameWeekendCoast)
                                 .font(KlavikaFont.regular.font(size: 12))
                                 .foregroundColor(AppColor.black)
                             
@@ -271,7 +267,7 @@ struct ConnectedRideMapView: View {
             
         }) {
             HStack(alignment: .center) {
-                Text("Standard")
+                Text(AppStrings.ConnectedRide.standard)
                     .font(KlavikaFont.regular.font(size: 12))
                     .foregroundStyle(AppColor.stoneGray)
             }
@@ -434,10 +430,9 @@ struct ActiveRiderView: View {
             }
             Spacer()
             Button(action: {
-                // Your stop tracking action
                 startTrack.toggle()
             }) {
-                Text(!startTrack ? "Stop Tracking".uppercased() : "Start Tracking".uppercased())
+                Text(!startTrack ? AppStrings.ConnectedRide.stopTrackingButton.uppercased() : AppStrings.ConnectedRide.startTrackingButton.uppercased())
                     .font(KlavikaFont.bold.font(size: 12))
                     .foregroundColor(AppColor.white)
                     .frame(width: 120, height: 30)
