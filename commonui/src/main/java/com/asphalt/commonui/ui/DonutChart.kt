@@ -10,7 +10,10 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.constants.Constants.DONUT_STROKE_WIDTH
 import com.asphalt.commonui.theme.Dimensions
 
 @Composable
@@ -19,9 +22,10 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
     require(values.size == colors.size)
     val total = values.sum()
     var startAngle = Constants.DONUT_START_ANGLE
+    val strokeWidth: Float = GetPxValue(DONUT_STROKE_WIDTH)
 
     Canvas(modifier = Modifier.size(Dimensions.size185)) {
-        val strokeWidth = Constants.DONUT_STROKE_WIDTH
+
         val outerRadius = size.minDimension / 2 - strokeWidth / 2 - Constants.DONUT_RADIUS_OFFSET
         val innerRadius = outerRadius - strokeWidth
         val gapOffset = Constants.DONUT_SEGMENT_GAP_OFFSET
@@ -71,4 +75,16 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
             startAngle += Constants.DONUT_TOTAL_ANGLE * (value / total)
         }
     }
+}
+@Composable
+fun GetPxValue(dpValue: Int): Float {
+    // Get the current density object from the CompositionLocal
+    val density = LocalDensity.current
+
+    // Convert the dp value to pixels (Float) using the 'with' scope
+    return with(density) {
+        dpValue.dp.toPx()
+    }
+
+    // pxValue will be the float pixel equivalent of the dpValue.
 }
