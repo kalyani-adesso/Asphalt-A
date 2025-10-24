@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -49,9 +51,18 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.resetpassword.viewmodel.CreatePasswordViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
+fun CreatePasswordScreen(
+    email: String = "",
+    viewModel: CreatePasswordViewModel = koinViewModel(),
+    onUpdateClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
+    val state = viewModel.createPasswordState.collectAsState()
+    viewModel.updateEmail(email)
     val scrollState = rememberScrollState()
     AsphaltTheme {
         Scaffold { paddingValues ->
@@ -133,8 +144,8 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = "",
-                            onValueChange = { },
+                            value = state.value.email ?: "",
+                            onValueChange = { viewModel.updateEmail(it) },
                             placeholder = {
                                 Text(
                                     text = stringResource(string.enter_email),
@@ -179,12 +190,14 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
-                    Text(
-                        text = stringResource(R.string.enter_valid_email),
-                        Modifier.padding(top = Dimensions.size4),
-                        style = Typography.bodySmall,
-                        color = NeutralRed
-                    )
+                    if (state.value.isShowEmailError) {
+                        Text(
+                            text = stringResource(R.string.enter_valid_email),
+                            Modifier.padding(top = Dimensions.size4),
+                            style = Typography.bodySmall,
+                            color = NeutralRed
+                        )
+                    }
                     Text(
                         text = stringResource(string.new_password),
                         modifier = Modifier.padding(top = Dimensions.spacing20),
@@ -207,8 +220,8 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = "",
-                            onValueChange = { },
+                            value = state.value.password ?: "",
+                            onValueChange = { viewModel.updatePassword(it) },
                             placeholder = {
                                 Text(
                                     text = stringResource(string.enter_new_password),
@@ -253,12 +266,14 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
-                    Text(
-                        text = stringResource(R.string.enter_valid_password),
-                        Modifier.padding(top = Dimensions.size4),
-                        style = Typography.bodySmall,
-                        color = NeutralRed
-                    )
+                    if (state.value.isShowPasswordError) {
+                        Text(
+                            text = stringResource(R.string.enter_valid_password),
+                            Modifier.padding(top = Dimensions.size4),
+                            style = Typography.bodySmall,
+                            color = NeutralRed
+                        )
+                    }
                     Text(
                         text = stringResource(string.confirm_password),
                         modifier = Modifier.padding(top = Dimensions.spacing20),
@@ -281,8 +296,8 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = "",
-                            onValueChange = { },
+                            value = state.value.confirmPassword ?: "",
+                            onValueChange = { viewModel.updateConfirmPassword(it) },
                             placeholder = {
                                 Text(
                                     text = stringResource(string.confirm_new_password),
@@ -327,13 +342,15 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
                         )
 
                     }
-                    Text(
-                        text = stringResource(R.string.enter_valid_password),
-                        Modifier.padding(top = Dimensions.size4),
-                        style = Typography.bodySmall,
-                        color = NeutralRed
-                    )
-                    //Spacer(Modifier.height(Dimensions.spacing10))
+                    if (state.value.isShowConfirmPasswordError) {
+                        Text(
+                            text = stringResource(R.string.enter_valid_password),
+                            Modifier.padding(top = Dimensions.size4),
+                            style = Typography.bodySmall,
+                            color = NeutralRed
+                        )
+                        //Spacer(Modifier.height(Dimensions.spacing10))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(Dimensions.spacing20))
@@ -389,7 +406,8 @@ fun CreatePasswordScreen(onUpdateClick: () -> Unit, onBackClick: () -> Unit) {
 @Preview
 @Composable
 fun CreatePasswordReview() {
-    CreatePasswordScreen({
+    val viewModel: CreatePasswordViewModel = viewModel()
+    CreatePasswordScreen("hari@test.cocm", viewModel, {
 
     }, {
 
