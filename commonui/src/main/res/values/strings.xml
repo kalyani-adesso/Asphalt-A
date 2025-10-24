@@ -205,6 +205,10 @@
     <string name="safety">Safety</string>
     <string name="other">Other</string>
 
+    <string name="post_answer">Post Answer</string>
+    <string name="share_your_knowledge">Share your knowledge and help the community…</string>
+    <string name="answer_to_query">Answer to Query</string>
+
 
 
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,20 +36,28 @@ import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Answer
 import com.asphalt.queries.viewmodels.QueriesVM
+import kotlinx.coroutines.launch
 
 @Composable
-fun Answers(answers: List<Answer>, queriesVM: QueriesVM) {
+fun Answers(
+    answers: List<Answer>,
+    queriesVM: QueriesVM,
+    modifier: Modifier = Modifier,
+    showDivider: Boolean = true
+) {
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20), modifier = modifier) {
         answers.forEach {
             AnswerComponent(it, queriesVM)
         }
-        HorizontalDivider(color = LightSilver)
+        if (showDivider)
+            HorizontalDivider(color = LightSilver)
     }
 }
 
 @Composable
 fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
+    val scope = rememberCoroutineScope()
     RoundedBox(backgroundColor = PaleMint, modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -100,8 +109,12 @@ fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
                     modifier = Modifier
                         .size(Dimensions.spacing15pt75, Dimensions.spacing15)
                         .clickable {
-                            queriesVM.likeOrRemoveLikeOfAnswer(answer.id)
-                        }.offset(y = Dimensions.spacingNeg2)
+                            scope.launch {
+
+                                queriesVM.likeOrRemoveLikeOfAnswer(answer.id)
+                            }
+                        }
+                        .offset(y = Dimensions.spacingNeg2)
                 )
                 Text(text = answer.likeCount.toString(), style = TypographyMedium.bodySmall)
                 Image(
@@ -110,7 +123,9 @@ fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
                     modifier = Modifier
                         .size(Dimensions.spacing15pt75, Dimensions.spacing15)
                         .clickable {
-                            queriesVM.likeOrRemoveDislikeOfAnswer(answer.id)
+                            scope.launch {
+                                queriesVM.likeOrRemoveDislikeOfAnswer(answer.id)
+                            }
                         }
                 )
                 Text(text = answer.dislikeCount.toString(), style = TypographyMedium.bodySmall)

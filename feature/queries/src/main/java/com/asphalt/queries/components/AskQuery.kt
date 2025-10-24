@@ -46,6 +46,7 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.ScarletRed
 import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividOrange
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
@@ -160,8 +161,7 @@ fun AskQuery(
                                 text = stringResource(
                                     selectedCategory.value?.nameRes ?: R.string.select_a_category
                                 ),
-                                style = Typography.bodyMedium,
-                                fontSize = Dimensions.textSize14,
+                                style = TypographyMedium.bodySmall,
                                 color = if (selectedCategory.value?.nameRes != null) NeutralBlack else NeutralDarkGrey,
                                 modifier = Modifier.padding(start = Dimensions.padding16)
                             )

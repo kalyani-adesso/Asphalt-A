@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.RoundedBox
 
 object ComposeUtils {
@@ -183,7 +185,7 @@ object ComposeUtils {
     fun SectionTitle(text: String, modifier: Modifier = Modifier, color: Color = NeutralBlack) {
         Text(
             style = TypographyBold.bodyMedium,
-            fontSize = Dimensions.textSize16, text = text, modifier = modifier, color = color
+            text = text, modifier = modifier, color = color
         )
     }
 
@@ -212,12 +214,14 @@ object ComposeUtils {
         backColor: Color = NeutralWhite,
         borderColor: Color? = null,
         borderStroke: Dp? = null,
-        isSingleLine: Boolean = true
+        isSingleLine: Boolean = true,
+        heightMin: Dp = Dimensions.size50,
+        textStyle: TextStyle = TypographyMedium.bodySmall
 
     ) {
         RoundedBox(
             modifier = Modifier
-                .heightIn(min = Dimensions.size50),
+                .heightIn(min = heightMin, max = Dimensions.padding100),
             cornerRadius = Dimensions.size10,
             backgroundColor = backColor,
             borderColor = borderColor,
@@ -233,13 +237,12 @@ object ComposeUtils {
                 placeholder = {
                     Text(
                         placeHolderText,
-                        style = Typography.bodyMedium,
-                        fontSize = Dimensions.textSize14,
+                        style = textStyle,
                         color = NeutralDarkGrey
                     )
                 },
 
-                textStyle = Typography.bodyMedium,
+                textStyle = textStyle,
 
                 singleLine = isSingleLine,
                 keyboardOptions = keyboardOptions,

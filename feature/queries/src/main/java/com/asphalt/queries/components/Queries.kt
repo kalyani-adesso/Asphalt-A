@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -41,21 +42,24 @@ import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.data.Query
 import com.asphalt.queries.sealedclasses.QueryCategories
 import com.asphalt.queries.viewmodels.QueriesVM
+import kotlinx.coroutines.launch
 
 @Composable
-fun Queries(queries: List<Query>, queriesVM: QueriesVM) {
+fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
         items(queries) {
             ComposeUtils.CommonContentBox {
-                QueryComponent(it, queriesVM)
+                QueryComponent(it, queriesVM,selectQueryForAnswer)
             }
         }
     }
 }
 
 @Composable
-fun QueryComponent(query: Query, queriesVM: QueriesVM) {
+fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
+val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .padding(
@@ -68,7 +72,13 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM) {
         Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10)) {
 
             QueryCategories.getCategoryNameById(query.categoryId)
-                ?.let { CustomLabel(textColor = SafetyOrange, backColor = PaleOrange, text = stringResource(it)) }
+                ?.let {
+                    CustomLabel(
+                        textColor = SafetyOrange,
+                        backColor = PaleOrange,
+                        text = stringResource(it)
+                    )
+                }
             if (query.isAnswered) CustomLabel(
                 textColor = GreenLIGHT25, backColor = PaleGreen, text =
                     stringResource(R.string.answered)
@@ -108,7 +118,10 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM) {
                 modifier = Modifier
                     .size(Dimensions.spacing15pt75, Dimensions.spacing15)
                     .clickable {
-                        queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                        scope.launch {
+
+                            queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                        }
                     }
                     .offset(y = Dimensions.spacingNeg2)
             )
@@ -122,7 +135,11 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM) {
             Spacer(Modifier.weight(1f))
             RoundedBox(
                 borderColor = BrightGray,
-                borderStroke = Dimensions.padding1, cornerRadius = Dimensions.radius5
+                borderStroke = Dimensions.padding1, cornerRadius = Dimensions.radius5,
+                modifier = Modifier.clickable {
+
+                   selectQueryForAnswer(query.id)
+                }
             ) {
                 Row(
                     modifier = Modifier.padding(

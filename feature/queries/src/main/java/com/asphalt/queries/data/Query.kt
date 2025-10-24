@@ -27,7 +27,7 @@ var bikeQueries: MutableList<Query> = listOf(
         postedByName = "Alex Rodriguez",
         postedByUrl = "https://picsum.photos/seed/AR/100/100",
         likeCount = 55,
-        answerCount = 2,
+        answerCount = 1,
         answers = listOf(
             Answer(
                 id = 1011, // ID added

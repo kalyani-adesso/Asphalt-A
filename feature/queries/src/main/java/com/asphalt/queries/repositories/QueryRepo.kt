@@ -5,14 +5,22 @@ import com.asphalt.queries.data.Answer
 import com.asphalt.queries.data.Query
 import com.asphalt.queries.data.bikeQueries
 import kotlinx.coroutines.delay
+import java.time.Instant
 
 class QueryRepo {
     suspend fun loadQueryList(): List<Query> {
         delay(200)
-        return bikeQueries.sortedByDescending { query ->
+
+        val sortedQueries = bikeQueries.sortedByDescending { query ->
             Utils.parseISODateToMillis(query.postedOn)
         }
 
+        return sortedQueries.map { query ->
+            val sortedAnswers = query.answers.sortedByDescending { answer ->
+                Utils.parseISODateToMillis(answer.answeredOn)
+            }
+            query.copy(answers = sortedAnswers)
+        }
     }
 
     suspend fun addQuery(query: Query) {
@@ -41,43 +49,82 @@ class QueryRepo {
     }
 
 
-    /**
-     * Finds the parent Query by answerId, updates the specific Answer using the
-     * provided lambda, updates the Query list, and returns the modified Query.
-     * @param answerId The ID of the answer to modify.
-     * @param updateLogic A lambda that takes the old Answer and returns the new, modified Answer.
-     */
+
     private suspend fun updateAnswerInQuery(
         answerId: Int,
         updateLogic: (Answer) -> Answer
     ): Query? {
         delay(100) // Simulate network delay
 
-        // 1. Find the index of the Query that contains the target Answer
         val queryIndex = bikeQueries.indexOfFirst { query ->
             query.answers.any { it.id == answerId }
         }
 
         if (queryIndex == -1) {
-            return null // Query not found
+            return null
         }
 
         val originalQuery = bikeQueries[queryIndex]
 
-        // 2. Map over answers and apply the specific updateLogic to the target Answer
-        val updatedAnswers = originalQuery.answers.map { answer ->
+        val updatedAnswersUnsorted = originalQuery.answers.map { answer ->
             if (answer.id == answerId) {
-                updateLogic(answer) // Apply the specific logic here
+                updateLogic(answer)
             } else {
-                answer // Return other answers unchanged
+                answer
             }
         }
 
-        // 3. Create a new Query object and replace it in the list
+        val updatedAnswers = updatedAnswersUnsorted.sortedByDescending { answer ->
+            Utils.parseISODateToMillis(answer.answeredOn)
+        }
+
         val updatedQuery = originalQuery.copy(answers = updatedAnswers)
         bikeQueries[queryIndex] = updatedQuery
 
         return updatedQuery
+    }
+    suspend fun postAnswer(answer: String, queryId: Int?, name: String?){
+        if (queryId == null || name.isNullOrBlank()) {
+            return  // Cannot post without a query ID and a name
+        }
+
+        delay(300)
+
+        val queryIndex = bikeQueries.indexOfFirst { it.id == queryId }
+
+        if (queryIndex == -1) {
+            return
+        }
+
+        val originalQuery = bikeQueries[queryIndex]
+
+        val maxAnswerId = bikeQueries.flatMap { it.answers }.maxOfOrNull { it.id } ?: 0
+        val newAnswerId = maxAnswerId + 1
+
+        val newAnswer = Answer(
+            id = newAnswerId,
+            answer = answer,
+            answeredOn = Utils.formatClientMillisToISO(System.currentTimeMillis()), // Current timestamp
+            answeredByName = name,
+            answeredByUrl = "https://example.com/placeholder_profile.jpg",
+            likeCount = 0,
+            dislikeCount = 0,
+            isUserLiked = false,
+            isUserDisliked = false
+        )
+
+        val updatedAnswers = originalQuery.answers + newAnswer
+
+        val updatedQuery = originalQuery.copy(
+            answers = updatedAnswers,
+            answerCount = updatedAnswers.size,
+            isAnswered = true
+        )
+
+        bikeQueries[queryIndex] = updatedQuery
+
+
+
     }
 
 
@@ -86,7 +133,6 @@ class QueryRepo {
             val newLikeCount =
                 if (answer.isUserLiked) answer.likeCount - 1 else answer.likeCount + 1
 
-            // When LIKING, ensure the user DISLIKE is OFF
             val newDislikeCount =
                 if (answer.isUserDisliked) answer.dislikeCount - 1 else answer.dislikeCount
 
@@ -104,7 +150,6 @@ class QueryRepo {
             val newDislikeCount =
                 if (answer.isUserDisliked) answer.dislikeCount - 1 else answer.dislikeCount + 1
 
-            // When DISLIKING, ensure the user LIKE is OFF
             val newLikeCount = if (answer.isUserLiked) answer.likeCount - 1 else answer.likeCount
 
             answer.copy(

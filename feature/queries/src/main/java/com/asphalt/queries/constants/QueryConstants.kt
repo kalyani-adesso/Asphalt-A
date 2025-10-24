@@ -7,5 +7,6 @@ object QueryConstants {
     const val CATEGORY_GEAR_ID = 3
     const val CATEGORY_SAFETY_ID = 4
     const val CATEGORY_OTHER_ID = 5
+    const val BOTTOM_SHEET_HEIGHT_RATIO = 0.75f
 
 }
