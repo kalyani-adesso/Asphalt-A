@@ -38,13 +38,13 @@ sealed class BikeType(val typeRes: Int, val imageRes: Int, val id: Int) {
 
     object Scooter : BikeType(
         R.string.bike_type_scooter,
-        R.drawable.sports_bike,
+        R.drawable.scooter,
         ProfileConstants.SCOOTER
     )
 
     object Electric : BikeType(
         R.string.bike_type_electric,
-        R.drawable.naked_bike, ProfileConstants.ELECTRIC
+        R.drawable.electric, ProfileConstants.ELECTRIC
     )
 
 
