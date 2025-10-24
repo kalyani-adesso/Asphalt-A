@@ -200,6 +200,16 @@
     <string name="check_responses">Check Responses</string>
     <string name="notifications">Notifications</string>
     <string name="garage_vehicle">%1$s - %2$s</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="routes">Routes</string>
+    <string name="gear">Gear</string>
+    <string name="safety">Safety</string>
+    <string name="other">Other</string>
+
+    <string name="post_answer">Post Answer</string>
+    <string name="share_your_knowledge">Share your knowledge and help the community…</string>
+    <string name="answer_to_query">Answer to Query</string>
+
 
 
 </resources>

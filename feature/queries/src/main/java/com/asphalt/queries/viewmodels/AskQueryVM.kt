@@ -9,6 +9,7 @@ import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.random.Random
 
 class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
     private val _askQuestion = MutableStateFlow("")
@@ -61,21 +62,32 @@ class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
     suspend fun submitQuestion() {
         queryRepo.addQuery(
             Query(
+                id = Random.nextInt(),
                 title = _askQuestion.value,
                 description = _description.value,
                 isAnswered = false,
                 categoryId = _selectedCategory.value?.id ?: 0,
                 postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
-                postedByName = user?.name?:"",
+                postedByName = user?.name ?: "",
                 postedByUrl = "",
                 likeCount = 0,
                 answerCount = 0,
                 answers = emptyList()
             )
         )
+        clearAll()
     }
 
     fun setUser(user: CurrentUser?) {
         this.user = user
+    }
+
+    fun clearAll() {
+        _askQuestion.value = ""
+        _description.value = ""
+        _questionError.value = false
+        _categoryError.value = false
+        _descriptionError.value = false
+        _selectedCategory.value = null
     }
 }
