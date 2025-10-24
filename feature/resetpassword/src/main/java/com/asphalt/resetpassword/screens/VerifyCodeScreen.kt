@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -48,9 +49,14 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.resetpassword.viewmodel.VerifyCodeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun VerifyScreen(email: String, onVerifyClick: () -> Unit) {
+fun VerifyScreen(
+    email: String,
+    viewModel: VerifyCodeViewModel = koinViewModel(), onVerifyClick: () -> Unit
+) {
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -127,8 +133,8 @@ fun VerifyScreen(email: String, onVerifyClick: () -> Unit) {
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = "",
-                            onValueChange = { },
+                            value = viewModel.verificationCode.value,
+                            onValueChange = { viewModel.updateCode(it) },
                             placeholder = {
                                 Text(
                                     text = stringResource(string.enter_code),
@@ -187,17 +193,20 @@ fun VerifyScreen(email: String, onVerifyClick: () -> Unit) {
 
 
                     }
-                    Text(
-                        text = stringResource(R.string.enter_valid_verification_code),
-                        Modifier.padding(top = Dimensions.size4),
-                        style = Typography.bodySmall,
-                        color = NeutralRed
-                    )
+                    if (viewModel.isShowError.value) {
+                        Text(
+                            text = stringResource(R.string.enter_valid_verification_code),
+                            Modifier.padding(top = Dimensions.size4),
+                            style = Typography.bodySmall,
+                            color = NeutralRed
+                        )
+                    }
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
-                            onVerifyClick.invoke()
+                            if (viewModel.verifyCode())
+                                onVerifyClick.invoke()
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
@@ -220,5 +229,6 @@ fun VerifyScreen(email: String, onVerifyClick: () -> Unit) {
 @Preview
 @Composable
 fun VerifyScreenPreview() {
-    VerifyScreen("test@test.com",{})
+    val viewmodel: VerifyCodeViewModel = viewModel()
+    VerifyScreen("test@test.com", viewmodel, {})
 }
