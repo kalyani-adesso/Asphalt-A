@@ -22,7 +22,7 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
     require(values.size == colors.size)
     val total = values.sum()
     var startAngle = Constants.DONUT_START_ANGLE
-    val strokeWidth: Float = GetPxValue(DONUT_STROKE_WIDTH)
+    val strokeWidth: Float = getPxValue(DONUT_STROKE_WIDTH)
 
     Canvas(modifier = Modifier.size(Dimensions.size185)) {
 
@@ -77,7 +77,7 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
     }
 }
 @Composable
-fun GetPxValue(dpValue: Int): Float {
+fun getPxValue(dpValue: Int): Float {
     // Get the current density object from the CompositionLocal
     val density = LocalDensity.current
 
