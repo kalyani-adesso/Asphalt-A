@@ -44,10 +44,14 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.resetpassword.viewmodel.ForgotPasswordViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ForgotPasswordScreen(onSendClick: () -> Unit) {
-    val viewModel: ForgotPasswordViewModel = viewModel()
+fun ForgotPasswordScreen(
+    onSendClick: () -> Unit,
+    viewModel: ForgotPasswordViewModel = koinViewModel()
+) {
+
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -211,5 +215,6 @@ fun ForgotPasswordScreen(onSendClick: () -> Unit) {
 @Preview
 @Composable
 fun ForgotPasswordPreview() {
-    ForgotPasswordScreen({})
+    val viewModel: ForgotPasswordViewModel = viewModel()
+    ForgotPasswordScreen({}, viewModel)
 }
