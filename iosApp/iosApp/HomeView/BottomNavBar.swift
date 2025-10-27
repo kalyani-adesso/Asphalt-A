@@ -35,7 +35,7 @@ struct BottomNavBar: View {
                 HStack {
                     tabItem(index: 0, label: "Home", systemIcon: "house")
                     Spacer()
-                    tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides)
+                    tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides  .renderingMode(.template))
                     Spacer()
                     tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
                     Spacer()
