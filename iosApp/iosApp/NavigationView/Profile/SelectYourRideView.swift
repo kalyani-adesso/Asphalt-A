@@ -13,7 +13,7 @@ struct SelectYourRideView: View {
     @State private var currentPage = 0
     @Binding var isPresented: Bool
     
-    private let totalPages = 8
+    private let totalPages = 7
     @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
         VStack {
@@ -23,7 +23,7 @@ struct SelectYourRideView: View {
                         ProfileTitleView(title:AppStrings.SelectRide.selectingRide, subtitle: AppStrings.SelectRide.chooseType, icon: AppIcon.Profile.ride)
                             .padding(.horizontal,15)
                             .padding(.top,20)
-                        SelectBikeTabView(image:AppIcon.Profile.sportsBike ,vehicleArray: viewModel.vehicleArray,  currentPage:$currentPage , totalPages: totalPages)
+                        SelectBikeTabView(image:viewModel.vehicleImageArray ,vehicleArray: viewModel.vehicleArray,  currentPage:$currentPage , totalPages: totalPages)
                         AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
                         AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
                         ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
@@ -75,7 +75,7 @@ struct AddBikeFieldView: View {
 }
 
 private struct SelectBikeTabView: View {
-    let image: Image
+    let image: [Image]
     let vehicleArray: [AppStrings.VehicleType]
     @Binding var currentPage: Int
     let totalPages: Int
@@ -85,9 +85,9 @@ private struct SelectBikeTabView: View {
         return vehicleArray[currentPage].rawValue
     }
     
-    private var subtitle: String {
-        guard currentPage < vehicleArray.count else { return "" }
-        return vehicleArray[currentPage].subtitle ?? ""
+    private var imageName: Image {
+        guard currentPage < image.count else { return Image("") }
+        return image[currentPage]
     }
     
     public var body: some View {
@@ -129,7 +129,7 @@ private struct SelectBikeTabView: View {
                         .opacity(currentPage == totalPages - 1 ? 0.3 : 1.0)
                 }
             }
-            image
+            imageName
                 .resizable()
                 .scaledToFill()
                 .frame(width: 311, height: 164)
@@ -140,11 +140,6 @@ private struct SelectBikeTabView: View {
             Text(title)
                 .font(KlavikaFont.bold.font(size: 16))
                 .foregroundColor(AppColor.black)
-                .multilineTextAlignment(.center)
-            
-            Text(subtitle)
-                .font(KlavikaFont.regular.font(size: 12))
-                .foregroundColor(AppColor.stoneGray)
                 .multilineTextAlignment(.center)
         }
     }

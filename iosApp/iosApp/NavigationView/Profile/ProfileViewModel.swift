@@ -60,6 +60,14 @@ final class ProfileViewModel: ObservableObject {
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
     let vehicleArray: [AppStrings.VehicleType] = AppStrings.VehicleType.allCases
+    let vehicleImageArray: [Image] = [AppIcon.Profile.sportsBike,
+                                      AppIcon.Profile.nakedBike,
+                                      AppIcon.Profile.touringBike,
+                                      AppIcon.Profile.adventureBike,
+                                      AppIcon.Profile.cruiserBike,
+                                      AppIcon.Profile.scooter,
+                                      AppIcon.Profile.electric]
+    
     @Published var selectedBikeType: [SelectedBikeType] = []
     
     init() {

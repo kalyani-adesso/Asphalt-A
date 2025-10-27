@@ -16,7 +16,6 @@ struct ForgotPassword: View {
     @State private var showSnackbar: Bool = false
     
     var body: some View {
-        
         ZStack(alignment: .top) {
             VStack {
                 
@@ -39,7 +38,6 @@ struct ForgotPassword: View {
                             value: $email,
                             isValidEmail: $isValidEmail
                         )
-                        
                         
                         ButtonView(
                             title: AppStrings.ForgotPassword.forgotAction.rawValue

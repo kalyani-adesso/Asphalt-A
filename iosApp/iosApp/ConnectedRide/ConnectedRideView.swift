@@ -13,7 +13,6 @@ struct ConnectedRideView: View {
     let subTitle:String
     let model:JoinRideModel
     @State var showView = false
-   // @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             HStack(spacing: 10) {
