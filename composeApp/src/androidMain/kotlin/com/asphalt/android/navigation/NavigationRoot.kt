@@ -58,11 +58,9 @@ import org.koin.compose.koinInject
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.JoinRideNavKey)
+    val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()
 
-//    var showAppBars by remember { mutableStateOf(false) }
-//    var navigationDrawer by remember { mutableStateOf(false) }
     val showBottomBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
@@ -78,9 +76,7 @@ fun NavigationRoot(
         AppNavKey.NotificationNav,
         AppNavKey.JoinRideNavKey,
         AppNavKey.ConnectedRideNavKey
-
     )
-
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -113,7 +109,6 @@ fun NavigationRoot(
         }
     }
 
-
     fun onBackPressed() {
         println("Back Nav from ${backStack.lastOrNull()}")
         if (backStack.size > 1) {
@@ -122,13 +117,8 @@ fun NavigationRoot(
             when (key) {
                 is RegistrationPasswordNavKey -> {
                     backStack.removeLastOrNull()
-                    backStack.add(
-                        RegistrationCodeNavKey(
-                            id = key.id,
-                        )
-                    )
+                    backStack.add(RegistrationCodeNavKey(id = key.id))
                 }
-
                 else -> {
                     backStack.removeLastOrNull()
                     manageSelectKeyOnBackPress()
@@ -148,13 +138,10 @@ fun NavigationRoot(
                     backStack.clear()
                     backStack.add(AppNavKey.LoginScreenNavKey)
                     drawerState.close()
-
                 }
             }
         }
-
     }) {
-
         Scaffold(
 
             topBar = {
@@ -168,7 +155,6 @@ fun NavigationRoot(
                     )
                 }
             },
-
             bottomBar = {
                 if (showBottomBar) {
                     BottomBar(
@@ -196,9 +182,7 @@ fun NavigationRoot(
             NavDisplay(
                 modifier =
                     if (showBottomBar || showTopAppBar)
-                        Modifier
-                            .padding(paddingValues)
-                            .fillMaxSize()
+                        Modifier.padding(paddingValues).fillMaxSize()
                     else Modifier,
                 backStack = backStack,
                 onBack = {
@@ -223,7 +207,6 @@ fun NavigationRoot(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
                                 backStack.add(AppNavKey.LoginScreenNavKey)
-
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -250,14 +233,12 @@ fun NavigationRoot(
                                 //  backStack.add(RegistrationDetailsNavKey(password))
                                 backStack.remove(SplashKey)
                                 backStack.add(AppNavKey.LoginScreenNavKey)
-
                             },
                             onBackPressed = { onBackPressed() }
                         )
                     }
                     entry<AppNavKey.LoginScreenNavKey> { key ->
                         LoginScreen(onSignInClick = {
-
                             backStack.add(AppNavKey.LoginSuccessScreenNavKey)
                             backStack.remove(AppNavKey.LoginScreenNavKey)
                         }, onSignUpClick = {
@@ -273,7 +254,6 @@ fun NavigationRoot(
                         LoginSuccessScreen(exploreClick = {
                             backStack.remove(AppNavKey.LoginSuccessScreenNavKey)
                             backStack.add(AppNavKey.DashboardNavKey)
-
                         })
                     }
                     entry<AppNavKey.DashboardNavKey> { key ->
@@ -318,22 +298,18 @@ fun NavigationRoot(
                             navigateToConnectedRide = {
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
                                 // backStack.add(AppNavKey.DashboardNavKey)
-
                                 entry<AppNavKey.ForgotPasswordNav> { key ->
                                     ForgotPasswordScreen(onSendClick = { emailId ->
                                         backStack.remove(AppNavKey.ForgotPasswordNav)
                                         backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
                                     })
-
                                 }
-
                                 entry<AppNavKey.VerifyPassCodeNav> { key ->
                                     VerifyScreen(key.emailId, onVerifyClick = {
                                         backStack.remove(AppNavKey.VerifyPassCodeNav(key.emailId))
                                         backStack.add(AppNavKey.CreatPasswordNav)
                                     })
                                 }
-
                                 entry<AppNavKey.CreatPasswordNav> { key ->
                                     CreatePasswordScreen(onUpdateClick = {
                                         onBackPressed()
@@ -341,18 +317,17 @@ fun NavigationRoot(
                                         onBackPressed()
                                     })
                                 }
+                                entry(AppNavKey.ConnectedRideNavKey) { key ->
+                                    ConnectedRideScreen(setTopAppBarState = setTopAppBarState,
+                                        onBackButton = {
+                                            backStack.remove(AppNavKey.ConnectedRideNavKey)
 
+                                        }
+                                    )
+                                }
                             }
                         )
                     }
-                }
-                    entry(AppNavKey.ConnectedRideNavKey) { key ->
-                        ConnectedRideScreen(setTopAppBarState = setTopAppBarState,
-                            onBackButton = {
-                                backStack.remove(AppNavKey.ConnectedRideNavKey)
-
-                            }
-                        )
                 }
             )
         }

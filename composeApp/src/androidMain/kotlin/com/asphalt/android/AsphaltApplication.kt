@@ -30,9 +30,8 @@ class AsphaltApplication : Application() {
             //First start Koin with all modules including shared components
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
-                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule + resetModule,
-                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule
-                + joinRideModule,
+                        + sharedModule + dashboardModule + profileModule + androidSharedModule
+                        + queryModule + resetModule + joinRideModule,
 
                 )
             module {
