@@ -9,6 +9,7 @@ import cocoapods.FirebaseDatabase.FIRDatabase
 import platform.Foundation.NSError
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.UIKit.UIDevice
+
 import kotlin.coroutines.resume
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
