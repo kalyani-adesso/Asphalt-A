@@ -1,6 +1,5 @@
 package com.asphalt.profile.screens.sections
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,12 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +37,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.profile.data.VehicleData
 import com.asphalt.profile.screens.components.AddBikePopup
+import com.asphalt.profile.sealedclasses.BikeType
 import com.asphalt.profile.viewmodels.YourVehiclesVM
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,7 +55,6 @@ fun YourVehiclesSection(yourVehiclesVM: YourVehiclesVM = koinViewModel()) {
                 AddBikePopup({
                     showPopup = false
                 }, onAddBike = {
-                    Log.d("add_bike_cb", it.toString())
                     yourVehiclesVM.addVehicle(it)
                 })
             ComposeUtils.RoundedIconWithHeaderComponent(
@@ -102,8 +98,12 @@ fun GarageItem(vehicleData: VehicleData, onDeleteBike: () -> Unit) {
             ComposeUtils.RoundedIconWithHeaderComponent(
                 VividOrange,
                 R.drawable.ic_two_wheeler,
-                vehicleData.make,
-                vehicleData.model
+                stringResource(BikeType.getBikeTypeById(vehicleData.type)!!),
+                stringResource(
+                    R.string.garage_vehicle,
+                    vehicleData.make,
+                    vehicleData.model
+                )
             )
 
             Box(
@@ -140,7 +140,7 @@ fun YourGarage(
                 yourVehiclesList.size
             )
         )
-        Column (modifier = Modifier.wrapContentHeight()) {
+        Column(modifier = Modifier.wrapContentHeight()) {
             yourVehiclesList.forEach {
                 GarageItem(it, onDeleteBike = { onDeleteBike(it) })
                 Spacer(Modifier.height(Dimensions.spacing15))

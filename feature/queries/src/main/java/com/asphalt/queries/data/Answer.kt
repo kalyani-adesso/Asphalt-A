@@ -1,11 +1,14 @@
 package com.asphalt.queries.data
 
 data class Answer(
+    val id:Int,
     val answeredByName: String,
     val answeredByUrl: String,
     val answeredOn: String,
     val likeCount: Int,
     val dislikeCount: Int,
     val answer: String,
-    val isMechanic: Boolean = false
+    val isMechanic: Boolean = false,
+    val isUserLiked: Boolean = false,
+    val isUserDisliked: Boolean = false,
 )

@@ -17,7 +17,7 @@ struct JoinRideView: View {
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         NavigationStack {
-            SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {dismiss()})
+            SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
             VStack {
                 searchBarView
                     .font(KlavikaFont.regular.font(size: 14))
@@ -30,6 +30,9 @@ struct JoinRideView: View {
                 Spacer()
             }
             .navigationBarBackButtonHidden(true)
+            .navigationDestination(isPresented: $showHomeView, destination: {
+                BottomNavBar()
+            })
             .navigationDestination(isPresented: $showConnectedRides, destination: {
                 ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
                     title: "Weekend Coast Ride",

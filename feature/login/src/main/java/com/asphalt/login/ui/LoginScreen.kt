@@ -79,6 +79,7 @@ fun LoginScreen(
     onSignInClick: () -> Unit,
     onSignUpClick: () -> Unit,
     onDashboardNav: () -> Unit,
+    onForgotClick: () -> Unit,
     dataStoreManager: DataStoreManager = currentKoinScope().get()
 ) {
     val context = LocalContext.current
@@ -126,7 +127,7 @@ fun LoginScreen(
                 .imePadding()
                 .background(Color.White)
         ) {
-            Spacer(modifier = Modifier.height(Dimensions.spacing80))
+            Spacer(modifier = Modifier.height(Dimensions.spacing54))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -380,7 +381,9 @@ fun LoginScreen(
                     Text(
                         text = stringResource(string.forgot_password),
                         style = TypographyMedium.bodySmall,
-                        color = PrimaryDarkerLightB75
+                        color = PrimaryDarkerLightB75, modifier = Modifier.clickable {
+                        onForgotClick.invoke()
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing27))
@@ -484,6 +487,8 @@ fun LoginPreview() {
     }, onSignUpClick = {
 
     }, onDashboardNav = {
+
+    }, onForgotClick = {
 
     }, dataStoreManager)
 

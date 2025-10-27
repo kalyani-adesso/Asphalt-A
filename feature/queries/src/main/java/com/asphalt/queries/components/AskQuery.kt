@@ -46,6 +46,7 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.ScarletRed
 import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividOrange
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
@@ -55,10 +56,14 @@ import com.asphalt.commonui.utils.ComposeUtils.SectionTitle
 import com.asphalt.queries.sealedclasses.QueryCategories
 import com.asphalt.queries.viewmodels.AskQueryVM
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AskQuery(askQueryVM: AskQueryVM = koinViewModel(), onDismiss: () -> Unit,onSubmit:()-> Unit,user: CurrentUser?) {
+fun AskQuery(
+    askQueryVM: AskQueryVM,
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
+    user: CurrentUser?
+) {
     val askQuestion = askQueryVM.askQuestion.collectAsStateWithLifecycle()
     val questionError = askQueryVM.questionError.collectAsStateWithLifecycle()
     val categoryError = askQueryVM.categoryError.collectAsStateWithLifecycle()
@@ -152,10 +157,11 @@ fun AskQuery(askQueryVM: AskQueryVM = koinViewModel(), onDismiss: () -> Unit,onS
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = selectedCategory.value?.name ?: stringResource(R.string.select_a_category),
-                                style = Typography.bodyMedium,
-                                fontSize = Dimensions.textSize14,
-                                color = if (selectedCategory.value?.name!=null) NeutralBlack else NeutralDarkGrey,
+                                text = stringResource(
+                                    selectedCategory.value?.nameRes ?: R.string.select_a_category
+                                ),
+                                style = TypographyMedium.bodySmall,
+                                color = if (selectedCategory.value?.nameRes != null) NeutralBlack else NeutralDarkGrey,
                                 modifier = Modifier.padding(start = Dimensions.padding16)
                             )
                             Image(
@@ -175,14 +181,20 @@ fun AskQuery(askQueryVM: AskQueryVM = koinViewModel(), onDismiss: () -> Unit,onS
                         ) {
                             categories.forEach { option ->
                                 DropdownMenuItem(
-                                    text = { Text(option.name, style = Typography.bodySmall) },
+                                    text = {
+                                        Text(
+                                            stringResource(option.nameRes),
+                                            style = Typography.bodySmall
+                                        )
+                                    },
                                     onClick = {
                                         askQueryVM.updateSelectedCategory(option)
                                         expanded = false
                                     })
                             }
                         }
-                        ComposeUtils.TexFieldError(categoryError.value,
+                        ComposeUtils.TexFieldError(
+                            categoryError.value,
                             stringResource(R.string.category_cannot_be_empty)
                         )
                     }

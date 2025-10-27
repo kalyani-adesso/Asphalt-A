@@ -14,7 +14,6 @@ struct ConnectedRideMapView: View {
 //    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var startTrack: Bool = false
     @State private var showToast: Bool = true
-    //    @Environment(\.dismiss) var dismiss
     @State var showJoinRideView:Bool = false
     
     let rideStops: [RideStop] = [

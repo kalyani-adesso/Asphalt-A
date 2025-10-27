@@ -10,7 +10,11 @@ import SwiftUI
 struct NavigationSlideBar: View {
     @StateObject private var viewModel = NavigationSliderViewModel()
     @Environment(\.dismiss) var dismiss
+    @State var showHome: Bool = false
     var body: some View {
+        SimpleCustomNavBar(title: "adesso Rider's Club", onBackToHome: {
+            showHome = true
+        } )
         VStack {
             List(viewModel.sections, id: \.self) { item in
                 MenuItemRow(item: item)
@@ -23,19 +27,11 @@ struct NavigationSlideBar: View {
             .cornerRadius(10)
             .padding(16)
         }
-       
-        .navigationTitle(AppStrings.SignInLabel.clubName.localized)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading, content: {
-                Button(action: {
-                    dismiss()
-                }, label:{
-                    AppIcon.CreateRide.backButton
-                })
-            })
-        }
+        .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $showHome, destination: {
+            BottomNavBar()
+        })
     }
 }
 

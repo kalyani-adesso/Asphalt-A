@@ -11,6 +11,7 @@ import com.asphalt.login.di.loginModule
 import com.asphalt.profile.di.profileModule
 import com.asphalt.queries.di.queryModule
 import com.asphalt.registration.di.registrationModule
+import com.asphalt.resetpassword.di.resetModule
 import com.asphalt.welcome.di.welcomeFeatureModule
 import com.google.firebase.FirebaseApp
 import org.koin.android.ext.koin.androidContext
@@ -29,6 +30,7 @@ class AsphaltApplication : Application() {
             //First start Koin with all modules including shared components
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
+                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule + resetModule,
                         + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule
                 + joinRideModule,
 

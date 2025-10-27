@@ -12,50 +12,97 @@ struct UpcomingRideView: View {
     @State private var selectedStatus: String? = nil
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
+    @State var showHome: Bool = false
+    @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
-        NavigationStack {
-            SimpleCustomNavBar(title: "Your Rides", onBackToHome: onBackToHome)
-            
-            VStack {
-                HStack(spacing: 12) {
-                    ForEach(viewModel.rideStatus, id: \.self) { status in
-                        let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
-                        SegmentButtonView(
-                            rideStatus: status.rawValue,
-                            isSelected: isSelected
-                        ) {
-                            selectedStatus = status.rawValue
+        
+        
+        ZStack{
+            NavigationStack {
+                SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
+                    onBackToHome?()
+                    showHome = true
+                } )
+                
+                VStack {
+                    HStack(spacing: 12) {
+                        ForEach(viewModel.rideStatus, id: \.self) { status in
+                            let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
+                            SegmentButtonView(
+                                rideStatus: status.rawValue,
+                                isSelected: isSelected
+                            ) {
+                                selectedStatus = status.rawValue
+                            }
                         }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppColor.listGray)
+                    )
+                    .padding([.leading, .trailing])
+                    .contentShape(Rectangle())
+                    VStack {
+                        List {
+                            ForEach($viewModel.rides.filter { $ride in
+                                ride.rideAction.rawValue == selectedStatus
+                            }, id: \.id) { $ride in
+                                UpComingView(ride: $ride)
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                            }
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-                .padding([.leading, .trailing])
-                .contentShape(Rectangle())
-                VStack {
-                    List {
-                        ForEach($viewModel.rides.filter { $ride in
-                            ride.rideAction.rawValue == selectedStatus
-                        }, id: \.id) { $ride in
-                            UpComingView(ride: $ride)
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .onAppear {
+                    selectedStatus = viewModel.rideStatus.first?.rawValue
+                    if showpopup {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                withAnimation(.easeInOut) {
+                                    showpopup = false
+                                }
+                            }
                         }
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
             }
-            .onAppear {
-                selectedStatus = viewModel.rideStatus.first?.rawValue
+            .navigationBarBackButtonHidden(true)
+            .navigationDestination(isPresented: $showHome, destination: {
+                BottomNavBar()
+            })
+            
+            
+            // Popup overlay (always stays above)
+            if showpopup {
+                // Dimmed background
+                AppColor.backgroundLight.opacity(0.7)
+                    .ignoresSafeArea()
+                    .zIndex(1)
+                    .onTapGesture {
+                        withAnimation {
+                            showpopup = false
+                        }
+                    }
+                
+                // Popup content
+                VStack {
+                    Snackbar(
+                        message: "Ride Created Successfully",
+                        subMessage: "Your ride has been created and is now live for other riders to join."
+                    )
+                    
+                    Spacer()
+                }
+                .frame(width: 390, height: 620)
+                .transition(.scale)
+                .zIndex(2)
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .zIndex(showpopup ? 2 : 0)
     }
 }
 

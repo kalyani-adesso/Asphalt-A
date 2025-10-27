@@ -45,6 +45,9 @@ import com.asphalt.registration.navigation.NavigationRegistrationDetails
 import com.asphalt.registration.navigation.RegistrationCodeNavKey
 import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
+import com.asphalt.resetpassword.screens.CreatePasswordScreen
+import com.asphalt.resetpassword.screens.ForgotPasswordScreen
+import com.asphalt.resetpassword.screens.VerifyScreen
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import kotlinx.coroutines.launch
@@ -220,7 +223,7 @@ fun NavigationRoot(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
                                 backStack.add(AppNavKey.LoginScreenNavKey)
-                                //backStack.add(AppNavKey.CreateRideNav)
+
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -262,6 +265,8 @@ fun NavigationRoot(
                         }, onDashboardNav = {
                             backStack.add(AppNavKey.DashboardNavKey)
                             backStack.remove(AppNavKey.LoginScreenNavKey)
+                        }, onForgotClick = {
+                            backStack.add(AppNavKey.ForgotPasswordNav)
                         })
                     }
                     entry<AppNavKey.LoginSuccessScreenNavKey> { key ->
@@ -312,6 +317,32 @@ fun NavigationRoot(
                             navigateToConnectedRide = {
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
                                // backStack.add(AppNavKey.DashboardNavKey)
+
+                    entry<AppNavKey.ForgotPasswordNav> { key ->
+                        ForgotPasswordScreen(onSendClick = { emailId ->
+                            backStack.remove(AppNavKey.ForgotPasswordNav)
+                            backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
+                        })
+
+                    }
+
+                    entry<AppNavKey.VerifyPassCodeNav> { key ->
+                        VerifyScreen(key.emailId, onVerifyClick = {
+                            backStack.remove(AppNavKey.VerifyPassCodeNav(key.emailId))
+                            backStack.add(AppNavKey.CreatPasswordNav)
+                        })
+                    }
+
+                    entry<AppNavKey.CreatPasswordNav> { key ->
+                        CreatePasswordScreen(onUpdateClick = {
+                            onBackPressed()
+                        }, onBackClick = {
+                            onBackPressed()
+                        })
+                    }
+
+                }
+            )
 
                             })
                     }

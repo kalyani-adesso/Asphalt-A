@@ -38,7 +38,7 @@ struct ShareView: View {
                         .background(Color.white)
                         .cornerRadius(10)
                         Spacer() .frame(height: 0)
-                  
+                        
                         Text("Share Via")
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
@@ -65,22 +65,22 @@ struct ShareView: View {
                     isPresented = true
                 }
                 ).navigationDestination(isPresented: $isPresented, destination: {
-                    YourRideScreen()
+                    UpcomingRideView(showpopup: true)
                 })
                 
             }
             .padding()
         }
     }
-        var stepIndicator: some View {
-            HStack(spacing: 32) {
-                StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.review, title: "Review",isActive: true, isCurrentPage: false)
-                StepIndicator(icon: AppIcon.CreateRide.share, title: "Share",isActive: true, isCurrentPage: true)
-            }
+    var stepIndicator: some View {
+        HStack(spacing: 32) {
+            StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.review, title: "Review",isActive: true, isCurrentPage: false)
+            StepIndicator(icon: AppIcon.CreateRide.share, title: "Share",isActive: true, isCurrentPage: true)
         }
+    }
     
 }
 struct ShareIconButton: View {

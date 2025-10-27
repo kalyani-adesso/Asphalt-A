@@ -1,5 +1,9 @@
 package com.asphalt.commonui.utils
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -111,6 +115,7 @@ object Utils {
             "$value ${unit}s ago"
         }
     }
+
     fun nextMultipleOfFive(value: Int): Int {
         val remainder = value % 5
         return (5 - remainder) % 5
@@ -144,6 +149,42 @@ object Utils {
         } catch (e: Exception) {
             e.printStackTrace()
             0L
+        }
+    }
+
+
+    @Suppress("DEPRECATION")
+    fun getLocationRegion(context: Context, latitude: Double, longitude: Double): String {
+
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val resultList: List<Address>?
+
+        return try {
+            resultList = geocoder.getFromLocation(latitude, longitude, 1)
+
+            if (resultList.isNullOrEmpty()) {
+                ""
+            } else {
+                val address: Address = resultList[0]
+
+                val region = address.subLocality ?: address.locality ?: address.subAdminArea ?: ""
+
+                val country = address.countryName ?: ""
+
+                if (region.isNotEmpty() && country.isNotEmpty()) {
+                    "$region, $country"
+                } else region.ifEmpty {
+                    country.ifEmpty {
+                        ""
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            "Geocoding error"
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            "Invalid coordinates"
         }
     }
 
