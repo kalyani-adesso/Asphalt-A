@@ -313,39 +313,39 @@ fun NavigationRoot(
                         NotificationScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry(AppNavKey.JoinRideNavKey) { key ->
-                        JoinRideScreen(setTopAppBarState = setTopAppBarState,
+                        JoinRideScreen(
+                            setTopAppBarState = setTopAppBarState,
                             navigateToConnectedRide = {
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
-                               // backStack.add(AppNavKey.DashboardNavKey)
+                                // backStack.add(AppNavKey.DashboardNavKey)
 
-                    entry<AppNavKey.ForgotPasswordNav> { key ->
-                        ForgotPasswordScreen(onSendClick = { emailId ->
-                            backStack.remove(AppNavKey.ForgotPasswordNav)
-                            backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
-                        })
+                                entry<AppNavKey.ForgotPasswordNav> { key ->
+                                    ForgotPasswordScreen(onSendClick = { emailId ->
+                                        backStack.remove(AppNavKey.ForgotPasswordNav)
+                                        backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
+                                    })
 
+                                }
+
+                                entry<AppNavKey.VerifyPassCodeNav> { key ->
+                                    VerifyScreen(key.emailId, onVerifyClick = {
+                                        backStack.remove(AppNavKey.VerifyPassCodeNav(key.emailId))
+                                        backStack.add(AppNavKey.CreatPasswordNav)
+                                    })
+                                }
+
+                                entry<AppNavKey.CreatPasswordNav> { key ->
+                                    CreatePasswordScreen(onUpdateClick = {
+                                        onBackPressed()
+                                    }, onBackClick = {
+                                        onBackPressed()
+                                    })
+                                }
+
+                            }
+                        )
                     }
-
-                    entry<AppNavKey.VerifyPassCodeNav> { key ->
-                        VerifyScreen(key.emailId, onVerifyClick = {
-                            backStack.remove(AppNavKey.VerifyPassCodeNav(key.emailId))
-                            backStack.add(AppNavKey.CreatPasswordNav)
-                        })
-                    }
-
-                    entry<AppNavKey.CreatPasswordNav> { key ->
-                        CreatePasswordScreen(onUpdateClick = {
-                            onBackPressed()
-                        }, onBackClick = {
-                            onBackPressed()
-                        })
-                    }
-
                 }
-            )
-
-                            })
-                    }
                     entry(AppNavKey.ConnectedRideNavKey) { key ->
                         ConnectedRideScreen(setTopAppBarState = setTopAppBarState,
                             onBackButton = {
@@ -353,7 +353,6 @@ fun NavigationRoot(
 
                             }
                         )
-                    }
                 }
             )
         }
