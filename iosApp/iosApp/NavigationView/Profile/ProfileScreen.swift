@@ -121,8 +121,8 @@ struct YourVehicleRow: View {
                         AddBikeView(
                             bikeId: bikeType.id,
                             viewModel: viewModel,
-                            title: bikeType.make,
-                            subtitle: bikeType.model
+                            title: bikeType.type,
+                            subtitle: "\(bikeType.make)-\(bikeType.model)"
                         )
                     }
                     .padding()

@@ -237,11 +237,10 @@ public struct AppStrings{
         case sportBike = "Sport Bike"
         case nakedBike = "Naked Bike"
         case touringBike = "Touring Bike"
-        case cruiser = "Cruiser"
         case adventureBike = "Adventure Bike"
+        case cruiser = "Cruiser"
         case scooter = "Scooter"
         case electric = "Electric"
-        case other = "Other"
 
         var id: String { rawValue }
 
