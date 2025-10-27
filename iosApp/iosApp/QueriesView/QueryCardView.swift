@@ -9,6 +9,7 @@ import SwiftUI
 
 struct QueryCardView: View {
     let query: Query
+    @State private var showAnswer: Bool = false
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             
@@ -81,7 +82,9 @@ struct QueryCardView: View {
                         .font(KlavikaFont.medium.font(size: 14))
                     }
                 Spacer()
-                Button("Answer") {}
+                Button("Answer") {
+                    showAnswer = true
+                }
                     .font(KlavikaFont.medium.font(size: 12))
                     .foregroundColor(AppColor.black)
                     .frame(width: 72, height: 24)
@@ -97,6 +100,11 @@ struct QueryCardView: View {
         .padding()
         .background(AppColor.listGray)
         .cornerRadius(12)
+        .sheet(isPresented: $showAnswer) {
+            AnswerSheetView(query: query)
+                .presentationDetents([.fraction(0.8)])
+                .presentationBackground(.ultraThinMaterial)
+        }
        
     }
 }
