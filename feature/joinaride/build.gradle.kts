@@ -35,6 +35,7 @@ dependencies {
 
     implementation(projects.commonui)
     implementation(projects.shared)
+    implementation(projects.feature.dashboard)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -56,11 +57,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     // Koin
+    // KOIN
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
-    implementation(libs.koin.compose.androidx)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)

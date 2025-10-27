@@ -69,3 +69,5 @@ val ElectricGreen = Color(0xFF03D311)
 val BrightGray = Color(0xFFEAEAEA)
 val VividOrangeLight = Color(0xFFFF6900)
 val GrayLight15 = Color(0xFFE4F3FF)
+
+val LightGreen = Color(0xFFBFFDD9)

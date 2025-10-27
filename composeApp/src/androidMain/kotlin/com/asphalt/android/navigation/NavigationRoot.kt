@@ -34,6 +34,8 @@ import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
+import com.asphalt.joinaride.ConnectedRideScreen
+import com.asphalt.joinaride.JoinRideScreen
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
@@ -45,13 +47,7 @@ import com.asphalt.registration.navigation.RegistrationDetailsNavKey
 import com.asphalt.registration.navigation.RegistrationPasswordNavKey
 import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +55,7 @@ import org.koin.compose.koinInject
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(RegistrationDetailsNavKey)
+    val backStack = rememberNavBackStack(AppNavKey.JoinRideNavKey)
     val datastore: DataStoreManager = koinInject()
 
 //    var showAppBars by remember { mutableStateOf(false) }
@@ -76,7 +72,9 @@ fun NavigationRoot(
         AppNavKey.QueriesKey,
         AppNavKey.ProfileKey,
         AppNavKey.CreateRideNav,
-        AppNavKey.NotificationNav
+        AppNavKey.NotificationNav,
+        AppNavKey.JoinRideNavKey,
+        AppNavKey.ConnectedRideNavKey
 
     )
 
@@ -217,7 +215,6 @@ fun NavigationRoot(
                             }
                         )
                     }
-
                     entry<SplashKey> { key ->
                         NavigationSplashScreen(
                             onNavigateToLogin = {
@@ -235,7 +232,6 @@ fun NavigationRoot(
                             }
                         )
                     }
-
                     entry<RegistrationCodeNavKey> { key ->
                         NavigationRegistrationCode(
                             id = key.id,
@@ -245,7 +241,6 @@ fun NavigationRoot(
                             }
                         )
                     }
-
                     entry<RegistrationDetailsNavKey> {
                         NavigationRegistrationDetails(
                             onNavigateToLogin = { //password ->
@@ -257,7 +252,6 @@ fun NavigationRoot(
                             onBackPressed = { onBackPressed() }
                         )
                     }
-
                     entry<AppNavKey.LoginScreenNavKey> { key ->
                         LoginScreen(onSignInClick = {
 
@@ -270,7 +264,6 @@ fun NavigationRoot(
                             backStack.remove(AppNavKey.LoginScreenNavKey)
                         })
                     }
-
                     entry<AppNavKey.LoginSuccessScreenNavKey> { key ->
                         LoginSuccessScreen(exploreClick = {
                             backStack.remove(AppNavKey.LoginSuccessScreenNavKey)
@@ -278,7 +271,6 @@ fun NavigationRoot(
 
                         })
                     }
-
                     entry<AppNavKey.DashboardNavKey> { key ->
                         DashBoardScreen(
                             upcomingRideClick = {
@@ -290,6 +282,9 @@ fun NavigationRoot(
 
                             }, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
+                            },
+                            joinRideClick = {
+                                backStack.add(AppNavKey.JoinRideNavKey)
                             }
                         )
                     }
@@ -312,10 +307,24 @@ fun NavigationRoot(
                     entry<AppNavKey.NotificationNav> { key ->
                         NotificationScreen(setTopAppBarState = setTopAppBarState)
                     }
+                    entry(AppNavKey.JoinRideNavKey) { key ->
+                        JoinRideScreen(setTopAppBarState = setTopAppBarState,
+                            navigateToConnectedRide = {
+                                backStack.add(AppNavKey.ConnectedRideNavKey)
+                               // backStack.add(AppNavKey.DashboardNavKey)
+
+                            })
+                    }
+                    entry(AppNavKey.ConnectedRideNavKey) { key ->
+                        ConnectedRideScreen(setTopAppBarState = setTopAppBarState,
+                            onBackButton = {
+                                backStack.remove(AppNavKey.ConnectedRideNavKey)
+
+                            }
+                        )
+                    }
                 }
             )
-
         }
-
     }
 }

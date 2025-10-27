@@ -6,6 +6,7 @@ import com.asphalt.android.di.appModule
 import com.asphalt.android.di.sharedModule
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.dashboard.di.dashboardModule
+import com.asphalt.joinaride.di.joinRideModule
 import com.asphalt.login.di.loginModule
 import com.asphalt.profile.di.profileModule
 import com.asphalt.queries.di.queryModule
@@ -28,7 +29,8 @@ class AsphaltApplication : Application() {
             //First start Koin with all modules including shared components
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
-                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule,
+                        + sharedModule + dashboardModule + profileModule + androidSharedModule + queryModule
+                + joinRideModule,
 
                 )
             module {

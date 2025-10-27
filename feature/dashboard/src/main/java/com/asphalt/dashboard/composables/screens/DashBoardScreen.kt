@@ -28,7 +28,8 @@ fun DashBoardScreen(
     upcomingRideClick: () -> Unit,
     androidUserVM: AndroidUserVM = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    notificationsClick: () -> Unit, creatRideClick: () -> Unit
+    notificationsClick: () -> Unit, creatRideClick: () -> Unit,
+    joinRideClick : () -> Unit
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
     setTopAppBarState(
@@ -56,7 +57,7 @@ fun DashBoardScreen(
         CreateOrJoinRide({
             creatRideClick.invoke()
         }, {
-            //TODO:Join Ride Navigation
+            joinRideClick.invoke()
         })
         RideStatsPerMonth()
         DashboardUpcomingRide(upcomingRideClick)

@@ -199,6 +199,10 @@
     <string name="review_ride">Review Your Ride</string>
     <string name="check_responses">Check Responses</string>
     <string name="notifications">Notifications</string>
+    <string name="call_ride">Call Rider</string>
+    <string name="connected_ride">Connected Ride</string>
+    <string name="duration">Duration</string>
+    <string name="ride_difficulty">Ride Difficulty Level</string>
 
 
 </resources>
