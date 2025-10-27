@@ -6,6 +6,7 @@ import com.asphalt.dashboard.repository.PerMonthRideStatsRepo
 import com.asphalt.dashboard.repository.PlaceVisitedGraphRepo
 import com.asphalt.dashboard.viewmodels.AdventureJourneyViewModel
 import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
+import com.asphalt.dashboard.viewmodels.NotificationViewModel
 import com.asphalt.dashboard.viewmodels.PerMonthRideStatsViewModel
 import com.asphalt.dashboard.viewmodels.PlacesVisitedGraphViewModel
 import org.koin.core.module.dsl.viewModel
@@ -20,4 +21,5 @@ val dashboardModule = module {
     viewModel { DashboardRideInviteViewModel(get()) }
     viewModel { AdventureJourneyViewModel(get()) }
     viewModel { PlacesVisitedGraphViewModel(get()) }
+    viewModel { NotificationViewModel() }
 }

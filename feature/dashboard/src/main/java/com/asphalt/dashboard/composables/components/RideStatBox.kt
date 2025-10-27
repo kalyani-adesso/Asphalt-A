@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
@@ -30,6 +31,7 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
             painter = painterResource(iconRes),
             contentDescription = null,
             modifier = Modifier.align(Alignment.TopStart)
+                .padding(top = Dimensions.padding5)
         )
 
         FadingLine(Modifier.align(Alignment.Center))

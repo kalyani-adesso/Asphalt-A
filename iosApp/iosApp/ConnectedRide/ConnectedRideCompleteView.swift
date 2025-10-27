@@ -15,7 +15,6 @@ struct ConnectedRideCompleteView: View {
     @State var rating: Int = 0
     @State var showHome: Bool = false
     @State var showMapView:Bool = false
-//    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack(spacing: 16) {
             SucessView(title: viewModel.title,
@@ -27,8 +26,7 @@ struct ConnectedRideCompleteView: View {
         }
         .padding(.horizontal,16)
         .navigationDestination(isPresented: $showHome, destination: {
-            HomeView()
-                .environmentObject(homeViewModel)
+            BottomNavBar()
         })
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
         .navigationBarBackButtonHidden()

@@ -32,6 +32,7 @@ struct ActionButtonView: View {
                showJoinRide = true
             })
         }
+        .padding(.vertical,10)
         .navigationDestination(isPresented: $isPresented, destination: {
             CreateRideView()
         })

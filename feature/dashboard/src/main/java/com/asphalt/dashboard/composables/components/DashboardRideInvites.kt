@@ -129,7 +129,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(end = Dimensions.size10)
                         )
-                        Spacer(Modifier.height(Dimensions.size3))
+                        Spacer(Modifier.height(Dimensions.size5))
                         Text(
                             stringResource(
                                 R.string.start_to_destination,

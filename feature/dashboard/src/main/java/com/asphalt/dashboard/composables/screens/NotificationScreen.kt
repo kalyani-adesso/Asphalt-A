@@ -1,6 +1,7 @@
 package com.asphalt.dashboard.composables.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -37,11 +37,13 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.data.NotificationData
 import com.asphalt.dashboard.viewmodels.NotificationViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun NotificationScreen(
     setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: NotificationViewModel = viewModel()
+    viewModel: NotificationViewModel = koinActivityViewModel()
 ) {
     setTopAppBarState(AppBarState(title = stringResource(R.string.notifications)))
     val notificationList = viewModel.notificationState.collectAsState()
@@ -70,9 +72,12 @@ fun NotificationItem(
     RoundedBox(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = Dimensions.padding16, end = Dimensions.padding16),
+            .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+            .clickable {
+                viewModel.updateReadStatus(notificationItem.id)
+            },
         cornerRadius = Dimensions.size10,
-        backgroundColor = if (notificationItem.isRead) GrayLight15 else NeutralLightPaper
+        backgroundColor = if (notificationItem.isRead) NeutralLightPaper else GrayLight15
     ) {
         Row(
             modifier = Modifier

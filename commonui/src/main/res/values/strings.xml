@@ -97,7 +97,7 @@
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
 
-    <string name="bike_type_sport_bike">Sport Bike</string>
+    <string name="bike_type_sport_bike">Sports Bike</string>
     <string name="bike_type_naked_bike">Naked Bike</string>
     <string name="bike_type_adventure_bike">Adventure Bike</string>
     <string name="bike_type_cruiser">Cruiser</string>
@@ -216,6 +216,17 @@
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="enter_valid_verification_code">Enter a valid verification code</string>
     <string name="password_confirm_password_match">Password and confirm password should match</string>
+    <string name="garage_vehicle">%1$s - %2$s</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="routes">Routes</string>
+    <string name="gear">Gear</string>
+    <string name="safety">Safety</string>
+    <string name="other">Other</string>
+
+    <string name="post_answer">Post Answer</string>
+    <string name="share_your_knowledge">Share your knowledge and help the community…</string>
+    <string name="answer_to_query">Answer to Query</string>
+
 
 
 </resources>

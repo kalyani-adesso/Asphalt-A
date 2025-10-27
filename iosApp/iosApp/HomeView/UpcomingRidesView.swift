@@ -129,7 +129,7 @@ struct UpcomingRideCard: View {
                     endPoint: .trailing), height: 50)
                 
             }
-            .padding(.bottom,-15)
+            .padding(.vertical,10)
         }
         .padding()
         .frame(width: 290)
