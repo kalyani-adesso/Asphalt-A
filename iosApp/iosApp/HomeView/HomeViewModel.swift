@@ -7,11 +7,14 @@
 
 import Foundation
 import SwiftUI
+import shared
 
 class HomeViewModel: ObservableObject {
 
-    @Published var userName: String = "Aromal"
+    @Published var userName: String = "Guest"
     @Published var location: String = "Kochi, Infopark"
+    
+    private let userRepo = UserRepoImpl()
 
     // MARK: - Dashboard
     @Published var stats: [RideStat] = [
@@ -105,6 +108,20 @@ class HomeViewModel: ObservableObject {
 
 
     init() {
-        // can fetch remote data or simulate delay here
+        loadUserName()
     }
+    func loadUserName() {
+           Task {
+               if let user = try? await userRepo.getUserDetails() {
+                   DispatchQueue.main.async {
+                       self.userName = user.name ?? "Guest"
+                   }
+               } else {
+                   DispatchQueue.main.async {
+                       self.userName = "Guest"
+                   }
+               }
+           }
+       }
+
 }
