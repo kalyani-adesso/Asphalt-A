@@ -17,6 +17,7 @@ class LoginViewModel: ObservableObject {
             AuthenticatorImpl().signIn(email: email, password: password, completionHandler: { result,error in
                 if let result = result {
                     if let _ = result.uid {
+                        MBUserDefaults.rememberMeDataStatic = result.isSuccess
                         completion()
                     } else {
                         self.errorMessage = result.errorMessage ?? ""
