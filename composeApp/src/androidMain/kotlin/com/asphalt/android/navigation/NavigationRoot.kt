@@ -130,19 +130,9 @@ fun NavigationRoot(
             manageSelectKeyOnBackPress()
         }
     }
-    RidersClubSideMenu(drawerState, itemClick = { item ->
-        when (item) {
-            Constants.LOGOUT_CLICK -> {
-                scope.launch {
-                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
-                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
-                    backStack.clear()
-                    backStack.add(AppNavKey.LoginScreenNavKey)
-                    drawerState.close()
-                }
-            }
-        }
-    }) {
+
+    @Composable
+    fun AppContent() {
         Scaffold(
 
             topBar = {
@@ -335,5 +325,22 @@ fun NavigationRoot(
             )
         }
     }
+    if (showTopAppBar)
+        RidersClubSideMenu(drawerState, itemClick = { item ->
+            when (item) {
+                Constants.LOGOUT_CLICK -> {
+                    scope.launch {
+                        datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        backStack.clear()
+                        backStack.add(AppNavKey.LoginScreenNavKey)
+                        drawerState.close()
+                    }
+                }
+            }
+        }) {
+            AppContent()
+        }
+    else AppContent()
 
 }
