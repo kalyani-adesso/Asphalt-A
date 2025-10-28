@@ -35,7 +35,7 @@ class KtorClient {
             install(DefaultRequest) {
                 url {
                     // api call
-                    host = ""
+                    host = "asphalt-a-d59cb-default-rtdb.firebaseio.com"
                     protocol = URLProtocol.HTTPS
                     headers {
                         append(name = HttpHeaders.Authorization, value = "")

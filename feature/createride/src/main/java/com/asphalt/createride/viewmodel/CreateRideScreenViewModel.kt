@@ -5,13 +5,27 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.model.createride.CreateRideRoot
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.viewmodel.createridevm.CreateRideVm
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CreateRideScreenViewModel : ViewModel() {
+
+class CreateRideScreenViewModel : ViewModel(), KoinComponent {
+    val showToast = mutableStateOf(false)
+    val showLoader = mutableStateOf(false)
+    val createVm: CreateRideVm = CreateRideVm()
+
+    val data: DataStoreManager by inject()
+    val userRepoImpl: UserRepoImpl by inject()
+
     //var fullList = getUsers()
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
@@ -74,7 +88,6 @@ class CreateRideScreenViewModel : ViewModel() {
         // Re-filter with current query so filtered list reflects changes
         onSearchQueryChanged(searchQuery.value)
         getUserCount()
-
 
 
     }
@@ -175,8 +188,32 @@ class CreateRideScreenViewModel : ViewModel() {
         return type
     }
 
-
-
+    suspend fun createRide() {
+        val userDetails = userRepoImpl.getUserDetails()
+        userDetails?.uid
+        var createRide: CreateRideRoot = CreateRideRoot(
+            rideType = _rideDetailsMutableState.value.rideType,
+            rideTitle = _rideDetailsMutableState.value.rideTitle,
+            description = _rideDetailsMutableState.value.description,
+            dateMils = _rideDetailsMutableState.value.dateMils,
+            dateString = _rideDetailsMutableState.value.dateString,
+            hour = _rideDetailsMutableState.value.hour,
+            mins = _rideDetailsMutableState.value.mins,
+            isAm = _rideDetailsMutableState.value.isAm,
+            displayTime = _rideDetailsMutableState.value.displayTime,
+            startLocation = _rideDetailsMutableState.value.startLocation,
+            endLocation = _rideDetailsMutableState.value.endLocation
+        )
+        showLoader.value = true
+        var response = createVm.createRid(userDetails?.uid ?: "", createRide)
+        if (response) {
+            showLoader.value = false
+            showToast.value = true
+        } else {
+            showLoader.value = false
+            showToast.value = false
+        }
+    }
 
     fun getUsers(): ArrayList<RidersList> {
         var list = arrayListOf(
