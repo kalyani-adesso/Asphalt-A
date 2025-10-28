@@ -44,7 +44,7 @@ struct ConnectedRideView: View {
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showView, destination: {
-            if title == "Completing ride" {
+            if title == AppStrings.ConnectedRide.rideMessage {
                 ConnectedRideCompleteView(viewModel:model )
             } else {
                 ConnectedRideMapView()
