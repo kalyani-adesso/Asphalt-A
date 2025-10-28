@@ -7,11 +7,16 @@
 
 import Foundation
 import SwiftUI
+import shared
 
+@MainActor
 class HomeViewModel: ObservableObject {
+    @Published var locationManager = LocationManager()
 
-    @Published var userName: String = "Aromal"
+    @Published var userName: String = "Guest"
     @Published var location: String = "Kochi, Infopark"
+    
+    private let userRepo = UserRepoImpl()
 
     // MARK: - Dashboard
     @Published var stats: [RideStat] = [
@@ -105,6 +110,34 @@ class HomeViewModel: ObservableObject {
 
 
     init() {
-        // can fetch remote data or simulate delay here
+        loadUserName()
+        locationManager.requestLocation()
+            
+            // Observe location updates
+            Task {
+                for await address in locationManager.$currentAddress.values {
+                    self.location = address
+                }
+            }
+        
     }
+    func loadUserName() {
+        if let cachedName = UserDefaults.standard.string(forKey: "userName") {
+                self.userName = cachedName
+            }
+        
+           Task {
+               if let user = try? await userRepo.getUserDetails() {
+                   DispatchQueue.main.async {
+                       self.userName = user.name ?? "Guest"
+                       UserDefaults.standard.set(self.userName, forKey: "userName") //to avoid flicker
+                   }
+               } else {
+                   DispatchQueue.main.async {
+                       self.userName = "Guest"
+                   }
+               }
+           }
+       }
+
 }
