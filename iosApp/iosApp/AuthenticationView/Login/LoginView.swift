@@ -39,6 +39,9 @@ struct SignInView: View {
                 ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
                     viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
                         hasLoggedIn = true
+                        MBUserDefaults.rememberMeDataStatic = true
+                    }, errorCompletion: {
+                        MBUserDefaults.rememberMeDataStatic = false
                     })
                 })
                 .padding(.bottom,20)
