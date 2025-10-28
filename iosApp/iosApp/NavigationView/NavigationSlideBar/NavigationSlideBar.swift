@@ -61,6 +61,7 @@ struct MenuItemRow: View {
         .contentShape(Rectangle())
         .onTapGesture {
             itemIsSelected = true
+            MBUserDefaults.rememberMeDataStatic = false
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {
             item.destination

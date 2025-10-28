@@ -14,16 +14,21 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct iOSApp: App {
     @AppStorage(AppStrings.userdefaultKeys.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var homeViewModel: HomeViewModel = .init()
     var body: some Scene {
         WindowGroup {
-            if MBUserDefaults.hasSeenOnboardingStatic {
-                NavigationStack {
-              SignInView()
-                }
+            if MBUserDefaults.rememberMeDataStatic == true  {
+                BottomNavBar()
             } else {
-                WelcomeScreen()
+                if MBUserDefaults.hasSeenOnboardingStatic {
+                    NavigationStack {
+                        SignInView()
+                    }
+                } else {
+                    WelcomeScreen()
+                }
             }
+            
         }
-        
     }
 }

@@ -70,14 +70,18 @@ public struct AppStrings{
         case clubName = "adesso Rider’s Club"
         case emailOrPhone = "Email or Phone Number"
         case password = "Password"
-
+        case confirmPassword = "Confirm Password"
+        case updatePassword = "Update Password"
+        case createNewPassword = "Create New Password"
+        case enterYourNewPassword = "Enter your new password below."
+        case backToSignIn = "Back to Sign In"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
     enum SignInPlaceholder: String {
         case email = "Enter your email"
         case password = "Enter your password"
-
+        case confirmPassword = "Confirm your Password"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
@@ -114,6 +118,7 @@ public struct AppStrings{
     enum ValidationMessage: String {
         case validatePassword = "Please enter a password"
         case validateEmail = "Please enter a valid email"
+        case validateConfirmPassword = "Passwords do not match"
     }
 
 

@@ -53,9 +53,6 @@ struct SignInView: View {
             })
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
         }
-        .onAppear() {
-            MBUserDefaults.rememberMeDataStatic = true
-        }
     }
 }
 
@@ -120,8 +117,9 @@ extension SignInView {
                         .foregroundColor(.stoneGray)
                 }
             }
+            .disabled(emailOrPhone.isEmpty && password.isEmpty)
             Spacer()
-            NavigationLink(destination: ForgotPassword(email: emailOrPhone )) {
+            NavigationLink(destination: ForgotPassword()) {
                 Text(AppStrings.SignInAction.forgotPassword.localized)
                     .font(KlavikaFont.medium.font(size: 14))
                     .foregroundColor(.celticBlue)
