@@ -46,8 +46,7 @@ actual class AuthenticatorImpl actual constructor() {
             }
         }
     }
-
-
+    
     actual suspend fun signIn(email: String, password: String): LoginResult = suspendCancellableCoroutine { cont ->
         auth.signInWithEmail(email = email, password = password) { result: FIRAuthDataResult?, error: NSError? ->
             if (error != null) {
