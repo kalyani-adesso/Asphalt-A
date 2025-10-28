@@ -14,7 +14,7 @@ struct Query: Identifiable {
     let author: String
     let daysAgo: String
     let content: String
-    let answers: [Answer]
+    var answers: [Answer]
     let likes: Int
     let comments: Int
 }

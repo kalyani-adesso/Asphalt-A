@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,14 +35,17 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.queries.components.AnswerToQuery
 import com.asphalt.queries.components.AskQuery
 import com.asphalt.queries.components.FilterCategories
 import com.asphalt.queries.components.Queries
 import com.asphalt.queries.components.SearchQueries
+import com.asphalt.queries.viewmodels.AskQueryVM
 import com.asphalt.queries.viewmodels.QueriesVM
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueriesScreen(
     setTopAppBarState: (AppBarState) -> Unit,
@@ -48,8 +53,11 @@ fun QueriesScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 
 ) {
+    val askQueryVM: AskQueryVM = koinViewModel()
     var showQueryPopup by remember { mutableStateOf(false) }
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
+    var showAnswerPopup by remember { mutableStateOf(false) }
+
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.queries),
@@ -94,16 +102,25 @@ fun QueriesScreen(
     LaunchedEffect(selectedCategory.intValue) {
         queriesVM.setFilterCategory(selectedCategory.intValue)
     }
+    val selectedQueryId: MutableState<Int?> = remember { mutableStateOf(null) }
     val scope = rememberCoroutineScope()
+    if (showAnswerPopup) {
+        AnswerToQuery({
+            showAnswerPopup = false
+            selectedQueryId.value = null
+            queriesVM.clearAnswerToQuestion()
+        }, selectedQueryId.value, queriesVM, queryList.value)
+    }
     if (showQueryPopup)
-        AskQuery(onSubmit = {
+        AskQuery(askQueryVM = askQueryVM, onSubmit = {
             scope.launch {
                 queriesVM.loadQueries()
                 showQueryPopup = false
             }
         }, onDismiss = {
             showQueryPopup = false
-        },user=user.value)
+        }, user = user.value)
+    else askQueryVM.clearAll()
     ComposeUtils.DefaultColumnRoot(
         Dimensions.size0,
         bottomPadding = Dimensions.size0,
@@ -112,7 +129,10 @@ fun QueriesScreen(
         Spacer(Modifier.height(Dimensions.padding20))
         SearchQueries()
         FilterCategories(selectedCategory)
-        Queries(queryList.value)
+        Queries(queryList.value, queriesVM) { it ->
+            selectedQueryId.value = it
+            showAnswerPopup = true
+        }
 
     }
 

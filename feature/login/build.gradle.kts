@@ -12,8 +12,6 @@ android {
     defaultConfig {
         minSdk = 24
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -40,7 +38,6 @@ dependencies {
     implementation(projects.shared)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.compose.material3)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.testExt.junit)
@@ -59,10 +56,6 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     debugImplementation(libs.compose.ui.tooling)
-
-    // ViewModel
-    //implementation(libs.androidx.lifecycle.viewmodel.compose)
-
     // Navigation
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)

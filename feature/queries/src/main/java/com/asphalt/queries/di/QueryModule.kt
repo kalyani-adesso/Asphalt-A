@@ -8,7 +8,7 @@ import org.koin.dsl.module
 
 val queryModule = module {
     single { QueryRepo() }
-    viewModel { QueriesVM(get()) }
+    viewModel { QueriesVM(get(),get()) }
     viewModel { AskQueryVM(get()) }
 
 }

@@ -24,15 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.registration.viewmodel.RegistrationDetailsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegistrationDetailsScreen(
-    authViewModel: AuthViewModel = koinViewModel(),
+    authViewModel: RegistrationDetailsViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
     onNavigateToLogin: () -> Unit = {}
 ) {
@@ -68,7 +68,7 @@ fun RegistrationDetailsScreen(
 
 @Composable
 private fun RegistrationDetailsHeader(
-    viewModel: AuthViewModel,
+    viewModel: RegistrationDetailsViewModel,
     onNavigateToLogin: () -> Unit
 ) {
 
@@ -101,7 +101,7 @@ private fun RegistrationDetailsHeader(
             text = "adesso Rider's Club",
             style = TypographyMedium.bodyMedium
         )
-        RegistrationForm(viewModel, {
+        RegistrationForm(viewModel, navigateToLogin = {
             onNavigateToLogin.invoke()
         })
     }

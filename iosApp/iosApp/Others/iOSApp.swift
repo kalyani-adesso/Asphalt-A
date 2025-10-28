@@ -28,7 +28,7 @@ struct iOSApp: App {
                     WelcomeScreen()
                 }
             }
-            
+
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.asphalt.registration.di
 
+import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.registration.viewmodel.RegistrationCodeViewModel
 import com.asphalt.registration.viewmodel.RegistrationDetailsViewModel
 import com.asphalt.registration.viewmodel.RegistrationPasswordViewModel
@@ -11,5 +12,5 @@ val registrationModule = module {
 
     viewModel { RegistrationPasswordViewModel() }
 
-    viewModel { RegistrationDetailsViewModel() }
+    viewModel { RegistrationDetailsViewModel(authViewModel = get()) }
 }

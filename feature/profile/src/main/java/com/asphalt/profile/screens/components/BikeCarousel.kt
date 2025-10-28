@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -33,10 +32,11 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.profile.sealedclasses.BikeType
+import com.asphalt.profile.viewmodels.AddBikesVM
 import kotlinx.coroutines.launch
 
 @Composable
-fun BikeCarousel() {
+fun BikeCarousel(addBikesVM: AddBikesVM) {
     val bikeCarousels = BikeType.getAllTypes()
     val pagerState = rememberPagerState(pageCount = {
         bikeCarousels.size
@@ -61,7 +61,7 @@ fun BikeCarousel() {
                 Image(
                     painter = painterResource(if (leftEnabled) R.drawable.ic_prev_enabled else R.drawable.ic_prev_disabled),
                     null,
-                   )
+                )
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ComposeUtils.SectionSubtitle(
@@ -116,10 +116,7 @@ fun BikeCarousel() {
                     contentScale = ContentScale.FillWidth
                 )
                 ComposeUtils.SectionTitle(stringResource(bikeCarousels[page].typeRes))
-                ComposeUtils.SectionSubtitle(
-                    stringResource(bikeCarousels[page].descriptionRes),
-                    color = NeutralBlack, modifier = Modifier.offset(y = Dimensions.spacingNeg8)
-                )
+                addBikesVM.updateBikeType(bikeCarousels[page].id)
             }
         }
     }

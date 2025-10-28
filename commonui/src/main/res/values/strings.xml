@@ -97,7 +97,7 @@
     <string name="model_cannot_be_empty">Model cannot be empty</string>
     <string name="add_vehicle">Add Vehicle</string>
 
-    <string name="bike_type_sport_bike">Sport Bike</string>
+    <string name="bike_type_sport_bike">Sports Bike</string>
     <string name="bike_type_naked_bike">Naked Bike</string>
     <string name="bike_type_adventure_bike">Adventure Bike</string>
     <string name="bike_type_cruiser">Cruiser</string>
@@ -199,6 +199,38 @@
     <string name="review_ride">Review Your Ride</string>
     <string name="check_responses">Check Responses</string>
     <string name="notifications">Notifications</string>
+    <string name="send_reset_code">Send reset code</string>
+    <string name="forgot_password_q">Forgot Password?</string>
+    <string name="sent_reset_instruction">We’ll send you reset instructions</string>
+    <string name="check_email">Check Your Email</string>
+    <string name="enter_verification_code">Enter Verification Code</string>
+    <string name="enter_code">Enter code</string>
+    <string name="verify_code">Verify code</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="update_password">Update password</string>
+    <string name="back_to_sign_in">Back to Sign In</string>
+    <string name="create_new_password">Create New Password</string>
+    <string name="enter_your_password">Enter your new password below.</string>
+    <string name="enter_new_password">Enter New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="enter_valid_verification_code">Enter a valid verification code</string>
+    <string name="password_confirm_password_match">Password and confirm password should match</string>
+    <string name="garage_vehicle">%1$s - %2$s</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="routes">Routes</string>
+    <string name="gear">Gear</string>
+    <string name="safety">Safety</string>
+    <string name="other">Other</string>
+
+    <string name="post_answer">Post Answer</string>
+    <string name="share_your_knowledge">Share your knowledge and help the community…</string>
+    <string name="answer_to_query">Answer to Query</string>
+
+    <string name="call_ride">Call Rider</string>
+    <string name="connected_ride">Connected Ride</string>
+    <string name="duration">Duration</string>
+    <string name="ride_difficulty">Ride Difficulty Level</string>
 
 
 </resources>

@@ -35,35 +35,33 @@ dependencies {
 
     implementation(projects.commonui)
     implementation(projects.shared)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.compose.material3)
-    //implementation(libs.google.firebase.firestore.ktx)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.compose.ui.tooling)
 
-    // Koin
+
+    // KOIN
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
-    debugImplementation(libs.compose.ui.tooling)
-
-    // ViewModel
-    implementation(libs.androidx.lifecycle.viewmodelCompose)
-    implementation(libs.firebase.firestore.ktx)
-
-    // Navigation
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.firebase.firestore.ktx)
 
 }

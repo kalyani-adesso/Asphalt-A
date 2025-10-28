@@ -57,26 +57,26 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                         selected = false,
                         onClick = {}
                     )
-
-                    NavigationDrawerItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_knowledge),
-                                contentDescription = "error",
-                                tint = Color.Black
-                            )
-                        },
-                        badge = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_arrow),
-                                contentDescription = "",
-                                tint = Color.Black
-                            )
-                        },
-                        label = { Text("Knowledge Circle") },
-                        selected = false,
-                        onClick = {}
-                    )
+//
+//                    NavigationDrawerItem(
+//                        icon = {
+//                            Icon(
+//                                painter = painterResource(R.drawable.ic_knowledge),
+//                                contentDescription = "error",
+//                                tint = Color.Black
+//                            )
+//                        },
+//                        badge = {
+//                            Icon(
+//                                painter = painterResource(R.drawable.ic_arrow),
+//                                contentDescription = "",
+//                                tint = Color.Black
+//                            )
+//                        },
+//                        label = { Text("Knowledge Circle") },
+//                        selected = false,
+//                        onClick = {}
+//                    )
 
                     NavigationDrawerItem(
                         icon = {

@@ -75,7 +75,7 @@ fun AddBikePopup(
                         stringResource(R.string.choose_motorcycle_type)
                     )
                     Spacer(Modifier.height(Dimensions.size25))
-                    BikeCarousel()
+                    BikeCarousel(addBikesVM)
                     Spacer(Modifier.height(Dimensions.size25))
                     Text(
                         stringResource(R.string.make),
