@@ -10,7 +10,6 @@ class CreateRideVm {
     suspend fun createRid(uid: String, createRide: CreateRideRoot): Boolean {
         //var createMap: MutableMap<String, CreateRideRoot> = mutableMapOf()
         // createMap.put(uid, createRide)
-        val isSucess = MutableStateFlow(false)
         var repo = CreateRideRepository()
         var response: HttpResponse = repo.createRide(uid, createRide)
         if (response.status.value == 200)
