@@ -349,6 +349,7 @@ public struct AppStrings{
         static let rideCompletionProgressTitle = "Completing ride"
         static let rideCompletionProgressSubtitle = "Saving your ride data and generating summary"
         static let standard = "Standard"
+        static let rideMessage = "Completing ride"
     }
 }
 
