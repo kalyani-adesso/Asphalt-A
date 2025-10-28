@@ -6,7 +6,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.model.User
 import com.asphalt.android.model.createride.CreateRideRoot
+import com.asphalt.android.model.createride.Users
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.viewmodel.createridevm.CreateRideVm
 import com.asphalt.commonui.R
@@ -191,6 +193,18 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     suspend fun createRide() {
         val userDetails = userRepoImpl.getUserDetails()
         userDetails?.uid
+        var arrList= ArrayList<Users>()
+        var user1=Users("Hari","1234")
+        var user2=Users("Krishnan","12345")
+        var user3 =Users("Sree","12346")
+        arrList.add(user1)
+        arrList.add(user2)
+        arrList.add(user3)
+        var map : MutableMap<String, Users> = mutableMapOf()
+        map.put("user1",user1)
+        map.put("user2",user2)
+        map.put("user3",user3)
+
         var createRide: CreateRideRoot = CreateRideRoot(
             rideType = _rideDetailsMutableState.value.rideType,
             rideTitle = _rideDetailsMutableState.value.rideTitle,
@@ -202,7 +216,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             isAm = _rideDetailsMutableState.value.isAm,
             displayTime = _rideDetailsMutableState.value.displayTime,
             startLocation = _rideDetailsMutableState.value.startLocation,
-            endLocation = _rideDetailsMutableState.value.endLocation
+            endLocation = _rideDetailsMutableState.value.endLocation,map
         )
         showLoader.value = true
         var response = createVm.createRid(userDetails?.uid ?: "", createRide)

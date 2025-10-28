@@ -14,5 +14,10 @@ class CreateRideRoot(
     var isAm: Boolean = false,
     var displayTime: String? = null,
     var startLocation: String? = null,
-    var endLocation: String? = null
+    var endLocation: String? = null,
+    var user : Map<String,Users>?=null
+    //var users: ArrayList<Users>?=null
 )
+
+@Serializable
+data class Users(var name:String,var id: String)
