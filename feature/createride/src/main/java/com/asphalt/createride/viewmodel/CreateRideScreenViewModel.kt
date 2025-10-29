@@ -5,14 +5,22 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.UserData
+import com.asphalt.android.repository.user.UserRepo
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CreateRideScreenViewModel : ViewModel() {
-    //var fullList = getUsers()
+class CreateRideScreenViewModel : ViewModel(), KoinComponent {
+    val userRepo: UserRepo by inject()
+
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
@@ -37,10 +45,10 @@ class CreateRideScreenViewModel : ViewModel() {
         mutableStateOf(arrayListOf())
     val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
 
-    init {
-        _fullList.value = getUsers()
-        _ridersListMutable.value = _fullList.value
-    }
+    /* init {
+         _fullList.value = getUsers()
+         _ridersListMutable.value = _fullList.value
+     }*/
 
     val searchQuery = mutableStateOf("")
 
@@ -62,9 +70,9 @@ class CreateRideScreenViewModel : ViewModel() {
         getUserCount()
     }
 
-    fun updateUerList(isSelcted: Boolean, id: Int?) {
+    fun updateUerList(isSelcted: Boolean, id: String?) {
         _fullList.value = ArrayList(_fullList.value.map { rider ->
-            if (rider.id == id) {
+            if (rider.id.equals(id)) {
                 rider.copy(isSelect = isSelcted)
             } else {
                 rider
@@ -74,7 +82,6 @@ class CreateRideScreenViewModel : ViewModel() {
         // Re-filter with current query so filtered list reflects changes
         onSearchQueryChanged(searchQuery.value)
         getUserCount()
-
 
 
     }
@@ -176,10 +183,30 @@ class CreateRideScreenViewModel : ViewModel() {
     }
 
 
+    fun getUsers() {
+        viewModelScope.launch {
+            var response: APIResult<List<UserData>> = userRepo.getAllUsers()
+            when (response) {
+                is APIResult.Success -> {
+                    if (response.data.size > 0) {
+                        _fullList.value =
+                            ArrayList(response.data.map { RidersList(name = it.name,
+                                id = it.uid, bike = "Unicorn") })
+                        _ridersListMutable.value = _fullList.value
+                    }
+
+                }
+
+                is APIResult.Error -> {
+                    //val msg = result.exception.message ?: "Something went wrong"
+
+                }
+            }
+
+        }
 
 
-    fun getUsers(): ArrayList<RidersList> {
-        var list = arrayListOf(
+       /* var list = arrayListOf(
 
             RidersList(
                 id = 1,
@@ -239,8 +266,8 @@ class CreateRideScreenViewModel : ViewModel() {
                 imgUrl = "https://picsum.photos/id/1/200/300"
             )
         )
-        return list;
-        //_ridersListMutable.value = list
+        return list;*/
+
     }
 
 }

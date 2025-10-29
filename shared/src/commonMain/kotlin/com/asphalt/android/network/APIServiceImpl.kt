@@ -2,8 +2,10 @@ package com.asphalt.android.network
 
 import com.asphalt.android.constants.APIConstants.ANSWERS_URL
 import com.asphalt.android.constants.APIConstants.QUERIES_URL
+import com.asphalt.android.constants.APIConstants.USER_URL
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
+import com.asphalt.android.model.User
 import com.asphalt.android.model.queries.AnswerRequestDTO
 import com.asphalt.android.model.queries.QueryRequestDTO
 import com.asphalt.android.model.queries.QueryResponseDTO
@@ -59,6 +61,12 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
     ): APIResult<GenericResponse> {
         return safeApiCall {
             post(answerRequestDTO, "$QUERIES_URL/$queryId$ANSWERS_URL").body()
+        }
+    }
+
+    override suspend fun getAllUser(): APIResult<Map<String, User>>{
+        return safeApiCall {
+            get(USER_URL).body()
         }
     }
 

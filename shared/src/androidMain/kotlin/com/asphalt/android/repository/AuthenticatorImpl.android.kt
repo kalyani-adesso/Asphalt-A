@@ -14,7 +14,7 @@ actual class AuthenticatorImpl {
 
         return try {
             val result = FirebaseAuth.getInstance()
-                .createUserWithEmailAndPassword(user.email, user.password)
+                .createUserWithEmailAndPassword(user.email?:"", user.password?:"")
                 .await()
 
             val uId = result.user?.uid ?: return Result.failure(Exception("User Id missing"))
