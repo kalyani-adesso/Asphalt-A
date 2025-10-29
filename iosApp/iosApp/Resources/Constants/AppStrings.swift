@@ -350,6 +350,8 @@ public struct AppStrings{
         static let rideCompletionProgressSubtitle = "Saving your ride data and generating summary"
         static let standard = "Standard"
         static let rideMessage = "Completing ride"
+        static let skip = "skip"
+        static let submitRating = "Submit Rating"
     }
 }
 
