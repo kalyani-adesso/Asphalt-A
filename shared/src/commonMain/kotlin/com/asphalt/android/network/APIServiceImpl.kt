@@ -3,6 +3,7 @@ package com.asphalt.android.network
 import com.asphalt.android.constants.APIConstants.ANSWERS_URL
 import com.asphalt.android.constants.APIConstants.QUERIES_URL
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.queries.AnswerRequestDTO
 import com.asphalt.android.model.queries.QueryRequestDTO
 import com.asphalt.android.model.queries.QueryResponseDTO
@@ -45,22 +46,22 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
         }
     }
 
-    override suspend fun postQuery(queryRequestDTO: QueryRequestDTO): APIResult<Unit> {
+    override suspend fun postQuery(queryRequestDTO: QueryRequestDTO): APIResult<GenericResponse> {
         return safeApiCall {
             client.getClient().post(buildUrl(QUERIES_URL)) {
                 setBody(queryRequestDTO)
-            }
+            }.body()
         }
     }
 
     override suspend fun postAnswer(
         queryId: String,
         answerRequestDTO: AnswerRequestDTO
-    ): APIResult<Unit> {
+    ): APIResult<GenericResponse> {
         return safeApiCall {
             client.getClient().post(buildUrl("$QUERIES_URL/$queryId$ANSWERS_URL")) {
                 setBody(answerRequestDTO)
-            }
+            }.body()
         }
     }
 

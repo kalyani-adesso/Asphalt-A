@@ -2,6 +2,7 @@ package com.asphalt.android.repository.queries
 
 import com.asphalt.android.mapApiResult
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.queries.AnswerDTO
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.AnswerRequestDTO
@@ -54,7 +55,7 @@ class QueryRepository(private val apiService: APIService) {
         categoryId: Int,
         postedOn: String,
         postedBy: String
-    ): APIResult<Unit> {
+    ): APIResult<GenericResponse> {
         val request = QueryRequestDTO(
             queryTitle = queryTitle,
             queryDescription = queryDescription,
@@ -63,6 +64,7 @@ class QueryRepository(private val apiService: APIService) {
             postedBy = postedBy,
         )
         return apiService.postQuery(request).mapApiResult {
+            it
         }
     }
 
@@ -71,9 +73,10 @@ class QueryRepository(private val apiService: APIService) {
         answer: String,
         answeredBy: String,
         answeredOn: String
-    ): APIResult<Unit> {
+    ): APIResult<GenericResponse> {
         val request = AnswerRequestDTO(answer, answeredBy, answeredOn)
         return apiService.postAnswer(queryId, request).mapApiResult {
+            it
         }
     }
 

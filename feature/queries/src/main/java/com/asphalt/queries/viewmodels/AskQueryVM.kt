@@ -1,5 +1,6 @@
 package com.asphalt.queries.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.CurrentUser
