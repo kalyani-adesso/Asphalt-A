@@ -3,8 +3,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProfileInfo(
-    val userName: String,
-    val email: String,
     val phoneNumber: String,
     val emergencyContact: String,
     val drivingLicense: String,

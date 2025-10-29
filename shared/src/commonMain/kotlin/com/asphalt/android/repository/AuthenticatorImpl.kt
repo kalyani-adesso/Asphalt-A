@@ -8,3 +8,4 @@ expect class AuthenticatorImpl() {
     suspend fun signUp(user: User): Result<String>
     suspend fun signIn(email: String, password: String): LoginResult
 }
+

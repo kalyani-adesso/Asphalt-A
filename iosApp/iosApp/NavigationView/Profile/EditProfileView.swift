@@ -82,6 +82,7 @@ struct EditProfileView: View {
                             .padding(.bottom, 21)
                             ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
                                 profileViewModel.updateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL:drivingLicenseNumber , machanic:enableMechanic)
+                                profileViewModel.editProfile(userId:MBUserDefaults.userIdStatic ?? "", userName: userName, email: email, phoneNumber: phoneNumber, emergencyContact: emargeContact, drivingLicense: drivingLicenseNumber, isMachanic: enableMechanic)
                                 isPresented = false
                             }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber))
                                 .padding(.bottom, 21)

@@ -27,7 +27,10 @@ struct SelectYourRideView: View {
                         AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
                         AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
                         ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
-                            viewModel.getBikeType(model: model, make: make, type: viewModel.vehicleArray[currentPage].rawValue)
+                            Task {
+                                await viewModel.addNewBike(userId: MBUserDefaults.userIdStatic ?? "", model: model, make: make, type:viewModel.vehicleArray[currentPage].rawValue)
+                            }
+                           
                             isPresented = false
                         })
                         .disabled(viewModel.validateMake(make: make, moodel: model))

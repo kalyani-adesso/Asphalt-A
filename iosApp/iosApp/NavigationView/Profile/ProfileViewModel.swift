@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import shared
 
 struct ProfileSection: Identifiable {
     let id = UUID()
@@ -70,8 +71,49 @@ final class ProfileViewModel: ObservableObject {
     
     @Published var selectedBikeType: [SelectedBikeType] = []
     
+    private var api: FirebaseApi
+    private var viewModel: ProfileKMPViewModel
+    
     init() {
+        api = FirebaseApi()
+        viewModel = ProfileKMPViewModel(api: api)
         loadData()
+    }
+    
+    func fetchProfile(userId: String) async {
+        do {
+            if let profile = try await viewModel.getProfile(userId: userId) {
+                // Update your @Published properties, e.g.,
+//                self.profileName = profile.userName
+//                self.email = profile.email
+                self.phoneNumber = profile.phoneNumber
+                self.role = profile.isMechanic ? "Mechanic" : "Customer"
+            }
+        } catch {
+            print("Error fetching profile: \(error)")
+        }
+    }
+  
+    func addNewBike(userId: String, model:String,make:String,type:String) async {
+        let bikeInfo = BikeInfo(bikeType: type, make: make, model: model)
+        do {
+            try await viewModel.addBike(userId: userId, bike: bikeInfo)
+            // Refresh UI or handle success
+        } catch {
+            print("Error adding bike: \(error)")
+        }
+    }
+    
+    func editProfile(userId:String, userName:String,email:String,phoneNumber:String,emergencyContact:String,drivingLicense:String,isMachanic:Bool) {
+        
+        let profileInfo = ProfileInfo(phoneNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic)
+        viewModel.createOrEditProfile(userId: userId, profile: profileInfo, isEdit: false, email: email, userName: userName, completionHandler: { error in
+         if let error = error {
+                print("Error editing profile: \(error)")
+         } else {
+             print("Profile updated sucessfully.")
+         }
+     })
     }
     
     private func loadData() {
