@@ -102,7 +102,7 @@ fun QueriesScreen(
     LaunchedEffect(selectedCategory.intValue) {
         queriesVM.setFilterCategory(selectedCategory.intValue)
     }
-    val selectedQueryId: MutableState<Int?> = remember { mutableStateOf(null) }
+    val selectedQueryId: MutableState<String?> = remember { mutableStateOf(null) }
     val scope = rememberCoroutineScope()
     if (showAnswerPopup) {
         AnswerToQuery({

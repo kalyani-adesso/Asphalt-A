@@ -11,13 +11,14 @@ class QueryRepo {
     suspend fun loadQueryList(): List<Query> {
         delay(200)
 
-        val sortedQueries = bikeQueries.sortedByDescending { query ->
-            Utils.parseISODateToMillis(query.postedOn)
-        }
+        val sortedQueries = bikeQueries
+//            .sortedByDescending { query ->
+//            Utils.parseISODateToMillis(query.postedOn)
+//        }
 
         return sortedQueries.map { query ->
             val sortedAnswers = query.answers.sortedByDescending { answer ->
-                Utils.parseISODateToMillis(answer.answeredOn)
+                answer.answeredOn
             }
             query.copy(answers = sortedAnswers)
         }
@@ -28,7 +29,7 @@ class QueryRepo {
         bikeQueries.add(query)
     }
 
-    suspend fun likeOrRemoveLikeOfQuestion(queryId: Int): Query? {
+    suspend fun likeOrRemoveLikeOfQuestion(queryId: String): Query? {
         val index = bikeQueries.indexOfFirst { question -> question.id == queryId }
 
         if (index != -1) {
@@ -51,7 +52,7 @@ class QueryRepo {
 
 
     private suspend fun updateAnswerInQuery(
-        answerId: Int,
+        answerId: String,
         updateLogic: (Answer) -> Answer
     ): Query? {
         delay(100) // Simulate network delay
@@ -75,7 +76,7 @@ class QueryRepo {
         }
 
         val updatedAnswers = updatedAnswersUnsorted.sortedByDescending { answer ->
-            Utils.parseISODateToMillis(answer.answeredOn)
+            answer.answeredOn
         }
 
         val updatedQuery = originalQuery.copy(answers = updatedAnswers)
@@ -84,7 +85,7 @@ class QueryRepo {
         return updatedQuery
     }
     // QueryRepo.kt (MODIFIED)
-    suspend fun postAnswer(answer: String, queryId: Int?, name: String?): Query? { // 💡 Return Query?
+    suspend fun postAnswer(answer: String, queryId: String?, name: String?): Query? { // 💡 Return Query?
         if (queryId == null || name.isNullOrBlank()) {
             return null // Return null on failure
         }
@@ -100,12 +101,12 @@ class QueryRepo {
         val originalQuery = bikeQueries[queryIndex]
 
         val maxAnswerId = bikeQueries.flatMap { it.answers }.maxOfOrNull { it.id } ?: 0
-        val newAnswerId = maxAnswerId + 1
+        val newAnswerId = maxAnswerId.toString() + 1
 
         val newAnswer = Answer(
             id = newAnswerId,
             answer = answer,
-            answeredOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
+            answeredOn =System.currentTimeMillis(),
             answeredByName = name,
             answeredByUrl = "https://example.com/placeholder_profile.jpg",
             likeCount = 0,
@@ -130,7 +131,7 @@ class QueryRepo {
     }
 
 
-    suspend fun likeOrRemoveLikeOfAnswer(answerId: Int): Query? {
+    suspend fun likeOrRemoveLikeOfAnswer(answerId: String): Query? {
         return updateAnswerInQuery(answerId) { answer ->
             val newLikeCount =
                 if (answer.isUserLiked) answer.likeCount - 1 else answer.likeCount + 1
@@ -147,7 +148,7 @@ class QueryRepo {
         }
     }
 
-    suspend fun likeOrRemoveDislikeOfAnswer(answerId: Int): Query? {
+    suspend fun likeOrRemoveDislikeOfAnswer(answerId: String): Query? {
         return updateAnswerInQuery(answerId) { answer ->
             val newDislikeCount =
                 if (answer.isUserDisliked) answer.dislikeCount - 1 else answer.dislikeCount + 1

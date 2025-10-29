@@ -1,7 +1,7 @@
 package com.asphalt.android.network
 
+import com.asphalt.android.constants.APIConstants.BASE_URL
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 
 class KtorClient {
 
-    fun getClient() : HttpClient {
+    fun getClient(): HttpClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(Json {
@@ -35,7 +35,7 @@ class KtorClient {
             install(DefaultRequest) {
                 url {
                     // api call
-                    host = ""
+                    host = BASE_URL
                     protocol = URLProtocol.HTTPS
                     headers {
                         append(name = HttpHeaders.Authorization, value = "")
@@ -49,8 +49,10 @@ class KtorClient {
 
 
     suspend fun Registration() {
-       getClient()
-           .get(urlString = "") // mention end point
-           //.body<>()
+        getClient()
+            .get(urlString = "") // mention end point
+        //.body<>()
     }
+
+
 }

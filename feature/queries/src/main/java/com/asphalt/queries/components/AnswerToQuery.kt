@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AnswerToQuery(
     dismissPopup: () -> Unit,
-    queryId: Int?,
+    queryId: String?,
     queriesVM: QueriesVM,
     queryList: List<Query>
 ) {
@@ -187,7 +187,11 @@ fun AnswerToQuery(
                                         )
                                         Spacer(Modifier.weight(1f))
                                         ComposeUtils.SectionSubtitle(
-                                            Utils.formatRelativeTime(query.postedOn),
+                                            Utils.formatRelativeTime(
+                                                Utils.formatClientMillisToISO(
+                                                    query.postedOn
+                                                )
+                                            ),
                                             color = GrayDark
                                         )
                                     }
@@ -324,7 +328,7 @@ fun AnswerToQuery(
                                         .width(Dimensions.size132)
                                         .clickable(enabled = isPostAnswerEnabled.value) {
                                             scope.launch {
-                                                queriesVM.postAnswer(query)
+                                                query?.let { queriesVM.postAnswer(it) }
                                                 dismissPopup.invoke()
                                             }
                                         },

@@ -45,7 +45,7 @@ import com.asphalt.queries.viewmodels.QueriesVM
 import kotlinx.coroutines.launch
 
 @Composable
-fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
+fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (String) -> Unit) {
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
         items(queries) {
@@ -57,7 +57,7 @@ fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (I
 }
 
 @Composable
-fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
+fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (String) -> Unit) {
     val scope = rememberCoroutineScope()
 
     Column(
@@ -103,7 +103,13 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (In
                 query.postedByName, modifier = Modifier.padding(start = Dimensions.spacing10)
             )
             Spacer(Modifier.weight(1f))
-            ComposeUtils.SectionSubtitle(Utils.formatRelativeTime(query.postedOn), color = GrayDark)
+            ComposeUtils.SectionSubtitle(
+                Utils.formatRelativeTime(
+                    Utils.formatClientMillisToISO(
+                        query.postedOn
+                    )
+                ), color = GrayDark
+            )
         }
         HorizontalDivider(color = LightSilver)
         if (query.answers.isNotEmpty())
