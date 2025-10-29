@@ -212,7 +212,10 @@ fun AnswerToQuery(
                                                 .clickable {
                                                     scope.launch {
 
-                                                        queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                                                        queriesVM.likeOrRemoveLikeOfQuestion(
+                                                            query.id,
+                                                            query.isUserLiked
+                                                        )
                                                     }
                                                 }
                                                 .offset(y = Dimensions.spacingNeg2)
@@ -240,7 +243,7 @@ fun AnswerToQuery(
                                     query.answers,
                                     queriesVM,
                                     modifier = Modifier.padding(end = Dimensions.padding28),
-                                    showDivider = false
+                                    showDivider = false, queryId = query.id
                                 )
 
 

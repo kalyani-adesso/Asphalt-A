@@ -1,18 +1,16 @@
 package com.asphalt.queries.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.queries.repositories.QueryRepo
 import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class AskQueryVM(val queryRepo: QueryRepo, val queryRepository: QueryRepository) : ViewModel() {
+class AskQueryVM(val queryRepository: QueryRepository) : ViewModel() {
     private val _askQuestion = MutableStateFlow("")
     private val _questionError = MutableStateFlow(false)
     val questionError: StateFlow<Boolean> = _questionError.asStateFlow()

@@ -7,12 +7,10 @@ import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
-import com.asphalt.commonui.UIState
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.constants.QueryConstants.CATEGORY_ALL_ID
 import com.asphalt.queries.data.Answer
 import com.asphalt.queries.data.Query
-import com.asphalt.queries.repositories.QueryRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +21,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QueriesVM(
-    val queryRepo: QueryRepo,
     val androidUserVM: AndroidUserVM,
     val queryRepository: QueryRepository
 ) : ViewModel() {
@@ -58,22 +55,17 @@ class QueriesVM(
 
 
     suspend fun loadQueries() {
-//        _queryState.value = UIState.Loading
 
         when (val result = queryRepository.getQueries()) {
             is APIResult.Success -> {
                 val uiList = result.data.toQueryListUiModel()
                 _queryList.value = uiList
-//                _queryState.value = UIState.Success(uiList)
             }
+
             is APIResult.Error -> {
                 val msg = result.exception.message ?: "Something went wrong"
-//                _queryState.value = UIState.Error(msg)
             }
         }
-//        _queryList.value = queryRepository.getQueries().toQueryListUiModel()
-
-//        _queryList.value = queryRepo.loadQueryList()
     }
 
     private fun updateQuery(updatedQuery: Query?) {
@@ -89,23 +81,101 @@ class QueriesVM(
             }
         }
     }
+    private fun updateAnswer(queryId: String, updatedAnswer: Answer?) {
+        if (updatedAnswer == null) return
 
-    suspend fun likeOrRemoveLikeOfQuestion(id: String) {
-        val updatedQuery = queryRepo.likeOrRemoveLikeOfQuestion(id)
-        updateQuery(updatedQuery)
+        _queryList.update { currentList ->
+            currentList.map { query ->
+                if (query.id == queryId) {
+                    val updatedAnswers = query.answers.map { answer ->
+                        if (answer.id == updatedAnswer.id) {
+                            updatedAnswer
+                        } else {
+                            answer
+                        }
+                    }
+                    query.copy(answers = updatedAnswers)
+                } else {
+                    query
+                }
+            }
+        }
     }
 
-    suspend fun likeOrRemoveLikeOfAnswer(id: String) {
+    suspend fun likeOrRemoveLikeOfQuestion(id: String, currentLikeStatus: Boolean) {
+        androidUserVM.userState.value?.uid?.let {
+            val likeQueryResult = if (currentLikeStatus) queryRepository.removeLikeQuery(
+                it,
+                id
+            ) else queryRepository.likeQuery(it, id)
+            when (likeQueryResult) {
+                is APIResult.Error -> {
+                }
 
-
-        val updatedQuery = queryRepo.likeOrRemoveLikeOfAnswer(id)
-        updateQuery(updatedQuery)
+                is APIResult.Success -> getQueryById(id)
+            }
+        }
     }
 
-    suspend fun likeOrRemoveDislikeOfAnswer(id: String) {
+    suspend fun addOrRemoveLikeOfAnswer(
+        answerId: String,
+        currentLikeStatus: Boolean,
+        queryId: String
+    ) {
+        val uid = androidUserVM.userState.value?.uid
+        if (currentLikeStatus)
+            uid?.let {
+                val result =
+                    queryRepository.removeLikeOrDislikeAnswer(it, queryId, answerId)
+                when (result) {
+                    is APIResult.Error -> {}
+                    is APIResult.Success -> {
+                        getAnswerById(queryId,answerId)
+                    }
+                }
+            }
+        else uid?.let {
+            val result =
+                queryRepository.likeOrDislikeAnswer(uid, queryId, answerId, true)
+            when (result) {
+                is APIResult.Error -> {}
+                is APIResult.Success -> {
+                    getAnswerById(queryId,answerId)
 
-        val updatedQuery = queryRepo.likeOrRemoveDislikeOfAnswer(id)
-        updateQuery(updatedQuery)
+                }
+            }
+        }
+    }
+
+    suspend fun addOrRemoveDislikeOfAnswer(
+        answerId: String,
+        currentDislikeStatus: Boolean,
+        queryId: String
+    ) {
+        val uid = androidUserVM.userState.value?.uid
+        if (currentDislikeStatus)
+            uid?.let {
+                val result =
+                    queryRepository.removeLikeOrDislikeAnswer(it, queryId, answerId)
+                when (result) {
+                    is APIResult.Error -> {}
+                    is APIResult.Success -> {
+                        getAnswerById(queryId,answerId)
+
+                    }
+                }
+            }
+        else uid?.let {
+            val result =
+                queryRepository.likeOrDislikeAnswer(uid, queryId, answerId, false)
+            when (result) {
+                is APIResult.Error -> {}
+                is APIResult.Success -> {
+                    getAnswerById(queryId,answerId)
+
+                }
+            }
+        }
     }
 
     fun updateAnswerToQuery(answer: String) {
@@ -113,17 +183,18 @@ class QueriesVM(
     }
 
     suspend fun postAnswer(query: Query) {
-//        val postAnswer = queryRepo.postAnswer(
-//            _answerToQuery.value,
-//            query?.id,
-//            androidUserVM.userState.value?.name
-//        )
-//        updateQuery(postAnswer)
         val addAnswer = queryRepository.addAnswer(
             query.id, answerToQuery.value, androidUserVM.userState.value?.uid ?: "",
             Utils.formatClientMillisToISO(System.currentTimeMillis())
         )
-        
+        when (addAnswer) {
+            is APIResult.Error -> {
+            }
+
+            is APIResult.Success -> {
+                getQueryById(query.id)
+            }
+        }
 
 
     }
@@ -169,8 +240,32 @@ class QueriesVM(
         }
     }
 
+    suspend fun getQueryById(queryId: String) {
+        val result = queryRepository.getQueryByID(queryId)
+        when (result) {
+            is APIResult.Error -> {}
+            is APIResult.Success -> updateQuery(result.data.toQueryUiModel())
+            null -> {}
+        }
+
+    }
+    suspend fun getAnswerById(queryId: String,answerId: String) {
+        val result = queryRepository.getAnswerByID(queryId,answerId)
+        when (result) {
+            is APIResult.Error -> {}
+            is APIResult.Success -> updateAnswer(queryId,result.data.toAnswerUiModel())
+            null -> {}
+        }
+
+    }
+
     private fun AnswerDomain.toAnswerUiModel(): Answer {
         return with(this) {
+            val isUserLiked =
+                likes.find { it -> it == androidUserVM.userState.value?.uid }.isNullOrBlank().not()
+            val isUserDisLiked =
+                dislikes.find { it -> it == androidUserVM.userState.value?.uid }.isNullOrBlank()
+                    .not()
             Answer(
                 id,
                 "",
@@ -178,7 +273,8 @@ class QueriesVM(
                 Utils.parseISODateToMillis(answeredOn),
                 likes.size,
                 dislikes.size,
-                answer
+                answer,
+                isUserLiked = isUserLiked, isUserDisliked = isUserDisLiked
             )
         }
     }

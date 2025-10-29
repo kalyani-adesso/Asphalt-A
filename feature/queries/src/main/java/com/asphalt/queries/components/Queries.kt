@@ -113,7 +113,7 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (St
         }
         HorizontalDivider(color = LightSilver)
         if (query.answers.isNotEmpty())
-            Answers(query.answers, queriesVM)
+            Answers(query.answers, queriesVM, queryId = query.id)
         Row(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10),
             verticalAlignment = Alignment.CenterVertically
@@ -126,7 +126,7 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (St
                     .clickable {
                         scope.launch {
 
-                            queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                            queriesVM.likeOrRemoveLikeOfQuestion(query.id,query.isUserLiked)
                         }
                     }
                     .offset(y = Dimensions.spacingNeg2)

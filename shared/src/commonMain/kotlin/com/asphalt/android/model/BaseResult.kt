@@ -1,6 +1,5 @@
 package com.asphalt.android.model
 
-// In your domain or common module (e.g., com.asphalt.android.domain)
 sealed interface APIResult<out T> {
 
     /**
