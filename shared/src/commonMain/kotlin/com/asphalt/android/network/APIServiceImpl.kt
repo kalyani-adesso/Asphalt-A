@@ -14,6 +14,7 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.JsonConvertException
 
 class APIServiceImpl(private val client: KtorClient) : APIService {
@@ -42,15 +43,13 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
 
     override suspend fun getQueries(): APIResult<Map<String, QueryResponseDTO>?> {
         return safeApiCall {
-            client.getClient().get(urlString = buildUrl(QUERIES_URL)).body()
+            get(QUERIES_URL).body()
         }
     }
 
     override suspend fun postQuery(queryRequestDTO: QueryRequestDTO): APIResult<GenericResponse> {
         return safeApiCall {
-            client.getClient().post(buildUrl(QUERIES_URL)) {
-                setBody(queryRequestDTO)
-            }.body()
+            post(queryRequestDTO,QUERIES_URL).body()
         }
     }
 
@@ -59,9 +58,17 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
         answerRequestDTO: AnswerRequestDTO
     ): APIResult<GenericResponse> {
         return safeApiCall {
-            client.getClient().post(buildUrl("$QUERIES_URL/$queryId$ANSWERS_URL")) {
-                setBody(answerRequestDTO)
-            }.body()
+            post(answerRequestDTO, "$QUERIES_URL/$queryId$ANSWERS_URL").body()
+        }
+    }
+
+    private suspend fun get(url: String): HttpResponse {
+        return client.getClient().get(buildUrl(url))
+    }
+
+    private suspend fun post(body: Any, url: String): HttpResponse {
+        return client.getClient().post(buildUrl(url)) {
+            setBody(body)
         }
     }
 
@@ -69,6 +76,7 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
         private fun buildUrl(url: String): String {
             return "$url.json"
         }
+
 
     }
 }
