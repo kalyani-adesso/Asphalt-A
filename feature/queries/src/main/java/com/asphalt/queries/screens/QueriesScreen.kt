@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +41,6 @@ import com.asphalt.queries.components.Queries
 import com.asphalt.queries.components.SearchQueries
 import com.asphalt.queries.viewmodels.AskQueryVM
 import com.asphalt.queries.viewmodels.QueriesVM
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +101,6 @@ fun QueriesScreen(
         queriesVM.setFilterCategory(selectedCategory.intValue)
     }
     val selectedQueryId: MutableState<String?> = remember { mutableStateOf(null) }
-    val scope = rememberCoroutineScope()
     if (showAnswerPopup) {
         AnswerToQuery({
             showAnswerPopup = false
@@ -113,10 +110,8 @@ fun QueriesScreen(
     }
     if (showQueryPopup)
         AskQuery(askQueryVM = askQueryVM, onSubmit = {
-            scope.launch {
-                queriesVM.loadQueries()
-                showQueryPopup = false
-            }
+            showQueryPopup = false
+            queriesVM.addQuestion(it)
         }, onDismiss = {
             showQueryPopup = false
         }, user = user.value)

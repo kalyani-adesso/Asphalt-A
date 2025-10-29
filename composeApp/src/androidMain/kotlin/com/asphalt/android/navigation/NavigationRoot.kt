@@ -11,12 +11,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -27,9 +31,15 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.AppBarState
+import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.R
+import com.asphalt.commonui.StatusBanner
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
+import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
@@ -60,6 +70,32 @@ fun NavigationRoot(
 ) {
     val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()
+    var showLoader by remember { mutableStateOf(false) }
+    var showBanner by remember { mutableStateOf(false) }
+    var bannerMsg by remember { mutableStateOf("") }
+    var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
+    val density = LocalDensity.current
+    LaunchedEffect(Unit) {
+
+        UIStateHandler.event.collect { state ->
+            when (state) {
+                UIState.DismissLoader -> showLoader = false
+                is UIState.Error -> {
+                    showBanner = true
+                    bannerType = state.type
+                    bannerMsg = state.errorMsg
+                }
+
+                UIState.Loading -> showLoader = true
+                is UIState.SUCCESS -> {
+                    showBanner = true
+                    bannerType = state.type
+                    bannerMsg = state.successMsg
+                }
+            }
+
+        }
+    }
 
     val showBottomBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
@@ -169,7 +205,19 @@ fun NavigationRoot(
                 }
             }
         ) { paddingValues ->
+            val bannerOffsetDp = paddingValues.calculateTopPadding() + Dimensions.padding30
 
+            val bannerPixelYOffset: Int = with(density) {
+                bannerOffsetDp.roundToPx()
+            }
+            if (showLoader)
+                LoaderPopup()
+            if (showBanner)
+                Popup(offset = IntOffset(0,bannerPixelYOffset)) {
+                    StatusBanner(message = bannerMsg, type = bannerType, showBanner = showBanner) {
+                        showBanner = false
+                    }
+                }
             NavDisplay(
                 modifier =
                     if (showBottomBar || showTopAppBar)

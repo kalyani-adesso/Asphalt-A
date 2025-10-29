@@ -330,10 +330,8 @@ fun AnswerToQuery(
                                         .height(Dimensions.size35)
                                         .width(Dimensions.size132)
                                         .clickable(enabled = isPostAnswerEnabled.value) {
-                                            scope.launch {
                                                 query?.let { queriesVM.postAnswer(it) }
                                                 dismissPopup.invoke()
-                                            }
                                         },
                                     cornerRadius = Dimensions.radius5,
                                     contentAlignment = Alignment.Center

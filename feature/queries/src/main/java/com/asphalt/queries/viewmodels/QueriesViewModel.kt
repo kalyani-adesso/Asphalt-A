@@ -2,11 +2,13 @@ package com.asphalt.queries.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.asphalt.android.model.APIResult
+import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.constants.QueryConstants.CATEGORY_ALL_ID
 import com.asphalt.queries.data.Answer
@@ -53,24 +55,21 @@ class QueriesVM(
         }
     }
 
-
     suspend fun loadQueries() {
-
-        when (val result = queryRepository.getQueries()) {
-            is APIResult.Success -> {
-                val uiList = result.data.toQueryListUiModel()
-                _queryList.value = uiList
-            }
-
-            is APIResult.Error -> {
-                val msg = result.exception.message ?: "Something went wrong"
-            }
+        val result = APIHelperUI.runWithLoader { queryRepository.getQueries() }
+        APIHelperUI.handleApiResult(result, viewModelScope) {
+            val uiList = it.toQueryListUiModel()
+            _queryList.value = uiList
         }
     }
 
     private fun updateQuery(updatedQuery: Query?) {
-        if (updatedQuery != null) {
-            _queryList.update { currentList ->
+        if (updatedQuery == null) return
+
+        _queryList.update { currentList ->
+            val existingQuery = currentList.find { it.id == updatedQuery.id }
+
+            if (existingQuery != null) {
                 currentList.map { query ->
                     if (query.id == updatedQuery.id) {
                         updatedQuery
@@ -78,22 +77,28 @@ class QueriesVM(
                         query
                     }
                 }
+            } else {
+                listOf(updatedQuery) + currentList
             }
         }
     }
+
     private fun updateAnswer(queryId: String, updatedAnswer: Answer?) {
         if (updatedAnswer == null) return
 
         _queryList.update { currentList ->
             currentList.map { query ->
                 if (query.id == queryId) {
-                    val updatedAnswers = query.answers.map { answer ->
-                        if (answer.id == updatedAnswer.id) {
-                            updatedAnswer
-                        } else {
-                            answer
+                    val existingAnswer = query.answers.find { it.id == updatedAnswer.id }
+
+                    val updatedAnswers = if (existingAnswer != null) {
+                        query.answers.map { answer ->
+                            if (answer.id == updatedAnswer.id) updatedAnswer else answer
                         }
+                    } else {
+                        query.answers + updatedAnswer
                     }
+
                     query.copy(answers = updatedAnswers)
                 } else {
                     query
@@ -104,15 +109,14 @@ class QueriesVM(
 
     suspend fun likeOrRemoveLikeOfQuestion(id: String, currentLikeStatus: Boolean) {
         androidUserVM.userState.value?.uid?.let {
-            val likeQueryResult = if (currentLikeStatus) queryRepository.removeLikeQuery(
-                it,
-                id
-            ) else queryRepository.likeQuery(it, id)
-            when (likeQueryResult) {
-                is APIResult.Error -> {
-                }
-
-                is APIResult.Success -> getQueryById(id)
+            val likeQueryResult = APIHelperUI.runWithLoader {
+                if (currentLikeStatus) queryRepository.removeLikeQuery(
+                    it,
+                    id
+                ) else queryRepository.likeQuery(it, id)
+            }
+            APIHelperUI.handleApiResult(likeQueryResult, viewModelScope) {
+                getQueryById(id)
             }
         }
     }
@@ -125,24 +129,28 @@ class QueriesVM(
         val uid = androidUserVM.userState.value?.uid
         if (currentLikeStatus)
             uid?.let {
-                val result =
+                val result = APIHelperUI.runWithLoader {
                     queryRepository.removeLikeOrDislikeAnswer(it, queryId, answerId)
-                when (result) {
-                    is APIResult.Error -> {}
-                    is APIResult.Success -> {
-                        getAnswerById(queryId,answerId)
-                    }
+                }
+                APIHelperUI.handleApiResult(result, viewModelScope) {
+                    getAnswerById(
+                        queryId,
+                        answerId
+                    )
                 }
             }
         else uid?.let {
             val result =
-                queryRepository.likeOrDislikeAnswer(uid, queryId, answerId, true)
-            when (result) {
-                is APIResult.Error -> {}
-                is APIResult.Success -> {
-                    getAnswerById(queryId,answerId)
-
+                APIHelperUI.runWithLoader {
+                    queryRepository.likeOrDislikeAnswer(
+                        uid,
+                        queryId,
+                        answerId,
+                        true
+                    )
                 }
+            APIHelperUI.handleApiResult(result, viewModelScope) {
+                getAnswerById(queryId, answerId)
             }
         }
     }
@@ -156,24 +164,29 @@ class QueriesVM(
         if (currentDislikeStatus)
             uid?.let {
                 val result =
-                    queryRepository.removeLikeOrDislikeAnswer(it, queryId, answerId)
-                when (result) {
-                    is APIResult.Error -> {}
-                    is APIResult.Success -> {
-                        getAnswerById(queryId,answerId)
-
+                    APIHelperUI.runWithLoader {
+                        queryRepository.removeLikeOrDislikeAnswer(
+                            it,
+                            queryId,
+                            answerId
+                        )
                     }
+                APIHelperUI.handleApiResult(result, viewModelScope) {
+                    getAnswerById(queryId, answerId)
                 }
             }
         else uid?.let {
             val result =
-                queryRepository.likeOrDislikeAnswer(uid, queryId, answerId, false)
-            when (result) {
-                is APIResult.Error -> {}
-                is APIResult.Success -> {
-                    getAnswerById(queryId,answerId)
-
+                APIHelperUI.runWithLoader {
+                    queryRepository.likeOrDislikeAnswer(
+                        uid,
+                        queryId,
+                        answerId,
+                        false
+                    )
                 }
+            APIHelperUI.handleApiResult(result, viewModelScope) {
+                getAnswerById(queryId, answerId)
             }
         }
     }
@@ -182,21 +195,20 @@ class QueriesVM(
         _answerToQuery.value = answer
     }
 
-    suspend fun postAnswer(query: Query) {
-        val addAnswer = queryRepository.addAnswer(
-            query.id, answerToQuery.value, androidUserVM.userState.value?.uid ?: "",
-            Utils.formatClientMillisToISO(System.currentTimeMillis())
-        )
-        when (addAnswer) {
-            is APIResult.Error -> {
+    fun postAnswer(query: Query) {
+        viewModelScope.launch {
+            val answer = answerToQuery.value
+            val addAnswer = APIHelperUI.runWithLoader {
+                queryRepository.addAnswer(
+                    query.id, answer, androidUserVM.userState.value?.uid ?: "",
+                    Utils.formatClientMillisToISO(System.currentTimeMillis())
+                )
             }
-
-            is APIResult.Success -> {
-                getQueryById(query.id)
+            APIHelperUI.handleApiResult(addAnswer, viewModelScope) {
+                UIStateHandler.sendEvent(UIState.SUCCESS("Added answer successfully!"))
+                getAnswerById(query.id, it.name)
             }
         }
-
-
     }
 
     fun clearAnswerToQuestion() {
@@ -240,31 +252,33 @@ class QueriesVM(
         }
     }
 
-    suspend fun getQueryById(queryId: String) {
-        val result = queryRepository.getQueryByID(queryId)
-        when (result) {
-            is APIResult.Error -> {}
-            is APIResult.Success -> updateQuery(result.data.toQueryUiModel())
-            null -> {}
+    fun addQuestion(queryId: String) {
+        viewModelScope.launch {
+            getQueryById(queryId)
         }
-
     }
-    suspend fun getAnswerById(queryId: String,answerId: String) {
-        val result = queryRepository.getAnswerByID(queryId,answerId)
-        when (result) {
-            is APIResult.Error -> {}
-            is APIResult.Success -> updateAnswer(queryId,result.data.toAnswerUiModel())
-            null -> {}
-        }
 
+    suspend fun getQueryById(queryId: String) {
+        val result = APIHelperUI.runWithLoader { queryRepository.getQueryByID(queryId) }
+        APIHelperUI.handleApiResult(result, viewModelScope) {
+            updateQuery(it.toQueryUiModel())
+        }
+    }
+
+    suspend fun getAnswerById(queryId: String, answerId: String) {
+        val result = APIHelperUI.runWithLoader { queryRepository.getAnswerByID(queryId, answerId) }
+        APIHelperUI.handleApiResult(result, viewModelScope) {
+            updateAnswer(queryId, it.toAnswerUiModel())
+        }
     }
 
     private fun AnswerDomain.toAnswerUiModel(): Answer {
+        val uid = androidUserVM.userState.value?.uid
         return with(this) {
             val isUserLiked =
-                likes.find { it -> it == androidUserVM.userState.value?.uid }.isNullOrBlank().not()
+                likes.find { it -> it == uid }.isNullOrBlank().not()
             val isUserDisLiked =
-                dislikes.find { it -> it == androidUserVM.userState.value?.uid }.isNullOrBlank()
+                dislikes.find { it -> it == uid }.isNullOrBlank()
                     .not()
             Answer(
                 id,
