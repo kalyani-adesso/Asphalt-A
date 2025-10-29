@@ -8,7 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserData
-import com.asphalt.android.repository.user.UserRepo
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.createride.model.CreateRideModel
@@ -19,7 +20,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class CreateRideScreenViewModel : ViewModel(), KoinComponent {
-    val userRepo: UserRepo by inject()
+    val userRepo: UserRepository by inject()
+    val userRepoImpl: UserRepoImpl by inject()
 
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
@@ -185,13 +187,21 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     fun getUsers() {
         viewModelScope.launch {
+            val user = userRepoImpl.getUserDetails()
             var response: APIResult<List<UserData>> = userRepo.getAllUsers()
             when (response) {
                 is APIResult.Success -> {
                     if (response.data.size > 0) {
                         _fullList.value =
-                            ArrayList(response.data.map { RidersList(name = it.name,
-                                id = it.uid, bike = "Unicorn") })
+                            ArrayList(
+                                response.data
+                                    .filter { it.uid != user?.uid }
+                                    .map {
+                                        RidersList(
+                                            name = it.name,
+                                            id = it.uid, bike = "Unicorn"
+                                        )
+                                    })
                         _ridersListMutable.value = _fullList.value
                     }
 
@@ -206,67 +216,67 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         }
 
 
-       /* var list = arrayListOf(
+        /* var list = arrayListOf(
 
-            RidersList(
-                id = 1,
-                name = "Harikumar S",
-                job = "Mechanic",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 2,
-                name = "Sreedev",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
+             RidersList(
+                 id = 1,
+                 name = "Harikumar S",
+                 job = "Mechanic",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 2,
+                 name = "Sreedev",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
 
-            ),
-            RidersList(
-                id = 3,
-                name = "Vyshak ",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 4,
-                name = "Jerin John",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 5,
-                name = "Vipin Raj",
-                job = "Mechanic",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 6,
-                name = "Pramod Selvaraj",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 7,
-                name = "Vinu V John",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            )
-        )
-        return list;*/
+             ),
+             RidersList(
+                 id = 3,
+                 name = "Vyshak ",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 4,
+                 name = "Jerin John",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 5,
+                 name = "Vipin Raj",
+                 job = "Mechanic",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 6,
+                 name = "Pramod Selvaraj",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 7,
+                 name = "Vinu V John",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             )
+         )
+         return list;*/
 
     }
 
