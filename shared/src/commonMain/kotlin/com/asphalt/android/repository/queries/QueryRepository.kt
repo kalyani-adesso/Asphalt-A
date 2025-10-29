@@ -1,5 +1,7 @@
 package com.asphalt.android.repository.queries
 
+import com.asphalt.android.mapApiResult
+import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.queries.AnswerDTO
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.AnswerRequestDTO
@@ -9,8 +11,10 @@ import com.asphalt.android.model.queries.QueryResponseDTO
 import com.asphalt.android.network.APIService
 
 class QueryRepository(private val apiService: APIService) {
-    suspend fun getQueries(): List<QueryDomain> {
-        return apiService.getQueries()?.toDomain() ?: emptyList()
+    suspend fun getQueries(): APIResult<List<QueryDomain>> {
+        return apiService.getQueries().mapApiResult { response ->
+            response?.toDomain().orEmpty()
+        }
     }
 
 
@@ -50,7 +54,7 @@ class QueryRepository(private val apiService: APIService) {
         categoryId: Int,
         postedOn: String,
         postedBy: String
-    ) {
+    ): APIResult<Unit> {
         val request = QueryRequestDTO(
             queryTitle = queryTitle,
             queryDescription = queryDescription,
@@ -58,13 +62,21 @@ class QueryRepository(private val apiService: APIService) {
             postedOn = postedOn,
             postedBy = postedBy,
         )
-        apiService.postQuery(request)
+        return apiService.postQuery(request).mapApiResult {
+        }
     }
 
-    suspend fun addAnswer(queryId: String, answer: String, answeredBy: String, answeredOn: String) {
+    suspend fun addAnswer(
+        queryId: String,
+        answer: String,
+        answeredBy: String,
+        answeredOn: String
+    ): APIResult<Unit> {
         val request = AnswerRequestDTO(answer, answeredBy, answeredOn)
-        apiService.postAnswer(queryId, request)
+        return apiService.postAnswer(queryId, request).mapApiResult {
+        }
     }
+
 }
 
 

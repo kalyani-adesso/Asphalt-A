@@ -1,6 +1,7 @@
 package com.asphalt.queries.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.commonui.utils.Utils
@@ -58,16 +59,25 @@ class AskQueryVM(val queryRepo: QueryRepo, val queryRepository: QueryRepository)
 
     }
 
-    suspend fun submitQuestion() {
+    suspend fun submitQuestion(submitInvoke: () -> Unit) {
 
-        queryRepository.addQuery(
+        val addQueryResult = queryRepository.addQuery(
             queryTitle = _askQuestion.value,
             queryDescription = _description.value,
             categoryId = _selectedCategory.value!!.id,
             postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
             postedBy = user?.uid ?: "",
         )
-        clearAll()
+        when (addQueryResult) {
+            is APIResult.Error -> {
+                addQueryResult.exception.toString()
+            }
+
+            is APIResult.Success -> {
+                submitInvoke.invoke()
+                clearAll()
+            }
+        }
     }
 
     fun setUser(user: CurrentUser?) {

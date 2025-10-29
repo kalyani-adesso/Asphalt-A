@@ -239,8 +239,10 @@ fun AskQuery(
                         onClick = {
                             scope.launch {
                                 if (askQueryVM.validateFields()) {
-                                    askQueryVM.submitQuestion()
-                                    onSubmit.invoke()
+                                    askQueryVM.submitQuestion({
+                                        onSubmit.invoke()
+                                    })
+
                                 }
                             }
                         },

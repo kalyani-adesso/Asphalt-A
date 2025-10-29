@@ -2,10 +2,12 @@ package com.asphalt.queries.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.UIState
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.queries.constants.QueryConstants.CATEGORY_ALL_ID
 import com.asphalt.queries.data.Answer
@@ -56,7 +58,20 @@ class QueriesVM(
 
 
     suspend fun loadQueries() {
-        _queryList.value = queryRepository.getQueries().toQueryListUiModel()
+//        _queryState.value = UIState.Loading
+
+        when (val result = queryRepository.getQueries()) {
+            is APIResult.Success -> {
+                val uiList = result.data.toQueryListUiModel()
+                _queryList.value = uiList
+//                _queryState.value = UIState.Success(uiList)
+            }
+            is APIResult.Error -> {
+                val msg = result.exception.message ?: "Something went wrong"
+//                _queryState.value = UIState.Error(msg)
+            }
+        }
+//        _queryList.value = queryRepository.getQueries().toQueryListUiModel()
 
 //        _queryList.value = queryRepo.loadQueryList()
     }
@@ -104,8 +119,11 @@ class QueriesVM(
 //            androidUserVM.userState.value?.name
 //        )
 //        updateQuery(postAnswer)
-        queryRepository.addAnswer(query.id,answerToQuery.value,androidUserVM.userState.value?.uid?:"",
-            Utils.formatClientMillisToISO(System.currentTimeMillis()))
+        val addAnswer = queryRepository.addAnswer(
+            query.id, answerToQuery.value, androidUserVM.userState.value?.uid ?: "",
+            Utils.formatClientMillisToISO(System.currentTimeMillis())
+        )
+        
 
 
     }

@@ -38,23 +38,29 @@ class APIServiceImpl(private val client: KtorClient) : APIService {
             APIResult.Error(exception = e, code = null)
         }
     }
-    override suspend fun getQueries(): Map<String, QueryResponseDTO>? {
-        val httpResponse = client.getClient().get(urlString = buildUrl(QUERIES_URL))
-        return httpResponse.body()
+
+    override suspend fun getQueries(): APIResult<Map<String, QueryResponseDTO>?> {
+        return safeApiCall {
+            client.getClient().get(urlString = buildUrl(QUERIES_URL)).body()
+        }
     }
 
-    override suspend fun postQuery(queryRequestDTO: QueryRequestDTO) {
-        client.getClient().post(buildUrl(QUERIES_URL)) {
-            setBody(queryRequestDTO)
+    override suspend fun postQuery(queryRequestDTO: QueryRequestDTO): APIResult<Unit> {
+        return safeApiCall {
+            client.getClient().post(buildUrl(QUERIES_URL)) {
+                setBody(queryRequestDTO)
+            }
         }
     }
 
     override suspend fun postAnswer(
         queryId: String,
         answerRequestDTO: AnswerRequestDTO
-    ) {
-        client.getClient().post(buildUrl("$QUERIES_URL/$queryId$ANSWERS_URL")) {
-            setBody(answerRequestDTO)
+    ): APIResult<Unit> {
+        return safeApiCall {
+            client.getClient().post(buildUrl("$QUERIES_URL/$queryId$ANSWERS_URL")) {
+                setBody(answerRequestDTO)
+            }
         }
     }
 
