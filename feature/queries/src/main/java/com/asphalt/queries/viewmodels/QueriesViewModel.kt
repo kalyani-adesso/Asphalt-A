@@ -3,9 +3,12 @@ package com.asphalt.queries.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
+import com.asphalt.android.helpers.UserDataHelper
+import com.asphalt.android.model.UserData
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
@@ -23,12 +26,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QueriesVM(
-    val androidUserVM: AndroidUserVM,
-    val queryRepository: QueryRepository
+    androidUserVM: AndroidUserVM,
+    val queryRepository: QueryRepository, val userRepository: UserRepository
 ) : ViewModel() {
     fun setFilterCategory(categoryID: Int) {
         filterCategory.value = categoryID
     }
+
+    private val _userList = MutableStateFlow<List<UserData>>(emptyList())
+    val userList = _userList.asStateFlow()
+    private val currentUid = androidUserVM.userState.value?.uid
 
     private val _answerToQuery = MutableStateFlow("")
     val answerToQuery = _answerToQuery.asStateFlow()
@@ -51,7 +58,14 @@ class QueriesVM(
 
     init {
         viewModelScope.launch {
+            loadUserList()
             loadQueries()
+        }
+    }
+
+    suspend fun loadUserList() {
+        APIHelperUI.handleApiResult(userRepository.getAllUsers(), viewModelScope) {
+            _userList.value = it
         }
     }
 
@@ -108,7 +122,7 @@ class QueriesVM(
     }
 
     suspend fun likeOrRemoveLikeOfQuestion(id: String, currentLikeStatus: Boolean) {
-        androidUserVM.userState.value?.uid?.let {
+        currentUid?.let {
             val likeQueryResult = APIHelperUI.runWithLoader {
                 if (currentLikeStatus) queryRepository.removeLikeQuery(
                     it,
@@ -126,9 +140,8 @@ class QueriesVM(
         currentLikeStatus: Boolean,
         queryId: String
     ) {
-        val uid = androidUserVM.userState.value?.uid
         if (currentLikeStatus)
-            uid?.let {
+            currentUid?.let {
                 val result = APIHelperUI.runWithLoader {
                     queryRepository.removeLikeOrDislikeAnswer(it, queryId, answerId)
                 }
@@ -139,11 +152,11 @@ class QueriesVM(
                     )
                 }
             }
-        else uid?.let {
+        else currentUid?.let {
             val result =
                 APIHelperUI.runWithLoader {
                     queryRepository.likeOrDislikeAnswer(
-                        uid,
+                        currentUid,
                         queryId,
                         answerId,
                         true
@@ -160,9 +173,8 @@ class QueriesVM(
         currentDislikeStatus: Boolean,
         queryId: String
     ) {
-        val uid = androidUserVM.userState.value?.uid
         if (currentDislikeStatus)
-            uid?.let {
+            currentUid?.let {
                 val result =
                     APIHelperUI.runWithLoader {
                         queryRepository.removeLikeOrDislikeAnswer(
@@ -175,11 +187,11 @@ class QueriesVM(
                     getAnswerById(queryId, answerId)
                 }
             }
-        else uid?.let {
+        else currentUid?.let {
             val result =
                 APIHelperUI.runWithLoader {
                     queryRepository.likeOrDislikeAnswer(
-                        uid,
+                        currentUid,
                         queryId,
                         answerId,
                         false
@@ -200,7 +212,7 @@ class QueriesVM(
             val answer = answerToQuery.value
             val addAnswer = APIHelperUI.runWithLoader {
                 queryRepository.addAnswer(
-                    query.id, answer, androidUserVM.userState.value?.uid ?: "",
+                    query.id, answer, currentUid ?: "",
                     Utils.formatClientMillisToISO(System.currentTimeMillis())
                 )
             }
@@ -225,9 +237,10 @@ class QueriesVM(
 
     private fun QueryDomain.toQueryUiModel(): Query {
         return with(this) {
-
+            val userDataFromCurrentList =
+                UserDataHelper.getUserDataFromCurrentList(_userList.value, postedBy)
             val isUserLiked =
-                likes.find { it -> it == androidUserVM.userState.value?.uid }.isNullOrBlank().not()
+                likes.find { it -> it == currentUid }.isNullOrBlank().not()
             Query(
                 id,
                 title,
@@ -235,7 +248,7 @@ class QueriesVM(
                 categoryId,
                 answers.isNotEmpty(),
                 Utils.parseISODateToMillis(postedOn),
-                "", "",
+                userDataFromCurrentList?.name ?: "", "",
                 likes.size,
                 answers.size,
                 answers.toAnswersUiModel(),
@@ -273,16 +286,17 @@ class QueriesVM(
     }
 
     private fun AnswerDomain.toAnswerUiModel(): Answer {
-        val uid = androidUserVM.userState.value?.uid
+        val userDataFromCurrentList =
+            UserDataHelper.getUserDataFromCurrentList(_userList.value, answeredBy)
         return with(this) {
             val isUserLiked =
-                likes.find { it -> it == uid }.isNullOrBlank().not()
+                likes.find { it -> it == currentUid }.isNullOrBlank().not()
             val isUserDisLiked =
-                dislikes.find { it -> it == uid }.isNullOrBlank()
+                dislikes.find { it -> it == currentUid }.isNullOrBlank()
                     .not()
             Answer(
                 id,
-                "",
+                userDataFromCurrentList?.name ?: "",
                 "",
                 Utils.parseISODateToMillis(answeredOn),
                 likes.size,
