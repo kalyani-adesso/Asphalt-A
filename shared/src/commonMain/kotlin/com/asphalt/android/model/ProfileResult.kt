@@ -3,14 +3,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProfileInfo(
-    val phoneNumber: String,
-    val emergencyContact: String,
-    val drivingLicense: String,
-    val isMechanic: Boolean
+    val userName: String = "",
+    val email: String = "",
+    val phoneNumber: String = "",
+    val emergencyContact: String = "",
+    val drivingLicense: String = "",
+    val isMechanic: String = "false",
+    val bikes: Map<String, BikeInfo>? = null
 )
 
 @Serializable
 data class BikeInfo(
+    val bikeId: String = "",
     val bikeType: String,
     val make: String,
     val model: String

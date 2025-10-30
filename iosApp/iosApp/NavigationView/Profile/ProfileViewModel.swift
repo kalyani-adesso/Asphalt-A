@@ -48,15 +48,15 @@ struct SelectedBikeType: Identifiable,Hashable {
     let model: String
     let make: String
     let type: String
+    let bikeId: String
 }
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
-    //TODO: Static data - update this with actual data once login sucess.
-    @Published var profileName = "Aromal Sijulal"
-    @Published var email = "email@example.com"
-    @Published var role = "Mechanic"
-    @Published var phoneNumber = "+91 9876543210"
+    @Published var profileName = "--"
+    @Published var email = "--"
+    @Published var role = ""
+    @Published var phoneNumber = "--"
     @Published var profileImage = AppImage.Welcome.bg
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
@@ -79,43 +79,7 @@ final class ProfileViewModel: ObservableObject {
         viewModel = ProfileKMPViewModel(api: api)
         loadData()
     }
-    
-    func fetchProfile(userId: String) async {
-        do {
-            if let profile = try await viewModel.getProfile(userId: userId) {
-                // Update your @Published properties, e.g.,
-//                self.profileName = profile.userName
-//                self.email = profile.email
-                self.phoneNumber = profile.phoneNumber
-                self.role = profile.isMechanic ? "Mechanic" : "Customer"
-            }
-        } catch {
-            print("Error fetching profile: \(error)")
-        }
-    }
-  
-    func addNewBike(userId: String, model:String,make:String,type:String) async {
-        let bikeInfo = BikeInfo(bikeType: type, make: make, model: model)
-        do {
-            try await viewModel.addBike(userId: userId, bike: bikeInfo)
-            // Refresh UI or handle success
-        } catch {
-            print("Error adding bike: \(error)")
-        }
-    }
-    
-    func editProfile(userId:String, userName:String,email:String,phoneNumber:String,emergencyContact:String,drivingLicense:String,isMachanic:Bool) {
-        
-        let profileInfo = ProfileInfo(phoneNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic)
-        viewModel.createOrEditProfile(userId: userId, profile: profileInfo, isEdit: false, email: email, userName: userName, completionHandler: { error in
-         if let error = error {
-                print("Error editing profile: \(error)")
-         } else {
-             print("Profile updated sucessfully.")
-         }
-     })
-    }
-    
+
     private func loadData() {
         sections = [
             ProfileSection(
@@ -155,21 +119,105 @@ final class ProfileViewModel: ObservableObject {
         return make.isEmpty && moodel.isEmpty
     }
     
-    func getBikeType(model:String,make:String,type:String) {
-        selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type))
+    func getBikeType(model:String,make:String,type:String,bikeId:String) {
+        selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type, bikeId: bikeId))
     }
     
-    func deleteSelectedBikeType(id: UUID) {
+    func deleteSelectedBikeType(id: UUID) async {
         if let index = selectedBikeType.firstIndex(where: { $0.id == id }) {
+            let bikeId = selectedBikeType[index].bikeId
+            await deleteBike(userId: MBUserDefaults.userIdStatic ?? "", bikeId:bikeId)
             selectedBikeType.remove(at: index)
         }
+    }
+}
+
+// MARK: - Firebase API -
+extension ProfileViewModel {
+    
+    func fetchProfile(userId: String) async {
+        do {
+            if let profile = try await viewModel.getProfile(userId: userId) {
+                self.profileName = profile.userName
+                self.email = profile.email
+                self.phoneNumber = profile.phoneNumber
+                self.role = (Bool(profile.isMechanic) ?? false) ? "Mechanic" : ""
+            }
+        } catch {
+            print("Error fetching profile: \(error)")
+        }
         
+        Task {
+            await self.fetchBikes(userId: userId)
+        }
     }
     
-    func updateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String,machanic:Bool) {
-        self.profileName = fullName
-        self.email = email
-        self.phoneNumber = phoneNumber
-        self.role = machanic ? "Mechanic" : ""
+    func fetchBikes(userId: String) async {
+        do {
+            let bikesArray = try await viewModel.getBikes(userId: userId)
+            await MainActor.run {
+                self.selectedBikeType.removeAll()
+            }
+            for echBike in bikesArray {
+                getBikeType(model: echBike.model, make: echBike.make, type: echBike.bikeType, bikeId: echBike.bikeId)
+            }
+        } catch {
+            print("Error fetching bikes: \(error)")
+        }
+    }
+    
+    func addNewBike(userId: String, model: String, make: String, type: String) async {
+        let bikeInfo = BikeInfo(bikeId: "", bikeType: type, make: make, model: model)
+        do {
+            try await viewModel.addBike(userId: userId, bike: bikeInfo)
+            await fetchBikes(userId: userId)
+        } catch {
+            print("Error adding bike: \(error)")
+        }
+    }
+    
+    func editProfile(
+        userId: String,
+        userName: String,
+        email: String,
+        phoneNumber: String,
+        emergencyContact: String,
+        drivingLicense: String,
+        isMachanic: Bool
+    ) {
+        let profileInfo = ProfileInfo(
+            userName: userName,
+            email: email,
+            phoneNumber: phoneNumber,
+            emergencyContact: emergencyContact,
+            drivingLicense: drivingLicense,
+            isMechanic: "\(isMachanic)",
+            bikes: nil
+        )
+        
+        viewModel.createOrEditProfile(
+            userId: userId,
+            profile: profileInfo,
+            isEdit: true,
+            email: email,
+            userName: userName
+        ) { error in
+            if let error = error {
+                print("Error editing profile: \(error)")
+            } else {
+                print("Profile updated successfully.")
+            }
+        }
+    }
+    
+    func deleteBike(userId: String, bikeId: String) async {
+        Task {
+            do {
+                try await viewModel.deleteBike(userId: userId, bikeId: bikeId)
+                await fetchBikes(userId: userId)
+            } catch {
+                print("Error deleting bike: \(error)")
+            }
+        }
     }
 }

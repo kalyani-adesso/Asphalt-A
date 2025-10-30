@@ -13,7 +13,7 @@ class ProfileKMPViewModel(private val api: FirebaseApi) {
         email: String,
         userName: String
     ) {
-        if (isEdit) api.editProfile(userId, email, userName,profile)
+        if (isEdit) api.editProfile(userId, profile)
         else api.createProfile(userId, profile)
     }
 

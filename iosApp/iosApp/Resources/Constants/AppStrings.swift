@@ -237,6 +237,7 @@ public struct AppStrings{
         static let earnBadgeTip = "Complete quizzes and participate in the community to earn your first badge!"
         static let startEarnBadge = "Start earning badges"
         static let yourgarage = "Your Garage"
+        static let profileTitle = "Profile"
     }
 
     enum VehicleType: String, CaseIterable, Identifiable {

@@ -9,8 +9,7 @@ actual class FirebaseApi {
         profile: ProfileInfo
     ) {
     }
-
-
+    
     actual suspend fun addBike(userId: String, bike: BikeInfo) {
     }
 
@@ -21,15 +20,10 @@ actual class FirebaseApi {
         TODO("Not yet implemented")
     }
 
-    actual suspend fun getBikes(userId: String): List<BikeInfo> {
-        TODO("Not yet implemented")
+    actual suspend fun editProfile(userId: String, profile: ProfileInfo) {
     }
 
-    actual suspend fun editProfile(
-        userId: String,
-        email: String,
-        userName: String,
-        profile: ProfileInfo
-    ) {
+    actual suspend fun  getBikes(userId: String): List<BikeInfo> {
+        TODO("Not yet implemented")
     }
 }

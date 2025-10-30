@@ -13,6 +13,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import platform.UIKit.UIDevice
+import kotlinx.serialization.json.*
 
 actual class FirebaseApi {
 
@@ -48,31 +49,51 @@ actual class FirebaseApi {
     }
 
     actual suspend fun getProfile(userId: String): ProfileInfo? {
-        return client.get("$baseUrl/users/$userId/profile.json").body()
+        val url = "$baseUrl/users/$userId.json"
+
+        return try {
+            val jsonText: String = client.get(url).body()  // 🔹 get raw JSON string
+            val json = Json.parseToJsonElement(jsonText).jsonObject
+
+            ProfileInfo(
+                userName = json["userName"]?.jsonPrimitive?.contentOrNull ?: "",
+                email = json["email"]?.jsonPrimitive?.contentOrNull ?: "",
+                phoneNumber = json["phoneNumber"]?.jsonPrimitive?.contentOrNull ?: "",
+                emergencyContact = json["emergencyContact"]?.jsonPrimitive?.contentOrNull ?: "",
+                drivingLicense = json["drivingLicense"]?.jsonPrimitive?.contentOrNull ?: "",
+                isMechanic = json["isMechanic"]?.jsonPrimitive?.contentOrNull ?: "false"
+            )
+        } catch (e: Exception) {
+            println(" Error parsing profile: ${e.message}")
+            null
+        }
     }
 
     actual suspend fun getBikes(userId: String): List<BikeInfo> {
-        val map: Map<String, BikeInfo>? = client.get("$baseUrl/users/$userId/bikes.json").body()
-        return map?.values?.toList() ?: emptyList()
+        val url = "$baseUrl/users/$userId/bikes.json"
+        val map: Map<String, BikeInfo>? = client.get(url).body()
+        return map?.map { (bikeId, bikeInfo) ->
+            bikeInfo.copy(bikeId = bikeId)
+        } ?: emptyList()
     }
 
     actual suspend fun editProfile(
         userId: String,
-        email: String,
-        userName: String,
         profile: ProfileInfo
     ) {
         val url = "$baseUrl/users/$userId.json"
 
-        // Combined update: top-level email, userName + full profile
         val updateData = mapOf(
-            "email" to email,
-            "userName" to userName,
+            "email" to profile.email,
+            "userName" to profile.userName,
             "device" to UIDevice.currentDevice.model,
-            "profile" to profile,
+            "phoneNumber" to profile.phoneNumber,
+            "emergencyContact" to profile.emergencyContact,
+            "drivingLicense" to profile.drivingLicense,
+            "isMechanic" to profile.isMechanic.toString()
         )
 
-        val response = client.put(url) {
+        val response = client.patch(url) {
             contentType(ContentType.Application.Json)
             setBody(updateData)
         }

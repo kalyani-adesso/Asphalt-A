@@ -168,7 +168,10 @@ struct AddBikeView: View {
             }
             Spacer()
             Button(action: {
-                viewModel.deleteSelectedBikeType(id: bikeId)
+                Task {
+                    await viewModel.deleteSelectedBikeType(id: bikeId)
+                }
+               
             }) {
                 AppIcon.Profile.deleteBike
                     .resizable()
