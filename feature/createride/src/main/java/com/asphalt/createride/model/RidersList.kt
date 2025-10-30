@@ -1,7 +1,7 @@
 package com.asphalt.createride.model
 
 data class RidersList(
-    var id: Int? = null,
+    var id: String? = null,
     var name: String? = null,
     var job: String? = null,
     var bike: String? = null,

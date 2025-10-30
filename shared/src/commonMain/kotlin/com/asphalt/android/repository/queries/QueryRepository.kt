@@ -9,9 +9,9 @@ import com.asphalt.android.model.queries.AnswerRequestDTO
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.model.queries.QueryRequestDTO
 import com.asphalt.android.model.queries.QueryResponseDTO
-import com.asphalt.android.network.APIService
+import com.asphalt.android.network.queries.QueryAPIService
 
-class QueryRepository(private val apiService: APIService) {
+class QueryRepository(private val apiService: QueryAPIService) {
     suspend fun getQueries(): APIResult<List<QueryDomain>> {
         return apiService.getQueries().mapApiResult { response ->
             response?.toDomain().orEmpty()
