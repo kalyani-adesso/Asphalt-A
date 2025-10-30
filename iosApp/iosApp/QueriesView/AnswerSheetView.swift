@@ -10,7 +10,8 @@ import SwiftUI
 struct AnswerSheetView: View {
     @Environment(\.dismiss) var dismiss
     var query: Query
-    @State private var answerText: String = ""
+    @ObservedObject var viewModel: QueryViewModel
+
     var body: some View {
         VStack(spacing: 20) {
             // MARK: Header
@@ -119,7 +120,7 @@ struct AnswerSheetView: View {
                         )
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        TextField("Share your knowledge and help the community...", text: $answerText, axis: .vertical)
+                        TextField("Share your knowledge and help the community...", text: $viewModel.answerText, axis: .vertical)
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundColor(AppColor.richBlack)
                             .padding()
@@ -144,8 +145,11 @@ struct AnswerSheetView: View {
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppColor.darkGray, lineWidth: 1))
                             Spacer()
                             Button {
-                                // Post answer action here
-                                answerText = ""
+                                Task {
+                                    await viewModel.addAnswer()
+                                    viewModel.answerText = ""
+                                    dismiss()
+                                } 
                             } label: {
                                 HStack {
                                     Image(systemName: "paperplane.fill")
@@ -180,6 +184,9 @@ struct AnswerSheetView: View {
                 endPoint: .bottom
             )
         )
+        .onAppear {
+                viewModel.selectedQuery = query
+            }
 
 
     }
@@ -188,7 +195,7 @@ struct AnswerSheetView: View {
 
 #Preview {
     AnswerSheetView(query: Query(
-        title: "Best oil for Kawasaki Ninja 650?",
+        apiId: "", title: "Best oil for Kawasaki Ninja 650?",
         tags: ["Maintenance", "Answered"],
         author: "Vyshnav",
         daysAgo: "7 days ago",
@@ -205,5 +212,5 @@ struct AnswerSheetView: View {
         ],
         likes: 15,
         comments: 1
-    ))
+    ), viewModel: QueryViewModel.init())
 }
