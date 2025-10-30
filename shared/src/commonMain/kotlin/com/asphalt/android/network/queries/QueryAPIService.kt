@@ -1,14 +1,13 @@
-package com.asphalt.android.network
+package com.asphalt.android.network.queries
 
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
-import com.asphalt.android.model.User
 import com.asphalt.android.model.queries.AnswerDTO
 import com.asphalt.android.model.queries.AnswerRequestDTO
 import com.asphalt.android.model.queries.QueryRequestDTO
 import com.asphalt.android.model.queries.QueryResponseDTO
 
-interface APIService {
+interface QueryAPIService {
     suspend fun getQueries(): APIResult<Map<String, QueryResponseDTO>?>
     suspend fun postQuery(queryRequestDTO: QueryRequestDTO): APIResult<GenericResponse>
     suspend fun postAnswer(
@@ -16,7 +15,6 @@ interface APIService {
         answerRequestDTO: AnswerRequestDTO
     ): APIResult<GenericResponse>
 
-    suspend fun getAllUser(): APIResult<Map<String, User>>
     suspend fun likeQuery(queryId: String, userId: String): APIResult<Unit>
     suspend fun deleteLikeQuery(queryId: String, userId: String): APIResult<Unit>
     suspend fun likeOrDislikeAnswer(
@@ -31,6 +29,7 @@ interface APIService {
         answerId: String,
         userId: String
     ): APIResult<Unit>
+
     suspend fun getQuery(queryId: String): APIResult<QueryResponseDTO>?
-    suspend fun getAnswer(queryId: String,answerId: String): APIResult<AnswerDTO>?
+    suspend fun getAnswer(queryId: String, answerId: String): APIResult<AnswerDTO>?
 }
