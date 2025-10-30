@@ -150,6 +150,7 @@ struct AppIcon {
         static let startLocation = UIImage(named: "icon-startLocation")
         static let endLocation = UIImage(named: "icon-endLocation")
         static let intermediate = UIImage(named: "icon-intermediate")
+        static let rateLogo = Image("icon-rateLogo")
     }
     
     struct Queries {

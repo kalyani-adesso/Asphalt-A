@@ -10,8 +10,8 @@ data class AnswerDTO(
     val answeredBy: String,
     @SerialName("answered_on")
     val answeredOn: String,
-    val likes: List<String>? = emptyList(),
-    val dislikes: List<String>? = emptyList()
+    @SerialName("likes_dislikes")
+    val likesDislikes: Map<String, Boolean>? = null,
 )
 
 data class AnswerDomain(
@@ -20,7 +20,7 @@ data class AnswerDomain(
     val answeredBy: String,
     val answeredOn: String,
     val likes: List<String>,
-    val dislikes: List<String>
+    val dislikes: List<String>,
 )
 @Serializable
 data class AnswerRequestDTO(

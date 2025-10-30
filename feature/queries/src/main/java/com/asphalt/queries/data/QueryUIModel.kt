@@ -15,5 +15,4 @@ data class Query(
     val isUserLiked: Boolean = false
 )
 
-var bikeQueries: MutableList<Query> = emptyList<Query>().toMutableList()
 

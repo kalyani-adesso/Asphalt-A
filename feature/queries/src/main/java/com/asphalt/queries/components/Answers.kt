@@ -43,12 +43,12 @@ fun Answers(
     answers: List<Answer>,
     queriesVM: QueriesVM,
     modifier: Modifier = Modifier,
-    showDivider: Boolean = true
+    showDivider: Boolean = true, queryId: String
 ) {
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20), modifier = modifier) {
         answers.forEach {
-            AnswerComponent(it, queriesVM)
+            AnswerComponent(it, queriesVM, queryId)
         }
         if (showDivider)
             HorizontalDivider(color = LightSilver)
@@ -56,7 +56,7 @@ fun Answers(
 }
 
 @Composable
-fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
+fun AnswerComponent(answer: Answer, queriesVM: QueriesVM, queryId: String) {
     val scope = rememberCoroutineScope()
     RoundedBox(backgroundColor = PaleMint, modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -112,7 +112,7 @@ fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
                         .clickable {
                             scope.launch {
 
-                                queriesVM.likeOrRemoveLikeOfAnswer(answer.id)
+                                queriesVM.addOrRemoveLikeOfAnswer(answer.id,answer.isUserLiked,queryId)
                             }
                         }
                         .offset(y = Dimensions.spacingNeg2)
@@ -125,7 +125,10 @@ fun AnswerComponent(answer: Answer, queriesVM: QueriesVM) {
                         .size(Dimensions.spacing15pt75, Dimensions.spacing15)
                         .clickable {
                             scope.launch {
-                                queriesVM.likeOrRemoveDislikeOfAnswer(answer.id)
+                                queriesVM.addOrRemoveDislikeOfAnswer(
+                                    answer.id,
+                                    answer.isUserDisliked, queryId
+                                )
                             }
                         }
                 )

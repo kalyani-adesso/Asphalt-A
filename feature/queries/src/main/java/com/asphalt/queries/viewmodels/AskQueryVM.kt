@@ -1,18 +1,19 @@
 package com.asphalt.queries.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.asphalt.android.model.APIResult
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.android.repository.queries.QueryRepository
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.queries.repositories.QueryRepo
 import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class AskQueryVM(val queryRepo: QueryRepo, val queryRepository: QueryRepository) : ViewModel() {
+class AskQueryVM(val queryRepository: QueryRepository) : ViewModel() {
     private val _askQuestion = MutableStateFlow("")
     private val _questionError = MutableStateFlow(false)
     val questionError: StateFlow<Boolean> = _questionError.asStateFlow()
@@ -60,24 +61,21 @@ class AskQueryVM(val queryRepo: QueryRepo, val queryRepository: QueryRepository)
 
     }
 
-    suspend fun submitQuestion(submitInvoke: () -> Unit) {
+    suspend fun submitQuestion(submitInvoke: (queryId: String) -> Unit) {
 
-        val addQueryResult = queryRepository.addQuery(
-            queryTitle = _askQuestion.value,
-            queryDescription = _description.value,
-            categoryId = _selectedCategory.value!!.id,
-            postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
-            postedBy = user?.uid ?: "",
-        )
-        when (addQueryResult) {
-            is APIResult.Error -> {
-                addQueryResult.exception.toString()
-            }
-
-            is APIResult.Success -> {
-                submitInvoke.invoke()
-                clearAll()
-            }
+        val addQueryResult = APIHelperUI.runWithLoader {
+            queryRepository.addQuery(
+                queryTitle = _askQuestion.value,
+                queryDescription = _description.value,
+                categoryId = _selectedCategory.value!!.id,
+                postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
+                postedBy = user?.uid ?: "",
+            )
+        }
+        APIHelperUI.handleApiResult(addQueryResult, viewModelScope) {
+            UIStateHandler.sendEvent(UIState.SUCCESS("Added query successfully!"))
+            submitInvoke(it.name)
+            clearAll()
         }
     }
 
