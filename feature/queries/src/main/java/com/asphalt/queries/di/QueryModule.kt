@@ -6,7 +6,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val queryModule = module {
-    viewModel { QueriesVM(get(), get()) }
+    viewModel { QueriesVM(get(), get(),get()) }
     viewModel { AskQueryVM(get()) }
 
 }
