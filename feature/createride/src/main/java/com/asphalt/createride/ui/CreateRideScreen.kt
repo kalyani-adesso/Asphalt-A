@@ -50,6 +50,7 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     clickDone: () -> Unit
 ) {
+    viewModel.getUsers()
     val scrollState = rememberScrollState()
     setTopAppBarState(
         AppBarState(
