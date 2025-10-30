@@ -165,34 +165,45 @@ extension ProfileViewModel {
     }
     
     func fetchBikes(userId: String) async {
-        
         do {
-          await profileRepository.getBikes(userId: userId) { result, error in
-                if let success = result as? APIResultSuccess<AnyObject>,
-                   let domainArray = success.data as? [BikeDomain] {
-                    self.selectedBikeType.removeAll()
-                    DispatchQueue.main.async {
-                        for echBike in domainArray {
-                            self.getBikeType(model: echBike.model, make: echBike.make, type: echBike.type, bikeId: echBike.bikeId)
+            try await withCheckedThrowingContinuation { continuation in
+                profileRepository.getBikes(userId: userId) { result, error in
+                    if let success = result as? APIResultSuccess<AnyObject>,
+                       let domainArray = success.data as? [BikeDomain] {
+                        DispatchQueue.main.async {
+                            self.selectedBikeType.removeAll()
+                            for eachBike in domainArray {
+                                self.getBikeType(
+                                    model: eachBike.model,
+                                    make: eachBike.make,
+                                    type: eachBike.type,
+                                    bikeId: eachBike.bikeId
+                                )
+                            }
                         }
+                        continuation.resume()
+                    } else if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
                     }
                 }
             }
+        } catch {
+            print("Error fetching bikes: \(error)")
         }
     }
-    
+
     func addNewBike(userId: String, model: String, make: String, type: String) async {
         do {
-            await profileRepository.addBike(userId: userId, bikeId: "", bikeType: type, make: make, model: model, completionHandler: { result, error in
-                if let error = error {
-                    print("Error:\(error)")
-                } else {
-                    print("Bike added successfully")
-                }
-            })
+            try await profileRepository.addBike(userId: userId, bikeId: "", bikeType: type, make: make, model: model)
+            print("Bike added successfully")
             await fetchBikes(userId: userId)
+        } catch {
+            print("Error: \(error)")
         }
     }
+
     
     func editProfile(
         userId: String,

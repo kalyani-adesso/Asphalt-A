@@ -33,7 +33,7 @@ ProfileAPIService {
         bike: BikeDTO
     ): APIResult<GenericResponse> {
         return safeApiCall {
-            post( bike, "$USERS_URL${BIKES_URL}").body()
+            post( bike, "$USERS_URL/$userId$BIKES_URL").body()
         }
     }
 
