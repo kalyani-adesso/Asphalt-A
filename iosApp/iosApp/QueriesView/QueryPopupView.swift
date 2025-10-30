@@ -107,7 +107,12 @@ struct QueryPopupView: View {
                         })
                         ButtonView( title: "ASK QUESTION",
                                     showShadow: false,onTap: {
-                            isPresented = false
+                            Task {
+                                        await viewModel.addQuery()
+                                        await MainActor.run {
+                                            isPresented = false
+                                        }
+                                    }
                         }
                         )
                     

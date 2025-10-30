@@ -12,7 +12,7 @@ struct QueriesView: View {
     @State private var selectedStatus: String? = nil
     @State private var searchText = ""
     @State private var showAskPopup = false
-
+    
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
         NavigationStack {
@@ -20,63 +20,97 @@ struct QueriesView: View {
                 title: "Queries",
                 onBack: onBackToHome,
                 onAskTapped: {
-                          showAskPopup = true
-                  }
+                    showAskPopup = true
+                }
             )
             ZStack {
-                VStack(spacing: 20){
-                    FormFieldView(
-                        label: " ",
-                        icon:  AppIcon.CreateRide.searchLens,
-                        placeholder:"Search questions ...",
-                        iconColor: AppColor.celticBlue,
-                        value: $searchText,
-                        isValidEmail: .constant(false),
-                        backgroundColor: AppColor.listGray
-                    )
-                    
-                    HStack(spacing: 12) {
-                        ForEach(viewModel.queryStatus, id: \.self) { status in
-                            let firstRideStatus = viewModel.queryStatus.first?.rawValue ?? ""
-                            let isSelected = (selectedStatus ?? firstRideStatus) == status.rawValue
-                            QSegmentButtonView(
-                                rideStatus: status.rawValue,
-                                isSelected: isSelected
-                            ) {
-                                selectedStatus = status.rawValue
+                VStack(spacing: 0) {
+                    // Fixed top area (search + filters)
+                    VStack(spacing: 20) {
+                        FormFieldView(
+                            label: " ",
+                            icon: AppIcon.CreateRide.searchLens,
+                            placeholder: "Search questions ...",
+                            iconColor: AppColor.celticBlue,
+                            value: $searchText,
+                            isValidEmail: .constant(false),
+                            backgroundColor: AppColor.listGray
+                        )
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(viewModel.queryStatus, id: \.self) { status in
+                                    let isSelected = viewModel.selectedCategory == status.rawValue
+                                    QSegmentButtonView(
+                                        rideStatus: status.rawValue,
+                                        isSelected: isSelected
+                                    ) {
+                                        if viewModel.selectedCategory == status.rawValue {
+                                            viewModel.selectedCategory = nil
+                                        } else {
+                                            viewModel.selectedCategory = status.rawValue
+                                        }
+                                    }
+                                }
                             }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 15)
                         }
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppColor.listGray)
+                        )
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .contentShape(Rectangle())
+                    .padding(.horizontal, 20)
+                    .zIndex(1)
+                    .padding(.bottom, 20)
                     
+                    // Scrollable content
                     ScrollView {
-                        LazyVStack(spacing: 20) {
-                            ForEach(viewModel.queries) { query in
-                                QueryCardView(query: query)
+                        VStack(spacing: 20) {
+                            if viewModel.isLoading {
+                                ProgressView("Loading...")
+                                    .progressViewStyle(CircularProgressViewStyle())
+                                    .padding(.top, 100)
+                            } else if viewModel.filteredQueries.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "tray")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 60, height: 60)
+                                        .foregroundColor(.gray.opacity(0.5))
+                                    Text("No queries found")
+                                        .font(KlavikaFont.bold.font(size: 18))
+                                        .foregroundColor(.gray)
+                                    Text("Try changing filters or ask a new question.")
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(.gray.opacity(0.8))
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 400)
+                            } else {
+                                LazyVStack(spacing: 20) {
+                                    ForEach(viewModel.filteredQueries) { query in
+                                        QueryCardView(query: query, viewModel: viewModel)
+                                    }
+                                }
+                                .padding(.horizontal, 20)
                             }
                         }
-                        
-                        
                     }
-                    
                 }
-                .padding(.horizontal,20)
-                .padding(.top,-10)
+                
+                // Overlay popup
                 if showAskPopup {
                     QueryPopupView(isPresented: $showAskPopup, viewModel: viewModel)
-                            .transition(.scale)
-                            .zIndex(1)
-                    }
+                        .transition(.scale)
+                        .zIndex(2)
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
-        
+        .onAppear{
+            viewModel.loadQueries()
+        }
         
     }
 }
@@ -143,7 +177,8 @@ struct QSegmentButtonView: View {
             onTap?()
         }) {
             Text(rideStatus)
-                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 15)
                 .frame(height: 50)
                 .background(
                     Group {
