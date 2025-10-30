@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AnswerToQuery(
     dismissPopup: () -> Unit,
-    queryId: Int?,
+    queryId: String?,
     queriesVM: QueriesVM,
     queryList: List<Query>
 ) {
@@ -187,7 +187,11 @@ fun AnswerToQuery(
                                         )
                                         Spacer(Modifier.weight(1f))
                                         ComposeUtils.SectionSubtitle(
-                                            Utils.formatRelativeTime(query.postedOn),
+                                            Utils.formatRelativeTime(
+                                                Utils.formatClientMillisToISO(
+                                                    query.postedOn
+                                                )
+                                            ),
                                             color = GrayDark
                                         )
                                     }
@@ -208,7 +212,10 @@ fun AnswerToQuery(
                                                 .clickable {
                                                     scope.launch {
 
-                                                        queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                                                        queriesVM.likeOrRemoveLikeOfQuestion(
+                                                            query.id,
+                                                            query.isUserLiked
+                                                        )
                                                     }
                                                 }
                                                 .offset(y = Dimensions.spacingNeg2)
@@ -236,7 +243,7 @@ fun AnswerToQuery(
                                     query.answers,
                                     queriesVM,
                                     modifier = Modifier.padding(end = Dimensions.padding28),
-                                    showDivider = false
+                                    showDivider = false, queryId = query.id
                                 )
 
 
@@ -323,10 +330,8 @@ fun AnswerToQuery(
                                         .height(Dimensions.size35)
                                         .width(Dimensions.size132)
                                         .clickable(enabled = isPostAnswerEnabled.value) {
-                                            scope.launch {
-                                                queriesVM.postAnswer(query)
+                                                query?.let { queriesVM.postAnswer(it) }
                                                 dismissPopup.invoke()
-                                            }
                                         },
                                     cornerRadius = Dimensions.radius5,
                                     contentAlignment = Alignment.Center

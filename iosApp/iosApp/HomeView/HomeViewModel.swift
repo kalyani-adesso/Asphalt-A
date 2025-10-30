@@ -9,7 +9,9 @@ import Foundation
 import SwiftUI
 import shared
 
+@MainActor
 class HomeViewModel: ObservableObject {
+    @Published var locationManager = LocationManager()
 
     @Published var userName: String = "Guest"
     @Published var location: String = "Kochi, Infopark"
@@ -109,12 +111,26 @@ class HomeViewModel: ObservableObject {
 
     init() {
         loadUserName()
+        locationManager.requestLocation()
+            
+            // Observe location updates
+            Task {
+                for await address in locationManager.$currentAddress.values {
+                    self.location = address
+                }
+            }
+        
     }
     func loadUserName() {
+        if let cachedName = UserDefaults.standard.string(forKey: "userName") {
+                self.userName = cachedName
+            }
+        
            Task {
                if let user = try? await userRepo.getUserDetails() {
                    DispatchQueue.main.async {
                        self.userName = user.name ?? "Guest"
+                       UserDefaults.standard.set(self.userName, forKey: "userName") //to avoid flicker
                    }
                } else {
                    DispatchQueue.main.async {

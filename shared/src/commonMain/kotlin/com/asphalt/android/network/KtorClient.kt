@@ -1,10 +1,15 @@
 package com.asphalt.android.network
 
+import com.asphalt.android.constants.APIConstants.BASE_URL
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -16,7 +21,7 @@ import kotlinx.serialization.json.Json
 
 class KtorClient {
 
-    fun getClient() : HttpClient {
+    fun getClient(): HttpClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(Json {
@@ -31,11 +36,15 @@ class KtorClient {
                 connectTimeoutMillis = 3000
                 requestTimeoutMillis = 3000
             }
+            install(Logging){
+                logger = Logger.SIMPLE
+                level = LogLevel.ALL
+            }
 
             install(DefaultRequest) {
                 url {
                     // api call
-                    host = ""
+                    host = BASE_URL
                     protocol = URLProtocol.HTTPS
                     headers {
                         append(name = HttpHeaders.Authorization, value = "")
@@ -49,8 +58,10 @@ class KtorClient {
 
 
     suspend fun Registration() {
-       getClient()
-           .get(urlString = "") // mention end point
-           //.body<>()
+        getClient()
+            .get(urlString = "") // mention end point
+        //.body<>()
     }
+
+
 }

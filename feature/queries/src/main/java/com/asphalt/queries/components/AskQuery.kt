@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 fun AskQuery(
     askQueryVM: AskQueryVM,
     onDismiss: () -> Unit,
-    onSubmit: () -> Unit,
+    onSubmit: (queryId: String) -> Unit,
     user: CurrentUser?
 ) {
     val askQuestion = askQueryVM.askQuestion.collectAsStateWithLifecycle()
@@ -239,8 +239,10 @@ fun AskQuery(
                         onClick = {
                             scope.launch {
                                 if (askQueryVM.validateFields()) {
-                                    askQueryVM.submitQuestion()
-                                    onSubmit.invoke()
+                                    askQueryVM.submitQuestion({
+                                        onSubmit(it)
+                                    })
+
                                 }
                             }
                         },

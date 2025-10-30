@@ -23,11 +23,13 @@ struct TopNavBar: View {
                 .navigationBarBackButtonHidden(true)
                 Spacer()
                 VStack(spacing: 2) {
-                    Text(home.userName)
+                    Text("Hello \(home.userName)")
                         .font(.system(size: 17, weight: .semibold))
                     HStack(spacing: 4) {
                         Circle().fill(Color.green).frame(width: 6, height: 6)
-                        Text(home.location)
+                        Text(home.location == "Location access denied"
+                             ? "Location access denied"
+                             : home.location)
                             .font(.system(size: 13))
                             .foregroundColor(.gray)
                     }

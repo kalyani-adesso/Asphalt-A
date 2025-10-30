@@ -15,7 +15,7 @@ struct RatingView: View {
     let iconNotRate: Image
     var didSelect: (() -> Void)? = nil
     var body: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 15) {
             ForEach(1...maxRating, id: \.self) { index in
                 Button {
                     rating = index
@@ -30,6 +30,7 @@ struct RatingView: View {
                 .buttonStyle(.plain)
             }
         }
+
         .frame(maxWidth: .infinity)
     }
 }

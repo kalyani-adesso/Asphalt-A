@@ -1,17 +1,19 @@
 package com.asphalt.queries.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.CurrentUser
+import com.asphalt.android.repository.queries.QueryRepository
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.queries.data.Query
-import com.asphalt.queries.repositories.QueryRepo
 import com.asphalt.queries.sealedclasses.QueryCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.random.Random
 
-class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
+class AskQueryVM(val queryRepository: QueryRepository) : ViewModel() {
     private val _askQuestion = MutableStateFlow("")
     private val _questionError = MutableStateFlow(false)
     val questionError: StateFlow<Boolean> = _questionError.asStateFlow()
@@ -59,23 +61,22 @@ class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
 
     }
 
-    suspend fun submitQuestion() {
-        queryRepo.addQuery(
-            Query(
-                id = Random.nextInt(),
-                title = _askQuestion.value,
-                description = _description.value,
-                isAnswered = false,
-                categoryId = _selectedCategory.value?.id ?: 0,
+    suspend fun submitQuestion(submitInvoke: (queryId: String) -> Unit) {
+
+        val addQueryResult = APIHelperUI.runWithLoader {
+            queryRepository.addQuery(
+                queryTitle = _askQuestion.value,
+                queryDescription = _description.value,
+                categoryId = _selectedCategory.value!!.id,
                 postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
-                postedByName = user?.name ?: "",
-                postedByUrl = "",
-                likeCount = 0,
-                answerCount = 0,
-                answers = emptyList()
+                postedBy = user?.uid ?: "",
             )
-        )
-        clearAll()
+        }
+        APIHelperUI.handleApiResult(addQueryResult, viewModelScope) {
+            UIStateHandler.sendEvent(UIState.SUCCESS("Added query successfully!"))
+            submitInvoke(it.name)
+            clearAll()
+        }
     }
 
     fun setUser(user: CurrentUser?) {
@@ -90,4 +91,8 @@ class AskQueryVM(val queryRepo: QueryRepo) : ViewModel() {
         _descriptionError.value = false
         _selectedCategory.value = null
     }
+
+
 }
+
+
