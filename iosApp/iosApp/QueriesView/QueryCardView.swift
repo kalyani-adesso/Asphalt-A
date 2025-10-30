@@ -10,6 +10,7 @@ import SwiftUI
 struct QueryCardView: View {
     let query: Query
     @State private var showAnswer: Bool = false
+    @ObservedObject var viewModel: QueryViewModel
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             
@@ -54,7 +55,9 @@ struct QueryCardView: View {
                     .foregroundColor(AppColor.stoneGray)
             }
             
-            Divider()
+            if !query.answers.isEmpty{
+                Divider()
+            }
             
             // Answers
             ForEach(query.answers) { answer in
@@ -83,6 +86,7 @@ struct QueryCardView: View {
                     }
                 Spacer()
                 Button("Answer") {
+                    viewModel.selectedQuery = query
                     showAnswer = true
                 }
                     .font(KlavikaFont.medium.font(size: 12))
@@ -101,7 +105,7 @@ struct QueryCardView: View {
         .background(AppColor.listGray)
         .cornerRadius(12)
         .sheet(isPresented: $showAnswer) {
-            AnswerSheetView(query: query)
+            AnswerSheetView(query:  viewModel.selectedQuery!, viewModel: viewModel)
                 .presentationDetents([.fraction(0.8)])
                 .presentationBackground(.ultraThinMaterial)
         }
@@ -111,7 +115,7 @@ struct QueryCardView: View {
 
 #Preview {
     QueryCardView(query: Query(
-        title: "Best oil for Kawasaki Ninja 650?",
+        apiId: "", title: "Best oil for Kawasaki Ninja 650?",
         tags: ["Maintenance", "Answered"],
         author: "Vyshnav",
         daysAgo: "7 days ago",
@@ -128,5 +132,5 @@ struct QueryCardView: View {
         ],
         likes: 15,
         comments: 1
-    ))
+    ), viewModel: QueryViewModel.init())
 }
