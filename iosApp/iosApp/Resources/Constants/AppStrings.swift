@@ -126,6 +126,7 @@ public struct AppStrings{
         case rememberMeData = "com.adesso.rider.club.rememberMeData"
         case hasSeenOnboarding = "com.adesso.rider.club.hasSeenOnboarding"
         case hasShownLoginSuccess = "com.adesso.rider.club.hasShownLoginSuccess"
+        case userId = "com.adesso.rider.club.userId"
     }
     
     enum ForgotPassword: String {
@@ -236,6 +237,7 @@ public struct AppStrings{
         static let earnBadgeTip = "Complete quizzes and participate in the community to earn your first badge!"
         static let startEarnBadge = "Start earning badges"
         static let yourgarage = "Your Garage"
+        static let profileTitle = "Profile"
     }
 
     enum VehicleType: String, CaseIterable, Identifiable {

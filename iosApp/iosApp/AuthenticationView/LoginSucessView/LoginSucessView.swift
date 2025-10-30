@@ -27,7 +27,7 @@ struct LoginSucessView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
             Button(action: {
-                MBUserDefaults.hasShownLoginSuccessStatic = false
+                MBUserDefaults.hasShownLoginSuccessStatic = true
                 goToHome = true
             }) {
                 

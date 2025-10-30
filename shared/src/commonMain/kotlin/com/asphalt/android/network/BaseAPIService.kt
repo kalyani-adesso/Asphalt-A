@@ -6,6 +6,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -55,6 +56,12 @@ abstract class BaseAPIService(private val client: KtorClient)  {
 
     protected suspend fun delete(url: String): HttpResponse {
         return client.getClient().delete(buildUrl(url))
+    }
+
+    protected suspend fun patch(body: Any, url: String): HttpResponse {
+        return client.getClient().patch(buildUrl(url)) {
+            setBody(body)
+        }
     }
 
     protected fun buildUrl(url: String): String {

@@ -18,6 +18,7 @@ class LoginViewModel: ObservableObject {
                 if let result = result {
                     if let _ = result.uid {
                         MBUserDefaults.rememberMeDataStatic = result.isSuccess
+                        MBUserDefaults.userIdStatic = result.uid ?? ""
                         completion()
                     } else {
                         self.errorMessage = result.errorMessage ?? ""
