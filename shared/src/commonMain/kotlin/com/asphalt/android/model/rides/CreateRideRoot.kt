@@ -9,11 +9,12 @@ class CreateRideRoot(
     var rideTitle: String? = null,
     var description: String? = null,
     var startDate: Long? = null,
-    var hour: Int? = null,
-    var mins: Int? = null,
-    var isAm: Boolean = false,
     var startLocation: String? = null,
     var endLocation: String? = null,
     var createdDate: Long? = null,
-    var invites: Map<String, UserInvites>? = null
+    var participants: Map<String, UserInvites>? = null,
+    var startLatitude: Double = 0.0,
+    var startLongitude: Double = 0.0,
+    var endLatitude: Double = 0.0,
+    var endLongitude: Double = 0.0
 )

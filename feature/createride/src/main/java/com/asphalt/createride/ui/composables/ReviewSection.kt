@@ -87,7 +87,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation?:""}",
+                            text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -150,7 +150,12 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = viewModel.rideDetailsState.value.dateString ?: "",
+                            text = (viewModel.rideDetailsState.value.dateString ?: "") +"-"+
+                            viewModel.rideDetailsState.value.hour + ":" +
+                            viewModel.rideDetailsState.value.mins + " " + "${
+                                if (viewModel.rideDetailsState.value.isAm) stringResource(R.string.am)
+                                else stringResource(R.string.pm)
+                            }",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -233,7 +238,11 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = "${viewModel.ridersList.value.count{it.isSelect}} ${stringResource(R.string.riders_selected)}",
+                            text = "${viewModel.ridersList.value.count { it.isSelect }} ${
+                                stringResource(
+                                    R.string.riders_selected
+                                )
+                            }",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )

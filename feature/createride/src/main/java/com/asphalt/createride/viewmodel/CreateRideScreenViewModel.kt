@@ -16,9 +16,8 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
-import com.asphalt.commonui.UIState
-import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
@@ -195,19 +194,11 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     suspend fun createRide() {
         val cal = Calendar.getInstance()
         val userDetails = userRepoImpl.getUserDetails()
-
-//        var arrList = ArrayList<Users>()
-//        var user1 = Users("Hari", "1234")
-//        var user2 = Users("Krishnan", "12345")
-//        var user3 = Users("Sree", "12346")
-//        arrList.add(user1)
-//        arrList.add(user2)
-//        arrList.add(user3)
         val map: Map<String, UserInvites> =
             _ridersListMutable.value.filter { it.isSelect == true }
                 .associate { rider ->
                     rider.id.orEmpty() to UserInvites(
-                        acceptInvite = false
+                        acceptInvite = 0
                     )
                 } ?: emptyMap()
         var createRide: CreateRideRoot = CreateRideRoot(
@@ -215,14 +206,16 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             rideType = _rideDetailsMutableState.value.rideType,
             rideTitle = _rideDetailsMutableState.value.rideTitle,
             description = _rideDetailsMutableState.value.description,
-            startDate = _rideDetailsMutableState.value.dateMils,
-            hour = _rideDetailsMutableState.value.hour,
-            mins = _rideDetailsMutableState.value.mins,
-            isAm = _rideDetailsMutableState.value.isAm,
+            startDate = Utils.getDate(
+                _rideDetailsMutableState.value.dateMils ?: 0,
+                _rideDetailsMutableState.value.hour ?: 0,
+                _rideDetailsMutableState.value.mins ?: 0,
+                _rideDetailsMutableState.value.isAm
+            ),
             startLocation = _rideDetailsMutableState.value.startLocation,
             endLocation = _rideDetailsMutableState.value.endLocation,
             createdDate = cal.timeInMillis,
-            invites = map
+            participants = map
         )
 
         val apiResult = APIHelperUI.runWithLoader {

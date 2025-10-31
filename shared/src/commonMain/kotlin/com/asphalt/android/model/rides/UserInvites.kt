@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
  class UserInvites(
-    var acceptInvite: Boolean = false
+    var acceptInvite: Int = 0 // 0 - invite sent,1- invite accept, 2- invite declined
 )
