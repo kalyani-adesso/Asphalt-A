@@ -121,7 +121,9 @@ fun QueriesScreen(
         isScrollable = false
     ) {
         Spacer(Modifier.height(Dimensions.padding20))
-        SearchQueries()
+        SearchQueries({
+            queriesVM.search(it)
+        })
         FilterCategories(selectedCategory)
         Queries(queryList.value, queriesVM) { it ->
             selectedQueryId.value = it

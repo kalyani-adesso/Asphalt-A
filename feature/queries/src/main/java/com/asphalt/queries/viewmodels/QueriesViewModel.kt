@@ -34,6 +34,7 @@ class QueriesVM(
     }
 
     private val currentUid = androidUserVM.userState.value?.uid
+    private val searchText = MutableStateFlow("")
 
 
     private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
@@ -50,9 +51,17 @@ class QueriesVM(
     private var filterCategory = MutableStateFlow(CATEGORY_ALL_ID)
 
     val filteredQueryList: StateFlow<List<Query>> =
-        combine(_queryList, filterCategory) { queries, categoryId ->
+        combine(_queryList, filterCategory, searchText) { queries, categoryId, searchQuery ->
+            val searchFilteredQueries = if (searchQuery.isBlank()) {
+                queries
+            } else {
+                queries.filter {
+                    it.title.contains(searchQuery, ignoreCase = true)
+                }
+            }
+
             val filteredQuery =
-                if (categoryId == CATEGORY_ALL_ID) queries else queries.filter { it.categoryId == categoryId }
+                if (categoryId == CATEGORY_ALL_ID) searchFilteredQueries else searchFilteredQueries.filter { it.categoryId == categoryId }
             filteredQuery.sortedByDescending { it.postedOn }
 
         }.stateIn(
@@ -70,7 +79,10 @@ class QueriesVM(
     }
 
     suspend fun loadUserList() {
-        APIHelperUI.handleApiResult(userRepository.getAllUsers(), viewModelScope) {
+        APIHelperUI.handleApiResult(
+            APIHelperUI.runWithLoader { userRepository.getAllUsers() },
+            viewModelScope
+        ) {
             _userList.value = it
         }
     }
@@ -312,5 +324,9 @@ class QueriesVM(
                 isUserLiked = isUserLiked, isUserDisliked = isUserDisLiked
             )
         }
+    }
+
+    fun search(searchQuery: String) {
+        searchText.value = searchQuery
     }
 }
