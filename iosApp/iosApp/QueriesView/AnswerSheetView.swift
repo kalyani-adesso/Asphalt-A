@@ -29,7 +29,7 @@ struct AnswerSheetView: View {
                 }
             }
             .padding()
-           
+            
             
             // MARK: Question + Answers
             ScrollView {
@@ -100,7 +100,7 @@ struct AnswerSheetView: View {
                     )
                     // Answers
                     ForEach(query.answers) { answer in
-                        AnswerCardView(answer: answer)
+                        AnswerCardView(answer: answer, query: query, viewModel: viewModel)
                     }
                 }
                 .padding(.horizontal, 35)
@@ -149,7 +149,7 @@ struct AnswerSheetView: View {
                                     await viewModel.addAnswer()
                                     viewModel.answerText = ""
                                     dismiss()
-                                } 
+                                }
                             } label: {
                                 HStack {
                                     Image(systemName: "paperplane.fill")
@@ -164,7 +164,7 @@ struct AnswerSheetView: View {
                         }
                         .padding(.top, 10)
                     }
-                   
+                    
                 }
                 .padding(.top, 60)
                 .padding(.horizontal, 30)
@@ -185,32 +185,10 @@ struct AnswerSheetView: View {
             )
         )
         .onAppear {
-                viewModel.selectedQuery = query
-            }
-
-
+            viewModel.selectedQuery = query
+        }
+        
     }
     
 }
 
-#Preview {
-    AnswerSheetView(query: Query(
-        apiId: "", title: "Best oil for Kawasaki Ninja 650?",
-        tags: ["Maintenance", "Answered"],
-        author: "Vyshnav",
-        daysAgo: "7 days ago",
-        content: "I have a 2022 Kawasaki Ninja 650 and I'm due for an oil change. What oil do you recommend for optimal performance?",
-        answers: [
-            Answer(
-                author: "Sooraj",
-                role: "Mechanic",
-                daysAgo: "6 days ago",
-                content: "For your Ninja 650, I recommend using Kawasaki 4-Stroke Oil 10W-40 or Motul 7100 10W-40. Both are excellent choices that meet the JASO MA2 specification.",
-                likes: 10,
-                dislikes: 1
-            ),
-        ],
-        likes: 15,
-        comments: 1
-    ), viewModel: QueryViewModel.init())
-}
