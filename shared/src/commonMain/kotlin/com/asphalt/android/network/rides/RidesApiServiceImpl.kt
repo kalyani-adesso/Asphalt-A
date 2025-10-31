@@ -15,4 +15,10 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             post(createRideRoot, RIDES_URL).body()
         }
     }
+
+    override suspend fun getAllRide() : APIResult<Map<String, CreateRideRoot>> {
+       return safeApiCall {
+            get(url = RIDES_URL).body()
+        }
+    }
 }

@@ -43,6 +43,14 @@ struct MBUserDefaults {
             UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.userId.rawValue) 
         }
     }
+    static var userNameStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.userName.rawValue)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.userName.rawValue)
+        }
+    }
     
     static var removeAllUserDefaults: Void {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)

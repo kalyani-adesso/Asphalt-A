@@ -18,17 +18,20 @@ struct Query: Identifiable {
     var answers: [Answer]
     var likes: Int
     let comments: Int
+    var likesDict: [String: Bool] = [:]
 }
 
 struct Answer: Identifiable {
     let id = UUID()
-    let apiId: String
-    let author: String
-    let role: String?
-    let daysAgo: String
-    let content: String
+    var apiId: String
+    var author: String
+    var role: String?
+    var daysAgo: String
+    var content: String
     var likes: Int
     var dislikes: Int
+    var likesAnsDict: [String: Bool] = [:]
+    var disLikesAnsDict: [String: Bool] = [:]
 }
 
 struct AskQuery: Identifiable {

@@ -8,9 +8,17 @@
 import SwiftUI
 
 struct AnswerCardView: View {
+    @ObservedObject var viewModel: QueryViewModel
     let answer: Answer
     var query: Query
-    @ObservedObject var viewModel: QueryViewModel
+  
+    var isLiked: Bool {
+           viewModel.likedAnswers.contains(answer.apiId)
+       }
+
+       var isDisliked: Bool {
+           viewModel.disLikedAnswers.contains(answer.apiId)
+       }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -58,7 +66,7 @@ struct AnswerCardView: View {
                 HStack(spacing: 6) {
                     Button {
                         Task {
-                            if viewModel.isLikedQuery {
+                            if isLiked {
                                 await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
                             } else {
                                 await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: true)
@@ -67,10 +75,9 @@ struct AnswerCardView: View {
                             
                         }
                     } label: {
-                        AppIcon.Queries.like
-                            .resizable()
-                            .scaledToFit()
+                        Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .frame(width: 18, height: 18)
+                            .foregroundColor(AppColor.celticBlue)
                         Text("\(answer.likes)")
                             .foregroundColor(AppColor.black)
                             .font(KlavikaFont.medium.font(size: 14))
@@ -79,17 +86,15 @@ struct AnswerCardView: View {
                 HStack(spacing: 6) {
                     Button {
                         Task {
-                            if viewModel.isLikedQuery {
-                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
-                            } else {
-                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: false)
-                            }
-                        }
+                            if isDisliked {
+                                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
+                                            } else {
+                                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: false)
+                                            }                        }
                     } label: {
-                        AppIcon.Queries.dislike
-                            .resizable()
-                            .scaledToFit()
+                        Image(systemName: isDisliked ? "hand.thumbsdown.fill" : "hand.thumbsdown")
                             .frame(width: 18, height: 18)
+                            .foregroundColor(AppColor.darkRed)
                         Text("\(answer.dislikes)")
                             .foregroundColor(AppColor.black)
                             .font(KlavikaFont.medium.font(size: 14))

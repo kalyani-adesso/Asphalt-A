@@ -12,8 +12,6 @@ import shared
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var locationManager = LocationManager()
-
-    @Published var userName: String = "Guest"
     @Published var location: String = "Kochi, Infopark"
     
     private let userRepo = UserRepoImpl()
@@ -119,25 +117,21 @@ class HomeViewModel: ObservableObject {
                     self.location = address
                 }
             }
-        
     }
+    @MainActor
     func loadUserName() {
-        if let cachedName = UserDefaults.standard.string(forKey: "userName") {
-                self.userName = cachedName
-            }
-        
            Task {
-               if let user = try? await userRepo.getUserDetails() {
-                   DispatchQueue.main.async {
-                       self.userName = user.name ?? "Guest"
-                       UserDefaults.standard.set(self.userName, forKey: "userName") //to avoid flicker
+               do {
+                   if let currentUser = try await userRepo.getUserDetails() {
+                       DispatchQueue.main.async {
+                           MBUserDefaults.userNameStatic = currentUser.name!
+                       }
                    }
-               } else {
-                   DispatchQueue.main.async {
-                       self.userName = "Guest"
-                   }
+               } catch {
+                   print("Error fetching user: \(error)")
                }
            }
        }
+
 
 }

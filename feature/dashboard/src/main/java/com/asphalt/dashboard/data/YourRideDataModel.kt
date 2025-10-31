@@ -8,6 +8,6 @@ class YourRideDataModel(
     var place: String? = "",
     var rideStatus: String? = "",
     var date: String? = "",
-    var riders: String? = ""
+    var riders: Int? = 0
 ) {
 }
