@@ -40,8 +40,6 @@
 		};
 		31ECD9733CAFFAF08705E2B1 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};

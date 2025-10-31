@@ -204,7 +204,6 @@ extension ProfileViewModel {
         }
     }
 
-    
     func editProfile(
         userId: String,
         userName: String,

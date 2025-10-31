@@ -8,7 +8,6 @@
 import Foundation
 import shared
 
-
 @MainActor
 class QueryViewModel: ObservableObject {
     private let queryRepo: QueryRepository
@@ -189,7 +188,7 @@ class QueryViewModel: ObservableObject {
                 queryDescription: askQuery.description,
                 categoryId: Int32(category.backendId),
                 postedOn: timeToPostValue(),
-                postedBy: "OoYGII16wtRbooBdYYDCAwHyFf62"
+                postedBy: MBUserDefaults.userIdStatic ?? ""
             )
             
             if result is APIResultSuccess<GenericResponse> {

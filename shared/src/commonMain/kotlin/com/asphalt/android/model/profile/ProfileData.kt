@@ -15,7 +15,7 @@ data class ProfileDTO(
     @SerialName("driving_license")
     val drivingLicense: String = "",
     @SerialName("is_mechanic")
-    val isMechanic: Boolean = false,
+    val isMechanic: Boolean,
     val bikes: Map<String, BikeDTO>? = null
 )
 
