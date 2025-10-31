@@ -5,6 +5,7 @@ import android.icu.util.Calendar
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -242,7 +243,8 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                     .map {
                                         RidersList(
                                             name = it.name,
-                                            id = it.uid, bike = "Unicorn"
+                                            id = it.uid, bike = "Unicorn", job = if(it.isMechanic)
+                                                "Mechanic" else ""
                                         )
                                     })
                         _ridersListMutable.value = _fullList.value
