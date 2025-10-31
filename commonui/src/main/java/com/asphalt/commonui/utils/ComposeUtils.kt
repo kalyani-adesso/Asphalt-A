@@ -1,7 +1,6 @@
 package com.asphalt.commonui.utils
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -136,7 +135,8 @@ object ComposeUtils {
         backColor: Color,
         size: Dp = Dimensions.size30,
         radius: Dp = Dimensions.size5,
-        resId: Int
+        resId: Int,
+        tint: Color = NeutralWhite
     ) {
         RoundedBox(
             backgroundColor = backColor,
@@ -144,15 +144,9 @@ object ComposeUtils {
                 .width(size)
                 .height(size),
             cornerRadius = radius,
+            contentAlignment = Alignment.Center
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Image(
-                    modifier = Modifier,
-                    painter = painterResource(resId),
-                    contentDescription = ""
-                )
-            }
-
+            Icon(painterResource(resId), null, tint = tint)
         }
     }
 
