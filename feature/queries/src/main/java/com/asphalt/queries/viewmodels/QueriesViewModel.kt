@@ -33,9 +33,15 @@ class QueriesVM(
         filterCategory.value = categoryID
     }
 
-    private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
-    val userList = _userList.asStateFlow()
     private val currentUid = androidUserVM.userState.value?.uid
+
+
+    private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
+    fun getCurrentUserData(): UserDomain? {
+
+        return UserDataHelper.getUserDataFromCurrentList(_userList.value, currentUid ?: "")
+    }
+
 
     private val _answerToQuery = MutableStateFlow("")
     val answerToQuery = _answerToQuery.asStateFlow()
@@ -248,7 +254,8 @@ class QueriesVM(
                 categoryId,
                 answers.isNotEmpty(),
                 Utils.parseISODateToMillis(postedOn),
-                userDataFromCurrentList?.name ?: "", "",
+                userDataFromCurrentList?.name ?: "",
+                userDataFromCurrentList?.profilePic ?: "",
                 likes.size,
                 answers.size,
                 answers.toAnswersUiModel(),
@@ -297,7 +304,7 @@ class QueriesVM(
             Answer(
                 id,
                 userDataFromCurrentList?.name ?: "",
-                "",
+                userDataFromCurrentList?.profilePic ?: "",
                 Utils.parseISODateToMillis(answeredOn),
                 likes.size,
                 dislikes.size,
