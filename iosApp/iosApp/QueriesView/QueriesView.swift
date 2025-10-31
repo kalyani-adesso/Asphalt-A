@@ -105,11 +105,19 @@ struct QueriesView: View {
                         .transition(.scale)
                         .zIndex(2)
                 }
+                if viewModel.isLiking {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                    ProgressView("Loading...")
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .padding(.top, 100)
+                        .foregroundColor(.white)
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-            viewModel.loadQueries()
+            viewModel.fetchAllQueries()
         }
         
     }

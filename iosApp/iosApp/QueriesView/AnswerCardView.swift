@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AnswerCardView: View {
     let answer: Answer
+    var query: Query
+    @ObservedObject var viewModel: QueryViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -37,7 +39,7 @@ struct AnswerCardView: View {
                             .background(AppColor.backgroundLight)
                             .cornerRadius(6)
                         }
-    
+                        
                         Spacer()
                         Text(answer.daysAgo)
                             .font(KlavikaFont.regular.font(size: 12))
@@ -54,21 +56,45 @@ struct AnswerCardView: View {
             
             HStack(spacing: 16) {
                 HStack(spacing: 6) {
-                    AppIcon.Queries.like
+                    Button {
+                        Task {
+                            if viewModel.isLikedQuery {
+                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
+                            } else {
+                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: true)
+                            }
+                            
+                            
+                        }
+                    } label: {
+                        AppIcon.Queries.like
                             .resizable()
                             .scaledToFit()
                             .frame(width: 18, height: 18)
-                    Text("\(answer.likes)")
-                        .font(KlavikaFont.medium.font(size: 14))
+                        Text("\(answer.likes)")
+                            .foregroundColor(AppColor.black)
+                            .font(KlavikaFont.medium.font(size: 14))
                     }
+                }
                 HStack(spacing: 6) {
-                    AppIcon.Queries.dislike
+                    Button {
+                        Task {
+                            if viewModel.isLikedQuery {
+                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
+                            } else {
+                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: false)
+                            }
+                        }
+                    } label: {
+                        AppIcon.Queries.dislike
                             .resizable()
                             .scaledToFit()
                             .frame(width: 18, height: 18)
-                    Text("\(answer.dislikes)")
-                        .font(KlavikaFont.medium.font(size: 14))
+                        Text("\(answer.dislikes)")
+                            .foregroundColor(AppColor.black)
+                            .font(KlavikaFont.medium.font(size: 14))
                     }
+                }
                 Spacer()
             }
             .padding(.top, 4)
@@ -83,13 +109,3 @@ struct AnswerCardView: View {
     }
 }
 
-#Preview {
-    AnswerCardView(answer: Answer(
-        author: "Abhishek",
-        role: "Mechanic",
-        daysAgo: "5 days ago",
-        content: "For your Ninja 650, I recommend using Kawasaki 4-Stroke Oil 10W-40 or Motul 7100 10W-40. Both are excellent choices that meet the JASO MA2 specification.",
-        likes: 10,
-        dislikes: 1
-    ))
-}
