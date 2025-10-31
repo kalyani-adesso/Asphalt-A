@@ -49,7 +49,7 @@ import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun EditProfile(
-    onSaveChanges:()->Unit,
+    onSaveChanges: (String, String, String, String, String, Boolean) -> Unit,
     onDismiss: () -> Unit,
     editProfileVM: EditProfileVM = koinViewModel(),
     profileSectionVM: ProfileSectionVM = koinActivityViewModel()
@@ -59,7 +59,6 @@ fun EditProfile(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         val scope = rememberCoroutineScope()
-//        val profileData = editProfileVM.currentProfile.collectAsStateWithLifecycle()
         val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
         val fullName = editProfileVM.editFullName.collectAsStateWithLifecycle()
         val email = editProfileVM.editEmail.collectAsStateWithLifecycle()
@@ -72,7 +71,7 @@ fun EditProfile(
         val phoneNumberError = editProfileVM.phoneNumberError.collectAsStateWithLifecycle()
         val licenseError = editProfileVM.licenseError.collectAsStateWithLifecycle()
         val emergencyNoError = editProfileVM.emergencyNoError.collectAsStateWithLifecycle()
-        LaunchedEffect(profileData) {
+        LaunchedEffect(profileData.value) {
             editProfileVM.setCurrentProfile(profileData.value)
         }
 
@@ -165,7 +164,7 @@ fun EditProfile(
                         {
                             editProfileVM.updateEmail(it)
                         },
-                        stringResource(R.string.enter_email_placeholder ),
+                        stringResource(R.string.enter_email_placeholder),
                         emailError.value,
                         stringResource(R.string.enter_valid_email)
                     )
@@ -255,8 +254,14 @@ fun EditProfile(
                             onClick = {
                                 scope.launch {
                                     if (editProfileVM.validateProfileFields()) {
-                                        editProfileVM.editProfile(profileData.value?.uid)
-                                        onSaveChanges()
+                                        onSaveChanges(
+                                            fullName.value,
+                                            email.value,
+                                            phoneNumber.value,
+                                            license.value,
+                                            emergencyNo.value,
+                                            mechanic.value
+                                        )
                                         onDismiss.invoke()
                                     }
                                 }

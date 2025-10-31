@@ -120,24 +120,7 @@ class EditProfileVM(val profileRepository: ProfileRepository) : ViewModel() {
     }
 
 
-    suspend fun editProfile(uid: String?) {
-        uid?.let {
-            APIHelperUI.handleApiResult(
-                APIHelperUI.runWithLoader {
-                    profileRepository.editProfile(
-                        it, _editFullName.value,
-                        _editEmail.value, _editPhoneNumber.value,
-                        _editEmail.value,
-                        _editLicense.value,
-                        _editMechanic.value
-                    )
-                }, viewModelScope
-            ) {
 
-            }
-
-        }
-    }
 
     fun setCurrentProfile(profileUIModel: ProfileUIModel?) {
         _editMechanic.value = profileUIModel?.isMechanic ?: false

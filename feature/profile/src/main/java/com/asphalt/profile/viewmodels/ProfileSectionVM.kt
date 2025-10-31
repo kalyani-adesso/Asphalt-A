@@ -22,9 +22,38 @@ class ProfileSectionVM(val profileRepository: ProfileRepository) :
                     uid ?: ""
                 )
             }, this) {
-               _profileData.value =  it.toProfileUIModel()
+                _profileData.value = it.toProfileUIModel()
             }
 
+        }
+    }
+
+    fun editProfile(
+        uid: String?,
+        userName: String,
+        email: String,
+        contact: String,
+        emergencyNumber: String,
+        licenseNo: String,
+        isMechanic: Boolean
+    ) {
+        viewModelScope.launch {
+            uid?.let {
+                APIHelperUI.handleApiResult(
+                    APIHelperUI.runWithLoader {
+                        profileRepository.editProfile(
+                            it, userName,
+                            email, contact,
+                            emergencyNumber,
+                            licenseNo,
+                            isMechanic
+                        )
+                    }, viewModelScope
+                ) {
+                    getProfileData(uid)
+                }
+
+            }
         }
     }
 

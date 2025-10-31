@@ -39,7 +39,7 @@ fun ProfileScreen(
 ) {
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
     var showEditProfile by remember { mutableStateOf(false) }
-    LaunchedEffect(user) {
+    LaunchedEffect(user.value) {
         profileSectionVM.getProfileData(user.value?.uid)
     }
 
@@ -66,8 +66,16 @@ fun ProfileScreen(
             EditProfile(onDismiss = {
                 showEditProfile = false
 
-            }, onSaveChanges = {
-                profileSectionVM.getProfileData(user.value?.uid)
+            }, onSaveChanges = { name, email, contact, license, emergencyContact, isMechanic ->
+                profileSectionVM.editProfile(
+                    user.value?.uid,
+                    name,
+                    email,
+                    contact,
+                    emergencyContact,
+                    license,
+                    isMechanic
+                )
             })
 
 
