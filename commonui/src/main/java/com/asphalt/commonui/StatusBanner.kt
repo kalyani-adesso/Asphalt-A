@@ -89,7 +89,7 @@ fun StatusBanner(
                     radius = Dimensions.radius6,
                     resId = bannerUIElements.iconRes
                 )
-                Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor, overflow = TextOverflow.Ellipsis)
+                Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor, overflow = TextOverflow.Ellipsis, maxLines = 1)
 
             }
         }
