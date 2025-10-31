@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -47,6 +48,10 @@ fun BikeCarousel(addBikesVM: AddBikesVM) {
     }
     val rightEnabled by remember {
         derivedStateOf { pagerState.currentPage < pagerState.pageCount - 1 }
+    }
+    val selectedBikeType by remember {   derivedStateOf { bikeCarousels[pagerState.currentPage].id }}
+    LaunchedEffect(selectedBikeType) {
+        addBikesVM.updateBikeType(selectedBikeType)
     }
     Column {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -116,7 +121,7 @@ fun BikeCarousel(addBikesVM: AddBikesVM) {
                     contentScale = ContentScale.FillWidth
                 )
                 ComposeUtils.SectionTitle(stringResource(bikeCarousels[page].typeRes))
-                addBikesVM.updateBikeType(bikeCarousels[page].id)
+
             }
         }
     }

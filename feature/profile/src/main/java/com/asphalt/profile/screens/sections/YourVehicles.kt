@@ -54,8 +54,8 @@ fun YourVehiclesSection(yourVehiclesVM: YourVehiclesVM = koinViewModel()) {
             if (showPopup)
                 AddBikePopup({
                     showPopup = false
-                }, onAddBike = {
-                    yourVehiclesVM.addVehicle(it)
+                }, onAddBike = { type, make, model ->
+                    yourVehiclesVM.addBike(type, model, make)
                 })
             ComposeUtils.RoundedIconWithHeaderComponent(
                 PrimaryBrighterLightW50,
@@ -69,16 +69,13 @@ fun YourVehiclesSection(yourVehiclesVM: YourVehiclesVM = koinViewModel()) {
                 }
             else {
                 YourGarage(yourVehiclesList.value, {
-                    yourVehiclesVM.deleteVehicle(it)
+                    yourVehiclesVM.deleteBike(it.id)
                 }, {
                     showPopup = true
 
                 })
             }
-
-
         }
-
     }
 
 

@@ -1,21 +1,24 @@
 package com.asphalt.profile.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.asphalt.profile.data.VehicleData
 import com.asphalt.profile.sealedclasses.BikeType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class AddBikesVM : ViewModel() {
+class AddBikesVM :
+    ViewModel() {
+
     private val _make = MutableStateFlow("")
     val make: StateFlow<String> = _make
 
     private val _bikeType = MutableStateFlow(BikeType.SportsBike.id)
-    val bikeType: StateFlow<Int> = _bikeType
     fun updateMake(input: String) {
         _makeError.value = false
         _make.value = input
     }
+
+    val bikeType = _bikeType.asStateFlow()
 
     private val _makeError = MutableStateFlow(false)
     val makeError: StateFlow<Boolean> = _makeError
@@ -30,7 +33,7 @@ class AddBikesVM : ViewModel() {
         _model.value = input
     }
 
-    fun addBike(): VehicleData? {
+    fun addBike(onValidation: () -> Unit) {
         var isValidFields = true
         if (_make.value.isEmpty()) {
             _makeError.value = true
@@ -40,11 +43,11 @@ class AddBikesVM : ViewModel() {
             _modelError.value = true
             isValidFields = false
         }
-        return if (isValidFields)
-            VehicleData(_make.value, _model.value, _bikeType.value)
-        else null
+        if (isValidFields)
+            onValidation()
     }
-    fun updateBikeType(id:Int){
+
+    fun updateBikeType(id: Int) {
         _bikeType.value = id
     }
 
