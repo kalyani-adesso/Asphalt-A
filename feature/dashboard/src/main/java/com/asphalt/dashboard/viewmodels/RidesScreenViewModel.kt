@@ -4,11 +4,22 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
+import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class RidesScreenViewModel : ViewModel() {
+
+class RidesScreenViewModel : ViewModel(), KoinComponent {
+    val ridesRepo: RidesRepository by inject()
+    val userRepoImpl: UserRepoImpl by inject()
     private val _tabSelectionMutableFlow: MutableState<Int> = mutableStateOf(
         RideStatConstants.UPCOMING_RIDE
     )
@@ -22,6 +33,65 @@ class RidesScreenViewModel : ViewModel() {
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
     }
+
+    fun getRides1() {
+
+        viewModelScope.launch {
+            var user = userRepoImpl.getUserDetails()
+            val apiResult = APIHelperUI.runWithLoader {
+                ridesRepo.getAllRide()
+            }
+            APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
+
+                var resp = mapToYourRideDataModel(response, user?.uid ?: "")
+                var upcomiList = ArrayList<YourRideDataModel>()
+                upcomiList.addAll(resp)
+                var ridesList =
+                    YourRideRoot(upcoming = upcomiList, )//history = hirtoryList, invite = inviteList
+                _ridesListMutableState.value = ridesList
+            }
+            //response.mapApiResult { it }
+        }
+
+    }
+
+
+    fun mapToYourRideDataModel(
+        allRides: List<RidesData>,
+        userId: String
+    ): List<YourRideDataModel> {
+        // val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+
+        return allRides.mapNotNull { ride ->
+
+            val rideStatus: String? = when {
+                ride.userID == userId -> "Queue"
+
+                else -> {
+                    val participant = ride.participants.find { it.userId == userId }
+                    participant?.let {
+                        when (it.inviteStatus) {
+                            1 -> "Upcoming"
+                            else -> ""
+                        }
+                    }
+                }
+            }
+
+
+            if (rideStatus == null) return@mapNotNull null
+
+            YourRideDataModel(
+                title = ride.rideTitle ?: "",
+                place = ride.startLocation ?: "",
+                rideStatus = rideStatus,
+                //date = ride.startDate?.let { dateFormatter.format(Date(it)) } ?: "",
+                date = " ${ride.startDate}",
+                riders = ride.participants.size.toString()
+            )
+        }
+    }
+
 
     fun getRides() {
         var upcoming = YourRideDataModel(
@@ -76,11 +146,9 @@ class RidesScreenViewModel : ViewModel() {
         upcomiList.add(upcoming2)
 
 
-
         var hirtoryList = ArrayList<YourRideDataModel>()
         hirtoryList.add(hirtory)
         hirtoryList.add(hirtory1)
-
 
 
         var inviteList = ArrayList<YourRideDataModel>()

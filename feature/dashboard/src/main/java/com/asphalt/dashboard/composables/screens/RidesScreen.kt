@@ -70,6 +70,7 @@ fun RidesScreen(setTopAppBarState: (AppBarState) -> Unit) {
     LaunchedEffect(Unit) {
         ridesScreenViewModel.getRides()
     }
+    ridesScreenViewModel.getRides1()
     AsphaltTheme {
         Column(
             modifier = Modifier

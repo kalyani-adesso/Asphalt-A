@@ -9,4 +9,5 @@ interface RidesApIService {
         createRideRoot: CreateRideRoot
     ): APIResult<GenericResponse>
 
+    suspend fun getAllRide() :  APIResult<Map<String, CreateRideRoot>>
 }

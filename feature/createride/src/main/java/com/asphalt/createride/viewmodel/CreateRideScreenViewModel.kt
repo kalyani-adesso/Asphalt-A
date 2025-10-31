@@ -31,6 +31,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val userRepoImpl: UserRepoImpl by inject()
     val ridesRepo: RidesRepository by inject()
 
+
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
