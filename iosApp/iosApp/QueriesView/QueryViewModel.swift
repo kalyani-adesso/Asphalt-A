@@ -13,6 +13,7 @@ import shared
 class QueryViewModel: ObservableObject {
     private let queryRepo: QueryRepository
     private let userRepo: UserRepository
+    private let currentUserId = MBUserDefaults.userIdStatic ?? ""
     enum QueryCategory: String, CaseIterable {
         case All, Maintenance, Routes, Gear, Safety, Other
     }
@@ -39,7 +40,7 @@ class QueryViewModel: ObservableObject {
     }
     @Published var askQuery = AskQuery()
     @Published var queriesResult: [Query] = []
-    @Published private var usersById: [String: UserData] = [:]
+    @Published private var usersById: [String: UserDomain] = [:]
     @Published var selectedCategory: String? = QueryCategory.All.rawValue
     @Published var isLoading = false
     @Published var answerText: String = ""
@@ -78,7 +79,6 @@ class QueryViewModel: ObservableObject {
                     
                     // show likes/dislikes in fetching
                     for query in self.queriesResult {
-                        let currentUserId = "OoYGII16wtRbooBdYYDCAwHyFf62"
                         
                         if query.likesDict[currentUserId] == true {
                             likedQueries.insert(query.apiId)
@@ -115,7 +115,7 @@ class QueryViewModel: ObservableObject {
         let result = try await userRepo.getAllUsers()
         
         if let success = result as? APIResultSuccess<AnyObject>,
-           let users = success.data as? [UserData] {
+           let users = success.data as? [UserDomain] {
             for user in users {
                 print("User: \(user.uid) - \(user.name)")
             }
@@ -263,7 +263,7 @@ class QueryViewModel: ObservableObject {
                 queryDescription: askQuery.description,
                 categoryId: Int32(category.backendId),
                 postedOn: timeToPostValue(),
-                postedBy: "OoYGII16wtRbooBdYYDCAwHyFf62"
+                postedBy: currentUserId
             )
             
             if result is APIResultSuccess<GenericResponse> {
@@ -289,7 +289,7 @@ class QueryViewModel: ObservableObject {
                 let result = try await queryRepo.addAnswer(
                     queryId: query.apiId,
                     answer: answerText,
-                    answeredBy: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                    answeredBy: currentUserId,
                     answeredOn: timeToPostValue()
                 )
                 print(result)
@@ -311,7 +311,7 @@ class QueryViewModel: ObservableObject {
             isLiking = true
             do {
                 let result = try await queryRepo.likeQuery(
-                    userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                    userId: currentUserId,
                     queryId: query.apiId
                     
                 )
@@ -337,7 +337,7 @@ class QueryViewModel: ObservableObject {
         isLiking = true
         do {
             let result = try await queryRepo.removeLikeQuery(
-                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                userId: currentUserId,
                 queryId: query.apiId
                 
             )
@@ -362,7 +362,7 @@ class QueryViewModel: ObservableObject {
         isLiking = true
         do {
             let result = try await queryRepo.likeOrDislikeAnswer(
-                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                userId: currentUserId,
                 queryId: query.apiId,
                 answerId: answer.apiId,
                 isLike: isLikeorDisLike
@@ -397,7 +397,7 @@ class QueryViewModel: ObservableObject {
         isLiking = true
         do {
             let result = try await queryRepo.removeLikeOrDislikeAnswer(
-                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                userId: currentUserId,
                 queryId: query.apiId,
                 answerId: answer.apiId
             )
