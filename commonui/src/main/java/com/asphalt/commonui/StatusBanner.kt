@@ -19,6 +19,7 @@ import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT25
 import com.asphalt.commonui.theme.LightGreen
+import com.asphalt.commonui.theme.MutedRose
 import com.asphalt.commonui.theme.OrangeLight10
 import com.asphalt.commonui.theme.PaleMint
 import com.asphalt.commonui.theme.PalePink
@@ -104,5 +105,5 @@ sealed class BannerUIElements(
         BannerUIElements(PaleMint, LightGreen, GreenLIGHT25, R.drawable.ic_tick)
 
     object ErrorBannerElement :
-        BannerUIElements(PalePink, OrangeLight10, VividRed, R.drawable.ic_close)
+        BannerUIElements(PalePink, MutedRose, VividRed, R.drawable.ic_close)
 }
