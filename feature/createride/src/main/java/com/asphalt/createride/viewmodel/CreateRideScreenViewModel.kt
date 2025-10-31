@@ -1,17 +1,23 @@
 package com.asphalt.createride.viewmodel
 
 import android.content.Context
+import android.icu.util.Calendar
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserData
+import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
@@ -22,6 +28,7 @@ import org.koin.core.component.inject
 class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val userRepo: UserRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
+    val ridesRepo: RidesRepository by inject()
 
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
@@ -182,6 +189,42 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                 RideType(Constants.OPEN_EVENT, context.getString(R.string.open_event))
             )
         return type
+    }
+
+    suspend fun createRide() {
+        val cal = Calendar.getInstance()
+        val userDetails = userRepoImpl.getUserDetails()
+        val map: Map<String, UserInvites> =
+            _ridersListMutable.value.filter { it.isSelect == true }
+                .associate { rider ->
+                    rider.id.orEmpty() to UserInvites(
+                        acceptInvite = 0
+                    )
+                } ?: emptyMap()
+        var createRide: CreateRideRoot = CreateRideRoot(
+            userID = userDetails?.uid,
+            rideType = _rideDetailsMutableState.value.rideType,
+            rideTitle = _rideDetailsMutableState.value.rideTitle,
+            description = _rideDetailsMutableState.value.description,
+            startDate = Utils.getDate(
+                _rideDetailsMutableState.value.dateMils ?: 0,
+                _rideDetailsMutableState.value.hour ?: 0,
+                _rideDetailsMutableState.value.mins ?: 0,
+                _rideDetailsMutableState.value.isAm
+            ),
+            startLocation = _rideDetailsMutableState.value.startLocation,
+            endLocation = _rideDetailsMutableState.value.endLocation,
+            createdDate = cal.timeInMillis,
+            participants = map
+        )
+
+        val apiResult = APIHelperUI.runWithLoader {
+            ridesRepo.createRide(createRide)
+        }
+        APIHelperUI.handleApiResult(apiResult, viewModelScope) {
+            updateTab(1)
+            //UIStateHandler.sendEvent(UIState.SUCCESS("Added query successfully!"))
+        }
     }
 
 
