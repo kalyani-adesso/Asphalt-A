@@ -9,30 +9,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT25
 import com.asphalt.commonui.theme.LightGreen
-import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.OrangeLight10
 import com.asphalt.commonui.theme.PaleMint
 import com.asphalt.commonui.theme.PalePink
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.utils.ComposeUtils
 import kotlinx.coroutines.delay
 
 
@@ -88,14 +81,12 @@ fun StatusBanner(
                     Dimensions.spacing10
                 )
             ) {
-                RoundedBox(
-                    modifier = Modifier.size(Dimensions.padding28),
-                    contentAlignment = Alignment.Center,
-                    backgroundColor = bannerUIElements.bodyColor,
-                    cornerRadius = Dimensions.radius6
-                ) {
-                    Icon(painterResource(bannerUIElements.iconRes), null, tint = NeutralWhite)
-                }
+                ComposeUtils.ColorIconRounded(
+                    backColor = bannerUIElements.bodyColor,
+                    size = Dimensions.padding28,
+                    radius = Dimensions.radius6,
+                    resId = bannerUIElements.iconRes
+                )
                 Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor)
 
             }
