@@ -6,6 +6,7 @@ import com.asphalt.android.constants.APIConstants.USERS_URL
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.profile.BikeDTO
+import com.asphalt.android.model.profile.EditProfileRequestDTO
 import com.asphalt.android.model.profile.ProfileDTO
 import com.asphalt.android.network.BaseAPIService
 import com.asphalt.android.network.KtorClient
@@ -21,8 +22,8 @@ class ProfileAPIServiceImpl(client: KtorClient) : BaseAPIService(client),
 
     override suspend fun editProfile(
         userId: String,
-        profile: ProfileDTO
-    ): APIResult<GenericResponse> {
+        profile: EditProfileRequestDTO
+    ): APIResult<Unit> {
         return safeApiCall {
             patch(profile, "$USERS_URL/$userId").body()
         }
@@ -46,7 +47,7 @@ class ProfileAPIServiceImpl(client: KtorClient) : BaseAPIService(client),
         }
     }
 
-    override suspend fun getBikes(userId: String): APIResult<Map<String, BikeDTO>> {
+    override suspend fun getBikes(userId: String): APIResult<Map<String, BikeDTO>?> {
         return safeApiCall {
             get("$USERS_URL/$userId$BIKES_URL").body()
         }

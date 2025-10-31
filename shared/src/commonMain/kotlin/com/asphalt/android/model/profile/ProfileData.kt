@@ -22,6 +22,21 @@ data class ProfileDTO(
 )
 
 @Serializable
+data class EditProfileRequestDTO(
+    @SerialName("user_name")
+    val userName: String,
+    val email: String,
+    @SerialName("phone_number")
+    val phoneNumber: String,
+    @SerialName("emergency_contact")
+    val emergencyContact: String,
+    @SerialName("driving_license")
+    val drivingLicense: String,
+    @SerialName("is_mechanic")
+    val isMechanic: Boolean,
+)
+
+@Serializable
 data class BikeDTO(
 
     @SerialName("bike_type")
@@ -39,7 +54,8 @@ data class ProfileDomain(
     val emergencyContact: String,
     val drivingLicense: String,
     val isMechanic: Boolean,
-    val bikes: List<BikeDomain>
+    val bikes: List<BikeDomain>,
+    val profilePicUrl: String,
 )
 
 data class BikeDomain(

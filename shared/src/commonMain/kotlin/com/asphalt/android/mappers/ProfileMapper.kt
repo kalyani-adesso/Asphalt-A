@@ -30,6 +30,7 @@ fun BikeDTO.toBikeDomain(id: String): BikeDomain {
         emergencyContact = emergencyContact,
         drivingLicense = drivingLicense,
         isMechanic = isMechanic,
-        bikes = bikes?.map { (key, value) -> value.toBikeDomain(key) }.orEmpty()
+        bikes = bikes?.map { (key, value) -> value.toBikeDomain(key) }.orEmpty(),
+        profilePicUrl = profilePicUrl
     )
 }

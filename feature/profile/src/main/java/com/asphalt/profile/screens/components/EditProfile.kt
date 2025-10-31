@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,20 +42,25 @@ import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.CustomSwitch
 import com.asphalt.commonui.utils.ComposeUtils.HeaderWithInputField
 import com.asphalt.profile.viewmodels.EditProfileVM
+import com.asphalt.profile.viewmodels.ProfileSectionVM
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun EditProfile(
+    onSaveChanges:()->Unit,
     onDismiss: () -> Unit,
-    editProfileVM: EditProfileVM = koinViewModel()
+    editProfileVM: EditProfileVM = koinViewModel(),
+    profileSectionVM: ProfileSectionVM = koinActivityViewModel()
 ) {
     Dialog(
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         val scope = rememberCoroutineScope()
-        val profileData = editProfileVM.currentProfile.collectAsStateWithLifecycle()
+//        val profileData = editProfileVM.currentProfile.collectAsStateWithLifecycle()
+        val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
         val fullName = editProfileVM.editFullName.collectAsStateWithLifecycle()
         val email = editProfileVM.editEmail.collectAsStateWithLifecycle()
         val phoneNumber = editProfileVM.editPhoneNumber.collectAsStateWithLifecycle()
@@ -66,6 +72,9 @@ fun EditProfile(
         val phoneNumberError = editProfileVM.phoneNumberError.collectAsStateWithLifecycle()
         val licenseError = editProfileVM.licenseError.collectAsStateWithLifecycle()
         val emergencyNoError = editProfileVM.emergencyNoError.collectAsStateWithLifecycle()
+        LaunchedEffect(profileData) {
+            editProfileVM.setCurrentProfile(profileData.value)
+        }
 
         Box(
             modifier = Modifier
@@ -246,7 +255,8 @@ fun EditProfile(
                             onClick = {
                                 scope.launch {
                                     if (editProfileVM.validateProfileFields()) {
-                                        editProfileVM.editProfile()
+                                        editProfileVM.editProfile(profileData.value?.uid)
+                                        onSaveChanges()
                                         onDismiss.invoke()
                                     }
                                 }

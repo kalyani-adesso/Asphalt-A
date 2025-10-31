@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,17 +26,22 @@ import com.asphalt.profile.screens.sections.AchievementsSection
 import com.asphalt.profile.screens.sections.ProfileSection
 import com.asphalt.profile.screens.sections.TotalStatisticsSection
 import com.asphalt.profile.screens.sections.YourVehiclesSection
+import com.asphalt.profile.viewmodels.ProfileSectionVM
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     androidUserVM: AndroidUserVM = koinViewModel(),
-    setTopAppBarState: (AppBarState) -> Unit,
-
-    ) {
+    profileSectionVM: ProfileSectionVM = koinActivityViewModel(),
+    setTopAppBarState: (AppBarState) -> Unit
+) {
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
     var showEditProfile by remember { mutableStateOf(false) }
+    LaunchedEffect(user) {
+        profileSectionVM.getProfileData(user.value?.uid)
+    }
 
     setTopAppBarState(AppBarState(stringResource(R.string.profile), actions = {
         ComposeUtils.ColorIconRounded(
@@ -52,7 +58,7 @@ fun ProfileScreen(
     val bottomPadding = Dimensions.size0
     ComposeUtils.DefaultColumnRoot(topPadding, bottomPadding) {
         Spacer(Modifier.height(Dimensions.size20))
-        ProfileSection(user.value)
+        ProfileSection()
         YourVehiclesSection()
         TotalStatisticsSection()
         AchievementsSection()
@@ -60,6 +66,8 @@ fun ProfileScreen(
             EditProfile(onDismiss = {
                 showEditProfile = false
 
+            }, onSaveChanges = {
+                profileSectionVM.getProfileData(user.value?.uid)
             })
 
 

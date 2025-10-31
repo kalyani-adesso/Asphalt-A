@@ -8,7 +8,7 @@ import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.profile.BikeDTO
 import com.asphalt.android.model.profile.BikeDomain
-import com.asphalt.android.model.profile.ProfileDTO
+import com.asphalt.android.model.profile.EditProfileRequestDTO
 import com.asphalt.android.model.profile.ProfileDomain
 import com.asphalt.android.network.profile.ProfileAPIService
 
@@ -45,8 +45,8 @@ class ProfileRepository(private val apiService: ProfileAPIService) {
         emergencyContact: String,
         drivingLicense: String,
         isMechanic: Boolean
-    ): APIResult<GenericResponse> {
-        val profileDto = ProfileDTO(
+    ): APIResult<Unit> {
+        val profileDto = EditProfileRequestDTO(
             userName = userName,
             email = email,
             phoneNumber = contactNumber,
@@ -55,7 +55,6 @@ class ProfileRepository(private val apiService: ProfileAPIService) {
             isMechanic = isMechanic
         )
         return apiService.editProfile(userId, profileDto).mapApiResult {
-            it
         }
     }
 
