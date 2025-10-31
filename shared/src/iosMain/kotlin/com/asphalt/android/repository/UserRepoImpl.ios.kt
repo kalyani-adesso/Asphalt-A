@@ -31,7 +31,7 @@ actual class UserRepoImpl actual constructor() : UserRepo {
             eventType = FIRDataEventType.FIRDataEventTypeValue,
             withBlock = { snapshot ->
                 val data = snapshot?.value() as? Map<*, *>
-                val name = (data?.get("userName")) as? String ?: "Guest"
+                val name = (data?.get("user_name")) as? String ?: "Guest"
 
                 cont.resume(
                     CurrentUser(
