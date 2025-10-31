@@ -64,7 +64,7 @@ fun LoginSuccessScreen(exploreClick: () -> Unit) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_success),
+                    painter = painterResource(R.drawable.ic_login_success),
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
 
