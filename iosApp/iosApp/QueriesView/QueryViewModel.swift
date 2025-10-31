@@ -18,11 +18,25 @@ class QueryViewModel: ObservableObject {
     }
     var queryStatus: [QueryCategory] = QueryCategory.allCases
     var filteredQueries: [Query] {
-        guard let category = selectedCategory else { return queriesResult }
-        if category == "All" { return queriesResult }
-        return queriesResult.filter { $0.tags.contains(category) }
+        
+        var filtered = queriesResult
+        
+        //category filter
+        if let category = selectedCategory, category != "All" {
+            filtered = filtered.filter { $0.tags.contains(category) }
+        }
+        
+        //search filter
+        if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+            filtered = filtered.filter {
+                $0.title.localizedCaseInsensitiveContains(searchText) ||
+                $0.content.localizedCaseInsensitiveContains(searchText) ||
+                $0.author.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+        
+        return filtered
     }
-    
     @Published var askQuery = AskQuery()
     @Published var queriesResult: [Query] = []
     @Published private var usersById: [String: UserData] = [:]
@@ -33,6 +47,10 @@ class QueryViewModel: ObservableObject {
     @Published var isLikedQuery: Bool = false
     @Published var isLikedAnswer: Bool = false
     @Published var isLiking = false
+    @Published  var searchText = ""
+    @Published var likedQueries: Set<String> = []
+    @Published var likedAnswers: Set<String> = []
+    @Published var disLikedAnswers: Set<String> = []
     
     init() {
         let queryApiService = QueryAPIServiceImpl(client: KtorClient())
@@ -57,6 +75,25 @@ class QueryViewModel: ObservableObject {
                    let domains = success.data as? [QueryDomain] {
                     
                     self.queriesResult = mapQueries(domains)
+                    
+                    // show likes/dislikes in fetching
+                    for query in self.queriesResult {
+                        let currentUserId = "OoYGII16wtRbooBdYYDCAwHyFf62"
+                        
+                        if query.likesDict[currentUserId] == true {
+                            likedQueries.insert(query.apiId)
+                        }
+                        
+                        for answer in query.answers {
+                            if answer.likesAnsDict[currentUserId] == true {
+                                likedAnswers.insert(answer.apiId)
+                            }
+                            if answer.disLikesAnsDict[currentUserId] == true {
+                                disLikedAnswers.insert(answer.apiId)
+                            }
+                        }
+                    }
+                    
                     
                     if showLoader { isLoading = false }
                     await MainActor.run {
@@ -103,6 +140,26 @@ class QueryViewModel: ObservableObject {
             let answers: [Answer] = domain.answers.map { ans in
                 let answeredByName = usersById[ans.answeredBy]?.name ?? "Unknown User"
                 
+                let likes: [String: Bool]
+                let dislikes: [String: Bool]
+                
+                if let likeKeys = ans.likes as? [String] {
+                    likes = Dictionary(uniqueKeysWithValues: likeKeys.map { ($0, true) })
+                } else if let likeMap = ans.likes as? [String: Bool] {
+                    likes = likeMap
+                } else {
+                    likes = [:]
+                }
+
+                if let dislikeKeys = ans.dislikes as? [String] {
+                    dislikes = Dictionary(uniqueKeysWithValues: dislikeKeys.map { ($0, true) })
+                } else if let dislikeMap = ans.dislikes as? [String: Bool] {
+                    dislikes = dislikeMap
+                } else {
+                    dislikes = [:]
+                }
+                
+                
                 return Answer(
                     apiId: ans.id,
                     author: answeredByName,
@@ -110,7 +167,9 @@ class QueryViewModel: ObservableObject {
                     daysAgo: timeAgoString(from: parseDate(ans.answeredOn)),
                     content: ans.answer,
                     likes: ans.likes.count,
-                    dislikes: ans.dislikes.count
+                    dislikes: ans.dislikes.count,
+                    likesAnsDict: likes,
+                    disLikesAnsDict: dislikes
                 )
             }
             
@@ -134,6 +193,15 @@ class QueryViewModel: ObservableObject {
             
             let combinedTags = [categoryTag, answerTag]
             
+            let queryLikesDict: [String: Bool]
+            if let likeKeys = domain.likes as? [String] {
+                queryLikesDict = Dictionary(uniqueKeysWithValues: likeKeys.map { ($0, true) })
+            }
+            else{
+                queryLikesDict = [:]
+            }
+            
+            
             return Query(
                 apiId: domain.id,
                 title: domain.title,
@@ -143,7 +211,8 @@ class QueryViewModel: ObservableObject {
                 content: domain.description_,
                 answers: answers,
                 likes: domain.likes.count,
-                comments: answers.count
+                comments: answers.count,
+                likesDict: queryLikesDict
             )
         }
     }
@@ -214,8 +283,8 @@ class QueryViewModel: ObservableObject {
             print("No query selected!")
             return
         }
-        Task{
-                isLiking = true
+       
+            isLiking = true
             do {
                 let result = try await queryRepo.addAnswer(
                     queryId: query.apiId,
@@ -231,7 +300,7 @@ class QueryViewModel: ObservableObject {
             } catch {
                 print(" Exception: \(error.localizedDescription)")
             }
-        }
+        
     }
     
     
@@ -252,8 +321,9 @@ class QueryViewModel: ObservableObject {
                     self.fetchAllQueries(showLoader: false)
                     if let index = queriesResult.firstIndex(where: { $0.apiId == query.apiId }) {
                         queriesResult[index].likes = 1
-                        isLikedQuery = true
+                        
                     }
+                    likedQueries.insert(query.apiId)
                 }
             } catch {
                 print(" Exception: \(error.localizedDescription)")
@@ -273,9 +343,13 @@ class QueryViewModel: ObservableObject {
             )
             print(result)
             if result is APIResultSuccess<GenericResponse> {
-                isLikedQuery = false //for icon fill
                 print(" Removed Like from Query successfully!")
                 self.fetchAllQueries(showLoader: false)
+                if let index = queriesResult.firstIndex(where: { $0.apiId == query.apiId }),
+                   queriesResult[index].likes > 0 {
+                    queriesResult[index].likes -= 1
+                }
+                likedQueries.remove(query.apiId)
             }
         } catch {
             print(" Exception: \(error.localizedDescription)")
@@ -294,10 +368,23 @@ class QueryViewModel: ObservableObject {
                 isLike: isLikeorDisLike
             )
             print(result)
-            if result is APIResultSuccess<GenericResponse> {
+            if result is APIResultSuccess<GenericResponse> ,
+               let qIndex = queriesResult.firstIndex(where: { $0.apiId == query.apiId }),
+               let aIndex = queriesResult[qIndex].answers.firstIndex(where: { $0.apiId == answer.apiId }) {
                 print(" Liked Answer successfully! ")
                 self.fetchAllQueries(showLoader: false)
-                isLikedAnswer = true
+                
+                
+                if isLikeorDisLike {
+                    queriesResult[qIndex].answers[aIndex].likes += 1
+                    likedAnswers.insert(answer.apiId)
+                    disLikedAnswers.remove(answer.apiId)
+                } else {
+                    queriesResult[qIndex].answers[aIndex].dislikes += 1
+                    disLikedAnswers.insert(answer.apiId)
+                    likedAnswers.remove(answer.apiId)
+                }
+                
             }
         } catch {
             print(" Exception: \(error.localizedDescription)")
@@ -315,14 +402,29 @@ class QueryViewModel: ObservableObject {
                 answerId: answer.apiId
             )
             print(result)
-            if result is APIResultSuccess<GenericResponse> {
+            if result is APIResultSuccess<GenericResponse> ,
+               let qIndex = queriesResult.firstIndex(where: { $0.apiId == query.apiId }),
+               let aIndex = queriesResult[qIndex].answers.firstIndex(where: { $0.apiId == answer.apiId }) {
                 print(" Removed Liked Answer successfully! ")
                 self.fetchAllQueries(showLoader: false)
-                isLikedAnswer = false
+                
+                if likedAnswers.contains(answer.apiId),
+                   queriesResult[qIndex].answers[aIndex].likes > 0 {
+                    queriesResult[qIndex].answers[aIndex].likes -= 1
+                    likedAnswers.remove(answer.apiId)
+                }
+                
+                if disLikedAnswers.contains(answer.apiId),
+                   queriesResult[qIndex].answers[aIndex].dislikes > 0 {
+                    queriesResult[qIndex].answers[aIndex].dislikes -= 1
+                    disLikedAnswers.remove(answer.apiId)
+                }
+                
             }
         } catch {
             print(" Exception: \(error.localizedDescription)")
         }
     }
+    
     
 }

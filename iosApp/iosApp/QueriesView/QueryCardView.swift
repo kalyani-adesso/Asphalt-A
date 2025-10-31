@@ -60,7 +60,7 @@ struct QueryCardView: View {
             
             // Answers
             ForEach(query.answers) { answer in
-                AnswerCardView(answer: answer, query: query, viewModel: viewModel)
+                AnswerCardView(viewModel: viewModel, answer: answer, query: query)
             }
             
             Divider()
@@ -70,7 +70,7 @@ struct QueryCardView: View {
                 HStack(spacing: 6) {
                     Button {
                         Task {
-                            if viewModel.isLikedQuery {
+                            if viewModel.likedQueries.contains(query.apiId) {
                                 await viewModel.RemoveQuery(for: query)
                             } else {
                                 await viewModel.likeQuery(for: query)
@@ -79,12 +79,9 @@ struct QueryCardView: View {
                             
                         }
                     } label: {
-                        AppIcon.Queries.like
-                            .resizable()
-                            .renderingMode(.template)
-                            .foregroundColor(viewModel.isLikedQuery ? AppColor.celticBlue : .black)
-                            .scaledToFit()
+                        Image(systemName: viewModel.likedQueries.contains(query.apiId) ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .frame(width: 18, height: 18)
+                            .foregroundColor(AppColor.celticBlue)
                         Text("\(query.likes)")
                             .foregroundColor(AppColor.black)
                             .font(KlavikaFont.medium.font(size: 14))
