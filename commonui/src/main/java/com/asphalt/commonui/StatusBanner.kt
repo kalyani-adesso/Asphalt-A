@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT25
@@ -88,7 +89,7 @@ fun StatusBanner(
                     radius = Dimensions.radius6,
                     resId = bannerUIElements.iconRes
                 )
-                Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor)
+                Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor, overflow = TextOverflow.Ellipsis)
 
             }
         }
@@ -105,5 +106,5 @@ sealed class BannerUIElements(
         BannerUIElements(PaleMint, LightGreen, GreenLIGHT25, R.drawable.ic_tick)
 
     object ErrorBannerElement :
-        BannerUIElements(PalePink, MutedRose, VividRed, R.drawable.ic_close)
+        BannerUIElements(PalePink, MutedRose, VividRed, R.drawable.ic_error)
 }
