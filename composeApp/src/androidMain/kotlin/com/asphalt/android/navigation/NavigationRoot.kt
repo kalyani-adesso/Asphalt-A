@@ -40,6 +40,7 @@ import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.ui.BouncingCirclesLoader
 import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
@@ -214,7 +215,7 @@ fun NavigationRoot(
                 bannerOffsetDp.roundToPx()
             }
             if (showLoader)
-                LoaderPopup()
+                BouncingCirclesLoader()
             if (showBanner)
                 Popup(offset = IntOffset(0,bannerPixelYOffset)) {
                     StatusBanner(message = bannerMsg, type = bannerType, showBanner = showBanner) {
