@@ -2,6 +2,8 @@ package com.asphalt.dashboard.utils
 
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.utils.Utils
+import com.asphalt.dashboard.constants.RideStatConstants.QUEUE
+import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
 
 object RidesFilter {
@@ -12,13 +14,13 @@ object RidesFilter {
         return allRides.mapNotNull { ride ->
 
             val rideStatus: String? = when {
-                ride.userID == userId -> "Queue".uppercase()
+                ride.userID == userId -> QUEUE
 
                 else -> {
                     val participant = ride.participants.find { it.userId == userId }
                     participant?.let {
                         when (it.inviteStatus) {
-                            1 -> "Upcoming".uppercase()
+                            1 -> UPCOMING
                             else -> null
                         }
                     }
