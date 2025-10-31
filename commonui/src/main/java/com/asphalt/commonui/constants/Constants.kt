@@ -22,8 +22,8 @@ object Constants {
     const val NO_OF_MONTHS_PLACE_VISITED = 7
 
     //Firebase Data base
-    const val FIREBASE_DB = "users_android"
-    const val Firebase_user_name = "name"
+    const val FIREBASE_DB = "users"
+    const val Firebase_user_name = "user_name"
     const val Firebase_user_email = "email"
 
 

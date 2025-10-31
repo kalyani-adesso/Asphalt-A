@@ -16,7 +16,9 @@ data class ProfileDTO(
     val drivingLicense: String = "",
     @SerialName("is_mechanic")
     val isMechanic: Boolean = false,
-    val bikes: Map<String, BikeDTO>? = null
+    val bikes: Map<String, BikeDTO>? = null,
+    @SerialName("profile_image_url")
+    val profilePicUrl: String = "",
 )
 
 @Serializable

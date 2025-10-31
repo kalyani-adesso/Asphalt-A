@@ -7,10 +7,16 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.viewmodel.UserViewModel
 
 class AndroidUserVM(userRepoImpl: UserRepoImpl, dataStoreManager: DataStoreManager) : ViewModel() {
+
+
     private val sharedVM = UserViewModel(userRepoImpl, viewModelScope)
 
     init {
         sharedVM.userRepoImpl.setDataStoreManager(dataStoreManager)
+        initialiseUserData()
+    }
+
+    fun initialiseUserData() {
         sharedVM.fetchDetails()
     }
 

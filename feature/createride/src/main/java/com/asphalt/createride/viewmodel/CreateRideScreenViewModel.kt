@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
-import com.asphalt.android.model.UserData
+import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.repository.UserRepoImpl
@@ -231,7 +231,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     fun getUsers() {
         viewModelScope.launch {
             val user = userRepoImpl.getUserDetails()
-            var response: APIResult<List<UserData>> = userRepo.getAllUsers()
+            var response: APIResult<List<UserDomain>> = userRepo.getAllUsers()
             when (response) {
                 is APIResult.Success -> {
                     if (response.data.size > 0) {

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.helpers.UserDataHelper
-import com.asphalt.android.model.UserData
+import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
@@ -33,7 +33,7 @@ class QueriesVM(
         filterCategory.value = categoryID
     }
 
-    private val _userList = MutableStateFlow<List<UserData>>(emptyList())
+    private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
     val userList = _userList.asStateFlow()
     private val currentUid = androidUserVM.userState.value?.uid
 

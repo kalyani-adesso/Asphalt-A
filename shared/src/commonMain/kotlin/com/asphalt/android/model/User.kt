@@ -15,9 +15,11 @@ data class User(
     val confirmPassword: String? = null
 )
 
-data class UserData(
+data class UserDomain(
     val uid: String,
     val email: String,
     val name: String,
+    val profilePic: String,
+    val isMechanic:Boolean
 )
 
