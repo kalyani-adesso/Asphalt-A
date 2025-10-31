@@ -9,9 +9,11 @@ import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
+import com.asphalt.dashboard.utils.RidesFilter
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -42,12 +44,19 @@ class RidesScreenViewModel : ViewModel(), KoinComponent {
                 ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
+                val sortedArray = response.sortedByDescending { it.createdDate }
 
-                var resp = mapToYourRideDataModel(response, user?.uid ?: "")
+                var upcoming = RidesFilter.getUComingRides(sortedArray, user?.uid ?: "")
+                var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "")
                 var upcomiList = ArrayList<YourRideDataModel>()
-                upcomiList.addAll(resp)
+                var inviteList = ArrayList<YourRideDataModel>()
+                upcomiList.addAll(upcoming)
+                inviteList.addAll(invite)
                 var ridesList =
-                    YourRideRoot(upcoming = upcomiList, )//history = hirtoryList, invite = inviteList
+                    YourRideRoot(
+                        upcoming = upcomiList,
+                        invite = inviteList
+                    )//history = hirtoryList, invite = inviteList
                 _ridesListMutableState.value = ridesList
             }
             //response.mapApiResult { it }
@@ -56,108 +65,52 @@ class RidesScreenViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun mapToYourRideDataModel(
-        allRides: List<RidesData>,
-        userId: String
-    ): List<YourRideDataModel> {
-        // val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-
-        return allRides.mapNotNull { ride ->
-
-            val rideStatus: String? = when {
-                ride.userID == userId -> "Queue"
-
-                else -> {
-                    val participant = ride.participants.find { it.userId == userId }
-                    participant?.let {
-                        when (it.inviteStatus) {
-                            1 -> "Upcoming"
-                            else -> ""
-                        }
-                    }
-                }
-            }
-
-
-            if (rideStatus == null) return@mapNotNull null
-
-            YourRideDataModel(
-                title = ride.rideTitle ?: "",
-                place = ride.startLocation ?: "",
-                rideStatus = rideStatus,
-                //date = ride.startDate?.let { dateFormatter.format(Date(it)) } ?: "",
-                date = " ${ride.startDate}",
-                riders = ride.participants.size.toString()
-            )
-        }
-    }
-
-
     fun getRides() {
         var upcoming = YourRideDataModel(
             title = "Kanyakumari Trip",
             place = "Kochi - Kanyakumari",
             rideStatus = "Upcoming".uppercase(),
-            date = "Sun, Oct 26 - 02:00 PM", "3 Riders"
+            date = "Sun, Oct 26 - 02:00 PM", 2
         )
         var upcoming1 = YourRideDataModel(
             title = "Trip to Moonnar",
             place = "Kochi - Moonnar",
             rideStatus = "Queue".uppercase(),
-            date = "Sun, Oct 26 - 04:00 AM", "3 Riders"
+            date = "Sun, Oct 26 - 04:00 AM", 2
         )
         var upcoming2 = YourRideDataModel(
             title = "Weekend Coast Ride",
             place = "Kochi - Vagamon",
             rideStatus = "Queue".uppercase(),
-            date = "Thu, Oct 23 - 05:00 AM", "3 Riders"
+            date = "Thu, Oct 23 - 05:00 AM", 2
         )
 
         var hirtory = YourRideDataModel(
             title = "Weekend Coast Ride",
             place = "Kochi - Kanyakumari",
             rideStatus = "Completed".uppercase(),
-            date = "Sun, Jun 22", "3 Riders"
+            date = "Sun, Jun 22", 2
         )
         var hirtory1 = YourRideDataModel(
             title = "Vagamon trip",
             place = "Kochi - Vagamon",
             rideStatus = "Completed".uppercase(),
-            date = "Tue, Jun 24", "3 Riders"
+            date = "Tue, Jun 24", 2
         )
 
         var invites = YourRideDataModel(
             title = "Invite from Sooraj",
             place = "Kochi - Kanyakumari",
             rideStatus = "",
-            date = "Tomorrow - 08:00 AM", "3 Riders"
+            date = "Tomorrow - 08:00 AM", 2
         )
 
         var invites1 = YourRideDataModel(
             title = "Invite from Sreedev",
             place = "Kochi - Wayanad",
             rideStatus = "",
-            date = "Tomorrow - 08:00 AM", "3 Riders"
+            date = "Tomorrow - 08:00 AM", 2
         )
-
-        var upcomiList = ArrayList<YourRideDataModel>()
-        upcomiList.add(upcoming)
-        upcomiList.add(upcoming1)
-        upcomiList.add(upcoming2)
-
-
-        var hirtoryList = ArrayList<YourRideDataModel>()
-        hirtoryList.add(hirtory)
-        hirtoryList.add(hirtory1)
-
-
-        var inviteList = ArrayList<YourRideDataModel>()
-        inviteList.add(invites)
-        inviteList.add(invites1)
-
-
-        var ridesList =
-            YourRideRoot(upcoming = upcomiList, history = hirtoryList, invite = inviteList)
-        _ridesListMutableState.value = ridesList
     }
+
 }
