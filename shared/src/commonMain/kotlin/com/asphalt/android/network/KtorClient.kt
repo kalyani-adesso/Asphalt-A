@@ -27,6 +27,7 @@ class KtorClient {
                     ignoreUnknownKeys = true
                     prettyPrint = true
                     isLenient = true
+                    encodeDefaults = true
                 })
             }
 

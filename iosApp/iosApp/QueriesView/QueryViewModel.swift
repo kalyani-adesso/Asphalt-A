@@ -29,6 +29,9 @@ class QueryViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var answerText: String = ""
     @Published var selectedQuery: Query? = nil
+    @Published var isLikedQuery: Bool = false
+    @Published var isLikedAnswer: Bool = false
+    @Published var isLiking = false
     
     init() {
         let queryApiService = QueryAPIServiceImpl(client: KtorClient())
@@ -39,9 +42,9 @@ class QueryViewModel: ObservableObject {
     
     // MARK: - Load Queries
     @MainActor
-    func loadQueries() {
+    func fetchAllQueries(showLoader: Bool = true) {
         Task {
-            isLoading = true
+            if showLoader { isLoading = true }
             do {
                 //Fetch all users first
                 try await fetchAllUsers()
@@ -53,16 +56,17 @@ class QueryViewModel: ObservableObject {
                    let domains = success.data as? [QueryDomain] {
                     
                     self.queriesResult = mapQueries(domains)
-                    print("result \(queriesResult)")
-                    isLoading = false
+                    
+                    if showLoader { isLoading = false }
+                    await MainActor.run {
+                        isLiking = false
+                    }
                     
                 } else {
                     print("Unexpected data type: \(type(of: result))")
-                    isLoading = false
                 }
             } catch {
                 print("Failed to load queries: \(error)")
-                isLoading = false
             }
         }
     }
@@ -99,6 +103,7 @@ class QueryViewModel: ObservableObject {
                 let answeredByName = usersById[ans.answeredBy]?.name ?? "Unknown User"
                 
                 return Answer(
+                    apiId: ans.id,
                     author: answeredByName,
                     role: nil,
                     daysAgo: timeAgoString(from: parseDate(ans.answeredOn)),
@@ -137,7 +142,7 @@ class QueryViewModel: ObservableObject {
                 content: domain.description_,
                 answers: answers,
                 likes: domain.likes.count,
-                comments: 0
+                comments: answers.count
             )
         }
     }
@@ -173,7 +178,7 @@ class QueryViewModel: ObservableObject {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         isoFormatter.formatOptions = [.withInternetDateTime]
-         let postedOnString = isoFormatter.string(from: Date())
+        let postedOnString = isoFormatter.string(from: Date())
         return postedOnString
     }
     
@@ -193,7 +198,7 @@ class QueryViewModel: ObservableObject {
             
             if result is APIResultSuccess<GenericResponse> {
                 print(" Query added successfully!")
-                self.loadQueries()
+                self.fetchAllQueries()
             }
         } catch {
             print(" Exception: \(error.localizedDescription)")
@@ -203,27 +208,120 @@ class QueryViewModel: ObservableObject {
     // MARK: - Post Answer
     @MainActor
     func addAnswer() async {
-//        guard !answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-//        guard let query = selectedQuery else {
-//               print("No query selected!")
-//               return
-//           }
-//
-//        do {
-//            let result = try await queryRepo.addAnswer(
-//                queryId: query.apiId,
-//                answer: answerText,
-//                answeredBy: "OoYGII16wtRbooBdYYDCAwHyFf62",
-//                answeredOn: timeToPostValue()
-//            )
-//            print(result)
-//            if result is APIResultSuccess<GenericResponse> {
-//                print(" Answer added successfully!")
-//                self.loadQueries()
-//            }
-//        } catch {
-//            print(" Exception: \(error.localizedDescription)")
-//        }
+        guard !answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard let query = selectedQuery else {
+            print("No query selected!")
+            return
+        }
+        Task{
+                isLiking = true
+            do {
+                let result = try await queryRepo.addAnswer(
+                    queryId: query.apiId,
+                    answer: answerText,
+                    answeredBy: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                    answeredOn: timeToPostValue()
+                )
+                print(result)
+                if result is APIResultSuccess<GenericResponse> {
+                    print(" Answer added successfully!")
+                    self.fetchAllQueries(showLoader: false)
+                }
+            } catch {
+                print(" Exception: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    // MARK: - Post Like for Query
+    @MainActor
+    func likeQuery(for query: Query) async {
+        Task {
+            isLiking = true
+            do {
+                let result = try await queryRepo.likeQuery(
+                    userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                    queryId: query.apiId
+                    
+                )
+                print(result)
+                if result is APIResultSuccess<GenericResponse> {
+                    print(" Liked Query successfully!")
+                    self.fetchAllQueries(showLoader: false)
+                    if let index = queriesResult.firstIndex(where: { $0.apiId == query.apiId }) {
+                        queriesResult[index].likes = 1
+                        isLikedQuery = true
+                    }
+                }
+            } catch {
+                print(" Exception: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    // MARK: - Remove Like for Query
+    @MainActor
+    func RemoveQuery(for query: Query) async {
+        isLiking = true
+        do {
+            let result = try await queryRepo.removeLikeQuery(
+                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                queryId: query.apiId
+                
+            )
+            print(result)
+            if result is APIResultSuccess<GenericResponse> {
+                isLikedQuery = false //for icon fill
+                print(" Removed Like from Query successfully!")
+                self.fetchAllQueries(showLoader: false)
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Post Like/Dislike for Anwer
+    @MainActor
+    func likeDislikeAnswer(for query: Query, for answer : Answer, isLikeorDisLike: Bool) async {
+        isLiking = true
+        do {
+            let result = try await queryRepo.likeOrDislikeAnswer(
+                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                queryId: query.apiId,
+                answerId: answer.apiId,
+                isLike: isLikeorDisLike
+            )
+            print(result)
+            if result is APIResultSuccess<GenericResponse> {
+                print(" Liked Answer successfully! ")
+                self.fetchAllQueries(showLoader: false)
+                isLikedAnswer = true
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Remove Like/Dislike for Anwer
+    @MainActor
+    func RemovelikeDislikeAnswer(for query: Query, for answer : Answer) async {
+        isLiking = true
+        do {
+            let result = try await queryRepo.removeLikeOrDislikeAnswer(
+                userId: "OoYGII16wtRbooBdYYDCAwHyFf62",
+                queryId: query.apiId,
+                answerId: answer.apiId
+            )
+            print(result)
+            if result is APIResultSuccess<GenericResponse> {
+                print(" Removed Liked Answer successfully! ")
+                self.fetchAllQueries(showLoader: false)
+                isLikedAnswer = false
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
     }
     
 }

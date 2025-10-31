@@ -278,7 +278,7 @@ fun AnswerToQuery(
                         ) {
 
                             CircularNetworkImage(
-                                imageUrl = "",
+                                imageUrl = queriesVM.getCurrentUserData()?.profilePic?:"",
                                 size = Dimensions.size52,
                                 placeholderPainter = painterResource(R.drawable.profile_placeholder)
                             )

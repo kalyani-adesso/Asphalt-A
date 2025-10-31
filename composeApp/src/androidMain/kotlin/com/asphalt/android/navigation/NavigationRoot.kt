@@ -30,6 +30,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.navigation.AppNavKey.SplashKey
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.R
@@ -62,11 +63,13 @@ import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
 @Composable
 fun NavigationRoot(
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()

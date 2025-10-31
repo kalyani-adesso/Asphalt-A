@@ -188,4 +188,22 @@ object Utils {
         }
     }
 
+    fun getDate(timeInMills: Long, hour: Int, mins: Int, isAm: Boolean): Long {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMills
+
+        val hour = hour
+        val minute = mins
+
+
+        calendar.set(Calendar.HOUR, hour) // 1–12 hour format
+        calendar.set(Calendar.MINUTE, minute)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        calendar.set(Calendar.AM_PM, if (isAm) Calendar.AM else Calendar.PM)
+
+        val updatedMillis = calendar.timeInMillis
+        return updatedMillis;
+    }
 }

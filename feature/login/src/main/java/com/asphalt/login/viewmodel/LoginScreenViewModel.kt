@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.model.CurrentUser
 import com.asphalt.android.viewmodel.AuthViewModel
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.util.EmailValidator
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager) :
+class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager,val androidUserVM: AndroidUserVM) :
     ViewModel() {
 
     private val _emailTextMutableState = MutableStateFlow("")
@@ -76,6 +77,7 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
                     val jsonString = Json.encodeToString(user)
                     datastore.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
                     datastore.saveValue(PreferenceKeys.REMEMBER_ME, isrememberMe.value)
+                    androidUserVM.initialiseUserData()
                     //println("isRemberMe: ${isrememberMe.value}")
                     _emailTextMutableState.value = ""
                     _passwordTextMutableState.value = ""

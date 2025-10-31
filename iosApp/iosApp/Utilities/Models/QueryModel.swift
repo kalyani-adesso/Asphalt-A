@@ -16,18 +16,19 @@ struct Query: Identifiable {
     let daysAgo: String
     let content: String
     var answers: [Answer]
-    let likes: Int
+    var likes: Int
     let comments: Int
 }
 
 struct Answer: Identifiable {
     let id = UUID()
+    let apiId: String
     let author: String
     let role: String?
     let daysAgo: String
     let content: String
-    let likes: Int
-    let dislikes: Int
+    var likes: Int
+    var dislikes: Int
 }
 
 struct AskQuery: Identifiable {

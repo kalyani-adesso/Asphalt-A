@@ -6,8 +6,8 @@ object APIConstants {
     const val BIKES_URL = "/bikes"
     const val QUERIES_URL = "/queries"
     const val ANSWERS_URL = "/answers"
-    const val USER_URL = "/users_android"
     const val LIKES_URL = "/likes"
     const val LIKES_DISLIKES_URL = "/likes_dislikes"
+    const val RIDES_URL = "/rides"
     const val GENERIC_ERROR_MSG = "Something went wrong!"
 }
