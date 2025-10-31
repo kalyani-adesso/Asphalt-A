@@ -1,5 +1,6 @@
 package com.asphalt.profile.screens.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,18 +26,18 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.profile.data.VehicleData
 import com.asphalt.profile.viewmodels.AddBikesVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AddBikePopup(
     onDismiss: () -> Unit, addBikesVM: AddBikesVM = koinViewModel(),
-    onAddBike: (VehicleData) -> Unit
+    onAddBike: (Int, String, String) -> Unit
 ) {
     addBikesVM.clearAll()
     val make = addBikesVM.make.collectAsStateWithLifecycle()
     val model = addBikesVM.model.collectAsStateWithLifecycle()
+    val type = addBikesVM.bikeType.collectAsStateWithLifecycle()
     val modelError = addBikesVM.modelError.collectAsStateWithLifecycle()
     val makeError = addBikesVM.makeError.collectAsStateWithLifecycle()
 
@@ -110,11 +111,10 @@ fun AddBikePopup(
                     )
                     Spacer(Modifier.height(Dimensions.padding20))
                     GradientButton(onClick = {
-                        addBikesVM.addBike()?.let {
-                            onAddBike(it)
-                            onDismiss.invoke()
+                        addBikesVM.addBike {
+                            onAddBike(type.value, make.value, model.value)
                         }
-
+                        onDismiss.invoke()
                     }) {
                         ComposeUtils.DefaultButtonContent(stringResource(R.string.add_vehicle).uppercase())
                     }

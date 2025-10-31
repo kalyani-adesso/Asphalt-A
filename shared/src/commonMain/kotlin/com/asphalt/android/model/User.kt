@@ -20,6 +20,7 @@ data class UserDomain(
     val email: String,
     val name: String,
     val profilePic: String,
-    val isMechanic:Boolean
+    val isMechanic:Boolean,
+    val primaryBike: String
 )
 

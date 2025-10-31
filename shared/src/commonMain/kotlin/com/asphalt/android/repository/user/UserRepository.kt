@@ -1,6 +1,7 @@
 package com.asphalt.android.repository.user
 
 import com.asphalt.android.mapApiResult
+import com.asphalt.android.mappers.toBikeListDomain
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.profile.ProfileDTO
@@ -15,12 +16,14 @@ class UserRepository(private val apiService: UserAPIService) {
 
     private fun Map<String, ProfileDTO>?.toUserData(): List<UserDomain>? {
         return this?.map { (id, profileDTO) ->
+            val bikeDomain = profileDTO.bikes.toBikeListDomain().orEmpty().firstOrNull()
             UserDomain(
                 uid = id,
                 email = profileDTO.email ?: "",
                 name = profileDTO.userName ?: "",
                 profilePic = profileDTO.profilePicUrl,
-                isMechanic = profileDTO.isMechanic
+                isMechanic = profileDTO.isMechanic,
+                primaryBike = bikeDomain?.let { it.model + " " + it.make } ?: ""
             )
         }
     }

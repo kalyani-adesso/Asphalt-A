@@ -23,15 +23,16 @@ data class ProfileDTO(
 
 @Serializable
 data class BikeDTO(
-    @SerialName("bike_id")
-    val bikeId: String = "",
+
     @SerialName("bike_type")
-    val bikeType: String = "",
+    val bikeType: Int,
     val make: String = "",
     val model: String = ""
 )
 
+
 data class ProfileDomain(
+    val id:String,
     val userName: String,
     val email: String,
     val phoneNumber: String,
@@ -43,7 +44,7 @@ data class ProfileDomain(
 
 data class BikeDomain(
     val bikeId: String,
-    val type: String,
+    val type: Int,
     val make: String,
     val model: String
 )
