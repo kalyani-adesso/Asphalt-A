@@ -206,4 +206,12 @@ object Utils {
         val updatedMillis = calendar.timeInMillis
         return updatedMillis;
     }
+
+    fun getDateWithTime(millis: Long?): String {
+        val sdf = SimpleDateFormat("EEE, MMM dd - hh:mm a", Locale.getDefault())
+        if (millis != null)
+            return sdf.format(Date(millis))
+        else
+            return ""
+    }
 }
