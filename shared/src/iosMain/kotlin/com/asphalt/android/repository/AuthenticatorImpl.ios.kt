@@ -19,7 +19,7 @@ actual class AuthenticatorImpl actual constructor() {
 
     actual suspend fun signUp(user: User): Result<String> = suspendCancellableCoroutine { cont ->
         val database = FIRDatabase.database().reference()
-        auth.createUserWithEmail(user.email, user.confirmPassword) { result, error ->
+        auth.createUserWithEmail(user.email ?: "", user.confirmPassword ?: "") { result, error ->
             if (error != null) {
                 cont.resume(Result.failure(Exception(error.localizedDescription ?: "Unknown error")))
                 return@createUserWithEmail
@@ -33,7 +33,7 @@ actual class AuthenticatorImpl actual constructor() {
 
             val userValues = mapOf<Any?, Any?>(
                 "email" to user.email,
-                "userName" to user.name,
+                "user_name" to user.name,
                 "device" to UIDevice.currentDevice.model
             )
 

@@ -26,6 +26,6 @@ val sharedModule: Module = module {
     single { UserRepoImpl() }
     single { QueryRepository(get()) }
     factory { AuthViewModel(authenticator = get()) }
-    factory { UserRepository(get()) }
     single { RidesRepository(get()) }
+    single { UserRepository(get()) }
 }

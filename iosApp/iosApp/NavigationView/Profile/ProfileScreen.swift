@@ -18,7 +18,7 @@ struct ProfileScreen: View {
         VStack {
             HStack {
                 Button {
-                  showHome = true
+                    showHome = true
                 } label: {
                     AppIcon.CreateRide.backButton
                         .frame(width: 24, height: 24)
@@ -26,7 +26,7 @@ struct ProfileScreen: View {
                 
                 Spacer()
                 
-                Text("Profile")
+                Text(AppStrings.Profile.profileTitle)
                     .font(KlavikaFont.bold.font(size: 19))
                     .foregroundColor(AppColor.black)
                 
@@ -37,7 +37,7 @@ struct ProfileScreen: View {
                     AppIcon.Profile.editProfile
                         .frame(width: 30 , height: 30)
                 }
-               
+                
             }
             .padding(.horizontal)
             .padding(.vertical, 12)
@@ -81,9 +81,17 @@ struct ProfileScreen: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .refreshable {
+            Task {
+                await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+            }
+        }
         .navigationDestination(isPresented: $showHome, destination: {
             BottomNavBar()
         })
+        .task {
+            await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+        }
     }
 }
 
@@ -156,6 +164,7 @@ struct YourVehicleRow: View {
                 })
                 .frame(width: 135)
                 .padding(.top,15)
+                .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity)
             .padding([.leading, .trailing],16)
@@ -367,7 +376,7 @@ struct ProfileHeaderView: View {
                         .background(AppColor.white)
                         .cornerRadius(5)
                     }
-                 
+                    
                     HStack {
                         AppIcon.NavigationSlider.call
                             .frame(width: 16, height: 16)

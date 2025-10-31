@@ -55,6 +55,7 @@ fun QueriesScreen(
     var showQueryPopup by remember { mutableStateOf(false) }
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
     var showAnswerPopup by remember { mutableStateOf(false) }
+    val userList = queriesVM.userList.collectAsStateWithLifecycle()
 
     setTopAppBarState(
         AppBarState(
