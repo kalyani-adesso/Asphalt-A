@@ -210,7 +210,8 @@ object ComposeUtils {
         borderStroke: Dp? = null,
         isSingleLine: Boolean = true,
         heightMin: Dp = Dimensions.size50,
-        textStyle: TextStyle = TypographyMedium.bodySmall
+        textStyle: TextStyle = Typography.bodySmall,
+        placeHolderTextStyle: TextStyle = TypographyMedium.bodySmall,
 
     ) {
         RoundedBox(
@@ -231,7 +232,7 @@ object ComposeUtils {
                 placeholder = {
                     Text(
                         placeHolderText,
-                        style = textStyle,
+                        style = placeHolderTextStyle,
                         color = NeutralDarkGrey
                     )
                 },

@@ -294,7 +294,8 @@ fun AnswerToQuery(
                                 borderColor = NeutralLightGrayishBlue50,
                                 borderStroke = Dimensions.size1pt5,
                                 heightMin = Dimensions.padding100,
-                                textStyle = TypographyMedium.bodyMedium
+                                textStyle = Typography.bodyMedium,
+                                placeHolderTextStyle = TypographyMedium.bodyMedium,
                             )
 
                             Row(
