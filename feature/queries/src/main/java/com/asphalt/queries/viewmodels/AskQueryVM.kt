@@ -68,7 +68,7 @@ class AskQueryVM(val queryRepository: QueryRepository) : ViewModel() {
                 queryTitle = _askQuestion.value,
                 queryDescription = _description.value,
                 categoryId = _selectedCategory.value!!.id,
-                postedOn = Utils.formatClientMillisToISO(System.currentTimeMillis()),
+                postedOn = Utils.formatDateMillisToISO(System.currentTimeMillis()),
                 postedBy = user?.uid ?: "",
             )
         }

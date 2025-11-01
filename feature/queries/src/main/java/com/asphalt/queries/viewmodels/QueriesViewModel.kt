@@ -37,10 +37,10 @@ class QueriesVM(
     private val searchText = MutableStateFlow("")
 
 
-    private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
+    private val userList = MutableStateFlow<List<UserDomain>>(emptyList())
     fun getCurrentUserData(): UserDomain? {
 
-        return UserDataHelper.getUserDataFromCurrentList(_userList.value, currentUid ?: "")
+        return UserDataHelper.getUserDataFromCurrentList(userList.value, currentUid ?: "")
     }
 
 
@@ -83,7 +83,7 @@ class QueriesVM(
             APIHelperUI.runWithLoader { userRepository.getAllUsers() },
             viewModelScope
         ) {
-            _userList.value = it
+            userList.value = it
         }
     }
 
@@ -230,8 +230,8 @@ class QueriesVM(
             val answer = answerToQuery.value
             val addAnswer = APIHelperUI.runWithLoader {
                 queryRepository.addAnswer(
-                    query.id, answer, currentUid ?: "",
-                    Utils.formatClientMillisToISO(System.currentTimeMillis())
+                    query.id, answer, currentUid.orEmpty(),
+                    Utils.formatDateMillisToISO(System.currentTimeMillis())
                 )
             }
             APIHelperUI.handleApiResult(addAnswer, viewModelScope) {
@@ -256,7 +256,7 @@ class QueriesVM(
     private fun QueryDomain.toQueryUiModel(): Query {
         return with(this) {
             val userDataFromCurrentList =
-                UserDataHelper.getUserDataFromCurrentList(_userList.value, postedBy)
+                UserDataHelper.getUserDataFromCurrentList(userList.value, postedBy)
             val isUserLiked =
                 likes.find { it -> it == currentUid }.isNullOrBlank().not()
             Query(
@@ -266,8 +266,8 @@ class QueriesVM(
                 categoryId,
                 answers.isNotEmpty(),
                 Utils.parseISODateToMillis(postedOn),
-                userDataFromCurrentList?.name ?: "",
-                userDataFromCurrentList?.profilePic ?: "",
+                userDataFromCurrentList?.name.orEmpty(),
+                userDataFromCurrentList?.profilePic.orEmpty(),
                 likes.size,
                 answers.size,
                 answers.toAnswersUiModel(),
@@ -306,7 +306,7 @@ class QueriesVM(
 
     private fun AnswerDomain.toAnswerUiModel(): Answer {
         val userDataFromCurrentList =
-            UserDataHelper.getUserDataFromCurrentList(_userList.value, answeredBy)
+            UserDataHelper.getUserDataFromCurrentList(userList.value, answeredBy)
         return with(this) {
             val isUserLiked =
                 likes.find { it -> it == currentUid }.isNullOrBlank().not()
@@ -315,8 +315,8 @@ class QueriesVM(
                     .not()
             Answer(
                 id,
-                userDataFromCurrentList?.name ?: "",
-                userDataFromCurrentList?.profilePic ?: "",
+                userDataFromCurrentList?.name.orEmpty(),
+                userDataFromCurrentList?.profilePic.orEmpty(),
                 Utils.parseISODateToMillis(answeredOn),
                 likes.size,
                 dislikes.size,

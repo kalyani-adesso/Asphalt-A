@@ -14,7 +14,7 @@ object RidesFilter {
         return allRides.mapNotNull { ride ->
 
             val rideStatus: String? = when {
-                ride.userID == userId -> QUEUE
+                ride.createdBy == userId -> QUEUE
 
                 else -> {
                     val participant = ride.participants.find { it.userId == userId }
@@ -47,7 +47,7 @@ object RidesFilter {
         return allRides.mapNotNull { ride ->
 
             // Step 1: skip if user is the owner
-            if (ride.userID == userId) return@mapNotNull null
+            if (ride.createdBy == userId) return@mapNotNull null
 
             // Step 2: find participant matching current user
             val participant = ride.participants.find { it.userId == userId }

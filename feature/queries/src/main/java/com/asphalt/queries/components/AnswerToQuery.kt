@@ -188,7 +188,7 @@ fun AnswerToQuery(
                                         Spacer(Modifier.weight(1f))
                                         ComposeUtils.SectionSubtitle(
                                             Utils.formatRelativeTime(
-                                                Utils.formatClientMillisToISO(
+                                                Utils.formatDateMillisToISO(
                                                     query.postedOn
                                                 )
                                             ),
