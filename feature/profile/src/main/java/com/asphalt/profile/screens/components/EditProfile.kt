@@ -166,7 +166,7 @@ fun EditProfile(
                         },
                         stringResource(R.string.enter_email_placeholder),
                         emailError.value,
-                        stringResource(R.string.enter_valid_email)
+                        stringResource(R.string.enter_valid_email), readOnly = true
                     )
 
                     HeaderWithInputField(

@@ -21,6 +21,7 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.profile.mapper.toCurrentUserModel
 import com.asphalt.profile.screens.components.EditProfile
 import com.asphalt.profile.screens.sections.AchievementsSection
 import com.asphalt.profile.screens.sections.ProfileSection
@@ -42,6 +43,11 @@ fun ProfileScreen(
     LaunchedEffect(user.value) {
         profileSectionVM.getProfileData(user.value?.uid)
     }
+    val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
+    LaunchedEffect(profileData.value) {
+        profileData.value?.let { androidUserVM.updateUserData(it.toCurrentUserModel()) }
+    }
+
 
     setTopAppBarState(AppBarState(stringResource(R.string.profile), actions = {
         ComposeUtils.ColorIconRounded(

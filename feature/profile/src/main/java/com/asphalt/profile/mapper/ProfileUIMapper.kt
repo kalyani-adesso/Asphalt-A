@@ -1,5 +1,6 @@
 package com.asphalt.profile.mapper
 
+import com.asphalt.android.model.CurrentUser
 import com.asphalt.android.model.profile.BikeDomain
 import com.asphalt.android.model.profile.ProfileDomain
 import com.asphalt.profile.data.ProfileUIModel
@@ -30,5 +31,10 @@ fun ProfileDomain.toProfileUIModel() : ProfileUIModel{
             drivingLicense,
             emergencyContact
         )
+    }
+}
+fun ProfileUIModel.toCurrentUserModel(): CurrentUser{
+    return with(this){
+        CurrentUser(isSuccess = true, name = username, uid = uid, email = userEmail)
     }
 }

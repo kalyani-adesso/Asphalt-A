@@ -39,13 +39,17 @@ import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenDark
+import com.asphalt.commonui.theme.LightGray28
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralGrey30
+import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
+import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
@@ -212,6 +216,7 @@ object ComposeUtils {
         heightMin: Dp = Dimensions.size50,
         textStyle: TextStyle = Typography.bodySmall,
         placeHolderTextStyle: TextStyle = TypographyMedium.bodySmall,
+        readOnly: Boolean = false
 
     ) {
         RoundedBox(
@@ -223,7 +228,7 @@ object ComposeUtils {
             borderStroke = borderStroke
         ) {
             TextField(
-
+                readOnly = readOnly,
                 keyboardActions = keyboardActions,
                 leadingIcon = leadingIcon,
                 trailingIcon = trailingIcon,
@@ -295,7 +300,8 @@ object ComposeUtils {
         isError: Boolean,
         errorText: String,
         keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        isSingleLine: Boolean = true
+        isSingleLine: Boolean = true,
+        readOnly: Boolean = false,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing12)) {
             SectionTitle(title)
@@ -303,7 +309,11 @@ object ComposeUtils {
                 value,
                 { onValueChanged(it) },
                 placeHolderText = placeholder,
-                keyboardOptions = keyboardOptions, isSingleLine = isSingleLine
+                keyboardOptions = keyboardOptions,
+                isSingleLine = isSingleLine,
+                readOnly = readOnly,
+                backColor = if (readOnly) LightGray28 else NeutralWhite
+
             )
             TexFieldError(
                 isError,

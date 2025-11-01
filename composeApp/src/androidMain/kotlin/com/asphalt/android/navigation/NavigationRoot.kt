@@ -1,5 +1,7 @@
 package com.asphalt.android.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -40,6 +42,12 @@ import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralGrey80
+import com.asphalt.commonui.theme.NeutralLightGray25
+import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.NeutralWhite40
+import com.asphalt.commonui.theme.PaleMintyBlue30
+import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BouncingCirclesLoader
 import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.createride.ui.CreateRideScreen
@@ -214,8 +222,7 @@ fun NavigationRoot(
             val bannerPixelYOffset: Int = with(density) {
                 bannerOffsetDp.roundToPx()
             }
-            if (showLoader)
-                BouncingCirclesLoader()
+
             if (showBanner)
                 Popup(offset = IntOffset(0,bannerPixelYOffset)) {
                     StatusBanner(message = bannerMsg, type = bannerType, showBanner = showBanner) {
@@ -375,6 +382,11 @@ fun NavigationRoot(
                     }
                 }
             )
+            if (showLoader){
+//                Box(modifier = Modifier.background(NeutralWhite40).padding(paddingValues).fillMaxSize()){
+                    BouncingCirclesLoader()
+//                }
+            }
         }
     }
     if (showTopAppBar)

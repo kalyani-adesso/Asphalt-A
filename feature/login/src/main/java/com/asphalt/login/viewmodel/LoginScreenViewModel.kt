@@ -74,10 +74,8 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
                     var user = with(loginresponse) {
                         CurrentUser(isSuccess, errorMessage, name, email, uid)
                     }
-                    val jsonString = Json.encodeToString(user)
-                    datastore.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
+                   androidUserVM.updateUserData(user)
                     datastore.saveValue(PreferenceKeys.REMEMBER_ME, isrememberMe.value)
-                    androidUserVM.initialiseUserData()
                     //println("isRemberMe: ${isrememberMe.value}")
                     _emailTextMutableState.value = ""
                     _passwordTextMutableState.value = ""
