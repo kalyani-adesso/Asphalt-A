@@ -34,7 +34,7 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
     // Track which field is active (start or end)
     var isSelectingStart = true
     
-    let participants: [Participant] = [
+    @Published  var participants: [Participant] = [
         Participant(name: "Sooraj Rajan", role: "Mechanic", bike: "Harley Davidson 750", image: "avatar1", isOnline: true),
         Participant(name: "Abhishek", role: nil, bike: "Classic 350", image: "avatar1", isOnline: true),
         Participant(name: "Vyshnav", role: nil, bike: "Harley Davidson 750", image: "avatar1", isOnline: false),
@@ -51,12 +51,19 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
     
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
-    
+   
+   private var rideAPIService: RidesApIService
+   private var rideRepository: RidesRepository
 
     override init() {
         completer = MKLocalSearchCompleter()
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
+        
+//        UserRepository
+//
+        rideAPIService = RidesApiServiceImpl(client: KtorClient())
+        rideRepository = RidesRepository(apiService: rideAPIService)
         super.init()
         completer.delegate = self
     }
@@ -102,11 +109,30 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
 }
 
 extension CreateRideViewModel {
-    func getAllUsers()  {
-        userRepository.getAllUsers { result,error  in
+    func getAllUsers() {
+        userRepository.getAllUsers { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
-               let domain = success.data as? UserData {
-                print("User name:\(domain.name)")
+               let domainList = success.data as? [UserDomain] {
+
+                // Map each UserDomain to Participant
+                let participants = domainList.map { user in
+                    Participant(
+                        name: user.name,
+                        role: user.isMechanic ? "Mechanic" : nil,
+                        bike: "", // TODO: assign from user.bike if available
+                        image: user.profilePic.isEmpty ? "avatar1" : user.profilePic,
+                        isOnline: true // or false if you track it elsewhere
+                    )
+                }
+
+                DispatchQueue.main.async {
+                    self.participants = participants
+                }
+
+            } else if let error = error {
+                print("Error fetching users: \(error)")
+            } else {
+                print("Unexpected data format")
             }
         }
     }
