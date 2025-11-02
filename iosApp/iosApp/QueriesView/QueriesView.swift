@@ -10,7 +10,6 @@ import SwiftUI
 struct QueriesView: View {
     @StateObject private var viewModel = QueryViewModel()
     @State private var selectedStatus: String? = nil
-    @State private var searchText = ""
     @State private var showAskPopup = false
     
     var onBackToHome: (() -> Void)? = nil
@@ -32,7 +31,7 @@ struct QueriesView: View {
                             icon: AppIcon.CreateRide.searchLens,
                             placeholder: "Search questions ...",
                             iconColor: AppColor.celticBlue,
-                            value: $searchText,
+                            value: $viewModel.searchText,
                             isValidEmail: .constant(false),
                             backgroundColor: AppColor.listGray
                         )

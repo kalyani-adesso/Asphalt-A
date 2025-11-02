@@ -7,5 +7,5 @@ object ProfileConstants {
     const val CRUISER = 4
     const val TOURING_BIKE = 5
     const val SCOOTER = 6
-    const val ELECTRIC = 1
+    const val ELECTRIC = 7
 }

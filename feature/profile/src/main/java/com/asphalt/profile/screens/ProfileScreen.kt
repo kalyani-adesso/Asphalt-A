@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,22 +21,33 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.profile.mapper.toCurrentUserModel
 import com.asphalt.profile.screens.components.EditProfile
 import com.asphalt.profile.screens.sections.AchievementsSection
 import com.asphalt.profile.screens.sections.ProfileSection
 import com.asphalt.profile.screens.sections.TotalStatisticsSection
 import com.asphalt.profile.screens.sections.YourVehiclesSection
+import com.asphalt.profile.viewmodels.ProfileSectionVM
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     androidUserVM: AndroidUserVM = koinViewModel(),
-    setTopAppBarState: (AppBarState) -> Unit,
-
-    ) {
+    profileSectionVM: ProfileSectionVM = koinActivityViewModel(),
+    setTopAppBarState: (AppBarState) -> Unit
+) {
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
     var showEditProfile by remember { mutableStateOf(false) }
+    LaunchedEffect(user.value) {
+        profileSectionVM.getProfileData(user.value?.uid)
+    }
+    val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
+    LaunchedEffect(profileData.value) {
+        profileData.value?.let { androidUserVM.updateUserData(it.toCurrentUserModel()) }
+    }
+
 
     setTopAppBarState(AppBarState(stringResource(R.string.profile), actions = {
         ComposeUtils.ColorIconRounded(
@@ -52,7 +64,7 @@ fun ProfileScreen(
     val bottomPadding = Dimensions.size0
     ComposeUtils.DefaultColumnRoot(topPadding, bottomPadding) {
         Spacer(Modifier.height(Dimensions.size20))
-        ProfileSection(user.value)
+        ProfileSection()
         YourVehiclesSection()
         TotalStatisticsSection()
         AchievementsSection()
@@ -60,6 +72,16 @@ fun ProfileScreen(
             EditProfile(onDismiss = {
                 showEditProfile = false
 
+            }, onSaveChanges = { name, email, contact, license, emergencyContact, isMechanic ->
+                profileSectionVM.editProfile(
+                    user.value?.uid,
+                    name,
+                    email,
+                    contact,
+                    emergencyContact,
+                    license,
+                    isMechanic
+                )
             })
 
 

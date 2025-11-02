@@ -1,14 +1,15 @@
 package com.asphalt.android.repository.queries
 
 import com.asphalt.android.mapApiResult
+import com.asphalt.android.mappers.toAnswerDomain
+import com.asphalt.android.mappers.toDomain
+import com.asphalt.android.mappers.toQueryDomain
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
-import com.asphalt.android.model.queries.AnswerDTO
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.AnswerRequestDTO
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.model.queries.QueryRequestDTO
-import com.asphalt.android.model.queries.QueryResponseDTO
 import com.asphalt.android.network.queries.QueryAPIService
 
 class QueryRepository(private val apiService: QueryAPIService) {
@@ -18,53 +19,6 @@ class QueryRepository(private val apiService: QueryAPIService) {
         }
     }
 
-
-    private fun Map<String, QueryResponseDTO>?.toDomain(): List<QueryDomain>? {
-        return this?.map { (id, rawQuery) ->
-            rawQuery.toQueryDomain(id)
-        }
-    }
-
-    private fun QueryResponseDTO.toQueryDomain(id: String): QueryDomain {
-        return with(this) {
-            QueryDomain(
-                id,
-                queryTitle,
-                queryDescription,
-                postedBy,
-                postedOn,
-                categoryId,
-                answers.toAnswersDomain(),
-                likes = likes.orEmpty().map { (id, _) -> id },
-            )
-        }
-    }
-
-    private fun Map<String, AnswerDTO>?.toAnswersDomain(): List<AnswerDomain> {
-
-        return this.orEmpty().map { (id, rawAnswer) ->
-            rawAnswer.toAnswerDomain(id)
-        }
-    }
-
-    private fun AnswerDTO.toAnswerDomain(id: String): AnswerDomain {
-        return with(this) {
-            val likesDislikesMap = likesDislikes.orEmpty()
-            AnswerDomain(
-                id,
-                answer,
-                answeredBy,
-                answeredOn,
-                likes = likesDislikesMap
-                    .filterValues { it }
-                    .keys.toList(),
-
-                dislikes = likesDislikesMap
-                    .filterValues { !it }
-                    .keys.toList(),
-            )
-        }
-    }
 
     suspend fun addQuery(
         queryTitle: String,
@@ -104,7 +58,6 @@ class QueryRepository(private val apiService: QueryAPIService) {
 
     suspend fun removeLikeQuery(userId: String, queryId: String): APIResult<Unit> {
         return apiService.deleteLikeQuery(queryId, userId).mapApiResult {
-
         }
     }
 

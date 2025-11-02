@@ -1,7 +1,6 @@
 package com.asphalt.commonui.utils
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -40,13 +39,17 @@ import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenDark
+import com.asphalt.commonui.theme.LightGray28
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralGrey30
+import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
+import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
@@ -136,7 +139,8 @@ object ComposeUtils {
         backColor: Color,
         size: Dp = Dimensions.size30,
         radius: Dp = Dimensions.size5,
-        resId: Int
+        resId: Int,
+        tint: Color = NeutralWhite
     ) {
         RoundedBox(
             backgroundColor = backColor,
@@ -144,15 +148,9 @@ object ComposeUtils {
                 .width(size)
                 .height(size),
             cornerRadius = radius,
+            contentAlignment = Alignment.Center
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Image(
-                    modifier = Modifier,
-                    painter = painterResource(resId),
-                    contentDescription = ""
-                )
-            }
-
+            Icon(painterResource(resId), null, tint = tint)
         }
     }
 
@@ -216,7 +214,9 @@ object ComposeUtils {
         borderStroke: Dp? = null,
         isSingleLine: Boolean = true,
         heightMin: Dp = Dimensions.size50,
-        textStyle: TextStyle = TypographyMedium.bodySmall
+        textStyle: TextStyle = Typography.bodySmall,
+        placeHolderTextStyle: TextStyle = TypographyMedium.bodySmall,
+        readOnly: Boolean = false
 
     ) {
         RoundedBox(
@@ -228,7 +228,7 @@ object ComposeUtils {
             borderStroke = borderStroke
         ) {
             TextField(
-
+                readOnly = readOnly,
                 keyboardActions = keyboardActions,
                 leadingIcon = leadingIcon,
                 trailingIcon = trailingIcon,
@@ -237,7 +237,7 @@ object ComposeUtils {
                 placeholder = {
                     Text(
                         placeHolderText,
-                        style = textStyle,
+                        style = placeHolderTextStyle,
                         color = NeutralDarkGrey
                     )
                 },
@@ -300,7 +300,8 @@ object ComposeUtils {
         isError: Boolean,
         errorText: String,
         keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        isSingleLine: Boolean = true
+        isSingleLine: Boolean = true,
+        readOnly: Boolean = false,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing12)) {
             SectionTitle(title)
@@ -308,7 +309,11 @@ object ComposeUtils {
                 value,
                 { onValueChanged(it) },
                 placeHolderText = placeholder,
-                keyboardOptions = keyboardOptions, isSingleLine = isSingleLine
+                keyboardOptions = keyboardOptions,
+                isSingleLine = isSingleLine,
+                readOnly = readOnly,
+                backColor = if (readOnly) LightGray28 else NeutralWhite
+
             )
             TexFieldError(
                 isError,

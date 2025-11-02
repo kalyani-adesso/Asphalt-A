@@ -100,7 +100,7 @@ struct AnswerSheetView: View {
                     )
                     // Answers
                     ForEach(query.answers) { answer in
-                        AnswerCardView(answer: answer, query: query, viewModel: viewModel)
+                        AnswerCardView(viewModel: viewModel, answer: answer, query: query)
                     }
                 }
                 .padding(.horizontal, 35)

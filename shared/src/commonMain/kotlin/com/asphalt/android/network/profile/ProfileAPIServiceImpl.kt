@@ -1,29 +1,30 @@
 package com.asphalt.android.network.profile
 
 
-import com.asphalt.android.constants.APIConstants.USERS_URL
 import com.asphalt.android.constants.APIConstants.BIKES_URL
+import com.asphalt.android.constants.APIConstants.USERS_URL
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.profile.BikeDTO
+import com.asphalt.android.model.profile.EditProfileRequestDTO
 import com.asphalt.android.model.profile.ProfileDTO
-import com.asphalt.android.network.KtorClient
 import com.asphalt.android.network.BaseAPIService
+import com.asphalt.android.network.KtorClient
 import io.ktor.client.call.body
 
 class ProfileAPIServiceImpl(client: KtorClient) : BaseAPIService(client),
-ProfileAPIService {
+    ProfileAPIService {
     override suspend fun getProfile(userId: String): APIResult<ProfileDTO> {
-        return  safeApiCall {
+        return safeApiCall {
             get("$USERS_URL/$userId").body()
         }
     }
 
     override suspend fun editProfile(
         userId: String,
-        profile: ProfileDTO
-    ): APIResult<GenericResponse> {
-        return  safeApiCall {
+        profile: EditProfileRequestDTO
+    ): APIResult<Unit> {
+        return safeApiCall {
             patch(profile, "$USERS_URL/$userId").body()
         }
     }
@@ -33,22 +34,27 @@ ProfileAPIService {
         bike: BikeDTO
     ): APIResult<GenericResponse> {
         return safeApiCall {
-            post( bike, "$USERS_URL/$userId$BIKES_URL").body()
+            post(bike, "$USERS_URL/$userId$BIKES_URL").body()
         }
     }
 
     override suspend fun deleteBike(
         userId: String,
         bikeId: String
-    ): APIResult<GenericResponse> {
+    ): APIResult<Unit> {
         return safeApiCall {
             delete("$USERS_URL/$userId$BIKES_URL/$bikeId").body()
         }
     }
 
-    override suspend fun getBikes(userId: String): APIResult<Map<String, BikeDTO>> {
-        return  safeApiCall {
+    override suspend fun getBikes(userId: String): APIResult<Map<String, BikeDTO>?> {
+        return safeApiCall {
             get("$USERS_URL/$userId$BIKES_URL").body()
+        }
+    }
+    override suspend fun getBikeById(userId: String,bikeId: String): APIResult<BikeDTO> {
+        return safeApiCall {
+            get("$USERS_URL/$userId$BIKES_URL/$bikeId").body()
         }
     }
 }

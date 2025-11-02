@@ -1,6 +1,6 @@
 package com.asphalt.profile.data
 
-data class ProfileData(
+data class ProfileUIModel(
     val uid: String?,
     val profilePicUrl: String,
     val username: String,

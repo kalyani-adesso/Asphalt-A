@@ -68,8 +68,9 @@ fun RidesScreen(setTopAppBarState: (AppBarState) -> Unit) {
     val ridesScreenViewModel: RidesScreenViewModel = viewModel()
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
-        ridesScreenViewModel.getRides()
+        //ridesScreenViewModel.getRides()
     }
+    ridesScreenViewModel.getRides1()
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -223,7 +224,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = upconing.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(text = "${upconing.riders}" +" " +stringResource(R.string.riders) , style = Typography.bodyMedium, color = GrayDark)
 
             }
         }
@@ -362,7 +363,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = history.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(text ="${history.riders}" +" " +stringResource(R.string.riders), style = Typography.bodyMedium, color = GrayDark)
 
             }
         }
@@ -494,7 +495,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = invites.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(text ="${invites.riders}" +" " +stringResource(R.string.riders), style = Typography.bodyMedium, color = GrayDark)
 
             }
         }

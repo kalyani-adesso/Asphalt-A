@@ -14,9 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 
 @Composable
@@ -27,7 +29,7 @@ fun CircularNetworkImage(
     size: Dp = Constants.AVATAR_DEFAULT_SIZE,
     borderWidth: Dp = Constants.AVATAR_DEFAULT_BORDER_WIDTH,
     borderColor: Color = Color.Transparent,
-    placeholderPainter: Painter? = null,
+    placeholderPainter: Painter? = painterResource(R.drawable.profile_placeholder),
     contentScale: ContentScale = ContentScale.Crop,
     onClick: (() -> Unit)? = null
 ) {

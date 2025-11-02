@@ -270,8 +270,6 @@ fun AvatarRow(imageUrls: List<String>) {
                 imageUrl = imageUrl, size = Dimensions.size20, modifier = Modifier.border(
                     width = Dimensions.size1pt5, shape = CircleShape, color = NeutralMidGrey
                 ),
-                placeholderPainter = painterResource(R.drawable.profile_placeholder)
-
             )
         }
         if (extraCount > 0) {

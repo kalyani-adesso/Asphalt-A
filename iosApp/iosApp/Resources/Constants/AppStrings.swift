@@ -127,6 +127,7 @@ public struct AppStrings{
         case hasSeenOnboarding = "com.adesso.rider.club.hasSeenOnboarding"
         case hasShownLoginSuccess = "com.adesso.rider.club.hasShownLoginSuccess"
         case userId = "com.adesso.rider.club.userId"
+        case userName = "com.adesso.rider.club.userName"
     }
     
     enum ForgotPassword: String {

@@ -5,6 +5,7 @@ import android.icu.util.Calendar
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -29,6 +30,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val userRepo: UserRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
     val ridesRepo: RidesRepository by inject()
+
 
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
@@ -242,7 +244,8 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                     .map {
                                         RidersList(
                                             name = it.name,
-                                            id = it.uid, bike = "Unicorn"
+                                            id = it.uid, bike = "Unicorn", job = if(it.isMechanic)
+                                                "Mechanic" else ""
                                         )
                                     })
                         _ridersListMutable.value = _fullList.value
