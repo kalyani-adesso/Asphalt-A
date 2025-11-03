@@ -129,6 +129,7 @@ struct DetailsView: View {
                 viewModel.nextStep()
             }
             )
+            .disabled(!viewModel.isDetailsValid)
             .padding()
         }
         

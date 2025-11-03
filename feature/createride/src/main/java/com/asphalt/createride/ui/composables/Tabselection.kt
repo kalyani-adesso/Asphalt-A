@@ -123,63 +123,71 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = stringResource(R.string.route), style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
-                    TypographyBold.bodySmall
-                } else {
-                    Typography.bodySmall
-                }, color = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
-                    NeutralBlack
-                } else {
-                    NeutralDarkGrey
-                }, fontSize = Dimensions.textSize12
-            )
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-            Box(
-                modifier = Modifier
-                    .height(Dimensions.padding50)
-                    .width(Dimensions.padding50)
-                    .then(
-                        if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
-                            Modifier.background(
-                                color = PrimaryDarkerLightB75,
-                                shape = RoundedCornerShape(Dimensions.padding10)
-                            )
-                        } else {
-                            Modifier.background(
-                                color = NeutralWhite,
-                                shape = RoundedCornerShape(Dimensions.padding10)
-                            )
-                        }
-                    ), contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_participants),
-                    contentDescription = "",
-                    colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
-                        ColorFilter.tint(NeutralWhite)
-                    } else {
-                        ColorFilter.tint(NeutralDarkGrey)
-                    }
-                )
-
-            }
-            Spacer(modifier = Modifier.height(Dimensions.size10))
-            Text(
-                text = stringResource(R.string.participants),
-                style = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                text = stringResource(R.string.route),
+                style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
                 },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                color = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
                 },
-                maxLines = 1,
                 fontSize = Dimensions.textSize12
             )
+        }
+        if (viewModel.show_participant_Tab.value) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(Dimensions.padding50)
+                        .width(Dimensions.padding50)
+                        .then(
+                            if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
+                                Modifier.background(
+                                    color = PrimaryDarkerLightB75,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            } else {
+                                Modifier.background(
+                                    color = NeutralWhite,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            }
+                        ), contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_participants),
+                        contentDescription = "",
+                        colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
+                            ColorFilter.tint(NeutralWhite)
+                        } else {
+                            ColorFilter.tint(NeutralDarkGrey)
+                        }
+                    )
+
+                }
+                Spacer(modifier = Modifier.height(Dimensions.size10))
+                Text(
+                    text = stringResource(R.string.participants),
+                    style = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                        TypographyBold.bodySmall
+                    } else {
+                        Typography.bodySmall
+                    },
+                    color = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                        NeutralBlack
+                    } else {
+                        NeutralDarkGrey
+                    },
+                    maxLines = 1,
+                    fontSize = Dimensions.textSize12
+                )
+            }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
             Box(
@@ -259,15 +267,18 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
-                text = stringResource(R.string.share), style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                text = stringResource(R.string.share),
+                style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
-                }, color = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                },
+                color = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
-                }, fontSize = Dimensions.textSize12
+                },
+                fontSize = Dimensions.textSize12
             )
         }
     }
@@ -276,9 +287,9 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
 
 @Preview
 @Composable
-fun ButtonPreview(){
-    var viewModel : CreateRideScreenViewModel= viewModel()
-    Box(){
+fun ButtonPreview() {
+    var viewModel: CreateRideScreenViewModel = viewModel()
+    Box() {
         TabSelection(viewModel)
     }
 

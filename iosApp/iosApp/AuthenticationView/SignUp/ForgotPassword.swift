@@ -33,20 +33,9 @@ struct ForgotPassword: View {
                         value: $emailOrPhone,
                         isValidEmail: $isValidEmail
                     )
-                    PasswordFormField(
-                        label: AppStrings.SignInLabel.password.localized,
-                        icon: AppIcon.Login.password,
-                        placeholder: AppStrings.SignInPlaceholder.password.localized,
-                        password: $password
-                    )
-                    PasswordFormField(
-                        label: AppStrings.SignInLabel.confirmPassword.localized,
-                        icon: AppIcon.Login.password,
-                        placeholder: AppStrings.SignInPlaceholder.confirmPassword.localized,
-                        password: $confirmPassword
-                    )
                 }
                 .padding(.bottom, 18)
+                //TODO: Show forgot password mail send toast.
                 ButtonView(title: AppStrings.SignInLabel.updatePassword.localized.uppercased(), onTap: {
                     viewModel.getEmailorPhoneNumber(emailorPhoneNumber: emailOrPhone, password: password, confirmPassword: confirmPassword, onSucess: {
                         hasPasswordReset = true

@@ -163,7 +163,11 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 BorderedButton(
                     modifier = Modifier.weight(1f), onClick = {
                         if (viewModel.tabSelectState.value > 1) {
-                            viewModel.updateTab(-1)
+                            if(viewModel.tabSelectState.value == Constants.TAB_REVIEW
+                                && !viewModel.show_participant_Tab.value)
+                            viewModel.updateTab(-2)
+                            else
+                                viewModel.updateTab(-1)
                         }
                     }, contentPaddingValues = PaddingValues(
                         Dimensions.size0
@@ -185,8 +189,15 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
-                                if (viewModel.routeFieldValidation())
-                                    viewModel.updateTab(1)
+                                if (viewModel.routeFieldValidation()){
+                                    if(viewModel.show_participant_Tab.value){
+                                        viewModel.updateTab(1)
+                                    }else{
+                                        viewModel.updateTab(2)
+                                    }
+
+                                }
+
                             } else if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
                                 viewModel.updateTab(1)
                             } else if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {

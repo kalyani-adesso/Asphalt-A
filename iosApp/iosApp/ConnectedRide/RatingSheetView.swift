@@ -16,11 +16,11 @@ struct RatingSheetView: View {
     
     var ratingText: String {
         switch rating {
-        case 1: return "Very Bad"
-        case 2: return "Bad"
-        case 3: return "Good!"
-        case 4: return "Very Good"
-        case 5: return "Excellent!"
+        case 1: return "Needs improvement"
+        case 2: return "Fair"
+        case 3: return "Good"
+        case 4: return "Great"
+        case 5: return "Excellent"
         default: return ""
         }
     }
