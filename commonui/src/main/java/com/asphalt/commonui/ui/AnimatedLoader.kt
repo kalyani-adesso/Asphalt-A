@@ -77,7 +77,6 @@ fun BouncingCirclesLoader(
                 )
 
                 val currentSizeDp = with(density) {
-                    val heightDifference = baseSize + bounceHeight
                     val animationProgress = 1f - (currentOffset.toDp().value / bounceHeight.value)
                     baseSize + (bounceHeight * animationProgress)
                 }

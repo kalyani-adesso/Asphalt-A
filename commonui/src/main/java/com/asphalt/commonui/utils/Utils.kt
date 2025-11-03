@@ -134,18 +134,13 @@ object Utils {
     }
 
     fun formatDateMillisToISO(timestamp: Long?): String {
-        val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.US)
-
-        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
+        val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
         return timestamp?.let { dateFormat.format(Date(timestamp)) } ?: ""
     }
 
     fun parseISODateToMillis(isoString: String): Long {
         return try {
-            val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.US)
-            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
+            val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
             dateFormat.parse(isoString)?.time ?: 0L
         } catch (e: Exception) {
             e.printStackTrace()

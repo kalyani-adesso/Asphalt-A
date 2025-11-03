@@ -60,7 +60,6 @@ class DashboardRideInviteViewModel(
                 _dashboardRideInvites.value = it.toDashBoardInvites(userList.value)
             }
         }
-
     }
 
     fun updateRideInviteStatus(rideID: String, inviteStatus: Int) {
