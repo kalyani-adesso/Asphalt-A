@@ -16,7 +16,6 @@ import mappers.toDashBoardInvites
 
 class DashboardRideInviteViewModel(
     val ridesRepository: RidesRepository,
-    val userRepository: UserRepository,
     androidUserVM: AndroidUserVM
 ) :
     ViewModel() {
@@ -24,25 +23,17 @@ class DashboardRideInviteViewModel(
     private val currentUid = androidUserVM.userState.value?.uid
     private val _dashboardRideInvites =
         MutableStateFlow<List<DashboardRideInviteUIModel>>(emptyList())
-    private val userList = MutableStateFlow<List<UserDomain>>(emptyList())
+    private val userList = androidUserVM.userList
 
     val dashboardRideInviteList: StateFlow<List<DashboardRideInviteUIModel>> = _dashboardRideInvites
 
     init {
         viewModelScope.launch {
-            loadUserList()
             getDashboardRideInvites()
         }
     }
 
-    suspend fun loadUserList() {
-        APIHelperUI.handleApiResult(
-            APIHelperUI.runWithLoader { userRepository.getAllUsers() },
-            viewModelScope
-        ) {
-            userList.value = it
-        }
-    }
+
 
     private fun removeInviteFromList(rideID: String) {
         _dashboardRideInvites.update { currentList ->

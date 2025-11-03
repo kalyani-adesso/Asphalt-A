@@ -51,8 +51,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
@@ -482,7 +485,8 @@ fun LoginPreview() {
 
 
     var dataStoreManager = DataStoreManager(LocalContext.current)
-    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager)
+    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager, UserRepository(UserAPIServiceImpl(
+        KtorClient())))
     var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth, dataStoreManager, androidVM)
 
     LoginScreen(viewModel, onSignInClick = {
