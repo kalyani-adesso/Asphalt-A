@@ -12,6 +12,7 @@ struct ReviewView: View {
     
     var body: some View {
         ZStack{
+            VStack{
             VStack(spacing: 20) {
                 stepIndicator
                 VStack(alignment: .leading, spacing: 20) {
@@ -46,40 +47,44 @@ struct ReviewView: View {
                 .background(AppColor.backgroundLight)
                 .cornerRadius(10)
             }
-            if viewModel.isRideLoading {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding(.top, 100)
-                    .foregroundColor(.white)
-            }
-        }
-        
-        Spacer()
-        HStack(spacing: 15) {
-            ButtonView( title: AppStrings.CreateRide.previous.rawValue,
-                        background: LinearGradient(
-                            gradient: Gradient(colors: [.white, .white]),
-                            startPoint: .leading,
-                            endPoint: .trailing),
-                        foregroundColor: AppColor.celticBlue,
-                        showShadow: false ,
-                        borderColor: AppColor.celticBlue , onTap: {
-                viewModel.previousStep()
-            })
             
-            ButtonView( title: AppStrings.CreateRide.create.rawValue,
-                        showShadow: false , onTap: {
-                viewModel.createRide(completion: {success in
-                    if success {
-                        viewModel.nextStep()
-                    }
+            Spacer()
+            
+            HStack(spacing: 15) {
+                ButtonView( title: AppStrings.CreateRide.previous.rawValue,
+                            background: LinearGradient(
+                                gradient: Gradient(colors: [.white, .white]),
+                                startPoint: .leading,
+                                endPoint: .trailing),
+                            foregroundColor: AppColor.celticBlue,
+                            showShadow: false ,
+                            borderColor: AppColor.celticBlue , onTap: {
+                    viewModel.previousStep()
                 })
+                
+                ButtonView( title: AppStrings.CreateRide.create.rawValue,
+                            showShadow: false , onTap: {
+                    viewModel.createRide(completion: {success in
+                        if success {
+                            viewModel.nextStep()
+                        }
+                    })
+                }
+                )
             }
-            )
+            .padding()
         }
-        .padding()
+            
+                        if viewModel.isRideLoading {
+                            Color.black.opacity(0.5)
+                                .ignoresSafeArea()
+                            ProgressView("Loading...")
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .padding(.top, 100)
+                                .foregroundColor(.white)
+                        }
+                    }
+            
     }
     var stepIndicator: some View {
         HStack(spacing: 32) {

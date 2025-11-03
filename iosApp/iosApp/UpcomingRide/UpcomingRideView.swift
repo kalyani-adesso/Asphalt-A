@@ -9,141 +9,170 @@ import SwiftUI
 
 struct UpcomingRideView: View {
     @StateObject private var viewModel = UpcomingRideViewModel()
-    @State private var selectedStatus: String? = nil
-    @State private var showHomeView:Bool = false
-    @StateObject private var homeViewModel = HomeViewModel()
-    @State var showHome: Bool = false
+    @State private var selectedStatus: RideAction = .upcoming
+    @State private var showHome: Bool = false
     @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
+    
+    
     var body: some View {
-        
-        
-        ZStack{
+        ZStack {
             NavigationStack {
                 SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
                     onBackToHome?()
                     showHome = true
-                } )
+                })
                 
                 VStack {
+                    
+                    // Segment buttons
                     HStack(spacing: 12) {
-                        ForEach(viewModel.rideStatus, id: \.self) { status in
-                            let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
-                            SegmentButtonView(
-                                rideStatus: status.rawValue,
-                                isSelected: isSelected
-                            ) {
-                                selectedStatus = status.rawValue
-                            }
+                        SegmentButtonView(rideStatus: "Upcoming", isSelected: selectedStatus == .upcoming) {
+                            selectedStatus = .upcoming
+                        }
+                        SegmentButtonView(rideStatus: "History", isSelected: selectedStatus == .history) {
+                            selectedStatus = .history
+                        }
+                        SegmentButtonView(invitesNotification: !viewModel.inviteRides.isEmpty, rideStatus: "Invites", isSelected: selectedStatus == .invites) {
+                            selectedStatus = .invites
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
+                    .background(RoundedRectangle(cornerRadius: 10).fill(AppColor.listGray))
                     .padding([.leading, .trailing])
                     .contentShape(Rectangle())
-                    VStack {
-                        List {
-                            ForEach($viewModel.rides.filter { $ride in
-                                ride.rideAction.rawValue == selectedStatus
-                            }, id: \.id) { $ride in
-                                UpComingView(ride: $ride)
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                            }
+                    
+                    // Ride list
+                    List {
+                        ForEach(currentRides(), id: \.id) { ride in
+                            UpComingView(ride: .constant(ride))
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
                 .onAppear {
-                    selectedStatus = viewModel.rideStatus.first?.rawValue
+                    Task {
+                        await viewModel.fetchAllRides()
+                    }
                     if showpopup {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                withAnimation(.easeInOut) {
-                                    showpopup = false
-                                }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation(.easeInOut) {
+                                showpopup = false
                             }
                         }
+                    }
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHome, destination: {
+            .navigationDestination(isPresented: $showHome) {
                 BottomNavBar()
-            })
+            }
             
-            
-            // Popup overlay (always stays above)
+            // Popup overlay
             if showpopup {
-                // Dimmed background
                 AppColor.backgroundLight.opacity(0.7)
                     .ignoresSafeArea()
                     .zIndex(1)
                     .onTapGesture {
-                        withAnimation {
-                            showpopup = false
-                        }
+                        withAnimation { showpopup = false }
                     }
                 
-                // Popup content
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
                         subMessage: "Your ride has been created and is now live for other riders to join."
                     )
-                    
                     Spacer()
                 }
                 .frame(width: 390, height: 620)
                 .transition(.scale)
                 .zIndex(2)
             }
+            if viewModel.isRideLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
+            }
         }
         .zIndex(showpopup ? 2 : 0)
     }
+    
+    // Return rides based on selected segment
+    private func currentRides() -> [RideModel] {
+        switch selectedStatus {
+        case .upcoming:
+            return viewModel.upcomingRides
+        case .invites:
+            return viewModel.inviteRides
+        case .history:
+            return viewModel.historyRides
+        }
+    }
 }
 
+
 struct SegmentButtonView: View {
+    var invitesNotification: Bool = false
     var rideStatus: String
     var isSelected: Bool = false
     var onTap: (() -> Void)? = nil
     var body: some View {
-        Button(action: {
-            onTap?()
-        }) {
-            Text(rideStatus)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    Group {
-                        if isSelected {
-                            LinearGradient(
-                                gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        } else {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(AppColor.white)
+        ZStack(alignment: .topTrailing) {
+            Button(action: {
+                onTap?()
+            }) {
+                Text(rideStatus)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        Group {
+                            if isSelected {
+                                LinearGradient(
+                                    gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            } else {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.white)
+                            }
                         }
-                    }
-                )
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-                .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
-                        radius: isSelected ? 4 : 0,
-                        x: 0, y: isSelected ? 2 : 0)
-                .foregroundColor(isSelected ? AppColor.white : .black)
-                .font(KlavikaFont.bold.font(size: 16))
+                    )
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
+                            radius: isSelected ? 4 : 0,
+                            x: 0, y: isSelected ? 2 : 0)
+                    .foregroundColor(isSelected ? AppColor.white : .black)
+                    .font(KlavikaFont.bold.font(size: 16))
+            }
+            .buttonStyle(.plain)
+            if invitesNotification {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 19, height: 19)
+                        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
+                    
+                    // Inner blue circle
+                    Circle()
+                        .fill(AppColor.celticBlue)
+                        .frame(width: 12, height: 12)
+                }
+                .offset(x: 10, y: -5)
+            }
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -152,7 +181,7 @@ struct UpComingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 11) {
-                (ride.rideAction == .invities ? AppIcon.Profile.profile : rideIcon)
+                (ride.rideAction == .invites ? AppIcon.Profile.profile : rideIcon)
                     .resizable()
                     .modifier(RoundCorner(rideAction: ride.rideAction))
                     .frame(width: 30, height: 30)
@@ -165,7 +194,7 @@ struct UpComingView: View {
                         .foregroundColor(AppColor.stoneGray)
                 }
                 Spacer()
-                if ride.rideAction == .invities {
+                if ride.rideAction == .invites {
                     Button(action: {
                         
                     }) {
@@ -218,7 +247,7 @@ struct UpComingView: View {
                     .padding(.bottom,20)
                     .buttonStyle(.plain)
                 } else {
-                    ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(),onTap: {
+                    ButtonView(title: ride.rideAction == .invites ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(),onTap: {
                         
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
@@ -280,7 +309,7 @@ struct UpComingView: View {
 struct RoundCorner: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invities {
+        if rideAction == .invites {
             content
                 .overlay(
                     RoundedRectangle(cornerRadius: 15)
@@ -295,7 +324,7 @@ struct RoundCorner: ViewModifier {
 struct ButtonWidth: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invities {
+        if rideAction == .invites {
             content
                 .frame(maxWidth: .infinity)
         } else {
@@ -308,7 +337,7 @@ struct ButtonWidth: ViewModifier {
 struct ButtonBackground: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invities {
+        if rideAction == .invites {
             content
                 .background(AppColor.red)
                 .foregroundStyle(AppColor.white)

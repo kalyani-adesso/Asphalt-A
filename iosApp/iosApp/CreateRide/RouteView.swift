@@ -82,7 +82,7 @@ struct RouteView: View {
                     viewModel.nextStep()
                 }
             )
-            .disabled(!viewModel.isRouteValid)
+           .disabled(!viewModel.isRouteValid)
         }
         .padding()
     }

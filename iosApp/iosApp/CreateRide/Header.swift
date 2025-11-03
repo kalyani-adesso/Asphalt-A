@@ -14,16 +14,22 @@ struct Header: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button {
-                    if viewModel.currentStep > 1 {
-                        viewModel.previousStep()
-                    } else {
-                        goToHome = true
+                if viewModel.currentStep < 5 {
+                    Button {
+                        if viewModel.currentStep > 1 {
+                            viewModel.previousStep()
+                        } else {
+                            goToHome = true
+                        }
+                    } label: {
+                        AppIcon.CreateRide.backButton
+                            .frame(width: 24, height: 24)
                     }
-                } label: {
-                    AppIcon.CreateRide.backButton
-                        .frame(width: 24, height: 24)
+                } else {
+                    // Keep space so the title stays centered
+                    Spacer().frame(width: 24)
                 }
+                
                 
                 Spacer()
                 
