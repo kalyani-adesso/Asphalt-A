@@ -11,64 +11,80 @@ struct ReviewView: View {
     @ObservedObject var viewModel: CreateRideViewModel
     
     var body: some View {
-        VStack(spacing: 20) {
-            stepIndicator
-            VStack(alignment: .leading, spacing: 20) {
-                HStack {
-                    Text("Review Your Ride")
-                        .font(KlavikaFont.medium.font(size: 16))
-                }
-                ReviewCard(
-                    icon: AppIcon.Home.nearMe,
-                    iconColor: AppColor.lightBlue,
-                    title: viewModel.ride.title,
-                    subtitle: viewModel.ride.description,
-                    tag: tagValue)
-                ReviewCard(
-                    icon: AppIcon.Home.calender,
-                    iconColor: AppColor.darkOrange,
-                    title: "Date and Time",
-                    subtitle: formattedDateTime)
-                ReviewCard(
-                    icon: AppIcon.CreateRide.route,
-                    iconColor: AppColor.purple,
-                    title: "Route",
-                    subtitle: "\(viewModel.ride.startLocation) - \(viewModel.ride.endLocation)")
-                ReviewCard(
-                    icon: AppIcon.Home.group,
-                    iconColor: AppColor.lightOrange,
-                    title: "Participants",
-                    subtitle:"\(viewModel.selectedParticipants.count) riders selected")
-            }
-            .frame(width: 343, height: 430)
-            .padding()
-            .background(AppColor.backgroundLight)
-            .cornerRadius(10)
-        }
-        Spacer()
-        HStack(spacing: 15) {
-            ButtonView( title: AppStrings.CreateRide.previous.rawValue,
-                        background: LinearGradient(
-                            gradient: Gradient(colors: [.white, .white]),
-                            startPoint: .leading,
-                            endPoint: .trailing),
-                        foregroundColor: AppColor.celticBlue,
-                        showShadow: false ,
-                        borderColor: AppColor.celticBlue , onTap: {
-                viewModel.previousStep()
-            })
-            
-            ButtonView( title: AppStrings.CreateRide.create.rawValue,
-                        showShadow: false , onTap: {
-                viewModel.createRide(completion: {success in
-                    if success {
-                        viewModel.nextStep()
+        ZStack{
+            VStack{
+            VStack(spacing: 20) {
+                stepIndicator
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack {
+                        Text("Review Your Ride")
+                            .font(KlavikaFont.medium.font(size: 16))
                     }
-                })
+                    ReviewCard(
+                        icon: AppIcon.Home.nearMe,
+                        iconColor: AppColor.lightBlue,
+                        title: viewModel.ride.title,
+                        subtitle: viewModel.ride.description,
+                        tag: tagValue)
+                    ReviewCard(
+                        icon: AppIcon.Home.calender,
+                        iconColor: AppColor.darkOrange,
+                        title: "Date and Time",
+                        subtitle: formattedDateTime)
+                    ReviewCard(
+                        icon: AppIcon.CreateRide.route,
+                        iconColor: AppColor.purple,
+                        title: "Route",
+                        subtitle: "\(viewModel.ride.startLocation) - \(viewModel.ride.endLocation)")
+                    ReviewCard(
+                        icon: AppIcon.Home.group,
+                        iconColor: AppColor.lightOrange,
+                        title: "Participants",
+                        subtitle:"\(viewModel.selectedParticipants.count) riders selected")
+                }
+                .frame(width: 343, height: 430)
+                .padding()
+                .background(AppColor.backgroundLight)
+                .cornerRadius(10)
             }
-            )
+            
+            Spacer()
+            
+            HStack(spacing: 15) {
+                ButtonView( title: AppStrings.CreateRide.previous.rawValue,
+                            background: LinearGradient(
+                                gradient: Gradient(colors: [.white, .white]),
+                                startPoint: .leading,
+                                endPoint: .trailing),
+                            foregroundColor: AppColor.celticBlue,
+                            showShadow: false ,
+                            borderColor: AppColor.celticBlue , onTap: {
+                    viewModel.previousStep()
+                })
+                
+                ButtonView( title: AppStrings.CreateRide.create.rawValue,
+                            showShadow: false , onTap: {
+                    viewModel.createRide(completion: {success in
+                        if success {
+                            viewModel.nextStep()
+                        }
+                    })
+                }
+                )
+            }
+            .padding()
         }
-        .padding()
+            
+                        if viewModel.isRideLoading {
+                            Color.black.opacity(0.5)
+                                .ignoresSafeArea()
+                            ProgressView("Loading...")
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .padding(.top, 100)
+                                .foregroundColor(.white)
+                        }
+                    }
+            
     }
     var stepIndicator: some View {
         HStack(spacing: 32) {

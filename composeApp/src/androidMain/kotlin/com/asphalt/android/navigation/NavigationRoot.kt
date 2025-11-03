@@ -326,7 +326,7 @@ fun NavigationRoot(
                         )
                     }
                     entry<AppNavKey.RidesScreenNav> { key ->
-                        RidesScreen(setTopAppBarState)
+                        RidesScreen(setTopAppBarState=setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
                         QueriesScreen(setTopAppBarState = setTopAppBarState)
