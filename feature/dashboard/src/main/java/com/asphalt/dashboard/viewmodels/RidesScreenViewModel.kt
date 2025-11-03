@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
-import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
-import com.asphalt.commonui.utils.Utils
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
@@ -19,9 +18,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-class RidesScreenViewModel : ViewModel(), KoinComponent {
+class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), KoinComponent {
+    private val currentUid = androidUserVM.userState.value?.uid
     val ridesRepo: RidesRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
+
     private val _tabSelectionMutableFlow: MutableState<Int> = mutableStateOf(
         RideStatConstants.UPCOMING_RIDE
     )
@@ -36,7 +37,7 @@ class RidesScreenViewModel : ViewModel(), KoinComponent {
         _tabSelectionMutableFlow.value = tab
     }
 
-    fun getRides1() {
+    fun getRides() {
 
         viewModelScope.launch {
             var user = userRepoImpl.getUserDetails()
@@ -46,8 +47,9 @@ class RidesScreenViewModel : ViewModel(), KoinComponent {
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
                 val sortedArray = response.sortedByDescending { it.createdDate }
 
-                var upcoming = RidesFilter.getUComingRides(sortedArray, user?.uid ?: "")
-                var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "")
+                var upcoming =
+                    RidesFilter.getUComingRides(sortedArray, user?.uid ?: "", androidUserVM)
+                var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "", androidUserVM)
                 var upcomiList = ArrayList<YourRideDataModel>()
                 var inviteList = ArrayList<YourRideDataModel>()
                 upcomiList.addAll(upcoming)
@@ -64,53 +66,71 @@ class RidesScreenViewModel : ViewModel(), KoinComponent {
 
     }
 
+    fun acceptDeclined(rideID: String, status: Int) {
+        viewModelScope.launch {
+            currentUid?.let {
+                APIHelperUI.handleApiResult(
+                    APIHelperUI.runWithLoader {
+                        ridesRepo.changeRideInviteStatus(rideID, currentUid, status)
+                    }, viewModelScope
+                ) {
+                    getRides()
+                }
 
-    fun getRides() {
-        var upcoming = YourRideDataModel(
-            title = "Kanyakumari Trip",
-            place = "Kochi - Kanyakumari",
-            rideStatus = "Upcoming".uppercase(),
-            date = "Sun, Oct 26 - 02:00 PM", 2
-        )
-        var upcoming1 = YourRideDataModel(
-            title = "Trip to Moonnar",
-            place = "Kochi - Moonnar",
-            rideStatus = "Queue".uppercase(),
-            date = "Sun, Oct 26 - 04:00 AM", 2
-        )
-        var upcoming2 = YourRideDataModel(
-            title = "Weekend Coast Ride",
-            place = "Kochi - Vagamon",
-            rideStatus = "Queue".uppercase(),
-            date = "Thu, Oct 23 - 05:00 AM", 2
-        )
+            }
 
-        var hirtory = YourRideDataModel(
-            title = "Weekend Coast Ride",
-            place = "Kochi - Kanyakumari",
-            rideStatus = "Completed".uppercase(),
-            date = "Sun, Jun 22", 2
-        )
-        var hirtory1 = YourRideDataModel(
-            title = "Vagamon trip",
-            place = "Kochi - Vagamon",
-            rideStatus = "Completed".uppercase(),
-            date = "Tue, Jun 24", 2
-        )
+        }
 
-        var invites = YourRideDataModel(
-            title = "Invite from Sooraj",
-            place = "Kochi - Kanyakumari",
-            rideStatus = "",
-            date = "Tomorrow - 08:00 AM", 2
-        )
 
-        var invites1 = YourRideDataModel(
-            title = "Invite from Sreedev",
-            place = "Kochi - Wayanad",
-            rideStatus = "",
-            date = "Tomorrow - 08:00 AM", 2
-        )
     }
+
+
+//    fun getRides() {
+//        var upcoming = YourRideDataModel(
+//            title = "Kanyakumari Trip",
+//            place = "Kochi - Kanyakumari",
+//            rideStatus = "Upcoming".uppercase(),
+//            date = "Sun, Oct 26 - 02:00 PM", 2
+//        )
+//        var upcoming1 = YourRideDataModel(
+//            title = "Trip to Moonnar",
+//            place = "Kochi - Moonnar",
+//            rideStatus = "Queue".uppercase(),
+//            date = "Sun, Oct 26 - 04:00 AM", 2
+//        )
+//        var upcoming2 = YourRideDataModel(
+//            title = "Weekend Coast Ride",
+//            place = "Kochi - Vagamon",
+//            rideStatus = "Queue".uppercase(),
+//            date = "Thu, Oct 23 - 05:00 AM", 2
+//        )
+//
+//        var hirtory = YourRideDataModel(
+//            title = "Weekend Coast Ride",
+//            place = "Kochi - Kanyakumari",
+//            rideStatus = "Completed".uppercase(),
+//            date = "Sun, Jun 22", 2
+//        )
+//        var hirtory1 = YourRideDataModel(
+//            title = "Vagamon trip",
+//            place = "Kochi - Vagamon",
+//            rideStatus = "Completed".uppercase(),
+//            date = "Tue, Jun 24", 2
+//        )
+//
+//        var invites = YourRideDataModel(
+//            title = "Invite from Sooraj",
+//            place = "Kochi - Kanyakumari",
+//            rideStatus = "",
+//            date = "Tomorrow - 08:00 AM", 2
+//        )
+//
+//        var invites1 = YourRideDataModel(
+//            title = "Invite from Sreedev",
+//            place = "Kochi - Wayanad",
+//            rideStatus = "",
+//            date = "Tomorrow - 08:00 AM", 2
+//        )
+//    }
 
 }
