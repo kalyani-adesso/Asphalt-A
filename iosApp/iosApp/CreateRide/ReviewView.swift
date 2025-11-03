@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ReviewView: View {
     @ObservedObject var viewModel: CreateRideViewModel
-
+    
     var body: some View {
         VStack(spacing: 20) {
             stepIndicator
@@ -60,7 +60,11 @@ struct ReviewView: View {
             
             ButtonView( title: AppStrings.CreateRide.create.rawValue,
                         showShadow: false , onTap: {
-                viewModel.nextStep()
+                viewModel.createRide(completion: {success in
+                    if success {
+                        viewModel.nextStep()
+                    }
+                })
             }
             )
         }

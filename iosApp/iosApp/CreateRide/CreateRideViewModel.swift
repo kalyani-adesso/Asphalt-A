@@ -51,7 +51,9 @@ class CreateRideViewModel: NSObject, ObservableObject {
     }
     
     func nextStep() {
-        if currentStep < 5 { currentStep += 1 }
+        DispatchQueue.main.async {
+            if self.currentStep < 5 { self.currentStep += 1 }
+        }
     }
     
     func previousStep() {
@@ -131,16 +133,27 @@ extension CreateRideViewModel {
         }
     }
     
-    func createRide() {
-        //TODO: You have to store all the particpants map it according to the structure
+    func createRide(completion: @escaping (Bool) -> Void) {
         
-        // TODO: convert date and time to long
-       
-        let userInvites = UserInvites(acceptInvite: 0)
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: <#T##KotlinLong?#>, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: <#T##KotlinLong?#>, participants: , startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        let participantDict: [String: UserInvites] = Dictionary(
+            uniqueKeysWithValues: participants.map { participant in
+                (participant.userId, UserInvites(acceptInvite: 0))
+            }
+        )
+        
+        let createdDateLong = Int64(Date().timeIntervalSince1970 * 1000)
+        let startDateLong = Int64((ride.date?.timeIntervalSince1970 ?? 0) * 1000)
+        
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: startDateLong as? KotlinLong, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate:createdDateLong as? KotlinLong , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
-            //TODO: Display the response.
-            
+            if let success = rideResult as? APIResultSuccess<AnyObject>,
+               let data = success.data as? GenericResponse {
+                //TODO: 1. storing ride id
+                print("ride id:\(data.name)")
+                // TODO: Participant selection fix.
+                    completion(true)
+            }
         })
     }
 }
+
