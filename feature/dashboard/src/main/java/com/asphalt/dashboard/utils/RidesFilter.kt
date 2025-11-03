@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.utils
 
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -21,7 +22,7 @@ object RidesFilter {
                     if (ride.participants.isNullOrEmpty()) {
                         UPCOMING
                     } else {
-                        val participant = ride.participants.find { it.inviteStatus == 0 }
+                        val participant = ride.participants.find { it.inviteStatus == APIConstants.RIDE_INVITED }
                         if (participant == null) {
                             UPCOMING
                         } else {
@@ -36,7 +37,7 @@ object RidesFilter {
                     val participant = ride.participants.find { it.userId == userId }
                     participant?.let {
                         when (it.inviteStatus) {
-                            1 -> UPCOMING
+                            APIConstants.RIDE_ACCEPTED -> UPCOMING
                             else -> null
                         }
                     }
@@ -70,8 +71,8 @@ object RidesFilter {
             // Step 2: find participant matching current user
             val participant = ride.participants.find { it.userId == userId }
 
-            // Step 3: check if participant exists and inviteStatus == 1
-            if (participant != null && participant.inviteStatus == 0) {
+            // Step 3: check if participant exists and inviteStatus == 0
+            if (participant != null && participant.inviteStatus == APIConstants.RIDE_INVITED) {
                 val userDomain: UserDomain? = androidUserVM.getUser(ride.createdBy ?: "")
                 YourRideDataModel(
                     ridesId = ride.ridesID,
@@ -84,7 +85,7 @@ object RidesFilter {
                     profileImageUrl = userDomain?.profilePic
                 )
             } else {
-                null // Skip if participant not found or inviteStatus != 1
+                null // Skip if participant not found
             }
 
         }

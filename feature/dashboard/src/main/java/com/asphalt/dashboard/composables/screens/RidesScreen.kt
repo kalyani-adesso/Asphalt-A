@@ -68,6 +68,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.viewmodels.RidesScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -157,7 +158,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(modifier = Modifier.weight(1f)) {
-                if (upconing.rideStatus == "UPCOMING") {
+                if (upconing.rideStatus == UPCOMING) {
                     ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
                 } else {
                     ColorIconRounded(backColor = VividOrangeLight, resId = R.drawable.ic_location)
@@ -184,7 +185,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                 modifier = Modifier
                     .height(Dimensions.size30)
                     .then(
-                        if (upconing.rideStatus == "UPCOMING") {
+                        if (upconing.rideStatus == UPCOMING) {
                             Modifier.background(
                                 color = MagentaDeep,
                                 shape = RoundedCornerShape(Dimensions.size10)
@@ -283,7 +284,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = if (upconing.rideStatus == "UPCOMING") {
+                    text = if (upconing.rideStatus == UPCOMING) {
                         stringResource(R.string.view_details).uppercase()
                     } else {
                         stringResource(R.string.check_responses).uppercase()
