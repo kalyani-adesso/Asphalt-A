@@ -37,7 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -464,7 +467,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        text = invites.title ?: "",
+                        text = stringResource(R.string.invite_from, invites.createdUSerName ?: ""),
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -700,7 +703,8 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
 @Composable
 fun RidesPreview() {
     var dataStoreManager = DataStoreManager(LocalContext.current)
-    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager)
+    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager,
+        UserRepository(UserAPIServiceImpl(KtorClient())))
     var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
 
     RidesScreen(ridesScreenViewModel,{})

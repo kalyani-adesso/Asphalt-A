@@ -47,8 +47,9 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
                 val sortedArray = response.sortedByDescending { it.createdDate }
 
-                var upcoming = RidesFilter.getUComingRides(sortedArray, user?.uid ?: "")
-                var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "")
+                var upcoming =
+                    RidesFilter.getUComingRides(sortedArray, user?.uid ?: "", androidUserVM)
+                var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "", androidUserVM)
                 var upcomiList = ArrayList<YourRideDataModel>()
                 var inviteList = ArrayList<YourRideDataModel>()
                 upcomiList.addAll(upcoming)
