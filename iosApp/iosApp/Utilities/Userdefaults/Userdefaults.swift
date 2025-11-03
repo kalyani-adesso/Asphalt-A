@@ -52,6 +52,15 @@ struct MBUserDefaults {
         }
     }
     
+    static var rideIdStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.rideId.rawValue)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.rideId.rawValue)
+        }
+    }
+    
     static var removeAllUserDefaults: Void {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
     }

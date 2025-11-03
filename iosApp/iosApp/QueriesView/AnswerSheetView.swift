@@ -146,9 +146,9 @@ struct AnswerSheetView: View {
                             Spacer()
                             Button {
                                 Task {
+                                    dismiss()
                                     await viewModel.addAnswer()
                                     viewModel.answerText = ""
-                                    dismiss()
                                 }
                             } label: {
                                 HStack {

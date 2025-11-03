@@ -13,11 +13,13 @@ class CreateRideViewModel: NSObject, ObservableObject {
     
     @Published var ride = Ride()
     @Published var currentStep = 1
-    @Published var selectedParticipants: Set<UUID> = []
+    @Published var selectedParticipants: Set<String> = []
     @Published var shareLink = "https://adessoriderclub.app/12121312"
     @Published var selectedTime: Date? = nil
     @Published var selectedDate: Date? = nil
-
+    @Published var isRideLoading = false
+    private var currentUserId = MBUserDefaults.userIdStatic ?? ""
+    
     @Published var query = "" {
         didSet {
             completer.queryFragment = query
@@ -26,7 +28,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
     
     private var completer: MKLocalSearchCompleter
-
+    
     var isSelectingStart = true
     
     @Published  var participants: [Participant] = []
@@ -58,6 +60,17 @@ class CreateRideViewModel: NSObject, ObservableObject {
     
     func previousStep() {
         if currentStep > 1 { currentStep -= 1 }
+    }
+    func isSelected(_ id: String) -> Bool {
+        selectedParticipants.contains(id)
+    }
+    
+    func toggle(_ id: String) {
+        if selectedParticipants.contains(id) {
+            selectedParticipants.remove(id)
+        } else {
+            selectedParticipants.insert(id)
+        }
     }
 }
 
@@ -110,19 +123,23 @@ extension CreateRideViewModel {
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
                 
-                let participants = domainList.map { user in
-                    Participant(
-                        name: user.name,
-                        role: user.isMechanic ? "Mechanic" : nil,
-                        bike: user.primaryBike,
-                        image: user.profilePic.isEmpty ? "avatar1" : user.profilePic,
-                        isOnline: true,
-                        userId: user.uid
-                    )
-                }
+                let filtered = domainList
+                    .filter { $0.uid != self.currentUserId }
+                    .map { user in
+                        
+                        Participant(
+                            id: user.uid,
+                            name: user.name,
+                            role: user.isMechanic ? "Mechanic" : nil,
+                            bike: user.primaryBike,
+                            image: user.profilePic.isEmpty ? "avatar1" : user.profilePic,
+                            isOnline: true,
+                            userId: user.uid
+                        )
+                    }
                 
                 DispatchQueue.main.async {
-                    self.participants = participants
+                    self.participants = filtered
                 }
                 
             } else if let error = error {
@@ -134,7 +151,7 @@ extension CreateRideViewModel {
     }
     
     func createRide(completion: @escaping (Bool) -> Void) {
-        
+        self.isRideLoading = true
         let participantDict: [String: UserInvites] = Dictionary(
             uniqueKeysWithValues: participants.map { participant in
                 (participant.userId, UserInvites(acceptInvite: 0))
@@ -142,18 +159,59 @@ extension CreateRideViewModel {
         )
         
         let createdDateLong = Int64(Date().timeIntervalSince1970 * 1000)
-        let startDateLong = Int64((ride.date?.timeIntervalSince1970 ?? 0) * 1000)
+        var startDateLong: Int64 = 0
+        if let merged = combine(date: selectedDate, time: selectedTime) {
+            startDateLong = Int64(merged.timeIntervalSince1970 * 1000)
+        }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: startDateLong as? KotlinLong, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate:createdDateLong as? KotlinLong , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
                let data = success.data as? GenericResponse {
-                //TODO: 1. storing ride id
-                print("ride id:\(data.name)")
-                // TODO: Participant selection fix.
+                Task { @MainActor in
+                    self.isRideLoading = false
+                    print("ride id:\(data.name)")
+                    MBUserDefaults.rideIdStatic = data.name
                     completion(true)
+                }
             }
         })
     }
+    
+    // MARK: - Epoch converter
+    func combine(date: Date?, time: Date?) -> Date? {
+        guard let date = date, let time = time else { return nil }
+        
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var merged = DateComponents()
+        merged.year = dateComponents.year
+        merged.month = dateComponents.month
+        merged.day = dateComponents.day
+        merged.hour = timeComponents.hour
+        merged.minute = timeComponents.minute
+        
+        return calendar.date(from: merged)
+    }
+    
+    // MARK: - Details View validation
+    var isDetailsValid: Bool {
+        guard let type = ride.type,
+              !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
+              !ride.description.trimmingCharacters(in: .whitespaces).isEmpty,
+              selectedDate != nil,
+              selectedTime != nil
+        else { return false }
+        return true
+    }
+    
+    // MARK: - Route View validation
+    var isRouteValid: Bool {
+        !ride.startLocation.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !ride.endLocation.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+    
 }
 

@@ -33,7 +33,7 @@ enum RideType: String, CaseIterable, Identifiable {
 }
 
 struct Participant: Identifiable {
-    let id = UUID()
+    let id : String
     let name: String
     let role: String?
     let bike: String
