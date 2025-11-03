@@ -47,12 +47,13 @@ struct SelectedBikeType: Identifiable,Hashable {
     let id = UUID()
     let model: String
     let make: String
-    let type: String
+    let type: Int32
     let bikeId: String
 }
 
 @MainActor
-final class ProfileViewModel: ObservableObject {
+class ProfileViewModel: ObservableObject {
+    @Published var isLoading = false
     @Published var profileName = "--"
     @Published var email = "--"
     @Published var role = ""
@@ -112,15 +113,15 @@ final class ProfileViewModel: ObservableObject {
         ]
     }
     
-    func validateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String) -> Bool {
-        return fullName.isEmpty && email.isEmpty && phoneNumber.isEmpty && emargencyContact.isEmpty && DL.isEmpty
+    func validateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String, isMachanic:Bool ) -> Bool {
+        return fullName.isEmpty && email.isEmpty && phoneNumber.isEmpty && emargencyContact.isEmpty && DL.isEmpty && !isMachanic
     }
     
     func validateMake(make:String,moodel:String) -> Bool {
         return make.isEmpty && moodel.isEmpty
     }
     
-    func getBikeType(model:String,make:String,type:String,bikeId:String) {
+    func getBikeType(model:String,make:String,type:Int32,bikeId:String) {
         selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type, bikeId: bikeId))
     }
     
@@ -138,21 +139,29 @@ final class ProfileViewModel: ObservableObject {
 extension ProfileViewModel {
     func fetchProfile(userId: String) async {
         do {
+            self.isLoading = true
             try await withCheckedThrowingContinuation { continuation in
                 profileRepository.getProfile(userId: userId) { result, error in
                     if let success = result as? APIResultSuccess<AnyObject>,
                        let domain = success.data as? ProfileDomain {
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             self.profileName = domain.userName
                             self.email = domain.email
                             self.phoneNumber = domain.phoneNumber
                             self.role = domain.isMechanic ? "Mechanic" : ""
+                            self.isLoading = false
+                            continuation.resume()
                         }
-                        continuation.resume()
+                       
+                     
                     } else if let error = error {
-                        continuation.resume(throwing: error)
+                        Task { @MainActor in
+                            continuation.resume(throwing: error)
+                        }
                     } else {
-                        continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
+                        Task { @MainActor in
+                            continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
+                        }
                     }
                 }
             }
@@ -166,11 +175,12 @@ extension ProfileViewModel {
     
     func fetchBikes(userId: String) async {
         do {
+           isLoading = true
             try await withCheckedThrowingContinuation { continuation in
-                profileRepository.getBikes(userId: userId) { result, error in
+                profileRepository.getBikes(userId: userId) { [self] result, error in
                     if let success = result as? APIResultSuccess<AnyObject>,
                        let domainArray = success.data as? [BikeDomain] {
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             self.selectedBikeType.removeAll()
                             for eachBike in domainArray {
                                 self.getBikeType(
@@ -180,12 +190,19 @@ extension ProfileViewModel {
                                     bikeId: eachBike.bikeId
                                 )
                             }
+                            isLoading = false
+                             continuation.resume()
                         }
-                        continuation.resume()
+                     
                     } else if let error = error {
-                        continuation.resume(throwing: error)
+                        Task { @MainActor in
+                            continuation.resume(throwing: error)
+                            
+                        }
                     } else {
-                        continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
+                        Task { @MainActor in
+                            continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
+                        }
                     }
                 }
             }
@@ -194,9 +211,9 @@ extension ProfileViewModel {
         }
     }
 
-    func addNewBike(userId: String, model: String, make: String, type: String) async {
+    func addNewBike(userId: String, model: String, make: String, type:Int32) async {
         do {
-            try await profileRepository.addBike(userId: userId, bikeId: "", bikeType: type, make: make, model: model)
+            try await profileRepository.addBike(userId: userId, bikeType: type, make: make, model: model)
             print("Bike added successfully")
             await fetchBikes(userId: userId)
         } catch {
@@ -204,7 +221,6 @@ extension ProfileViewModel {
         }
     }
 
-    
     func editProfile(
         userId: String,
         userName: String,
@@ -232,8 +248,10 @@ extension ProfileViewModel {
     
     func deleteBike(userId: String, bikeId: String) async {
         Task {
+           isLoading = true
             do {
                 try await profileRepository.deleteBike(userId: userId, bikeId: bikeId)
+                isLoading = false
             }
         }
     }

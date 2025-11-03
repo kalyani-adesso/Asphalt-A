@@ -28,7 +28,7 @@ struct SelectYourRideView: View {
                         AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
                         ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
                             Task {
-                                await viewModel.addNewBike(userId: MBUserDefaults.userIdStatic ?? "", model: model, make: make, type:viewModel.vehicleArray[currentPage].rawValue)
+                                await viewModel.addNewBike(userId: MBUserDefaults.userIdStatic ?? "", model: model, make: make, type:viewModel.vehicleArray[currentPage].constantValue)
                             }
                            
                             isPresented = false
@@ -171,7 +171,6 @@ struct AddBikeView: View {
                 Task {
                     await viewModel.deleteSelectedBikeType(id: bikeId)
                 }
-               
             }) {
                 AppIcon.Profile.deleteBike
                     .resizable()

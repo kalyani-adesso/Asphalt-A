@@ -41,13 +41,8 @@ struct ParticipantsView: View {
                             ParticipantsRow(
                                 participant: participant,
                                 isSelected: Binding(
-                                    get: { viewModel.selectedParticipants.contains(participant.id) },
-                                    set: { newValue in
-                                        if newValue {
-                                            viewModel.selectedParticipants.insert(participant.id)
-                                        } else {
-                                            viewModel.selectedParticipants.remove(participant.id)
-                                        }
+                                    get: { viewModel.isSelected(participant.id) },
+                                    set: { _ in viewModel.toggle(participant.id)
                                     }
                                 )
                             )
@@ -81,6 +76,9 @@ struct ParticipantsView: View {
             
         }
         .padding()
+        .onAppear {
+            viewModel.getAllUsers()
+        }
     }
     var filteredParticipants: [Participant] {
         if searchText.isEmpty {
