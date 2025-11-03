@@ -247,7 +247,7 @@ struct UpComingView: View {
                     .padding(.bottom,20)
                     .buttonStyle(.plain)
                 } else {
-                    ButtonView(title: ride.rideAction == .invites ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(),onTap: {
+                    ButtonView(title: ride.rideAction == .invites ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
                         
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
