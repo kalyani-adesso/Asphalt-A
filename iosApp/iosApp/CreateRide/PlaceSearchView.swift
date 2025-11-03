@@ -1,5 +1,5 @@
 //
-//  SearchLocationView.swift
+//  PlaceSearchView.swift
 //  iosApp
 //
 //  Created by Adarsha Hebbar on 31/10/25.
@@ -29,9 +29,10 @@ struct PlaceSearchView: View {
             .onAppear {
                 viewModel.query = searchText
             }
+            .onDisappear {
+                viewModel.results.removeAll()
+                viewModel.query = ""
+            }
         }
     }
 }
-
-
-

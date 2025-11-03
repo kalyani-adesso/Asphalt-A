@@ -145,7 +145,7 @@ struct YourVehicleRow: View {
                         AddBikeView(
                             bikeId: bikeType.id,
                             viewModel: viewModel,
-                            title: bikeType.type,
+                            title: AppStrings.VehicleType(constantValue: bikeType.type)?.rawValue ?? "",
                             subtitle: "\(bikeType.make)-\(bikeType.model)"
                         )
                     }

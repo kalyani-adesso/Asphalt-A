@@ -5,12 +5,11 @@
 //  Created by Lavanya Selvan on 13/10/25.
 //
 
-
 import Foundation
 import MapKit
 import shared
 
-class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
+class CreateRideViewModel: NSObject, ObservableObject {
     
     @Published var ride = Ride()
     @Published var currentStep = 1
@@ -18,10 +17,7 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
     @Published var shareLink = "https://adessoriderclub.app/12121312"
     @Published var selectedTime: Date? = nil
     @Published var selectedDate: Date? = nil
-    @Published var startLocation: String = ""
-    @Published var endLocation: String = ""
-    
-    // --- Place search properties ---
+
     @Published var query = "" {
         didSet {
             completer.queryFragment = query
@@ -30,16 +26,29 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
     @Published var results: [MKLocalSearchCompletion] = []
     
     private var completer: MKLocalSearchCompleter
-    
-    // Track which field is active (start or end)
+
     var isSelectingStart = true
     
-    @Published  var participants: [Participant] = [
-        Participant(name: "Sooraj Rajan", role: "Mechanic", bike: "Harley Davidson 750", image: "avatar1", isOnline: true),
-        Participant(name: "Abhishek", role: nil, bike: "Classic 350", image: "avatar1", isOnline: true),
-        Participant(name: "Vyshnav", role: nil, bike: "Harley Davidson 750", image: "avatar1", isOnline: false),
-        Participant(name: "Tony", role: nil, bike: "Harley Davidson 750", image: "avatar1", isOnline: true)
-    ]
+    @Published  var participants: [Participant] = []
+    
+    private var userAPIService: UserAPIService
+    private var userRepository: UserRepository
+    
+    private var rideAPIService: RidesApIService
+    private var rideRepository: RidesRepository
+    
+    override init() {
+        completer = MKLocalSearchCompleter()
+        
+        userAPIService = UserAPIServiceImpl(client: KtorClient())
+        userRepository = UserRepository(apiService: userAPIService)
+        
+        rideAPIService = RidesApiServiceImpl(client: KtorClient())
+        rideRepository = RidesRepository(apiService: rideAPIService)
+        
+        super.init()
+        completer.delegate = self
+    }
     
     func nextStep() {
         if currentStep < 5 { currentStep += 1 }
@@ -48,38 +57,10 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
     func previousStep() {
         if currentStep > 1 { currentStep -= 1 }
     }
-    
-    private var userAPIService: UserAPIService
-    private var userRepository: UserRepository
-   
-   private var rideAPIService: RidesApIService
-   private var rideRepository: RidesRepository
+}
 
-    override init() {
-        completer = MKLocalSearchCompleter()
-        userAPIService = UserAPIServiceImpl(client: KtorClient())
-        userRepository = UserRepository(apiService: userAPIService)
-        
-//        UserRepository
-//
-        rideAPIService = RidesApiServiceImpl(client: KtorClient())
-        rideRepository = RidesRepository(apiService: rideAPIService)
-        super.init()
-        completer.delegate = self
-    }
-    
-    // MARK: - MKLocalSearchCompleter Delegate
-    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        DispatchQueue.main.async {
-            self.results = completer.results
-        }
-    }
-    
-    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        print("Error: \(error.localizedDescription)")
-    }
-    
-    // MARK: - Select Place
+// MARK: - Search Place Delegates
+extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     func selectPlace(_ completion: MKLocalSearchCompletion, isStart: Bool) {
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
@@ -91,11 +72,13 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
                 let placeName = item.name ?? completion.title
                 
                 if isStart {
-                    self.startLocation = placeName
                     self.ride.startLocation = placeName
+                    self.ride.startLat = item.placemark.coordinate.latitude
+                    self.ride.startLng = item.placemark.coordinate.longitude
                 } else {
-                    self.endLocation = placeName
                     self.ride.endLocation = placeName
+                    self.ride.endLat = item.placemark.coordinate.latitude
+                    self.ride.endLng = item.placemark.coordinate.longitude
                 }
                 
                 if let coordinate = item.placemark.coordinate as CLLocationCoordinate2D? {
@@ -106,34 +89,58 @@ class CreateRideViewModel: NSObject, ObservableObject, MKLocalSearchCompleterDel
             }
         }
     }
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        DispatchQueue.main.async {
+            self.results = completer.results
+        }
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print("Error: \(error.localizedDescription)")
+    }
 }
 
+//MARK: - Create Ride API -
 extension CreateRideViewModel {
     func getAllUsers() {
         userRepository.getAllUsers { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
-
-                // Map each UserDomain to Participant
+                
                 let participants = domainList.map { user in
                     Participant(
                         name: user.name,
                         role: user.isMechanic ? "Mechanic" : nil,
-                        bike: "", // TODO: assign from user.bike if available
+                        bike: user.primaryBike,
                         image: user.profilePic.isEmpty ? "avatar1" : user.profilePic,
-                        isOnline: true // or false if you track it elsewhere
+                        isOnline: true,
+                        userId: user.uid
                     )
                 }
-
+                
                 DispatchQueue.main.async {
                     self.participants = participants
                 }
-
+                
             } else if let error = error {
                 print("Error fetching users: \(error)")
             } else {
                 print("Unexpected data format")
             }
         }
+    }
+    
+    func createRide() {
+        //TODO: You have to store all the particpants map it according to the structure
+        
+        // TODO: convert date and time to long
+       
+        let userInvites = UserInvites(acceptInvite: 0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: <#T##KotlinLong?#>, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: <#T##KotlinLong?#>, participants: , startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
+            //TODO: Display the response.
+            
+        })
     }
 }

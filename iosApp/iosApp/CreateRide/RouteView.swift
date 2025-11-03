@@ -28,7 +28,6 @@ struct RouteView: View {
                     backgroundColor: AppColor.white
                 ) {
                     isSelectingStart = true
-                    searchText = viewModel.ride.startLocation
                     showLocationPicker = true
                 }
     
@@ -41,7 +40,7 @@ struct RouteView: View {
                     backgroundColor: AppColor.white
                 ) {
                     isSelectingStart = false
-                    searchText = viewModel.ride.endLocation
+                    searchText = ""
                     showLocationPicker = true
                 }
             }
@@ -147,7 +146,6 @@ struct LocationFieldView: View {
         }
     }
 }
-
 
 #Preview {
     RouteView(viewModel: CreateRideViewModel.init())

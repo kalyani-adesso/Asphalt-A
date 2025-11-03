@@ -261,7 +261,7 @@ public struct AppStrings{
             }
         }
         
-        var constantValue: Int {
+        var constantValue: Int32 {
             switch self {
             case .sportBike: return 1
             case .nakedBike: return 2
@@ -273,7 +273,7 @@ public struct AppStrings{
             }
         }
         
-        init?(constantValue: Int) {
+        init?(constantValue: Int32) {
             switch constantValue {
             case 1: self = .sportBike
             case 2: self = .nakedBike

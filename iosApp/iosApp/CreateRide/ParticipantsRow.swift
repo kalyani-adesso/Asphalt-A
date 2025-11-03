@@ -32,7 +32,6 @@ struct ParticipantsRow: View {
                                 .stroke(Color.white, lineWidth: 1.5)
                         )
                 }
-                
             }
             
             VStack(alignment: .leading, spacing: 4) {
@@ -84,7 +83,6 @@ struct ParticipantsRow: View {
                     }
                 }
             }
-            
         }
         .padding()
         .background(Color.white)
@@ -95,7 +93,6 @@ struct ParticipantsRow: View {
         )
     }
 }
-
 
 #Preview {
     ParticipantsRow(participant: Participant(name: "Sooraj Rajan", role: "Mechanic", bike: "Harley Davidson 750", image: "avatar1", isOnline: true), isSelected: .constant(false))
