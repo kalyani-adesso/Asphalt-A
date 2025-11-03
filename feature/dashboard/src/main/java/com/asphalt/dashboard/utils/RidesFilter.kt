@@ -17,7 +17,20 @@ object RidesFilter {
         return allRides.mapNotNull { ride ->
 
             val rideStatus: String? = when {
-                ride.createdBy == userId -> QUEUE
+                ride.createdBy == userId -> {
+                    if (ride.participants.isNullOrEmpty()) {
+                        UPCOMING
+                    } else {
+                        val participant = ride.participants.find { it.inviteStatus == 0 }
+                        if (participant == null) {
+                            UPCOMING
+                        } else {
+                            QUEUE
+                        }
+
+                    }
+
+                }
 
                 else -> {
                     val participant = ride.participants.find { it.userId == userId }
@@ -59,7 +72,7 @@ object RidesFilter {
 
             // Step 3: check if participant exists and inviteStatus == 1
             if (participant != null && participant.inviteStatus == 0) {
-                val userDomain:UserDomain? = androidUserVM.getUser(ride.createdBy ?: "")
+                val userDomain: UserDomain? = androidUserVM.getUser(ride.createdBy ?: "")
                 YourRideDataModel(
                     ridesId = ride.ridesID,
                     title = "",
@@ -68,7 +81,7 @@ object RidesFilter {
                     riders = ride.participants.size,
                     createdBy = ride.createdBy,
                     createdUSerName = userDomain?.name ?: "",
-                    profileImageUrl=userDomain?.profilePic
+                    profileImageUrl = userDomain?.profilePic
                 )
             } else {
                 null // Skip if participant not found or inviteStatus != 1
