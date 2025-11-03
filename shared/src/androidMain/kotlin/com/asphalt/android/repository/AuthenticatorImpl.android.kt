@@ -82,4 +82,12 @@ actual class AuthenticatorImpl {
             AuthResultimpl(false, "Authentication failed: ${e.message}")
         }
     }
+
+    actual suspend fun resetPassword(email: String): Result<String> {
+        TODO("Not yet implemented")
+    }
+
+    actual suspend fun logout(): Result<String> {
+        TODO("Not yet implemented")
+    }
 }

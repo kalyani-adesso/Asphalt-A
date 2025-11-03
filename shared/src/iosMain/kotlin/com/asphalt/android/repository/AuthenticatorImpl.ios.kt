@@ -11,6 +11,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.UIKit.UIDevice
 
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual class AuthenticatorImpl actual constructor() {
@@ -67,6 +68,30 @@ actual class AuthenticatorImpl actual constructor() {
             } else {
                 cont.resume(AuthResultimpl(false, "Sign-in succeeded but user object was null."))
             }
+        }
+    }
+
+    actual suspend fun resetPassword(email: String): Result<String> {
+        return suspendCancellableCoroutine { continuation ->
+            auth.sendPasswordResetWithEmail(email) { error: NSError? ->
+                if (error == null) {
+                    continuation.resume(Result.success("Password reset email sent successfully."))
+                } else {
+                    continuation.resumeWithException(
+                        Exception(error.localizedDescription ?: "An unknown error occurred.")
+                    )
+                }
+            }
+        }
+    }
+
+    actual suspend fun logout(): Result<String> {
+        val auth = FIRAuth.auth()
+        return try {
+            auth.signOut(null)
+            Result.success("User logged out successfully.")
+        } catch (e: Exception) {
+            Result.failure(Exception("Error signing out: ${e.message}", e))
         }
     }
 }
