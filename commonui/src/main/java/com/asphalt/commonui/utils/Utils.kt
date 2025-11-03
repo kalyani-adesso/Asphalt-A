@@ -3,6 +3,7 @@ package com.asphalt.commonui.utils
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import com.asphalt.commonui.constants.Constants
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -66,7 +67,7 @@ object Utils {
 
     fun formatRelativeTime(pastTimestamp: String): String {
         return try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
             dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             val pastDate = dateFormat.parse(pastTimestamp)
@@ -132,19 +133,14 @@ object Utils {
         return format.format(Date(millis))
     }
 
-    fun formatClientMillisToISO(timestamp: Long): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
-
-        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-        return dateFormat.format(Date(timestamp))
+    fun formatDateMillisToISO(timestamp: Long?): String {
+        val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
+        return timestamp?.let { dateFormat.format(Date(timestamp)) } ?: ""
     }
 
     fun parseISODateToMillis(isoString: String): Long {
         return try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
-            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
+            val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
             dateFormat.parse(isoString)?.time ?: 0L
         } catch (e: Exception) {
             e.printStackTrace()

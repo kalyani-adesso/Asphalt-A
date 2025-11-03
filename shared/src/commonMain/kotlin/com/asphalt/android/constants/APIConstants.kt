@@ -9,5 +9,10 @@ object APIConstants {
     const val LIKES_URL = "/likes"
     const val LIKES_DISLIKES_URL = "/likes_dislikes"
     const val RIDES_URL = "/rides"
+    const val PARTICIPANTS_URL = "/participants"
     const val GENERIC_ERROR_MSG = "Something went wrong!"
+    //Ride Invite Status
+    const val RIDE_INVITED = 0
+    const val RIDE_ACCEPTED = 1
+    const val RIDE_DECLINED = 2
 }

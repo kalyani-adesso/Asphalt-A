@@ -1,11 +1,14 @@
 package com.asphalt.android.repository.rides
 
 import com.asphalt.android.mapApiResult
+import com.asphalt.android.mappers.toRideInviteListDomain
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
+import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.rides.RidesApIService
 
 class RidesRepository(val apiService: RidesApIService) {
@@ -20,12 +23,29 @@ class RidesRepository(val apiService: RidesApIService) {
             response?.toRides().orEmpty()
         }
     }
+    suspend fun getRideInvites(userID:String): APIResult<List<RideInvitesDomain>>{
+       return apiService.getAllRide().mapApiResult {
+              it.toRides().toRideInviteListDomain(userID)
+        }
+    }
+
+    suspend fun changeRideInviteStatus(
+        rideID: String,
+        currentUid: String,
+        inviteStatus: Int
+    ): APIResult<Unit> {
+        return apiService.changeRideInviteStatus(
+            rideID,
+            currentUid,
+            UserInvites(acceptInvite = inviteStatus)
+        )
+    }
 
     fun Map<String, CreateRideRoot>?.toRides(): List<RidesData> {
         return this?.map { (id, rowData) ->
             RidesData(
                 ridesID = id,
-                userID = rowData.userID,
+                createdBy = rowData.userID,
                 rideTitle = rowData.rideTitle,
                 description = rowData.description,
                 startDate = rowData.startDate,

@@ -90,7 +90,7 @@ fun AnswerComponent(answer: Answer, queriesVM: QueriesVM, queryId: String) {
                 }
                 Spacer(Modifier.weight(1f))
                 ComposeUtils.SectionSubtitle(
-                    Utils.formatRelativeTime(Utils.formatClientMillisToISO(answer.answeredOn)),
+                    Utils.formatRelativeTime(Utils.formatDateMillisToISO(answer.answeredOn)),
                     color = GrayDark
                 )
             }
