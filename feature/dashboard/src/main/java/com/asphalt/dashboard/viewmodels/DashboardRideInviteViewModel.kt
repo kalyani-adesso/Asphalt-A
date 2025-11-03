@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -16,24 +17,17 @@ import mappers.toDashBoardInvites
 
 class DashboardRideInviteViewModel(
     val ridesRepository: RidesRepository,
-    androidUserVM: AndroidUserVM
+    val androidUserVM: AndroidUserVM
 ) :
     ViewModel() {
 
-    private val currentUid = androidUserVM.userState.value?.uid
+    private val currentUid: String?
+        get() = androidUserVM.userState.value?.uid
     private val _dashboardRideInvites =
         MutableStateFlow<List<DashboardRideInviteUIModel>>(emptyList())
     private val userList = androidUserVM.userList
 
     val dashboardRideInviteList: StateFlow<List<DashboardRideInviteUIModel>> = _dashboardRideInvites
-
-    init {
-        viewModelScope.launch {
-            getDashboardRideInvites()
-        }
-    }
-
-
 
     private fun removeInviteFromList(rideID: String) {
         _dashboardRideInvites.update { currentList ->
