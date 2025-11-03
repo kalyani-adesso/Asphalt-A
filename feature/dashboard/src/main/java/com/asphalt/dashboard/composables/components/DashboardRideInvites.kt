@@ -34,12 +34,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
@@ -53,7 +52,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.DashboardInvitesConstants
-import com.asphalt.dashboard.data.DashboardRideInvite
+import com.asphalt.dashboard.data.DashboardRideInviteUIModel
 import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -70,7 +69,9 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
             )
         LazyRow {
             items(rideInvites.value) {
-                DashboardRideInviteUI(it)
+                DashboardRideInviteUI(it, { id, status ->
+                    dashboardRideInviteViewModel.updateRideInviteStatus(id, status)
+                })
             }
 
         }
@@ -78,7 +79,10 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
 }
 
 @Composable
-fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
+fun DashboardRideInviteUI(
+    dashboardRideInvite: DashboardRideInviteUIModel,
+    updateInviteStatus: (String, Int) -> Unit
+) {
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
@@ -92,7 +96,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
             .wrapContentHeight()
             .padding(end = Dimensions.padding20),
 
-    ) {
+        ) {
         Column(
             modifier = Modifier
                 .padding(
@@ -149,7 +153,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                     modifier = Modifier
                         .size(Dimensions.size30)
                         .clickable {
-                            //TODO:Click action for message
+
                         },
                     cornerRadius = Dimensions.size10,
                     backgroundColor = PrimaryDarkerLightB75
@@ -170,7 +174,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                 Text(
                     text = Utils.formatDateTime(
                         dashboardRideInvite.dateTime,
-                        "dd/MM/yyyy HH:mm",
+                        Constants.SERVER_TIME_FORMAT,
                         "EEE, dd MMM yyyy - hh:mm a"
                     ),
                     style = Typography.titleMedium,
@@ -213,7 +217,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                 GradientButton(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        //TODO:Accept Invite action
+                        updateInviteStatus(dashboardRideInvite.rideID, APIConstants.RIDE_ACCEPTED)
 
                     },
                     buttonHeight = Dimensions.size50,
@@ -233,7 +237,7 @@ fun DashboardRideInviteUI(dashboardRideInvite: DashboardRideInvite) {
                 }
                 Button(
                     {
-                        //TODO:Decline Invite action
+                        updateInviteStatus(dashboardRideInvite.rideID, APIConstants.RIDE_DECLINED)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                     modifier = Modifier
@@ -267,7 +271,8 @@ fun AvatarRow(imageUrls: List<String>) {
     ) {
         visibleImages.forEach { imageUrl ->
             CircularNetworkImage(
-                imageUrl = imageUrl, size = Dimensions.size20, modifier = Modifier.border(
+                imageUrl = imageUrl, size = Dimensions.size20,
+                modifier = Modifier.border(
                     width = Dimensions.size1pt5, shape = CircleShape, color = NeutralMidGrey
                 ),
             )

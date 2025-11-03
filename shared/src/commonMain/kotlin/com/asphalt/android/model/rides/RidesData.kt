@@ -2,7 +2,7 @@ package com.asphalt.android.model.rides
 
 class RidesData(
     var ridesID:String?=null,
-    var userID: String? = null,
+    var createdBy: String? = null,
     var rideType: String? = null,
     var rideTitle: String? = null,
     var description: String? = null,

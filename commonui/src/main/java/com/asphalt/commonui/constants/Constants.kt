@@ -20,6 +20,8 @@ object Constants {
 
     const val DATE_FORMAT_PLACES_VISITED = "dd MMM yyyy"
     const val NO_OF_MONTHS_PLACE_VISITED = 7
+    const val SERVER_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    const val UNKNOWN_USER = "Unknown User"
 
     //Firebase Data base
     const val FIREBASE_DB = "users"
@@ -46,5 +48,7 @@ object Constants {
 
     // Drawer Menu click
     const val LOGOUT_CLICK = 1
+
+
 
 }
