@@ -244,7 +244,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                     .map {
                                         RidersList(
                                             name = it.name,
-                                            id = it.uid, bike = "Unicorn", job = if(it.isMechanic)
+                                            id = it.uid, bike = it.primaryBike, job = if(it.isMechanic)
                                                 "Mechanic" else ""
                                         )
                                     })
