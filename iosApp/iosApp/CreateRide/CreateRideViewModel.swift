@@ -150,10 +150,9 @@ extension CreateRideViewModel {
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
                 
-                let filtered = domainList
+                let filteredParticpants = domainList
                     .filter { $0.uid != self.currentUserId }
                     .map { user in
-
                         Participant(
                             id: user.uid,
                             name: user.name,
@@ -166,7 +165,7 @@ extension CreateRideViewModel {
                     }
                 
                 DispatchQueue.main.async {
-                    self.participants = filtered
+                    self.participants = filteredParticpants
                 }
                 
             } else if let error = error {
@@ -191,7 +190,8 @@ extension CreateRideViewModel {
             startDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0)
+        
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
                let data = success.data as? GenericResponse {
@@ -206,6 +206,7 @@ extension CreateRideViewModel {
     }
 
     // MARK: - Epoch converter
+    
     func combine(date: Date?, time: Date?) -> Date? {
         guard let date = date, let time = time else { return nil }
 
@@ -239,6 +240,5 @@ extension CreateRideViewModel {
         !ride.startLocation.trimmingCharacters(in: .whitespaces).isEmpty &&
         !ride.endLocation.trimmingCharacters(in: .whitespaces).isEmpty
     }
-
 }
 

@@ -10,7 +10,6 @@ import SwiftUI
 import Combine
 import shared
 
-
 enum RideViewAction: String {
     case checkResponse = "Check Response"
     case viewDetails = "View Details"
@@ -54,9 +53,7 @@ class UpcomingRideViewModel: ObservableObject {
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     
-    
     init() {
-        
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
     }
@@ -131,25 +128,19 @@ class UpcomingRideViewModel: ObservableObject {
                     history.append(mapped)
                 }
             }
-            
             await MainActor.run {
                 self.upcomingRides = upcoming
                 self.inviteRides = invites
                 self.historyRides = history
                 self.isRideLoading = false
             }
-            
         } catch {
             print("Error :", error)
         }
     }
 
-
-
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date) }
-    
-    
 }
