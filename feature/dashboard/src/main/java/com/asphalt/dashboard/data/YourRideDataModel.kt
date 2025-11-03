@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class YourRideDataModel(
+    var ridesId: String? = null,
     var title: String? = "",
     var place: String? = "",
     var rideStatus: String? = "",

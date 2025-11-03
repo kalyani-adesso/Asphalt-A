@@ -31,6 +31,7 @@ object RidesFilter {
             if (rideStatus == null) return@mapNotNull null
 
             YourRideDataModel(
+                ridesId =ride.ridesID,
                 title = ride.rideTitle ?: "",
                 place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                 rideStatus = rideStatus,
@@ -55,6 +56,7 @@ object RidesFilter {
             // Step 3: check if participant exists and inviteStatus == 1
             if (participant != null && participant.inviteStatus == 0) {
                 YourRideDataModel(
+                    ridesId =ride.ridesID,
                     title = ride.rideTitle ?: "",
                     place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                     date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
