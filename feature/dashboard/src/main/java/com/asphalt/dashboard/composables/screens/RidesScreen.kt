@@ -462,7 +462,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         width = Dimensions.size2pt5,
                         color = PrimaryDarkerLightB75,
                         shape = CircleShape
-                    ), size = Dimensions.size32, imageUrl = "https://picsum.photos/id/1/200/300"
+                    ), size = Dimensions.size32, imageUrl = invites.profileImageUrl?:""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {

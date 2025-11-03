@@ -11,6 +11,7 @@ class YourRideDataModel(
     var date: String? = "",
     var riders: Int? = 0,
     var createdBy: String? = null,
-    var createdUSerName: String? = null
+    var createdUSerName: String? = null,
+    var profileImageUrl:String?=null
 ) {
 }

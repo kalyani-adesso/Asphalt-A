@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.utils
 
+import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.utils.Utils
@@ -58,6 +59,7 @@ object RidesFilter {
 
             // Step 3: check if participant exists and inviteStatus == 1
             if (participant != null && participant.inviteStatus == 0) {
+                val userDomain:UserDomain? = androidUserVM.getUser(ride.createdBy ?: "")
                 YourRideDataModel(
                     ridesId = ride.ridesID,
                     title = "",
@@ -65,7 +67,8 @@ object RidesFilter {
                     date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
                     riders = ride.participants.size,
                     createdBy = ride.createdBy,
-                    createdUSerName = androidUserVM.getUser(ride.createdBy ?: "")?.name ?: ""
+                    createdUSerName = userDomain?.name ?: "",
+                    profileImageUrl=userDomain?.profilePic
                 )
             } else {
                 null // Skip if participant not found or inviteStatus != 1
