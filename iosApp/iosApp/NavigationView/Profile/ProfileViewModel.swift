@@ -47,7 +47,7 @@ struct SelectedBikeType: Identifiable,Hashable {
     let id = UUID()
     let model: String
     let make: String
-    let type: String
+    let type: Int32
     let bikeId: String
 }
 
@@ -120,7 +120,7 @@ final class ProfileViewModel: ObservableObject {
         return make.isEmpty && moodel.isEmpty
     }
     
-    func getBikeType(model:String,make:String,type:String,bikeId:String) {
+    func getBikeType(model:String,make:String,type:Int32,bikeId:String) {
         selectedBikeType.append(SelectedBikeType(model: model, make: make, type: type, bikeId: bikeId))
     }
     
@@ -194,9 +194,9 @@ extension ProfileViewModel {
         }
     }
 
-    func addNewBike(userId: String, model: String, make: String, type: String) async {
+    func addNewBike(userId: String, model: String, make: String, type:Int32) async {
         do {
-            try await profileRepository.addBike(userId: userId, bikeId: "", bikeType: type, make: make, model: model)
+            try await profileRepository.addBike(userId: userId, bikeType: type, make: make, model: model)
             print("Bike added successfully")
             await fetchBikes(userId: userId)
         } catch {
@@ -204,7 +204,6 @@ extension ProfileViewModel {
         }
     }
 
-    
     func editProfile(
         userId: String,
         userName: String,

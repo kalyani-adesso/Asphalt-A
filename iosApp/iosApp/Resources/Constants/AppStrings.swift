@@ -249,9 +249,9 @@ public struct AppStrings{
         case cruiser = "Cruiser"
         case scooter = "Scooter"
         case electric = "Electric"
-
+        
         var id: String { rawValue }
-
+        
         var subtitle: String? {
             switch self {
             case .sportBike:
@@ -260,8 +260,34 @@ public struct AppStrings{
                 return nil
             }
         }
+        
+        var constantValue: Int32 {
+            switch self {
+            case .sportBike: return 1
+            case .nakedBike: return 2
+            case .adventureBike: return 3
+            case .cruiser: return 4
+            case .touringBike: return 5
+            case .scooter: return 6
+            case .electric: return 7
+            }
+        }
+        
+        init?(constantValue: Int32) {
+            switch constantValue {
+            case 1: self = .sportBike
+            case 2: self = .nakedBike
+            case 3: self = .adventureBike
+            case 4: self = .cruiser
+            case 5: self = .touringBike
+            case 6: self = .scooter
+            case 7: self = .electric
+            default: return nil
+            }
+        }
     }
-
+    
+  
 
     enum EditProfile {
         static let editProfile = "Edit Profile"

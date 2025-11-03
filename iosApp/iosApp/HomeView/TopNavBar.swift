@@ -23,7 +23,7 @@ struct TopNavBar: View {
                 .navigationBarBackButtonHidden(true)
                 Spacer()
                 VStack(spacing: 2) {
-                    Text("Hello \(MBUserDefaults.userNameStatic!)")
+                    Text("Hello \(MBUserDefaults.userNameStatic ?? "")")
                         .font(.system(size: 17, weight: .semibold))
                     HStack(spacing: 4) {
                         Circle().fill(Color.green).frame(width: 6, height: 6)

@@ -17,6 +17,10 @@ struct Ride: Identifiable {
     var time: Date?
     var startLocation: String = ""
     var endLocation: String = ""
+    var startLat: Double?
+    var startLng: Double?
+    var endLat: Double?
+    var endLng: Double?
 }
 
 enum RideType: String, CaseIterable, Identifiable {
@@ -35,6 +39,7 @@ struct Participant: Identifiable {
     let bike: String
     let image: String
     let isOnline: Bool
+    let userId: String
 }
 
 

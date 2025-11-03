@@ -23,7 +23,7 @@ class UserRepository(private val apiService: UserAPIService) {
                 name = profileDTO.userName ?: "",
                 profilePic = profileDTO.profilePicUrl,
                 isMechanic = profileDTO.isMechanic,
-                primaryBike = bikeDomain?.let { it.model + " " + it.make } ?: ""
+                primaryBike = bikeDomain?.let { it.make  + " " + it.model  } ?: ""
             )
         }
     }

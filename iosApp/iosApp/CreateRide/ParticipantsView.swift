@@ -81,6 +81,9 @@ struct ParticipantsView: View {
             
         }
         .padding()
+        .onAppear {
+            viewModel.getAllUsers()
+        }
     }
     var filteredParticipants: [Participant] {
         if searchText.isEmpty {
