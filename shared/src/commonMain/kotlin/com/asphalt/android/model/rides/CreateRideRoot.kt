@@ -42,5 +42,8 @@ class CreateRideRoot(
     var endLatitude: Double = 0.0,
 
     @SerialName("endLongitude")
-    var endLongitude: Double = 0.0
+    var endLongitude: Double = 0.0,
+
+    @SerialName("rideDistance")
+    var rideDistance: Double = 0.0
 )

@@ -21,6 +21,7 @@ struct Ride: Identifiable {
     var startLng: Double?
     var endLat: Double?
     var endLng: Double?
+    var rideDistance: Double?
 }
 
 enum RideType: String, CaseIterable, Identifiable {

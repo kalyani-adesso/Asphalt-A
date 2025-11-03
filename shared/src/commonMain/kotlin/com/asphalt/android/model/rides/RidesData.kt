@@ -14,5 +14,6 @@ class RidesData(
     var startLatitude: Double = 0.0,
     var startLongitude: Double = 0.0,
     var endLatitude: Double = 0.0,
-    var endLongitude: Double = 0.0
+    var endLongitude: Double = 0.0,
+    var rideDistance:Double = 0.0
 )

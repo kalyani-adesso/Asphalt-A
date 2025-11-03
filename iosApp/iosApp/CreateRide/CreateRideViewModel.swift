@@ -101,6 +101,33 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Error: \(error.localizedDescription)")
     }
+    
+    func getDistance() {
+        if let startLat = self.ride.startLat,
+           let startLng = self.ride.startLng,
+           let endLat = self.ride.endLat,
+           let endLng = self.ride.endLng {
+            
+            let startPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: startLat, longitude: startLng))
+            let endPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: endLat, longitude: endLng))
+            
+            let request = MKDirections.Request()
+            request.source = MKMapItem(placemark: startPlacemark)
+            request.destination = MKMapItem(placemark: endPlacemark)
+            request.transportType = .automobile
+            
+            let directions = MKDirections(request: request)
+            directions.calculate { response, error in
+                if let route = response?.routes.first {
+                    let distanceKm = route.distance / 1000.0
+                    print("Bike traveling distance: \(String(format: "%.2f", distanceKm)) km")
+                    self.ride.rideDistance = distanceKm.rounded()
+                } else if let error = error {
+                    print("Error calculating route distance: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
 }
 
 //MARK: - Create Ride API -
@@ -144,7 +171,7 @@ extension CreateRideViewModel {
         let createdDateLong = Int64(Date().timeIntervalSince1970 * 1000)
         let startDateLong = Int64((ride.date?.timeIntervalSince1970 ?? 0) * 1000)
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: startDateLong as? KotlinLong, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate:createdDateLong as? KotlinLong , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: startDateLong as? KotlinLong, startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate:createdDateLong as? KotlinLong , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, rideDistance: ride.rideDistance ?? 0.0)
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
                let data = success.data as? GenericResponse {
