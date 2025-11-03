@@ -13,7 +13,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     
     @Published var ride = Ride()
     @Published var currentStep = 1
-    @Published var selectedParticipants: Set<String> = []
+    @Published var selectedParticipants: [Participant] = []
     @Published var shareLink = "https://adessoriderclub.app/12121312"
     @Published var selectedTime: Date? = nil
     @Published var selectedDate: Date? = nil
@@ -62,14 +62,14 @@ class CreateRideViewModel: NSObject, ObservableObject {
         if currentStep > 1 { currentStep -= 1 }
     }
     func isSelected(_ id: String) -> Bool {
-        selectedParticipants.contains(id)
+        selectedParticipants.contains(where: { $0.id == id })
     }
-    
+
     func toggle(_ id: String) {
-        if selectedParticipants.contains(id) {
-            selectedParticipants.remove(id)
-        } else {
-            selectedParticipants.insert(id)
+        if let index = selectedParticipants.firstIndex(where: { $0.id == id }) {
+            selectedParticipants.remove(at: index)
+        } else if let participant = participants.first(where: { $0.id == id }) {
+            selectedParticipants.append(participant)
         }
     }
 }
@@ -116,7 +116,7 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     }
 }
 
-//MARK: - Create Ride API -
+//MARK: - Create Ride API
 extension CreateRideViewModel {
     func getAllUsers() {
         userRepository.getAllUsers { result, error in
@@ -153,7 +153,7 @@ extension CreateRideViewModel {
     func createRide(completion: @escaping (Bool) -> Void) {
         self.isRideLoading = true
         let participantDict: [String: UserInvites] = Dictionary(
-            uniqueKeysWithValues: participants.map { participant in
+            uniqueKeysWithValues: selectedParticipants.map { participant in
                 (participant.userId, UserInvites(acceptInvite: 0))
             }
         )

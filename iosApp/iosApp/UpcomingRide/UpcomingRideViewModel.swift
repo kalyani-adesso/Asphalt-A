@@ -8,12 +8,8 @@
 import Foundation
 import SwiftUI
 import Combine
+import shared
 
-enum RideAction: String {
-    case upcoming = "Upcoming"
-    case history = "History"
-    case invities = "Invities"
-}
 
 enum RideViewAction: String {
     case checkResponse = "Check Response"
@@ -24,47 +20,136 @@ enum RideViewAction: String {
 
 enum RideStatus: String {
     case upcoming = "Upcoming"
+    case history = "History"
+    case invites = "Invites"
     case queue = "Queue"
-    case complete = "Completed"
-    case invite = "Invite"
+}
+
+enum RideAction {
+    case upcoming
+    case history
+    case invites
 }
 
 struct RideModel: Identifiable,Hashable {
-    let id = UUID()
+    let id : String
     var title: String
     let routeStart: String
     let routeEnd: String
-    let status: RideStatus
-    let rideViewAction: RideViewAction
-    let rideAction: RideAction
+    var status: RideStatus
+    var rideViewAction: RideViewAction
+    var rideAction: RideAction
     let date: String
     let riderCount: Int
 }
 
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
-    @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invities]
+    @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invites]
     @Published var rideViewActions: [RideViewAction]  = [.checkResponse, .viewDetails, .shareExperience]
+    @Published var upcomingRides: [RideModel] = []
+    @Published var historyRides: [RideModel] = []
+    @Published var inviteRides: [RideModel] = []
+    @Published var isRideLoading = false
+    private var rideAPIService: RidesApIService
+    private var rideRepository: RidesRepository
+    
+    
     init() {
-        loadRides()
-    }
-    
-    func loadRides() {
-        rides = [
-            RideModel(title: "Weekend Coast Ride", routeStart: "Kochi", routeEnd: "Kanyakumari", status: .upcoming, rideViewAction: .viewDetails, rideAction: .upcoming, date:formattedRideDate(from:"2025-10-21T09:00:00Z" ), riderCount: 3),
-            RideModel(title: "Mountain Ride", routeStart: "Kochi", routeEnd: "Idukki", status: .queue, rideViewAction: .checkResponse, rideAction: .upcoming, date: formattedRideDate(from:"2025-10-21T09:00:00Z"), riderCount: 3),
-            RideModel(title: "Weekend Coast Ride", routeStart: "Kochi", routeEnd: "Kanyakumari", status: .complete, rideViewAction: .shareExperience, rideAction: .history, date: formattedRideDate(from:"2025-09-21T09:00:00Z"), riderCount: 3),
-            RideModel(title: "Invite from Suraj Rajan", routeStart: "Kochi", routeEnd: "Kanyakumari", status: .invite, rideViewAction: .decline, rideAction: .invities, date: formattedRideDate(from:"2025-10-17T09:00:00Z"), riderCount: 3)
-        ]
-    }
-    
-    func formattedRideDate(from isoString: String) -> String {
-        let isoFormatter = ISO8601DateFormatter()
-        guard let date = isoFormatter.date(from: isoString) else { return "" }
         
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "E, MMM dd - hh:mm a"
-        displayFormatter.locale = Locale(identifier: "en_US_POSIX")
-        return displayFormatter.string(from: date)
+        rideAPIService = RidesApiServiceImpl(client: KtorClient())
+        rideRepository = RidesRepository(apiService: rideAPIService)
     }
+    
+    // MARK: - Get all rides
+    @MainActor
+    func fetchAllRides() async {
+        do {
+            self.isRideLoading = true
+            let result = try await rideRepository.getAllRide()
+            
+            guard let success = result as? APIResultSuccess<AnyObject>,
+                  let rideArray = success.data as? [RidesData] else {
+                print("Error")
+                return
+            }
+            
+            let currentUserID = MBUserDefaults.userIdStatic ?? ""
+            var upcoming: [RideModel] = []
+            var invites: [RideModel] = []
+            var history: [RideModel] = []
+            
+            for ride in rideArray {
+                guard let startEpoch = ride.startDate else { continue }
+
+                let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
+                let dateString = formatDate(startDate)
+                let participantCount = ride.participants.count
+                
+                let isParticipant = ride.participants.contains { $0.userId == currentUserID }
+                let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+
+                var mapped = RideModel(
+                    id: ride.ridesID ?? "",
+                    title: ride.rideTitle ?? "",
+                    routeStart: ride.startLocation ?? "",
+                    routeEnd: ride.endLocation ?? "",
+                    status: .upcoming,
+                    rideViewAction: .checkResponse,
+                    rideAction: .upcoming,
+                    date: dateString,
+                    riderCount: participantCount
+                )
+
+                // Upcoming
+                if (ride.createdBy == currentUserID) && startDate >= Calendar.current.startOfDay(for: Date()) {
+                    if ride.participants.count > 0 {
+                        mapped.status = .queue
+                        mapped.rideViewAction = .checkResponse
+                    }
+                    else{
+                        mapped.status = .upcoming
+                        mapped.rideViewAction = .viewDetails
+                    }
+                    mapped.rideAction = .upcoming
+                    upcoming.append(mapped)
+                }
+                
+                // Invites
+                if ride.createdBy != currentUserID, isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
+                    mapped.status = .invites
+                    mapped.rideAction = .invites
+                    mapped.rideViewAction = .decline
+                    invites.append(mapped)
+                }
+
+                // History
+                if isParticipant, startDate < Calendar.current.startOfDay(for: Date()) || ride.rideType == "completed" {
+                    mapped.status = .history
+                    mapped.rideAction = .history
+                    mapped.rideViewAction = .shareExperience
+                    history.append(mapped)
+                }
+            }
+            
+            await MainActor.run {
+                self.upcomingRides = upcoming
+                self.inviteRides = invites
+                self.historyRides = history
+                self.isRideLoading = false
+            }
+            
+        } catch {
+            print("Error :", error)
+        }
+    }
+
+
+
+    func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.string(from: date) }
+    
+    
 }
