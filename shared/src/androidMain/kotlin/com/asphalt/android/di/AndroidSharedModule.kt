@@ -8,5 +8,5 @@ import org.koin.dsl.module
 
 val androidSharedModule = module {
     single { UserRepoImpl() }
-    single { AndroidUserVM(get(), get()) }
+    single { AndroidUserVM(get(), get(),get()) }
 }

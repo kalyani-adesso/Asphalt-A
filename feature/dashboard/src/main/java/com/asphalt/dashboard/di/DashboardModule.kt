@@ -17,7 +17,7 @@ val dashboardModule = module {
     single { AdventureJourneyRepo() }
     single { PlaceVisitedGraphRepo() }
     viewModel { PerMonthRideStatsViewModel(get()) }
-    viewModel { DashboardRideInviteViewModel(get(),get(),get()) }
+    viewModel { DashboardRideInviteViewModel(get(),get()) }
     viewModel { AdventureJourneyViewModel(get()) }
     viewModel { PlacesVisitedGraphViewModel(get()) }
     viewModel { NotificationViewModel() }

@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class QueriesVM(
     androidUserVM: AndroidUserVM,
-    val queryRepository: QueryRepository, val userRepository: UserRepository
+    val queryRepository: QueryRepository
 ) : ViewModel() {
     fun setFilterCategory(categoryID: Int) {
         filterCategory.value = categoryID
@@ -37,7 +37,7 @@ class QueriesVM(
     private val searchText = MutableStateFlow("")
 
 
-    private val userList = MutableStateFlow<List<UserDomain>>(emptyList())
+    private val userList = androidUserVM.userList
     fun getCurrentUserData(): UserDomain? {
 
         return UserDataHelper.getUserDataFromCurrentList(userList.value, currentUid ?: "")
@@ -73,19 +73,11 @@ class QueriesVM(
 
     init {
         viewModelScope.launch {
-            loadUserList()
             loadQueries()
         }
     }
 
-    suspend fun loadUserList() {
-        APIHelperUI.handleApiResult(
-            APIHelperUI.runWithLoader { userRepository.getAllUsers() },
-            viewModelScope
-        ) {
-            userList.value = it
-        }
-    }
+
 
     suspend fun loadQueries() {
         val result = APIHelperUI.runWithLoader { queryRepository.getQueries() }
