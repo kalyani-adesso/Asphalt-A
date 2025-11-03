@@ -79,6 +79,7 @@ struct RouteView: View {
                 title: AppStrings.CreateRide.next.rawValue,
                 showShadow: false,
                 onTap: {
+                    viewModel.getDistance()
                     viewModel.nextStep()
                 }
             )
