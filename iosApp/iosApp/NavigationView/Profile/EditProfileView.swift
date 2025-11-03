@@ -24,92 +24,105 @@ struct EditProfileView: View {
     @State private var isShowingImagePicker = false
     private let totalPages = 8
     var body: some View {
-        VStack {
-            ScrollView {
-                VStack {
-                    HStack {
-                        ProfileTitleView(title:AppStrings.EditProfile.editProfile, subtitle: AppStrings.EditProfile.updateProfileInfo, icon: AppIcon.Profile.ride)
-                            .padding(.horizontal,15)
-                            .padding(.top,20)
-                        Button(action: {
-                            isPresented = false
-                        }) {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .frame(width: 14,height: 14)
-                                .foregroundStyle(AppColor.richBlack)
-                                .padding(.trailing,15)
-                        }
-                    }
-                    ZStack(alignment: .bottomTrailing) {
-                        Image(uiImage: ((selectedImage ?? UIImage(named:"icon-profile"))!))
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 92, height: 73)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
-                            .padding([.top, .bottom], 20)
-                        Button(action: {
-                            showActionSheet = true
-                        }) {
-                            AppIcon.Profile.camera
-                                .resizable()
-                                .frame(width: 38,height: 38)
-                                .foregroundStyle(AppColor.richBlack)
-                                .padding([.leading, .bottom],10)
-                        }
-                    }
-                    
-                    Group {
-                        EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $userName, keyboardType: .default)
-                        EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $email, keyboardType: .emailAddress)
-                        EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $phoneNumber, keyboardType: .numberPad)
-                        EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $emargeContact, keyboardType: .numberPad)
-                        EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $drivingLicenseNumber, keyboardType: .default)
-                        MechanicView(isOn: $enableMechanic)
-                        HStack(spacing: 19) {
-                            ButtonView( title: "CANCEL",
-                                        background: LinearGradient(
-                                                    gradient: Gradient(colors: [.white, .white]),
-                                                    startPoint: .leading,
-                                                    endPoint: .trailing),
-                                        foregroundColor: AppColor.darkRed,
-                                        showShadow: false ,
-                                        borderColor: AppColor.darkRed,
-                                        onTap: {
+        ZStack {
+            VStack {
+                ScrollView {
+                    VStack {
+                        HStack {
+                            ProfileTitleView(title:AppStrings.EditProfile.editProfile, subtitle: AppStrings.EditProfile.updateProfileInfo, icon: AppIcon.Profile.ride)
+                                .padding(.horizontal,15)
+                                .padding(.top,20)
+                            Button(action: {
                                 isPresented = false
-                            })
-                            .padding(.bottom, 21)
-                            ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                profileViewModel.editProfile(userId:MBUserDefaults.userIdStatic ?? "", userName: userName, email: email, phoneNumber: phoneNumber, emergencyContact: emargeContact, drivingLicense: drivingLicenseNumber, isMachanic: enableMechanic)
-                                isPresented = false
-                            }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber))
+                            }) {
+                                Image(systemName: "xmark")
+                                    .resizable()
+                                    .frame(width: 14,height: 14)
+                                    .foregroundStyle(AppColor.richBlack)
+                                    .padding(.trailing,15)
+                            }
+                        }
+                        ZStack(alignment: .bottomTrailing) {
+                            Image(uiImage: ((selectedImage ?? UIImage(named:"icon-profile"))!))
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 92, height: 73)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
+                                .padding([.top, .bottom], 20)
+                            Button(action: {
+                                showActionSheet = true
+                            }) {
+                                AppIcon.Profile.camera
+                                    .resizable()
+                                    .frame(width: 38,height: 38)
+                                    .foregroundStyle(AppColor.richBlack)
+                                    .padding([.leading, .bottom],10)
+                            }
+                        }
+                        
+                        Group {
+                            EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $profileViewModel.profileName, keyboardType: .default)
+                            EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $profileViewModel.email, keyboardType: .emailAddress)
+                            EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.phoneNumber, keyboardType: .numberPad)
+                            EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $emargeContact, keyboardType: .numberPad)
+                            EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $drivingLicenseNumber, keyboardType: .default)
+                            MechanicView(isOn: $enableMechanic)
+                            HStack(spacing: 19) {
+                                ButtonView( title: "CANCEL",
+                                            background: LinearGradient(
+                                                gradient: Gradient(colors: [.white, .white]),
+                                                startPoint: .leading,
+                                                endPoint: .trailing),
+                                            foregroundColor: AppColor.darkRed,
+                                            showShadow: false ,
+                                            borderColor: AppColor.darkRed,
+                                            onTap: {
+                                    isPresented = false
+                                })
                                 .padding(.bottom, 21)
+                                ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
+                                    profileViewModel.editProfile(userId:MBUserDefaults.userIdStatic ?? "", userName: userName, email: email, phoneNumber: phoneNumber, emergencyContact: emargeContact, drivingLicense: drivingLicenseNumber, isMachanic: enableMechanic)
+                                    isPresented = false
+                                }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber, isMachanic: enableMechanic))
+                                    .padding(.bottom, 21)
+                            }
                         }
+                        .padding()
                     }
-                    .padding()
+                    .background(AppColor.listGray)
+                    .cornerRadius(10)
+                    .padding(EdgeInsets(top: 15, leading: 15, bottom: 150, trailing: 15))
                 }
-                .background(AppColor.listGray)
-                .cornerRadius(10)
-                .padding(EdgeInsets(top: 15, leading: 15, bottom: 150, trailing: 15))
             }
-        }
-        .frame(maxWidth: .infinity,maxHeight: .infinity)
-        .background(AppColor.darkgray)
-        // TODO: Actual names are not finalized once get the actuall text to display then i will localize this.
-        .confirmationDialog("Select Photo Source", isPresented: $showActionSheet) {
-            Button("Take Photo") {
-                sourceType = .camera
-                isShowingImagePicker = true
+            .frame(maxWidth: .infinity,maxHeight: .infinity)
+            .background(AppColor.darkgray)
+            // TODO: Actual names are not finalized once get the actuall text to display then i will localize this.
+            .confirmationDialog("Select Photo Source", isPresented: $showActionSheet) {
+                Button("Take Photo") {
+                    sourceType = .camera
+                    isShowingImagePicker = true
+                }
+                Button("Choose from Gallery") {
+                    sourceType = .photoLibrary
+                    isShowingImagePicker = true
+                }
+                Button(AppStrings.EditProfile.cancel, role: .cancel) {}
             }
-            Button("Choose from Gallery") {
-                sourceType = .photoLibrary
-                isShowingImagePicker = true
+            .sheet(isPresented: $isShowingImagePicker) {
+                ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
             }
-            Button(AppStrings.EditProfile.cancel, role: .cancel) {}
-        }
-        .sheet(isPresented: $isShowingImagePicker) {
-            ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
+            .task {
+                await profileViewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+            }
+            if profileViewModel.isLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
+            }
         }
     }
 }

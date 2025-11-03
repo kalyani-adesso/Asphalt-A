@@ -87,10 +87,10 @@ struct AnswerCardView: View {
                     Button {
                         Task {
                             if isDisliked {
-                                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
-                                            } else {
-                                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: false)
-                                            }                        }
+                                await viewModel.RemovelikeDislikeAnswer(for: query, for: answer)
+                            } else {
+                                await viewModel.likeDislikeAnswer(for: query, for: answer, isLikeorDisLike: false)
+                            }                        }
                     } label: {
                         Image(systemName: isDisliked ? "hand.thumbsdown.fill" : "hand.thumbsdown")
                             .frame(width: 18, height: 18)
