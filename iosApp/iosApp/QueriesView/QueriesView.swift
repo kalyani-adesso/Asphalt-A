@@ -113,6 +113,9 @@ struct QueriesView: View {
         .onAppear{
             viewModel.fetchAllQueries()
         }
+        .refreshable {
+            viewModel.fetchAllQueries()
+        }
         
     }
 }
