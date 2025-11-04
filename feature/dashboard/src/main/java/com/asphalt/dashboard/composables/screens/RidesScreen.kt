@@ -176,7 +176,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                     Text(
                         text = upconing.place ?: "",
                         style = Typography.bodySmall,
-                        color = NeutralDarkGrey
+                        color = NeutralDarkGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -456,7 +458,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             )
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(modifier = Modifier) {
+            Row(modifier = Modifier.weight(1.5f).fillMaxWidth()) {
 
                 CircularNetworkImage(
                     modifier = Modifier.border(
@@ -466,7 +468,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                     ), size = Dimensions.size32, imageUrl = invites.profileImageUrl?:""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Column {
+                Column(modifier = Modifier) {
                     Text(
                         text = stringResource(R.string.invite_from, invites.createdUSerName ?: ""),
                         style = TypographyMedium.titleMedium,
@@ -477,7 +479,9 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                     Text(
                         text = invites.place ?: "",
                         style = Typography.bodySmall,
-                        color = NeutralDarkGrey
+                        color = NeutralDarkGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
