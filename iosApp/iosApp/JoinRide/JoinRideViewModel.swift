@@ -54,24 +54,31 @@ extension JoinRideViewModel {
                 print(" Failed to fetch rides: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            let joinRideModels: [JoinRideModel] = rideArray.compactMap { ride in
+            let filteredRideArray = rideArray.filter {
+                $0.createdBy == MBUserDefaults.userIdStatic ||
+                ($0.participants.first(where: { $0.userId == MBUserDefaults.userIdStatic })?.inviteStatus == 1)
+            }
+
+            let joinRideModels: [JoinRideModel] = filteredRideArray.compactMap { ride in
                 guard let startEpoch = ride.startDate else { return nil }
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 let dateString = self.formatDate(startDate)
               
                 let acceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
-                
-                return JoinRideModel(
-                    title: ride.rideTitle ?? "",
-                    organizer: ride.createdBy ?? "",
-                    description: ride.description_ ?? "",
-                    route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
-                    distance:"\(Int(ride.rideDistance)) km",
-                    date: dateString,
-                    ridersCount: "0",
-                    maxRiders: "\(acceptedCount)",
-                    riderImage: "rider_avatar"
-                )
+                if startDate >= Calendar.current.startOfDay(for: Date()) {
+                    return JoinRideModel(
+                        title: ride.rideTitle ?? "",
+                        organizer: ride.createdBy ?? "",
+                        description: ride.description_ ?? "",
+                        route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
+                        distance:"\(Int(ride.rideDistance)) km",
+                        date: dateString,
+                        ridersCount: "0",
+                        maxRiders: "\(acceptedCount)",
+                        riderImage: "rider_avatar"
+                    )
+                }
+                return nil
             }
             
             DispatchQueue.main.async {
