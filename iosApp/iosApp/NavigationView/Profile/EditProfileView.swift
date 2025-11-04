@@ -116,12 +116,7 @@ struct EditProfileView: View {
                 await profileViewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
             }
             if profileViewModel.isLoading {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding(.top, 100)
-                    .foregroundColor(.white)
+                ProgressViewReusable(title: "Loading ...")
             }
         }
     }

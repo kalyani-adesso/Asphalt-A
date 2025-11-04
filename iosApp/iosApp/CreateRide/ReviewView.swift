@@ -76,12 +76,7 @@ struct ReviewView: View {
         }
             
                         if viewModel.isRideLoading {
-                            Color.black.opacity(0.5)
-                                .ignoresSafeArea()
-                            ProgressView("Loading...")
-                                .progressViewStyle(CircularProgressViewStyle())
-                                .padding(.top, 100)
-                                .foregroundColor(.white)
+                            ProgressViewReusable(title: "Loading ...")
                         }
                     }
             

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UpcomingRidesView: View {
     @EnvironmentObject var home: HomeViewModel
+    @EnvironmentObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -24,8 +25,10 @@ struct UpcomingRidesView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 25) {
-                    ForEach(home.upcomingRides) { ride in
-                        UpcomingRideCard(ride: ride)
+                    ForEach($viewModel.rides.filter { $ride in
+                        $ride.rideAction.wrappedValue == .invities
+                    }, id: \.id) { $ride in
+                        UpcomingRideCard(viewModel: viewModel, ride: $ride)
                     }
                 }
             }
@@ -33,13 +36,23 @@ struct UpcomingRidesView: View {
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
             UpcomingRideView()
+                .environmentObject(viewModel)
+                       .environmentObject(home)
         })
+        .task{
+            await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+        }
     }
 }
-
 struct UpcomingRideCard: View {
-    let ride: UpcomingRide
+    @ObservedObject var viewModel: UpcomingRideViewModel
+    @Binding var ride:RideModel
+    var hostName: String {
+           viewModel.usersById[ride.createdBy] ?? "Unknown"
+       }
     let totalCount = 5
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -50,11 +63,11 @@ struct UpcomingRideCard: View {
                         RoundedRectangle(cornerRadius: 32.5)
                             .stroke(AppColor.celticBlue, lineWidth: 2.5)
                     )
-                    .overlay(Text(initials(from: ride.hostName)).font(.headline))
+                   .overlay(Text(initials(from: hostName)).font(.headline))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Invite from \(ride.hostName)")
+                    Text("Invite from  \(hostName)")
                         .font(KlavikaFont.bold.font(size: 16))
-                    Text(ride.route)
+                    Text("\(ride.routeStart)")
                         .font(KlavikaFont.regular.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
                 }
@@ -63,12 +76,7 @@ struct UpcomingRideCard: View {
             }
             HStack(spacing: 8) {
                 AppIcon.Home.calender
-                Text(ride.date, style: .date)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundColor(AppColor.stoneGray)
-                Text("-")
-                    .foregroundColor(AppColor.stoneGray)
-                Text(ride.date, style: .time)
+                Text(ride.date)
                     .font(KlavikaFont.regular.font(size: 12))
                     .foregroundColor(AppColor.stoneGray)
                 Spacer()
@@ -122,11 +130,19 @@ struct UpcomingRideCard: View {
                 
             }
             HStack {
-                ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, height: 50)
+                ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, onTap :{
+                    Task {
+                        await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
+                    }
+                }, height: 50)
                 ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: LinearGradient(
                     gradient: Gradient(colors: [AppColor.darkRed, AppColor.darkRed]),
                     startPoint: .leading,
-                    endPoint: .trailing), height: 50)
+                    endPoint: .trailing), onTap :{
+                        Task {
+                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+                        }
+                    },height: 50)
                 
             }
             .padding(.vertical,10)
@@ -140,6 +156,7 @@ struct UpcomingRideCard: View {
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
     }
+    
     private func initials(from name: String) -> String {
         name.split(separator: " ").compactMap { $0.first }.map { String($0) }.joined()
     }
@@ -148,4 +165,6 @@ struct UpcomingRideCard: View {
 
 #Preview {
     UpcomingRidesView()
+        .environmentObject(HomeViewModel())
+        .environmentObject(UpcomingRideViewModel())
 }

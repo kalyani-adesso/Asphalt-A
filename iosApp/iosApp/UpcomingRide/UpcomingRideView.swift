@@ -7,13 +7,11 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct UpcomingRideView: View {
-    @StateObject private var viewModel = UpcomingRideViewModel()
-    @State private var selectedStatus: String? = nil
+    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    var currentSelected: RideAction { viewModel.selectedTab }
     @State private var showHomeView:Bool = false
-    @StateObject private var homeViewModel = HomeViewModel()
+    @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
     @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
@@ -33,17 +31,18 @@ struct UpcomingRideView: View {
                 VStack {
                     HStack(spacing: 12) {
                         let rideStatuses = viewModel.rideStatus
-                        let currentSelected = selectedStatus ?? rideStatuses.first?.rawValue
                         
                         ForEach(rideStatuses, id: \.self) { status in
-                            let isSelected = currentSelected == status.rawValue
+                            let isSelected = viewModel.selectedTab == status
                             let showDot = status == .invities && hasPendingInvites
                             SegmentButtonView(
                                 rideStatus: status.rawValue,
                                 isSelected: isSelected,
                                 showNotificationDot: showDot
                             ) {
-                                selectedStatus = status.rawValue
+                                withAnimation {
+                                    viewModel.selectedTab = status
+                                }
                             }
                         }
                     }
@@ -58,10 +57,10 @@ struct UpcomingRideView: View {
                     .contentShape(Rectangle())
                     VStack {
                         List {
-                            ForEach($viewModel.rides.filter { $ride in
-                                ride.rideAction.rawValue == selectedStatus
-                            }, id: \.id) { $ride in
-                                UpComingView(ride: $ride)
+                            ForEach($viewModel.rides.indices.filter { index in
+                                viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
+                            }, id: \.self) { index in
+                                UpComingView(viewModel: viewModel, ride: $viewModel.rides[index])
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                             }
@@ -71,7 +70,7 @@ struct UpcomingRideView: View {
                     }
                 }
                 .onAppear {
-                    selectedStatus = viewModel.rideStatus.first?.rawValue
+                    viewModel.selectedTab = .upcoming
                     if showpopup {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             withAnimation(.easeInOut) {
@@ -113,22 +112,16 @@ struct UpcomingRideView: View {
                 .zIndex(2)
             }
             if viewModel.isRideLoading {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding(.top, 100)
-                    .foregroundColor(.white)
+                ProgressViewReusable(title: "Loading Rides...")
             }
         }
         .zIndex(showpopup ? 2 : 0)
         .task{
             await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
         }
     }
 }
-
-
 
 struct SegmentButtonView: View {
     var rideStatus: String
@@ -190,6 +183,7 @@ struct SegmentButtonView: View {
 }
 
 struct UpComingView: View {
+    @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
@@ -199,7 +193,7 @@ struct UpComingView: View {
                     .modifier(RoundCorner(rideAction: ride.rideAction))
                     .frame(width: 30, height: 30)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(ride.title)
+                    Text(ride.rideAction == .invities ? "Invite from \(viewModel.usersById[ride.createdBy] ?? "Unknown")" : ride.title)
                         .font(KlavikaFont.bold.font(size: 16))
                         .foregroundColor(AppColor.black)
                     Text("\(ride.routeStart) - \(ride.routeEnd)")
@@ -261,14 +255,18 @@ struct UpComingView: View {
                     .buttonStyle(.plain)
                 } else {
                     ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
-                        
+                        Task {
+                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
+                        }
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
                     .padding(.bottom,20)
                 }
                 
                 Button(action: {
-                    
+                    Task {
+                        await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+                    }
                 }) {
                     Text(ride.rideViewAction.rawValue.uppercased())
                         .frame(maxWidth: .infinity)
@@ -372,4 +370,6 @@ struct ButtonBackground: ViewModifier {
 
 #Preview {
     UpcomingRideView()
+        .environmentObject(HomeViewModel())
+        .environmentObject(UpcomingRideViewModel())
 }

@@ -13,6 +13,8 @@ struct RatingSheetView: View {
     @State private var rating: Int = 0
     @State private var feedback: String = ""
     @State var showHome: Bool = false
+    @EnvironmentObject var home: HomeViewModel
+    @EnvironmentObject var viewModel : UpcomingRideViewModel
     
     var ratingText: String {
         switch rating {
@@ -81,6 +83,8 @@ struct RatingSheetView: View {
             .shadow(radius: 10)
             .navigationDestination(isPresented: $showHome, destination: {
                 UpcomingRidesView()
+                    .environmentObject(home)
+                    .environmentObject(viewModel)
             })
         }
     }

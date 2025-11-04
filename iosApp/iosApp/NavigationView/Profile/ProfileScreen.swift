@@ -94,12 +94,7 @@ struct ProfileScreen: View {
                 await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
             }
             if viewModel.isLoading {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding(.top, 100)
-                    .foregroundColor(.white)
+                ProgressViewReusable(title: "Loading Profile...")
             }
         }
     }

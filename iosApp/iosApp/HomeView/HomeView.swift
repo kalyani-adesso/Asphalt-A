@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    
+    @EnvironmentObject var home: HomeViewModel
+    @EnvironmentObject var viewModel : UpcomingRideViewModel
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
@@ -17,6 +18,8 @@ struct HomeView: View {
                     ActionButtonView()
                     DashboardView()
                     UpcomingRidesView()
+                        .environmentObject(home)
+                        .environmentObject(viewModel)
                     JourneyCardView()
                     PlacesVisitedView()
                 }
@@ -24,10 +27,25 @@ struct HomeView: View {
             }
             TopNavBar()
                 .ignoresSafeArea(edges: .top)
+            if viewModel.isRideLoading {
+                ProgressViewReusable(title: "Loading ...")
+            }
+        }
+        .task {
+            viewModel.isRideLoading = true
+            
+            async let rides = viewModel.fetchAllUsers()
+            async let allRides = viewModel.fetchAllRides()
+            
+            _ = await (rides, allRides)
+            
+            viewModel.isRideLoading = false
         }
     }
 }
 
 #Preview {
     HomeView()
+        .environmentObject(HomeViewModel())
+        .environmentObject(UpcomingRideViewModel())
 }
