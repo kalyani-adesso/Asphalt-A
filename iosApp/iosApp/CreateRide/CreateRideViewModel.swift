@@ -19,7 +19,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var selectedDate: Date? = nil
     @Published var isRideLoading = false
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
-    
+
     @Published var query = "" {
         didSet {
             completer.queryFragment = query
@@ -28,7 +28,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
     
     private var completer: MKLocalSearchCompleter
-    
+
     var isSelectingStart = true
     
     @Published  var participants: [Participant] = []
@@ -114,6 +114,33 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Error: \(error.localizedDescription)")
     }
+
+    func getDistance() {
+        if let startLat = self.ride.startLat,
+           let startLng = self.ride.startLng,
+           let endLat = self.ride.endLat,
+           let endLng = self.ride.endLng {
+
+            let startPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: startLat, longitude: startLng))
+            let endPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: endLat, longitude: endLng))
+
+            let request = MKDirections.Request()
+            request.source = MKMapItem(placemark: startPlacemark)
+            request.destination = MKMapItem(placemark: endPlacemark)
+            request.transportType = .automobile
+
+            let directions = MKDirections(request: request)
+            directions.calculate { response, error in
+                if let route = response?.routes.first {
+                    let distanceKm = route.distance / 1000.0
+                    print("Bike traveling distance: \(String(format: "%.2f", distanceKm)) km")
+                    self.ride.rideDistance = distanceKm.rounded()
+                } else if let error = error {
+                    print("Error calculating route distance: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
 }
 
 //MARK: - Create Ride API
@@ -123,10 +150,9 @@ extension CreateRideViewModel {
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
                 
-                let filtered = domainList
+                let filteredParticpants = domainList
                     .filter { $0.uid != self.currentUserId }
                     .map { user in
-                        
                         Participant(
                             id: user.uid,
                             name: user.name,
@@ -139,7 +165,7 @@ extension CreateRideViewModel {
                     }
                 
                 DispatchQueue.main.async {
-                    self.participants = filtered
+                    self.participants = filteredParticpants
                 }
                 
             } else if let error = error {
@@ -164,7 +190,8 @@ extension CreateRideViewModel {
             startDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0)
+        
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
                let data = success.data as? GenericResponse {
@@ -177,25 +204,26 @@ extension CreateRideViewModel {
             }
         })
     }
-    
+
     // MARK: - Epoch converter
+    
     func combine(date: Date?, time: Date?) -> Date? {
         guard let date = date, let time = time else { return nil }
-        
+
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
         let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
-        
+
         var merged = DateComponents()
         merged.year = dateComponents.year
         merged.month = dateComponents.month
         merged.day = dateComponents.day
         merged.hour = timeComponents.hour
         merged.minute = timeComponents.minute
-        
+
         return calendar.date(from: merged)
     }
-    
+
     // MARK: - Details View validation
     var isDetailsValid: Bool {
         guard let type = ride.type,
@@ -206,12 +234,11 @@ extension CreateRideViewModel {
         else { return false }
         return true
     }
-    
+
     // MARK: - Route View validation
     var isRouteValid: Bool {
         !ride.startLocation.trimmingCharacters(in: .whitespaces).isEmpty &&
         !ride.endLocation.trimmingCharacters(in: .whitespaces).isEmpty
     }
-    
 }
 
