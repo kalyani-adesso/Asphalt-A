@@ -56,7 +56,11 @@ dependencies {
     implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
-    // Koin
+    // Google Maps
+    implementation(libs.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.location)
+
     // KOIN
     implementation(libs.koin.android)
     implementation(libs.koin.core)

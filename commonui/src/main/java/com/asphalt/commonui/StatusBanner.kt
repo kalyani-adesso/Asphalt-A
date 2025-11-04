@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.LightGreen
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
@@ -39,14 +40,11 @@ enum class BannerType {
 }
 @Composable
 fun StatusBanner(
-    modifier: Modifier = Modifier,
     type: BannerType = BannerType.SUCCESS,
     message: String,
     showBanner : Boolean,
     autoDismissMillis : Long = 2500L,
-    onDismiss: () -> Unit
 ) {
-
     var showSuccess by remember { mutableStateOf(showBanner) }
 
     LaunchedEffect(showBanner) {
@@ -54,10 +52,8 @@ fun StatusBanner(
         if (showBanner && autoDismissMillis > 0) {
             delay(autoDismissMillis)
             showSuccess = false
-            onDismiss()
         }
     }
-
     val (bgColor,iconColor,icon) = when( type) {
         BannerType.SUCCESS -> Triple(Color(color = (0xFFBFFDD9)),
             Color(color = (0xFF016730)), Icons.Default.CheckBox)
@@ -68,7 +64,6 @@ fun StatusBanner(
 //        BannerType.ERROR -> Triple(Color(GreenLIGHT25),
 //            Color(ShamrockGreen), Icons.Default.CheckBox)
     }
-
     AnimatedVisibility(
         visible = showSuccess,
         enter = fadeIn(),
@@ -76,25 +71,25 @@ fun StatusBanner(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .padding(horizontal = Dimensions.padding, vertical = Dimensions.padding8)
+                .clip(RoundedCornerShape(Dimensions.padding13))
                 .background(bgColor),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_success),
                 contentDescription = "Success",
-                modifier = Modifier.padding(14.dp),
+                modifier = Modifier.padding(Dimensions.padding14),
                 tint = Color.Unspecified // keep original color
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimensions.padding13))
 
             Text(
                 text = message,
                 style = TypographyBold.bodyLarge,
                 color = iconColor,
                 modifier = Modifier
-                    .padding(10.dp)
+                    .padding(Dimensions.padding10)
             )
         }
     }
