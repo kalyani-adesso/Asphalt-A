@@ -7,6 +7,6 @@ class SharedViewModel(
     private val ktorClient: KtorClient
 )  : ViewModel() {
 
-    suspend fun Registration() = ktorClient.Registration()
+//    suspend fun Registration() = ktorClient.Registration()
 
 }
