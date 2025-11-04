@@ -12,14 +12,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProfileSectionVM(val profileRepository: ProfileRepository,val androidUserVM: AndroidUserVM) :
+class ProfileSectionVM(val profileRepository: ProfileRepository, val androidUserVM: AndroidUserVM) :
     ViewModel() {
 
     private val _profileData = MutableStateFlow<ProfileUIModel?>(null)
     val profileData = _profileData.asStateFlow()
     private val userUID: String
         get() = androidUserVM.getCurrentUserUID()
-    fun getProfileData() {
+
+    fun getProfileData(isUpdate: Boolean = false) {
         viewModelScope.launch {
             APIHelperUI.handleApiResult(APIHelperUI.runWithLoader {
                 profileRepository.getProfile(
@@ -28,7 +29,8 @@ class ProfileSectionVM(val profileRepository: ProfileRepository,val androidUserV
             }, this) {
                 val profileUIModel = it.toProfileUIModel()
                 _profileData.value = profileUIModel
-                androidUserVM.updateUserData(profileUIModel.toCurrentUserModel())
+                if (isUpdate)
+                    androidUserVM.updateUserData(profileUIModel.toCurrentUserModel())
             }
 
         }
@@ -55,7 +57,7 @@ class ProfileSectionVM(val profileRepository: ProfileRepository,val androidUserV
                         )
                     }, viewModelScope
                 ) {
-                    getProfileData()
+                    getProfileData(isUpdate = true)
                 }
 
             }
