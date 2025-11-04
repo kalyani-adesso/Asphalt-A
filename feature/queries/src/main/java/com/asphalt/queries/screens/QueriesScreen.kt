@@ -17,14 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -42,7 +40,6 @@ import com.asphalt.queries.components.Queries
 import com.asphalt.queries.components.SearchQueries
 import com.asphalt.queries.viewmodels.AskQueryVM
 import com.asphalt.queries.viewmodels.QueriesVM
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +50,9 @@ fun QueriesScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 
 ) {
+    LaunchedEffect(Unit) {
+        queriesVM.loadQueries()
+    }
     val askQueryVM: AskQueryVM = koinViewModel()
     var showQueryPopup by remember { mutableStateOf(false) }
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
@@ -75,7 +75,7 @@ fun QueriesScreen(
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 10.dp)
+                            .padding(horizontal = Dimensions.size10)
                             .height(Dimensions.padding30),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
@@ -102,8 +102,7 @@ fun QueriesScreen(
     LaunchedEffect(selectedCategory.intValue) {
         queriesVM.setFilterCategory(selectedCategory.intValue)
     }
-    val selectedQueryId: MutableState<Int?> = remember { mutableStateOf(null) }
-    val scope = rememberCoroutineScope()
+    val selectedQueryId: MutableState<String?> = remember { mutableStateOf(null) }
     if (showAnswerPopup) {
         AnswerToQuery({
             showAnswerPopup = false
@@ -113,10 +112,8 @@ fun QueriesScreen(
     }
     if (showQueryPopup)
         AskQuery(askQueryVM = askQueryVM, onSubmit = {
-            scope.launch {
-                queriesVM.loadQueries()
-                showQueryPopup = false
-            }
+            showQueryPopup = false
+            queriesVM.addQuestion(it)
         }, onDismiss = {
             showQueryPopup = false
         }, user = user.value)
@@ -127,7 +124,9 @@ fun QueriesScreen(
         isScrollable = false
     ) {
         Spacer(Modifier.height(Dimensions.padding20))
-        SearchQueries()
+        SearchQueries({
+            queriesVM.search(it)
+        })
         FilterCategories(selectedCategory)
         Queries(queryList.value, queriesVM) { it ->
             selectedQueryId.value = it

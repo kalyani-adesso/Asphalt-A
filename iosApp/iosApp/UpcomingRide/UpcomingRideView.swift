@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct UpcomingRideView: View {
     @StateObject private var viewModel = UpcomingRideViewModel()
     @State private var selectedStatus: String? = nil
@@ -15,6 +17,9 @@ struct UpcomingRideView: View {
     @State var showHome: Bool = false
     @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
+    var hasPendingInvites: Bool {
+        viewModel.rides.contains { $0.rideAction == .invities }
+    }
     var body: some View {
         
         
@@ -27,16 +32,22 @@ struct UpcomingRideView: View {
                 
                 VStack {
                     HStack(spacing: 12) {
-                        ForEach(viewModel.rideStatus, id: \.self) { status in
-                            let isSelected = (selectedStatus ?? viewModel.rideStatus.first?.rawValue) == status.rawValue
+                        let rideStatuses = viewModel.rideStatus
+                        let currentSelected = selectedStatus ?? rideStatuses.first?.rawValue
+                        
+                        ForEach(rideStatuses, id: \.self) { status in
+                            let isSelected = currentSelected == status.rawValue
+                            let showDot = status == .invities && hasPendingInvites
                             SegmentButtonView(
                                 rideStatus: status.rawValue,
-                                isSelected: isSelected
+                                isSelected: isSelected,
+                                showNotificationDot: showDot
                             ) {
                                 selectedStatus = status.rawValue
                             }
                         }
                     }
+                    
                     .frame(maxWidth: .infinity)
                     .padding(16)
                     .background(
@@ -62,12 +73,12 @@ struct UpcomingRideView: View {
                 .onAppear {
                     selectedStatus = viewModel.rideStatus.first?.rawValue
                     if showpopup {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                withAnimation(.easeInOut) {
-                                    showpopup = false
-                                }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation(.easeInOut) {
+                                showpopup = false
                             }
                         }
+                    }
                 }
             }
             .navigationBarBackButtonHidden(true)
@@ -101,49 +112,80 @@ struct UpcomingRideView: View {
                 .transition(.scale)
                 .zIndex(2)
             }
+            if viewModel.isRideLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
+            }
         }
         .zIndex(showpopup ? 2 : 0)
+        .task{
+            await viewModel.fetchAllRides()
+        }
     }
 }
+
+
 
 struct SegmentButtonView: View {
     var rideStatus: String
     var isSelected: Bool = false
+    var showNotificationDot: Bool = false
     var onTap: (() -> Void)? = nil
     var body: some View {
-        Button(action: {
-            onTap?()
-        }) {
-            Text(rideStatus)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    Group {
-                        if isSelected {
-                            LinearGradient(
-                                gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        } else {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(AppColor.white)
+        ZStack(alignment: .topTrailing){
+            Button(action: {
+                onTap?()
+            }) {
+                Text(rideStatus)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        Group {
+                            if isSelected {
+                                LinearGradient(
+                                    gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            } else {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.white)
+                            }
                         }
-                    }
-                )
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-                .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
-                        radius: isSelected ? 4 : 0,
-                        x: 0, y: isSelected ? 2 : 0)
-                .foregroundColor(isSelected ? AppColor.white : .black)
-                .font(KlavikaFont.bold.font(size: 16))
+                    )
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
+                            radius: isSelected ? 4 : 0,
+                            x: 0, y: isSelected ? 2 : 0)
+                    .foregroundColor(isSelected ? AppColor.white : .black)
+                    .font(KlavikaFont.bold.font(size: 16))
+            }
+            .buttonStyle(.plain)
+            if showNotificationDot {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 19, height: 19)
+                        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
+                    
+                    // Inner blue circle
+                    Circle()
+                        .fill(AppColor.celticBlue)
+                        .frame(width: 12, height: 12)
+                }
+                .offset(x: 8, y: -7)
+            }
+            
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -218,7 +260,7 @@ struct UpComingView: View {
                     .padding(.bottom,20)
                     .buttonStyle(.plain)
                 } else {
-                    ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(),onTap: {
+                    ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
                         
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
@@ -326,6 +368,7 @@ struct ButtonBackground: ViewModifier {
         }
     }
 }
+
 
 #Preview {
     UpcomingRideView()

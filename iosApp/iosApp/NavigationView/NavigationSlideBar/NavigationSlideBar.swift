@@ -17,7 +17,7 @@ struct NavigationSlideBar: View {
         } )
         VStack {
             List(viewModel.sections, id: \.self) { item in
-                MenuItemRow(item: item)
+                MenuItemRow(viewModel: viewModel, item: item)
                     .padding(.vertical, 5)
                     .listRowSeparator(.hidden)
                     .listRowBackground(AppColor.listGray)
@@ -36,6 +36,7 @@ struct NavigationSlideBar: View {
 }
 
 struct MenuItemRow: View {
+    let viewModel:NavigationSliderViewModel
     let item: MenuItemModel
     @State var itemIsSelected: Bool = false
     var body: some View {
@@ -56,8 +57,13 @@ struct MenuItemRow: View {
         .modifier(logoutSection(title: item.title))
         .contentShape(Rectangle())
         .onTapGesture {
-            itemIsSelected = true
-            MBUserDefaults.rememberMeDataStatic = false
+            //TODO: Show Logout toast
+            viewModel.logout {
+                itemIsSelected = true
+                MBUserDefaults.rememberMeDataStatic = false
+                MBUserDefaults.userIdStatic = ""
+                MBUserDefaults.userNameStatic = ""
+            }
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {
             item.destination
@@ -80,7 +86,6 @@ struct logoutSection:ViewModifier {
         }
     }
 }
-
 
 #Preview {
     NavigationSlideBar()

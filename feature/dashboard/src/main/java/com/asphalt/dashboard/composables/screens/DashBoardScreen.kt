@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -84,8 +85,8 @@ fun DashBoardScreen(
             locationStatus = ""
         }, context
     )
-
     val currentUser = androidUserVM.userState.collectAsState(null)
+
     val notificationList = notificationViewModel.notificationState.collectAsStateWithLifecycle()
     val hasUnreadNotifications: State<Boolean> = remember {
         derivedStateOf {
@@ -94,31 +95,34 @@ fun DashBoardScreen(
             }
         }
     }
-    setTopAppBarState(
-        AppBarState(
-            title = stringResource(
-                R.string.hello_user,
-                currentUser.value?.name.toString()
-            ), subtitle = locationStatus,
-            actions = {
-                IconButton(onClick = {
-                    notificationsClick.invoke()
-                }) {
-                    Box {
-                        Icon(painter = painterResource(R.drawable.ic_notification), null)
-                        if (hasUnreadNotifications.value)
-                            RoundedBox(
-                                backgroundColor = VividRed,
-                                modifier = Modifier
-                                    .size(Dimensions.size8)
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = Dimensions.spacingNeg1),
-                                cornerRadius = Dimensions.size8
-                            ) {}
+    val helloUser = stringResource(R.string.hello_user)
+    LaunchedEffect(Unit,locationStatus) {
+
+        setTopAppBarState(
+            AppBarState(
+                title = helloUser.format(
+                    currentUser.value?.name.toString()
+                ), subtitle = locationStatus,
+                actions = {
+                    IconButton(onClick = {
+                        notificationsClick.invoke()
+                    }) {
+                        Box {
+                            Icon(painter = painterResource(R.drawable.ic_notification), null)
+                            if (hasUnreadNotifications.value)
+                                RoundedBox(
+                                    backgroundColor = VividRed,
+                                    modifier = Modifier
+                                        .size(Dimensions.size8)
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = Dimensions.spacingNeg1),
+                                    cornerRadius = Dimensions.size8
+                                ) {}
+                        }
                     }
-                }
-            })
-    )
+                })
+        )
+    }
 
 
     ComposeUtils.DefaultColumnRoot(

@@ -3,9 +3,11 @@ package com.asphalt.queries.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -45,19 +47,23 @@ import com.asphalt.queries.viewmodels.QueriesVM
 import kotlinx.coroutines.launch
 
 @Composable
-fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
-
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
-        items(queries) {
-            ComposeUtils.CommonContentBox {
-                QueryComponent(it, queriesVM, selectQueryForAnswer)
+fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (String) -> Unit) {
+    if (queries.isEmpty())
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            ComposeUtils.SectionTitle("No data")
+        }
+    else
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
+            items(queries) {
+                ComposeUtils.CommonContentBox {
+                    QueryComponent(it, queriesVM, selectQueryForAnswer)
+                }
             }
         }
-    }
 }
 
 @Composable
-fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (Int) -> Unit) {
+fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (String) -> Unit) {
     val scope = rememberCoroutineScope()
 
     Column(
@@ -103,11 +109,17 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (In
                 query.postedByName, modifier = Modifier.padding(start = Dimensions.spacing10)
             )
             Spacer(Modifier.weight(1f))
-            ComposeUtils.SectionSubtitle(Utils.formatRelativeTime(query.postedOn), color = GrayDark)
+            ComposeUtils.SectionSubtitle(
+                Utils.formatRelativeTime(
+                    Utils.formatDateMillisToISO(
+                        query.postedOn
+                    )
+                ), color = GrayDark
+            )
         }
         HorizontalDivider(color = LightSilver)
         if (query.answers.isNotEmpty())
-            Answers(query.answers, queriesVM)
+            Answers(query.answers, queriesVM, queryId = query.id)
         Row(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing10),
             verticalAlignment = Alignment.CenterVertically
@@ -120,7 +132,7 @@ fun QueryComponent(query: Query, queriesVM: QueriesVM, selectQueryForAnswer: (In
                     .clickable {
                         scope.launch {
 
-                            queriesVM.likeOrRemoveLikeOfQuestion(query.id)
+                            queriesVM.likeOrRemoveLikeOfQuestion(query.id, query.isUserLiked)
                         }
                     }
                     .offset(y = Dimensions.spacingNeg2)

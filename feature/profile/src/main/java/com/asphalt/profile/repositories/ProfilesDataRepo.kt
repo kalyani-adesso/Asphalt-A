@@ -1,14 +1,14 @@
 package com.asphalt.profile.repositories
 
-import com.asphalt.profile.data.ProfileData
+import com.asphalt.profile.data.ProfileUIModel
 import com.asphalt.profile.data.dummyProfiles
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ProfilesDataRepo {
-    private val _profileData = MutableStateFlow<ProfileData?>(null)
-    val profileData: StateFlow<ProfileData?> = _profileData
+    private val _profileData = MutableStateFlow<ProfileUIModel?>(null)
+    val profileData: StateFlow<ProfileUIModel?> = _profileData
     suspend fun getProfileData(uid: String?) {
         delay(200)
         uid?.let {
@@ -18,7 +18,7 @@ class ProfilesDataRepo {
 
     }
 
-    suspend fun editProfileData(updatedProfileData: ProfileData) {
+    suspend fun editProfileData(updatedProfileData: ProfileUIModel) {
         delay(200)
         dummyProfiles = dummyProfiles.map { currentProfileData ->
             if (currentProfileData.uid == updatedProfileData.uid) updatedProfileData else currentProfileData

@@ -1,21 +1,25 @@
 package com.asphalt.profile.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
+import com.asphalt.android.repository.profile.ProfileRepository
 import com.asphalt.commonui.util.EmailValidator
-import com.asphalt.profile.repositories.ProfilesDataRepo
+import com.asphalt.profile.data.ProfileUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class EditProfileVM(val repo: ProfilesDataRepo) : ViewModel() {
-    val currentProfile = repo.profileData
-    private val _editFullName = MutableStateFlow(currentProfile.value?.username ?: "")
-    private val _editEmail = MutableStateFlow(currentProfile.value?.userEmail ?: "")
-    private val _editPhoneNumber = MutableStateFlow(currentProfile.value?.phoneNumber ?: "")
-    private val _editLicense = MutableStateFlow(currentProfile.value?.drivingLicenseNumber ?: "")
-    private val _editMechanic = MutableStateFlow(currentProfile.value?.isMechanic ?: false)
+class EditProfileVM(val profileRepository: ProfileRepository) : ViewModel() {
+
+    private val _editFullName = MutableStateFlow("")
+    private val _editEmail = MutableStateFlow("")
+    private val _editPhoneNumber = MutableStateFlow("")
+    private val _editLicense = MutableStateFlow("")
+    private val _editMechanic = MutableStateFlow(false)
     private val _editEmergencyNo =
-        MutableStateFlow(currentProfile.value?.emergencyContactNumber ?: "")
+        MutableStateFlow("")
     val editFullName: StateFlow<String> = _editFullName.asStateFlow()
     val editEmail: StateFlow<String> = _editEmail.asStateFlow()
     val editPhoneNumber: StateFlow<String> = _editPhoneNumber.asStateFlow()
@@ -116,19 +120,15 @@ class EditProfileVM(val repo: ProfilesDataRepo) : ViewModel() {
     }
 
 
-    suspend fun editProfile() {
-            val copy =
-                currentProfile.value?.copy(
-                    username = _editFullName.value,
-                    userEmail = _editEmail.value,
-                    phoneNumber = _editPhoneNumber.value,
-                    drivingLicenseNumber = _editLicense.value,
-                    isMechanic = _editMechanic.value,
-                    emergencyContactNumber = _editEmergencyNo.value
-                )
-            copy?.let { repo.editProfileData(it) }
 
 
+    fun setCurrentProfile(profileUIModel: ProfileUIModel?) {
+        _editMechanic.value = profileUIModel?.isMechanic ?: false
+        _editEmail.value = profileUIModel?.userEmail ?: ""
+        _editLicense.value = profileUIModel?.drivingLicenseNumber ?: ""
+        _editEmergencyNo.value = profileUIModel?.emergencyContactNumber ?: ""
+        _editPhoneNumber.value = profileUIModel?.phoneNumber ?: ""
+        _editFullName.value = profileUIModel?.username ?: ""
     }
 
 }

@@ -57,7 +57,7 @@ fun RidersScreenLoader(
                 type = BannerType.SUCCESS,
                 message = "Successfully joined the ride!",
                 showBanner = showBanner,
-                //onDismiss = { showBanner = false}
+                onDismiss = { showBanner = false}
             )
         }
     }

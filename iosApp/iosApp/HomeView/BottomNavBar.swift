@@ -31,6 +31,7 @@ struct BottomNavBar: View {
                             .environmentObject(homeViewModel)
                     }
                 }
+                .frame(maxHeight: .infinity)
                 .animation(.easeInOut(duration: 0.25), value: selectedTab)
                 HStack {
                     tabItem(index: 0, label: "Home", systemIcon: "house")

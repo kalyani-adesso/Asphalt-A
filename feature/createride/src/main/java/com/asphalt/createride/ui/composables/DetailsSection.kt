@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralBlackGrey
@@ -174,6 +175,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     DropdownMenuItem(
                         text = { Text(option.rideType, style = Typography.bodySmall) },
                         onClick = {
+                            viewModel.updateParticipantTab(option.id != Constants.SOLO_RIDE)
                             viewModel._showRideTypeError.value = false
                             viewModel.updateRiderType(option.rideType)
                             expanded = false
@@ -385,7 +387,8 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                         .fillMaxWidth()
                         .background(
                             NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10),
-                        ).then(
+                        )
+                        .then(
                             if (viewModel._showRideTimeError.value) {
                                 Modifier.border(
                                     width = Dimensions.padding1,

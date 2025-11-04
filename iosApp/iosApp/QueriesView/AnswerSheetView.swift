@@ -10,7 +10,8 @@ import SwiftUI
 struct AnswerSheetView: View {
     @Environment(\.dismiss) var dismiss
     var query: Query
-    @State private var answerText: String = ""
+    @ObservedObject var viewModel: QueryViewModel
+
     var body: some View {
         VStack(spacing: 20) {
             // MARK: Header
@@ -28,7 +29,7 @@ struct AnswerSheetView: View {
                 }
             }
             .padding()
-           
+            
             
             // MARK: Question + Answers
             ScrollView {
@@ -99,7 +100,7 @@ struct AnswerSheetView: View {
                     )
                     // Answers
                     ForEach(query.answers) { answer in
-                        AnswerCardView(answer: answer)
+                        AnswerCardView(viewModel: viewModel, answer: answer, query: query)
                     }
                 }
                 .padding(.horizontal, 35)
@@ -119,7 +120,7 @@ struct AnswerSheetView: View {
                         )
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        TextField("Share your knowledge and help the community...", text: $answerText, axis: .vertical)
+                        TextField("Share your knowledge and help the community...", text: $viewModel.answerText, axis: .vertical)
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundColor(AppColor.richBlack)
                             .padding()
@@ -144,8 +145,11 @@ struct AnswerSheetView: View {
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppColor.darkGray, lineWidth: 1))
                             Spacer()
                             Button {
-                                // Post answer action here
-                                answerText = ""
+                                Task {
+                                    dismiss()
+                                    await viewModel.addAnswer()
+                                    viewModel.answerText = ""
+                                }
                             } label: {
                                 HStack {
                                     Image(systemName: "paperplane.fill")
@@ -160,7 +164,7 @@ struct AnswerSheetView: View {
                         }
                         .padding(.top, 10)
                     }
-                   
+                    
                 }
                 .padding(.top, 60)
                 .padding(.horizontal, 30)
@@ -180,30 +184,11 @@ struct AnswerSheetView: View {
                 endPoint: .bottom
             )
         )
-
-
+        .onAppear {
+            viewModel.selectedQuery = query
+        }
+        
     }
     
 }
 
-#Preview {
-    AnswerSheetView(query: Query(
-        title: "Best oil for Kawasaki Ninja 650?",
-        tags: ["Maintenance", "Answered"],
-        author: "Vyshnav",
-        daysAgo: "7 days ago",
-        content: "I have a 2022 Kawasaki Ninja 650 and I'm due for an oil change. What oil do you recommend for optimal performance?",
-        answers: [
-            Answer(
-                author: "Sooraj",
-                role: "Mechanic",
-                daysAgo: "6 days ago",
-                content: "For your Ninja 650, I recommend using Kawasaki 4-Stroke Oil 10W-40 or Motul 7100 10W-40. Both are excellent choices that meet the JASO MA2 specification.",
-                likes: 10,
-                dislikes: 1
-            ),
-        ],
-        likes: 15,
-        comments: 1
-    ))
-}

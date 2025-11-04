@@ -10,6 +10,7 @@ import SwiftUI
 struct ButtonView: View {
     let title: String
     var icon: Image? = nil
+    var fontSize: CGFloat = 18
     var background: LinearGradient? = nil
     var foregroundColor: Color = AppColor.white
     var showShadow: Bool = true
@@ -47,7 +48,7 @@ struct ButtonView: View {
                     radius: showShadow ? 4 : 0,
                     x: 0, y: showShadow ? 2 : 0)
             .foregroundStyle(foregroundColor)
-            .font(KlavikaFont.bold.font(size: 18))
+            .font(KlavikaFont.bold.font(size: fontSize))
             
         }
         .buttonStyle(.plain)

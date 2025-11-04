@@ -1,6 +1,5 @@
 package com.asphalt.profile.screens.sections
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,12 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.asphalt.android.model.CurrentUser
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryBrighterLightB33
@@ -26,22 +23,19 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.profile.viewmodels.ProfileSectionVM
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun ProfileSection(
-    user: CurrentUser?,
-    profileSectionVM: ProfileSectionVM = koinViewModel(),
+    profileSectionVM: ProfileSectionVM = koinActivityViewModel()
 ) {
-    LaunchedEffect(user) {
-        profileSectionVM.getProfileData(user?.uid)
-    }
+
     val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
     ComposeUtils.CommonContentBox(
         modifier = Modifier
             .fillMaxWidth(),
 
-    ) {
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,8 +73,9 @@ fun ProfileSection(
                 Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing15)) {
                     if (profileData.value?.isMechanic == true)
                         ProfileLabel(R.drawable.ic_spanner_orange, "Mechanic")
-                    ProfileLabel(R.drawable.ic_call, profileData.value?.phoneNumber ?: "")
-
+                    profileData.value?.phoneNumber?.takeIf { it.isNotEmpty() }?.let { phoneNumber ->
+                        ProfileLabel(R.drawable.ic_call, phoneNumber)
+                    }
                 }
             }
         }

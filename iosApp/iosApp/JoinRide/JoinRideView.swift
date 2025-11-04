@@ -16,71 +16,88 @@ struct JoinRideView: View {
     @StateObject private var homeViewModel = HomeViewModel()
     @Environment(\.dismiss) private var dismiss
     var body: some View {
-        NavigationStack {
-            SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
-            VStack {
-                searchBarView
-                    .font(KlavikaFont.regular.font(size: 14))
-                    .padding(.top)
-                List(viewModel.rides, id: \.id) { ride in
-                    JoinRideRow(ride: ride, showConnectedRides: $showConnectedRides)
-                        .listRowSeparator(.hidden)
+        ZStack {
+            NavigationStack {
+                SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
+                VStack {
+                    searchBarView
+                        .font(KlavikaFont.regular.font(size: 14))
+                        .padding(.top)
+                    List(viewModel.filteredRides, id: \.id) { ride in
+                        JoinRideRow(ride: ride, viewModel: viewModel, showConnectedRides: $showConnectedRides)
+                            .listRowSeparator(.hidden)
+                    }
+                    .listStyle(.plain)
+                    Spacer()
                 }
-                .listStyle(.plain)
-                Spacer()
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(isPresented: $showHomeView, destination: {
+                    BottomNavBar()
+                })
+                .task {
+                    await viewModel.getRides()
+                }
+                .refreshable {
+                    Task {
+                        await viewModel.getRides()
+                    }
+                }
+                .navigationDestination(isPresented: $showConnectedRides, destination: {
+                    ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
+                        title: "Weekend Coast Ride",
+                        organizer: "Sooraj",
+                        description: "Join us for a beautiful sunrise ride along the coastal highway",
+                        route: "Kochi - Kanyakumari",
+                        distance: "280km",
+                        date: "Sun, Oct 21",
+                        ridersCount: "3",
+                        maxRiders: "8",
+                        riderImage: "rider_avatar"
+                    ))
+                })
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHomeView, destination: {
-                BottomNavBar()
-            })
-            .navigationDestination(isPresented: $showConnectedRides, destination: {
-                ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
-                    title: "Weekend Coast Ride",
-                    organizer: "Sooraj",
-                    description: "Join us for a beautiful sunrise ride along the coastal highway",
-                    route: "Kochi - Kanyakumari",
-                    distance: "280km",
-                    date: "Sun, Oct 21",
-                    time: "09:00 AM",
-                    ridersCount: "3",
-                    maxRiders: "8",
-                    riderImage: "rider_avatar"
-                ))
-            })
-            
+            if viewModel.isRideLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
+            }
         }
+        
     }
-        @ViewBuilder var searchBarView: some View {
-            HStack(spacing: 6) {
-                AppIcon.JoinRide.search
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .background(AppColor.whiteGray)
-                    .padding(.leading)
-                TextField(AppStrings.JoinRide.searcRide, text: $searchQuery)
-                    .font(KlavikaFont.regular.font(size: 14))
-                    .foregroundColor(.stoneGray)
-                    .background(.clear)
-                    .background(AppColor.whiteGray)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.listGray)
-            )
-            .padding([.leading, .trailing],16)
+    @ViewBuilder var searchBarView: some View {
+        HStack(spacing: 6) {
+            AppIcon.JoinRide.search
+                .resizable()
+                .frame(width: 20, height: 20)
+                .background(AppColor.whiteGray)
+                .padding(.leading)
+            TextField(AppStrings.JoinRide.searcRide, text: $viewModel.searchQuery)
+                .font(KlavikaFont.regular.font(size: 14))
+                .foregroundColor(.stoneGray)
+                .background(.clear)
+                .background(AppColor.whiteGray)
         }
-    
+        .frame(maxWidth: .infinity)
+        .frame(height: 50)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.listGray)
+        )
+        .padding([.leading, .trailing],16)
+    }
 }
 
 struct JoinRideRow: View {
     var ride:JoinRideModel
+    @ObservedObject var viewModel:JoinRideViewModel
     @Binding var showConnectedRides: Bool
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 11) {
-                 AppIcon.Profile.profile
+                AppIcon.Profile.profile
                     .resizable()
                     .overlay(
                         RoundedRectangle(cornerRadius: 15)
@@ -163,7 +180,6 @@ struct JoinRideRow: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(AppColor.darkGray, lineWidth: 2)
                     )
-                  
                 }
                 .padding(.bottom,20)
                 .buttonStyle(.plain)

@@ -4,10 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class YourRideDataModel(
+    var ridesId: String? = null,
     var title: String? = "",
     var place: String? = "",
     var rideStatus: String? = "",
     var date: String? = "",
-    var riders: String? = ""
+    var riders: Int? = 0,
+    var createdBy: String? = null,
+    var createdUSerName: String? = null,
+    var profileImageUrl:String?=null
 ) {
 }

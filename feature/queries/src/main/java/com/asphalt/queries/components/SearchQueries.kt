@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,11 +26,14 @@ import com.asphalt.commonui.utils.ComposeUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchQueries() {
+fun SearchQueries(onSearchQuery:(String)->Unit) {
     var searchText by rememberSaveable { mutableStateOf("") }
     var isActive by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(searchText) {
+        onSearchQuery(searchText)
+    }
     ComposeUtils.CustomTextField(
         borderColor = if (isActive) NeutralGrey30 else null,
         borderStroke = if (isActive) Dimensions.padding1 else null,

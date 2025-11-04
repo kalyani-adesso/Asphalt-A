@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.composables.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -28,12 +28,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.constants.APIConstants
+import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.user.UserRepository
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -60,16 +68,21 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.viewmodels.RidesScreenViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RidesScreen(setTopAppBarState: (AppBarState) -> Unit) {
-    val ridesScreenViewModel: RidesScreenViewModel = viewModel()
+fun RidesScreen(
+    ridesScreenViewModel: RidesScreenViewModel = koinViewModel(),
+    setTopAppBarState: (AppBarState) -> Unit
+) {
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
-        ridesScreenViewModel.getRides()
+        //ridesScreenViewModel.getRides()
     }
+    ridesScreenViewModel.getRides()
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -145,9 +158,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(modifier = Modifier.weight(1f)) {
-                if(upconing.rideStatus=="UPCOMING"){
+                if (upconing.rideStatus == UPCOMING) {
                     ColorIconRounded(backColor = MagentaDeep, resId = R.drawable.ic_location)
-                }else{
+                } else {
                     ColorIconRounded(backColor = VividOrangeLight, resId = R.drawable.ic_location)
                 }
 
@@ -169,18 +182,21 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
 
             }
             Box(
-                modifier = Modifier.height(Dimensions.size30)
-                    .then(if(upconing.rideStatus=="UPCOMING"){
-                        Modifier.background(
-                            color = MagentaDeep,
-                            shape = RoundedCornerShape(Dimensions.size10)
-                        )
-                    }else{
-                        Modifier.background(
-                            color = VividOrangeLight,
-                            shape = RoundedCornerShape(Dimensions.size10)
-                        )
-                    })
+                modifier = Modifier
+                    .height(Dimensions.size30)
+                    .then(
+                        if (upconing.rideStatus == UPCOMING) {
+                            Modifier.background(
+                                color = MagentaDeep,
+                                shape = RoundedCornerShape(Dimensions.size10)
+                            )
+                        } else {
+                            Modifier.background(
+                                color = VividOrangeLight,
+                                shape = RoundedCornerShape(Dimensions.size10)
+                            )
+                        }
+                    )
 
                     .padding(
                         start = Dimensions.padding16,
@@ -223,7 +239,11 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = upconing.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(
+                    text = "${upconing.riders}" + " " + stringResource(R.string.riders),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
 
             }
         }
@@ -264,7 +284,9 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                 buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = if(upconing.rideStatus=="UPCOMING"){stringResource(R.string.view_details).uppercase()}else{
+                    text = if (upconing.rideStatus == UPCOMING) {
+                        stringResource(R.string.view_details).uppercase()
+                    } else {
                         stringResource(R.string.check_responses).uppercase()
                     },
                     style = TypographyMedium.bodySmall,
@@ -316,7 +338,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 
             }
             Box(
-                modifier = Modifier.height(Dimensions.size30)
+                modifier = Modifier
+                    .height(Dimensions.size30)
                     .background(
                         color = GreenDark,
                         shape = RoundedCornerShape(Dimensions.size10)
@@ -362,7 +385,11 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = history.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(
+                    text = "${history.riders}" + " " + stringResource(R.string.riders),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
 
             }
         }
@@ -436,12 +463,12 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         width = Dimensions.size2pt5,
                         color = PrimaryDarkerLightB75,
                         shape = CircleShape
-                    ), size = Dimensions.size32, imageUrl = "https://picsum.photos/id/1/200/300"
+                    ), size = Dimensions.size32, imageUrl = invites.profileImageUrl?:""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        text = invites.title ?: "",
+                        text = stringResource(R.string.invite_from, invites.createdUSerName ?: ""),
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -494,7 +521,11 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = invites.riders ?: "", style = Typography.bodyMedium, color = GrayDark)
+                Text(
+                    text = "${invites.riders}" + " " + stringResource(R.string.riders),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
 
             }
         }
@@ -507,7 +538,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             GradientButton(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    //TODO:Accept Invite action
+                    ridesScreenViewModel.acceptDeclined(invites.ridesId?:"",APIConstants.RIDE_ACCEPTED)
 
                 },
                 buttonHeight = Dimensions.size50,
@@ -527,7 +558,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             }
             Button(
                 {
-                    //TODO:Decline Invite action
+                    ridesScreenViewModel.acceptDeclined(invites.ridesId?:"",APIConstants.RIDE_DECLINED)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                 modifier = Modifier
@@ -668,8 +699,14 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun RidesPreview() {
-    RidesScreen({})
+    var dataStoreManager = DataStoreManager(LocalContext.current)
+    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager,
+        UserRepository(UserAPIServiceImpl(KtorClient())))
+    var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
+
+    RidesScreen(ridesScreenViewModel,{})
 }

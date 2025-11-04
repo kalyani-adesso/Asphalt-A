@@ -9,24 +9,29 @@ import Foundation
 
 struct Query: Identifiable {
     let id = UUID()
+    let apiId: String
     let title: String
     let tags: [String]
     let author: String
     let daysAgo: String
     let content: String
     var answers: [Answer]
-    let likes: Int
+    var likes: Int
     let comments: Int
+    var likesDict: [String: Bool] = [:]
 }
 
 struct Answer: Identifiable {
     let id = UUID()
-    let author: String
-    let role: String?
-    let daysAgo: String
-    let content: String
-    let likes: Int
-    let dislikes: Int
+    var apiId: String
+    var author: String
+    var role: String?
+    var daysAgo: String
+    var content: String
+    var likes: Int
+    var dislikes: Int
+    var likesAnsDict: [String: Bool] = [:]
+    var disLikesAnsDict: [String: Bool] = [:]
 }
 
 struct AskQuery: Identifiable {
@@ -38,7 +43,7 @@ struct AskQuery: Identifiable {
 
 
 enum QueryCategory: String, CaseIterable, Identifiable {
-    case none = "Select a category"
+    case none = "All"
     case maintenance = "Maintenance"
     case routes = "Routes"
     case gear = "Gear"
@@ -46,4 +51,17 @@ enum QueryCategory: String, CaseIterable, Identifiable {
     case other = "Other"
 
     var id: String { rawValue }
+    
+
+    var backendId: Int {
+        switch self {
+        case .maintenance: return 1
+        case .routes: return 2
+        case .gear: return 3
+        case .safety: return 4
+        case .other: return 5
+        case .none:
+            return 6
+        }
+    }
 }

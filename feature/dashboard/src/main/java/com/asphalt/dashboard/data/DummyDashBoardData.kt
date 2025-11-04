@@ -26,62 +26,62 @@ val dummyRideDataList = listOf(
     RidePerMonthDto(RideDateDto(9, 2025), PerMonthRideStatisticsDto(42, 41, 20)),
     RidePerMonthDto(RideDateDto(10, 2025), PerMonthRideStatisticsDto(41, 21, 180)),
 )
-val dummyRideInvites = listOf(
-    // 1. Alice's Invite
-    DashboardRideInvite(
-        inviterName = "Johnson",
-        inviterProfilePicUrl = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=600&fit=crop&crop=face",
-        startPoint = "Kanyakumari",
-        destination = "Kochi",
-        dateTime = "11/10/2025 18:30",
-        inviteesProfilePicUrls = listOf(
-            "https://images.unsplash.com/photo-1507003211169-0a816d557620?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
-        )
-    ),
-
-    // 2. Bob's Invite
-    DashboardRideInvite(
-        inviterName = "Shiva Karthikeyan",
-        inviterProfilePicUrl = "https://images.unsplash.com/photo-1507003211169-0a816d557620?w=600&h=600&fit=crop&crop=face",
-        startPoint = "Trivandrum",
-        destination = "Kozhikode",
-        // Tomorrow, 07:45 -> dd/MM/yyyy HH:mm
-        dateTime = "12/10/2025 07:45",
-        inviteesProfilePicUrls = listOf(
-            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=600&fit=crop&crop=face"
-        )
-    ),
-
-    // 3. Cathy's Invite
-    DashboardRideInvite(
-        inviterName = "Christy",
-        inviterProfilePicUrl = "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
-        startPoint = "Kochi",
-        destination = "Bangalore",
-        // Next Friday, 17:00 (assuming next Friday is 17/10/2025) -> dd/MM/yyyy HH:mm
-        dateTime = "17/10/2025 17:00",
-        inviteesProfilePicUrls = listOf(
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1531427186808-54b15099ac5e?w=600&h=600&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29329?w=600&h=600&fit=crop&crop=face"
-        )
-    ),
-
-    // 4. David's Invite
-    DashboardRideInvite(
-        inviterName = "David",
-        inviterProfilePicUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=600&fit=crop&crop=face",
-        startPoint = "Delhi",
-        destination = "Kodaikanal",
-        // In 2 days, 13:00 (i.e., 13/10/2025) -> dd/MM/yyyy HH:mm
-        dateTime = "13/10/2025 13:00",
-        inviteesProfilePicUrls = emptyList()
-    )
-)
+//val dummyRideInvites = listOf(
+//    // 1. Alice's Invite
+//    DashboardRideInviteUIModel(
+//        inviterName = "Johnson",
+//        inviterProfilePicUrl = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=600&fit=crop&crop=face",
+//        startPoint = "Kanyakumari",
+//        destination = "Kochi",
+//        dateTime = "11/10/2025 18:30",
+//        inviteesProfilePicUrls = listOf(
+//            "https://images.unsplash.com/photo-1507003211169-0a816d557620?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
+//        )
+//    ),
+//
+//    // 2. Bob's Invite
+//    DashboardRideInviteUIModel(
+//        inviterName = "Shiva Karthikeyan",
+//        inviterProfilePicUrl = "https://images.unsplash.com/photo-1507003211169-0a816d557620?w=600&h=600&fit=crop&crop=face",
+//        startPoint = "Trivandrum",
+//        destination = "Kozhikode",
+//        // Tomorrow, 07:45 -> dd/MM/yyyy HH:mm
+//        dateTime = "12/10/2025 07:45",
+//        inviteesProfilePicUrls = listOf(
+//            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=600&fit=crop&crop=face"
+//        )
+//    ),
+//
+//    // 3. Cathy's Invite
+//    DashboardRideInviteUIModel(
+//        inviterName = "Christy",
+//        inviterProfilePicUrl = "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=600&fit=crop&crop=face",
+//        startPoint = "Kochi",
+//        destination = "Bangalore",
+//        // Next Friday, 17:00 (assuming next Friday is 17/10/2025) -> dd/MM/yyyy HH:mm
+//        dateTime = "17/10/2025 17:00",
+//        inviteesProfilePicUrls = listOf(
+//            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1531427186808-54b15099ac5e?w=600&h=600&fit=crop&crop=face",
+//            "https://images.unsplash.com/photo-1494790108377-be9c29b29329?w=600&h=600&fit=crop&crop=face"
+//        )
+//    ),
+//
+//    // 4. David's Invite
+//    DashboardRideInviteUIModel(
+//        inviterName = "David",
+//        inviterProfilePicUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=600&fit=crop&crop=face",
+//        startPoint = "Delhi",
+//        destination = "Kodaikanal",
+//        // In 2 days, 13:00 (i.e., 13/10/2025) -> dd/MM/yyyy HH:mm
+//        dateTime = "13/10/2025 13:00",
+//        inviteesProfilePicUrls = emptyList()
+//    )
+//)
 
 val adventureJourneyDummyDataList = listOf(
     AdventureTimeFrameChoiceDto(1, AdventureJourneyDto(12, 20, 20, 5)),

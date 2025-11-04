@@ -15,75 +15,93 @@ struct ProfileScreen: View {
     @Environment(\.dismiss) var dismiss
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
-        VStack {
-            HStack {
-                Button {
-                  showHome = true
-                } label: {
-                    AppIcon.CreateRide.backButton
-                        .frame(width: 24, height: 24)
-                }
-                
-                Spacer()
-                
-                Text("Profile")
-                    .font(KlavikaFont.bold.font(size: 19))
-                    .foregroundColor(AppColor.black)
-                
-                Spacer()
-                Button {
-                    showEditProfile = true
-                } label: {
-                    AppIcon.Profile.editProfile
-                        .frame(width: 30 , height: 30)
-                }
-               
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 12)
-            .background(AppColor.white)
-            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-            
-            ZStack{
-                
-                List {
-                    Section {
-                        ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
-                            .frame(height: 135)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.listGray)
-                            )
-                            .listRowInsets(EdgeInsets())
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                            .padding([.leading, .trailing])
+        ZStack {
+            VStack {
+                HStack {
+                    Button {
+                        showHome = true
+                    } label: {
+                        AppIcon.CreateRide.backButton
+                            .frame(width: 24, height: 24)
                     }
-                    ForEach(viewModel.sections) { section in
-                        ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
-                            .listRowBackground(Color.clear)
+                    
+                    Spacer()
+                    
+                    Text(AppStrings.Profile.profileTitle)
+                        .font(KlavikaFont.bold.font(size: 19))
+                        .foregroundColor(AppColor.black)
+                    
+                    Spacer()
+                    Button {
+                        showEditProfile = true
+                    } label: {
+                        AppIcon.Profile.editProfile
+                            .frame(width: 30 , height: 30)
                     }
+                    
                 }
-                .listStyle(.plain)
-                .padding(.top, 20)
+                .padding(.horizontal)
+                .padding(.vertical, 12)
                 .background(AppColor.white)
-                .sheet(isPresented: $showEditRide, onDismiss: {
-                    showEditRide = false
-                }) {
-                    SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
+                .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                
+                ZStack{
+                    
+                    List {
+                        Section {
+                            ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
+                                .frame(height: 135)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppColor.listGray)
+                                )
+                                .listRowInsets(EdgeInsets())
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .padding([.leading, .trailing])
+                        }
+                        ForEach(viewModel.sections) { section in
+                            ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
+                                .listRowBackground(Color.clear)
+                        }
+                    }
+                    .listStyle(.plain)
+                    .padding(.top, 20)
+                    .background(AppColor.white)
+                    .sheet(isPresented: $showEditRide, onDismiss: {
+                        showEditRide = false
+                    }) {
+                        SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
+                    }
+                    if showEditProfile {
+                        EditProfileView(isPresented: $showEditProfile)
+                    }
                 }
-                if showEditProfile {
-                    EditProfileView(isPresented: $showEditProfile)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .refreshable {
+                Task {
+                    await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
                 }
+            }
+            .navigationDestination(isPresented: $showHome, destination: {
+                BottomNavBar()
+            })
+            .task {
+                await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+            }
+            if viewModel.isLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .navigationDestination(isPresented: $showHome, destination: {
-            BottomNavBar()
-        })
     }
 }
 
@@ -137,7 +155,7 @@ struct YourVehicleRow: View {
                         AddBikeView(
                             bikeId: bikeType.id,
                             viewModel: viewModel,
-                            title: bikeType.type,
+                            title: AppStrings.VehicleType(constantValue: bikeType.type)?.rawValue ?? "",
                             subtitle: "\(bikeType.make)-\(bikeType.model)"
                         )
                     }
@@ -156,6 +174,7 @@ struct YourVehicleRow: View {
                 })
                 .frame(width: 135)
                 .padding(.top,15)
+                .padding(.bottom, 20)
             }
             .frame(maxWidth: .infinity)
             .padding([.leading, .trailing],16)
@@ -367,7 +386,7 @@ struct ProfileHeaderView: View {
                         .background(AppColor.white)
                         .cornerRadius(5)
                     }
-                 
+                    
                     HStack {
                         AppIcon.NavigationSlider.call
                             .frame(width: 16, height: 16)

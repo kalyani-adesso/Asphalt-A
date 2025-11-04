@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import shared
 
 struct MenuItemModel: Identifiable, Hashable {
     let id = UUID()
@@ -41,7 +42,6 @@ final class NavigationSliderViewModel: ObservableObject {
                 route: "Kochi - Kanyakumari",
                 distance: "280km",
                 date: "Sun, Oct 21",
-                time: "09:00 AM",
                 ridersCount: "3",
                 maxRiders: "8",
                 riderImage: "rider_avatar"
@@ -52,4 +52,15 @@ final class NavigationSliderViewModel: ObservableObject {
             MenuItemModel(icon: AppIcon.NavigationSlider.logout, iconColor: AppColor.red, title: AppStrings.NavigationSlider.logout, destination: AnyView(SignInView()))
         ]
     }
+    
+    func logout(completeion: @escaping () -> Void) {
+        AuthenticatorImpl().logout(completionHandler: { sucess, error in
+            if let error = error {
+                print("Error: \(error)")
+            } else {
+                completeion()
+            }
+        })
+    }
 }
+

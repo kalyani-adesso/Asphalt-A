@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct QueryCardView: View {
-    let query: Query
+    var query: Query
     @State private var showAnswer: Bool = false
+    @ObservedObject var viewModel: QueryViewModel
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            
             // Title
             Text(query.title)
                 .font(KlavikaFont.bold.font(size: 16))
@@ -54,11 +54,13 @@ struct QueryCardView: View {
                     .foregroundColor(AppColor.stoneGray)
             }
             
-            Divider()
+            if !query.answers.isEmpty{
+                Divider()
+            }
             
             // Answers
             ForEach(query.answers) { answer in
-                AnswerCardView(answer: answer)
+                AnswerCardView(viewModel: viewModel, answer: answer, query: query)
             }
             
             Divider()
@@ -66,34 +68,47 @@ struct QueryCardView: View {
             // Bottom actions
             HStack(spacing: 20) {
                 HStack(spacing: 6) {
-                    AppIcon.Queries.like
-                            .resizable()
-                            .scaledToFit()
+                    Button {
+                        Task {
+                            if viewModel.likedQueries.contains(query.apiId) {
+                                await viewModel.RemoveQuery(for: query)
+                            } else {
+                                await viewModel.likeQuery(for: query)
+                            }
+                            
+                            
+                        }
+                    } label: {
+                        Image(systemName: viewModel.likedQueries.contains(query.apiId) ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .frame(width: 18, height: 18)
-                    Text("\(query.likes)")
-                        .font(KlavikaFont.medium.font(size: 14))
+                            .foregroundColor(AppColor.celticBlue)
+                        Text("\(query.likes)")
+                            .foregroundColor(AppColor.black)
+                            .font(KlavikaFont.medium.font(size: 14))
                     }
+                }
                 HStack(spacing: 6) {
                     AppIcon.Queries.chat
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 18, height: 18)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 18, height: 18)
                     Text("\(query.comments)")
                         .font(KlavikaFont.medium.font(size: 14))
-                    }
+                }
                 Spacer()
                 Button("Answer") {
+                    viewModel.selectedQuery = query
                     showAnswer = true
                 }
-                    .font(KlavikaFont.medium.font(size: 12))
-                    .foregroundColor(AppColor.black)
-                    .frame(width: 72, height: 24)
-                    .background(AppColor.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 0)
-                            .stroke(AppColor.darkGray, lineWidth: 1)
-                    )
-                   
+                .font(KlavikaFont.medium.font(size: 12))
+                .foregroundColor(AppColor.black)
+                .frame(width: 72, height: 24)
+                .background(AppColor.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 0)
+                        .stroke(AppColor.darkGray, lineWidth: 1)
+                )
+                
             }
             .padding(.top, 4)
         }
@@ -101,32 +116,11 @@ struct QueryCardView: View {
         .background(AppColor.listGray)
         .cornerRadius(12)
         .sheet(isPresented: $showAnswer) {
-            AnswerSheetView(query: query)
+            AnswerSheetView(query:  viewModel.selectedQuery!, viewModel: viewModel)
                 .presentationDetents([.fraction(0.8)])
                 .presentationBackground(.ultraThinMaterial)
         }
-       
+        
     }
 }
 
-#Preview {
-    QueryCardView(query: Query(
-        title: "Best oil for Kawasaki Ninja 650?",
-        tags: ["Maintenance", "Answered"],
-        author: "Vyshnav",
-        daysAgo: "7 days ago",
-        content: "I have a 2022 Kawasaki Ninja 650 and I'm due for an oil change. What oil do you recommend for optimal performance?",
-        answers: [
-            Answer(
-                author: "Sooraj",
-                role: "Mechanic",
-                daysAgo: "6 days ago",
-                content: "For your Ninja 650, I recommend using Kawasaki 4-Stroke Oil 10W-40 or Motul 7100 10W-40. Both are excellent choices that meet the JASO MA2 specification.",
-                likes: 10,
-                dislikes: 1
-            ),
-        ],
-        likes: 15,
-        comments: 1
-    ))
-}

@@ -18,7 +18,9 @@ actual class UserRepoImpl actual constructor() : UserRepo {
         if (initialized) {
             val userDetails = dataStoreManager.getValue(PreferenceKeys.USER_DETAILS)
             return userDetails?.let {
-                Json.decodeFromString<CurrentUser>(it)
+                if (it.isNotEmpty()) {
+                    Json.decodeFromString<CurrentUser>(it)
+                } else null
             }
         } else
             return null

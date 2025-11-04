@@ -14,23 +14,22 @@ actual class AuthenticatorImpl {
 
         return try {
             val result = FirebaseAuth.getInstance()
-                .createUserWithEmailAndPassword(user.email, user.password)
+                .createUserWithEmailAndPassword(user.email ?: "", user.password ?: "")
                 .await()
 
             val uId = result.user?.uid ?: return Result.failure(Exception("User Id missing"))
             // store user data into realtime db
-            val userToSave = User(
-                email = user.email,
-                password = user.password,
-                name = user.name,
-                confirmPassword = user.confirmPassword
+            val userValues = mapOf<Any?, Any?>(
+                "email" to user.email,
+                "user_name" to user.name,
+                "device" to "Android"
             )
 
             val dbRef = FirebaseDatabase.getInstance()
-                .getReference("users_android")
+                .getReference(Constants.FIREBASE_DB)
                 .child(uId)
 
-            dbRef.setValue(userToSave).await()
+            dbRef.setValue(userValues).await()
 
             Result.success(uId)
 
@@ -82,5 +81,13 @@ actual class AuthenticatorImpl {
         } catch (e: Exception) {
             AuthResultimpl(false, "Authentication failed: ${e.message}")
         }
+    }
+
+    actual suspend fun resetPassword(email: String): Result<String> {
+        TODO("Not yet implemented")
+    }
+
+    actual suspend fun logout(): Result<String> {
+        TODO("Not yet implemented")
     }
 }

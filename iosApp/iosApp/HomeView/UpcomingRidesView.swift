@@ -122,8 +122,8 @@ struct UpcomingRideCard: View {
                 
             }
             HStack {
-                ButtonView(title: AppStrings.HomeButton.accept.rawValue, height: 50)
-                ButtonView(title: AppStrings.HomeButton.decline.rawValue,   background: LinearGradient(
+                ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, height: 50)
+                ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: LinearGradient(
                     gradient: Gradient(colors: [AppColor.darkRed, AppColor.darkRed]),
                     startPoint: .leading,
                     endPoint: .trailing), height: 50)

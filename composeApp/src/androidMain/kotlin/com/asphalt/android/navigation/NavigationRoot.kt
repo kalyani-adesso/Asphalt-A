@@ -1,5 +1,7 @@
 package com.asphalt.android.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -11,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +21,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -28,10 +34,24 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.navigation.AppNavKey.SplashKey
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
+import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.R
+import com.asphalt.commonui.StatusBanner
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
+import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralGrey80
+import com.asphalt.commonui.theme.NeutralLightGray25
+import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.NeutralWhite40
+import com.asphalt.commonui.theme.PaleMintyBlue30
+import com.asphalt.commonui.theme.VividRed
+import com.asphalt.commonui.ui.BouncingCirclesLoader
+import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
@@ -58,16 +78,44 @@ import com.asphalt.welcome.navigation.NavigationSplashScreen
 import com.asphalt.welcome.navigation.NavigationWelcomeFeature
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
 @Composable
 fun NavigationRoot(
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()
     val context = LocalContext.current
     val locationProvider = remember { AndroidLocationProvider(context.applicationContext) }
+    var showLoader by remember { mutableStateOf(false) }
+    var showBanner by remember { mutableStateOf(false) }
+    var bannerMsg by remember { mutableStateOf("") }
+    var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
+    val density = LocalDensity.current
+    LaunchedEffect(Unit) {
+
+        UIStateHandler.event.collect { state ->
+            when (state) {
+                UIState.DismissLoader -> showLoader = false
+                is UIState.Error -> {
+                    showBanner = true
+                    bannerType = state.type
+                    bannerMsg = state.errorMsg
+                }
+
+                UIState.Loading -> showLoader = true
+                is UIState.SUCCESS -> {
+                    showBanner = true
+                    bannerType = state.type
+                    bannerMsg = state.successMsg
+                }
+            }
+
+        }
+    }
 
     val showBottomBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
@@ -180,7 +228,18 @@ fun NavigationRoot(
                 }
             }
         ) { paddingValues ->
+            val bannerOffsetDp = paddingValues.calculateTopPadding() + Dimensions.padding30
 
+            val bannerPixelYOffset: Int = with(density) {
+                bannerOffsetDp.roundToPx()
+            }
+
+            if (showBanner)
+                Popup(offset = IntOffset(0,bannerPixelYOffset)) {
+                    StatusBanner(message = bannerMsg, type = bannerType, showBanner = showBanner) {
+                        showBanner = false
+                    }
+                }
             NavDisplay(
                 modifier =
                     if (showBottomBar || showTopAppBar)
@@ -278,7 +337,7 @@ fun NavigationRoot(
                         )
                     }
                     entry<AppNavKey.RidesScreenNav> { key ->
-                        RidesScreen(setTopAppBarState)
+                        RidesScreen(setTopAppBarState=setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
                         QueriesScreen(setTopAppBarState = setTopAppBarState)
@@ -377,6 +436,11 @@ fun NavigationRoot(
                     }
                 }
             )
+            if (showLoader){
+//                Box(modifier = Modifier.background(NeutralWhite40).padding(paddingValues).fillMaxSize()){
+                    BouncingCirclesLoader()
+//                }
+            }
         }
     }
     if (showTopAppBar)
@@ -385,6 +449,7 @@ fun NavigationRoot(
                 Constants.LOGOUT_CLICK -> {
                     scope.launch {
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        androidUserVM.initialiseUserData()
                         datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)

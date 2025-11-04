@@ -82,10 +82,7 @@ fun ConnectedRideMap(
     var showBanner by remember {  mutableStateOf(true) }
 
 
-    LaunchedEffect(Unit) {
-        delay(2000)
-        showBanner = false
-    }
+
 
     setTopAppBarState(
         AppBarState(
@@ -190,7 +187,11 @@ fun ConnectedRideMap(
                     StatusBanner(
                         type = BannerType.SUCCESS,
                         message = "Ride started! Navigation active",
-                        showBanner = showBanner
+                        showBanner = showBanner,
+                        autoDismissMillis = 2000L,
+                        {
+                            showBanner = false
+                        }
                     )
                 }
             }

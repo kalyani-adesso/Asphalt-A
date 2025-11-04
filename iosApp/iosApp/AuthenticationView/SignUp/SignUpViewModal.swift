@@ -14,19 +14,16 @@ class SignUpViewModal: ObservableObject {
     var emailorPhoneNumber: String?
     @Published var errorMessage: String?
     func getEmailorPhoneNumber(emailorPhoneNumber: String,password: String, confirmPassword: String, onSucess: @escaping () -> Void)  {
-        
-        if isValidEmailAndPassword(email: emailorPhoneNumber, password: password, confirmPassword: confirmPassword) {
-            //        Auth.auth().sendPasswordReset(withEmail: emailorPhoneNumber, completion: { error in
-            //            if let error = error {
-            //                print("Error sending password reset: \(error.localizedDescription)")
-            //                self.showToast = true
-            //                self.errorMessage = error.localizedDescription
-            //            } else {
-            //                print("Password reset email sent.")
-            //                onSucess()
-            //            }
-            //        })
-        }
+        AuthenticatorImpl().resetPassword(email:emailorPhoneNumber, completionHandler: { success, error in
+            if let error = error {
+                print("Error sending password reset: \(error.localizedDescription)")
+                self.showToast = true
+                self.errorMessage = error.localizedDescription
+            } else {
+                print("Password reset email sent.")
+                onSucess()
+            }
+        })
     }
     
     func didTapSignUp(email: String, username: String, password: String,confirmPassword:String, onSuccess: @escaping () -> Void) {

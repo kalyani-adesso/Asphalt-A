@@ -1,18 +1,36 @@
 package com.asphalt.createride.viewmodel
 
 import android.content.Context
+import android.icu.util.Calendar
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.asphalt.android.helpers.APIHelperUI
+import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.UserDomain
+import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.UserInvites
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.rides.RidesRepository
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CreateRideScreenViewModel : ViewModel() {
-    //var fullList = getUsers()
+class CreateRideScreenViewModel : ViewModel(), KoinComponent {
+    val userRepo: UserRepository by inject()
+    val userRepoImpl: UserRepoImpl by inject()
+    val ridesRepo: RidesRepository by inject()
+
+
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
@@ -30,6 +48,7 @@ class CreateRideScreenViewModel : ViewModel() {
     val _showRideTimeError = mutableStateOf(false)
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
+    val show_participant_Tab = mutableStateOf(true)
 
 
     private val _fullList = mutableStateOf(ArrayList<RidersList>())
@@ -37,10 +56,10 @@ class CreateRideScreenViewModel : ViewModel() {
         mutableStateOf(arrayListOf())
     val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
 
-    init {
-        _fullList.value = getUsers()
-        _ridersListMutable.value = _fullList.value
-    }
+    /* init {
+         _fullList.value = getUsers()
+         _ridersListMutable.value = _fullList.value
+     }*/
 
     val searchQuery = mutableStateOf("")
 
@@ -62,9 +81,9 @@ class CreateRideScreenViewModel : ViewModel() {
         getUserCount()
     }
 
-    fun updateUerList(isSelcted: Boolean, id: Int?) {
+    fun updateUerList(isSelcted: Boolean, id: String?) {
         _fullList.value = ArrayList(_fullList.value.map { rider ->
-            if (rider.id == id) {
+            if (rider.id.equals(id)) {
                 rider.copy(isSelect = isSelcted)
             } else {
                 rider
@@ -74,7 +93,6 @@ class CreateRideScreenViewModel : ViewModel() {
         // Re-filter with current query so filtered list reflects changes
         onSearchQueryChanged(searchQuery.value)
         getUserCount()
-
 
 
     }
@@ -164,6 +182,10 @@ class CreateRideScreenViewModel : ViewModel() {
         show_timePicker.value = isShow
     }
 
+    fun updateParticipantTab(showTab: Boolean) {
+        show_participant_Tab.value = showTab
+    }
+
 
     fun getRideType(context: Context): ArrayList<RideType> {
         var type =
@@ -175,72 +197,139 @@ class CreateRideScreenViewModel : ViewModel() {
         return type
     }
 
-
-
-
-    fun getUsers(): ArrayList<RidersList> {
-        var list = arrayListOf(
-
-            RidersList(
-                id = 1,
-                name = "Harikumar S",
-                job = "Mechanic",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
+    suspend fun createRide() {
+        val cal = Calendar.getInstance()
+        val userDetails = userRepoImpl.getUserDetails()
+        val map: Map<String, UserInvites> =
+            _ridersListMutable.value.filter { it.isSelect == true }
+                .associate { rider ->
+                    rider.id.orEmpty() to UserInvites(
+                        acceptInvite = 0
+                    )
+                } ?: emptyMap()
+        var createRide: CreateRideRoot = CreateRideRoot(
+            userID = userDetails?.uid,
+            rideType = _rideDetailsMutableState.value.rideType,
+            rideTitle = _rideDetailsMutableState.value.rideTitle,
+            description = _rideDetailsMutableState.value.description,
+            startDate = Utils.getDate(
+                _rideDetailsMutableState.value.dateMils ?: 0,
+                _rideDetailsMutableState.value.hour ?: 0,
+                _rideDetailsMutableState.value.mins ?: 0,
+                _rideDetailsMutableState.value.isAm
             ),
-            RidersList(
-                id = 2,
-                name = "Sreedev",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-
-            ),
-            RidersList(
-                id = 3,
-                name = "Vyshak ",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 4,
-                name = "Jerin John",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 5,
-                name = "Vipin Raj",
-                job = "Mechanic",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 6,
-                name = "Pramod Selvaraj",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            ),
-            RidersList(
-                id = 7,
-                name = "Vinu V John",
-                job = "",
-                bike = "Unicorn",
-                isSelect = false,
-                imgUrl = "https://picsum.photos/id/1/200/300"
-            )
+            startLocation = _rideDetailsMutableState.value.startLocation,
+            endLocation = _rideDetailsMutableState.value.endLocation,
+            createdDate = cal.timeInMillis,
+            participants = map
         )
-        return list;
-        //_ridersListMutable.value = list
+
+        val apiResult = APIHelperUI.runWithLoader {
+            ridesRepo.createRide(createRide)
+        }
+        APIHelperUI.handleApiResult(apiResult, viewModelScope) {
+            updateTab(1)
+            //UIStateHandler.sendEvent(UIState.SUCCESS("Added query successfully!"))
+        }
+    }
+
+
+    fun getUsers() {
+        viewModelScope.launch {
+            val user = userRepoImpl.getUserDetails()
+            var response: APIResult<List<UserDomain>> = userRepo.getAllUsers()
+            when (response) {
+                is APIResult.Success -> {
+                    if (response.data.size > 0) {
+                        _fullList.value =
+                            ArrayList(
+                                response.data
+                                    .filter { it.uid != user?.uid }
+                                    .map {
+                                        RidersList(
+                                            name = it.name,
+                                            id = it.uid,
+                                            bike = it.primaryBike,
+                                            job = if (it.isMechanic)
+                                                "Mechanic" else ""
+                                        )
+                                    })
+                        _ridersListMutable.value = _fullList.value
+                    }
+
+                }
+
+                is APIResult.Error -> {
+                    //val msg = result.exception.message ?: "Something went wrong"
+
+                }
+            }
+
+        }
+
+
+        /* var list = arrayListOf(
+
+             RidersList(
+                 id = 1,
+                 name = "Harikumar S",
+                 job = "Mechanic",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 2,
+                 name = "Sreedev",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+
+             ),
+             RidersList(
+                 id = 3,
+                 name = "Vyshak ",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 4,
+                 name = "Jerin John",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 5,
+                 name = "Vipin Raj",
+                 job = "Mechanic",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 6,
+                 name = "Pramod Selvaraj",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             ),
+             RidersList(
+                 id = 7,
+                 name = "Vinu V John",
+                 job = "",
+                 bike = "Unicorn",
+                 isSelect = false,
+                 imgUrl = "https://picsum.photos/id/1/200/300"
+             )
+         )
+         return list;*/
+
     }
 
 }

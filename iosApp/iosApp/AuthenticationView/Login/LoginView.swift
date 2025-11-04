@@ -52,7 +52,11 @@ struct SignInView: View {
             .navigationBarBackButtonHidden(true)
             .padding(.top, 40)
             .navigationDestination(isPresented: $hasLoggedIn, destination: {
-                LoginSucessView()
+                if MBUserDefaults.hasShownLoginSuccessStatic {
+                    BottomNavBar()
+                } else {
+                    LoginSucessView()
+                }
             })
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
         }
