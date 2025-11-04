@@ -16,43 +16,56 @@ struct JoinRideView: View {
     @StateObject private var homeViewModel = HomeViewModel()
     @Environment(\.dismiss) private var dismiss
     var body: some View {
-        NavigationStack {
-            SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
-            VStack {
-                searchBarView
-                    .font(KlavikaFont.regular.font(size: 14))
-                    .padding(.top)
-                List(viewModel.filteredRides, id: \.id) { ride in
-                    JoinRideRow(ride: ride, viewModel: viewModel, showConnectedRides: $showConnectedRides)
-                        .listRowSeparator(.hidden)
+        ZStack {
+            NavigationStack {
+                SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
+                VStack {
+                    searchBarView
+                        .font(KlavikaFont.regular.font(size: 14))
+                        .padding(.top)
+                    List(viewModel.filteredRides, id: \.id) { ride in
+                        JoinRideRow(ride: ride, viewModel: viewModel, showConnectedRides: $showConnectedRides)
+                            .listRowSeparator(.hidden)
+                    }
+                    .listStyle(.plain)
+                    Spacer()
                 }
-                .listStyle(.plain)
-                Spacer()
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(isPresented: $showHomeView, destination: {
+                    BottomNavBar()
+                })
+                .task {
+                    await viewModel.getRides()
+                }
+                .refreshable {
+                    Task {
+                        await viewModel.getRides()
+                    }
+                }
+                .navigationDestination(isPresented: $showConnectedRides, destination: {
+                    ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
+                        title: "Weekend Coast Ride",
+                        organizer: "Sooraj",
+                        description: "Join us for a beautiful sunrise ride along the coastal highway",
+                        route: "Kochi - Kanyakumari",
+                        distance: "280km",
+                        date: "Sun, Oct 21",
+                        ridersCount: "3",
+                        maxRiders: "8",
+                        riderImage: "rider_avatar"
+                    ))
+                })
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHomeView, destination: {
-                BottomNavBar()
-            })
-            .onAppear {
-                viewModel.getRides()
+            if viewModel.isRideLoading {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                ProgressView("Loading...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding(.top, 100)
+                    .foregroundColor(.white)
             }
-            .refreshable {
-                viewModel.getRides()
-            }
-            .navigationDestination(isPresented: $showConnectedRides, destination: {
-                ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
-                    title: "Weekend Coast Ride",
-                    organizer: "Sooraj",
-                    description: "Join us for a beautiful sunrise ride along the coastal highway",
-                    route: "Kochi - Kanyakumari",
-                    distance: "280km",
-                    date: "Sun, Oct 21",
-                    ridersCount: "3",
-                    maxRiders: "8",
-                    riderImage: "rider_avatar"
-                ))
-            })
         }
+        
     }
     @ViewBuilder var searchBarView: some View {
         HStack(spacing: 6) {

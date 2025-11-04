@@ -7,57 +7,71 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct UpcomingRideView: View {
     @StateObject private var viewModel = UpcomingRideViewModel()
-    @State private var selectedStatus: RideAction = .upcoming
-    @State private var showHome: Bool = false
+    @State private var selectedStatus: String? = nil
+    @State private var showHomeView:Bool = false
+    @StateObject private var homeViewModel = HomeViewModel()
+    @State var showHome: Bool = false
     @State var showpopup: Bool = false
     var onBackToHome: (() -> Void)? = nil
-    
-    
+    var hasPendingInvites: Bool {
+        viewModel.rides.contains { $0.rideAction == .invities }
+    }
     var body: some View {
-        ZStack {
+        
+        
+        ZStack{
             NavigationStack {
                 SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
                     onBackToHome?()
                     showHome = true
-                })
+                } )
                 
                 VStack {
-                    
-                    // Segment buttons
                     HStack(spacing: 12) {
-                        SegmentButtonView(rideStatus: "Upcoming", isSelected: selectedStatus == .upcoming) {
-                            selectedStatus = .upcoming
-                        }
-                        SegmentButtonView(rideStatus: "History", isSelected: selectedStatus == .history) {
-                            selectedStatus = .history
-                        }
-                        SegmentButtonView(invitesNotification: !viewModel.inviteRides.isEmpty, rideStatus: "Invites", isSelected: selectedStatus == .invites) {
-                            selectedStatus = .invites
+                        let rideStatuses = viewModel.rideStatus
+                        let currentSelected = selectedStatus ?? rideStatuses.first?.rawValue
+                        
+                        ForEach(rideStatuses, id: \.self) { status in
+                            let isSelected = currentSelected == status.rawValue
+                            let showDot = status == .invities && hasPendingInvites
+                            SegmentButtonView(
+                                rideStatus: status.rawValue,
+                                isSelected: isSelected,
+                                showNotificationDot: showDot
+                            ) {
+                                selectedStatus = status.rawValue
+                            }
                         }
                     }
+                    
                     .frame(maxWidth: .infinity)
                     .padding(16)
-                    .background(RoundedRectangle(cornerRadius: 10).fill(AppColor.listGray))
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppColor.listGray)
+                    )
                     .padding([.leading, .trailing])
                     .contentShape(Rectangle())
-                    
-                    // Ride list
-                    List {
-                        ForEach(currentRides(), id: \.id) { ride in
-                            UpComingView(ride: .constant(ride))
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    VStack {
+                        List {
+                            ForEach($viewModel.rides.filter { $ride in
+                                ride.rideAction.rawValue == selectedStatus
+                            }, id: \.id) { $ride in
+                                UpComingView(ride: $ride)
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                            }
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
                 .onAppear {
-                    Task {
-                        await viewModel.fetchAllRides()
-                    }
+                    selectedStatus = viewModel.rideStatus.first?.rawValue
                     if showpopup {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             withAnimation(.easeInOut) {
@@ -68,24 +82,30 @@ struct UpcomingRideView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHome) {
+            .navigationDestination(isPresented: $showHome, destination: {
                 BottomNavBar()
-            }
+            })
             
-            // Popup overlay
+            
+            // Popup overlay (always stays above)
             if showpopup {
+                // Dimmed background
                 AppColor.backgroundLight.opacity(0.7)
                     .ignoresSafeArea()
                     .zIndex(1)
                     .onTapGesture {
-                        withAnimation { showpopup = false }
+                        withAnimation {
+                            showpopup = false
+                        }
                     }
                 
+                // Popup content
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
                         subMessage: "Your ride has been created and is now live for other riders to join."
                     )
+                    
                     Spacer()
                 }
                 .frame(width: 390, height: 620)
@@ -102,29 +122,21 @@ struct UpcomingRideView: View {
             }
         }
         .zIndex(showpopup ? 2 : 0)
-    }
-    
-    // Return rides based on selected segment
-    private func currentRides() -> [RideModel] {
-        switch selectedStatus {
-        case .upcoming:
-            return viewModel.upcomingRides
-        case .invites:
-            return viewModel.inviteRides
-        case .history:
-            return viewModel.historyRides
+        .task{
+            await viewModel.fetchAllRides()
         }
     }
 }
 
 
+
 struct SegmentButtonView: View {
-    var invitesNotification: Bool = false
     var rideStatus: String
     var isSelected: Bool = false
+    var showNotificationDot: Bool = false
     var onTap: (() -> Void)? = nil
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topTrailing){
             Button(action: {
                 onTap?()
             }) {
@@ -158,7 +170,7 @@ struct SegmentButtonView: View {
                     .font(KlavikaFont.bold.font(size: 16))
             }
             .buttonStyle(.plain)
-            if invitesNotification {
+            if showNotificationDot {
                 ZStack {
                     Circle()
                         .fill(Color.white)
@@ -170,8 +182,9 @@ struct SegmentButtonView: View {
                         .fill(AppColor.celticBlue)
                         .frame(width: 12, height: 12)
                 }
-                .offset(x: 10, y: -5)
+                .offset(x: 8, y: -7)
             }
+            
         }
     }
 }
@@ -181,7 +194,7 @@ struct UpComingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 11) {
-                (ride.rideAction == .invites ? AppIcon.Profile.profile : rideIcon)
+                (ride.rideAction == .invities ? AppIcon.Profile.profile : rideIcon)
                     .resizable()
                     .modifier(RoundCorner(rideAction: ride.rideAction))
                     .frame(width: 30, height: 30)
@@ -194,7 +207,7 @@ struct UpComingView: View {
                         .foregroundColor(AppColor.stoneGray)
                 }
                 Spacer()
-                if ride.rideAction == .invites {
+                if ride.rideAction == .invities {
                     Button(action: {
                         
                     }) {
@@ -247,7 +260,7 @@ struct UpComingView: View {
                     .padding(.bottom,20)
                     .buttonStyle(.plain)
                 } else {
-                    ButtonView(title: ride.rideAction == .invites ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
+                    ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
                         
                     })
                     .modifier(ButtonWidth(rideAction: ride.rideAction))
@@ -309,7 +322,7 @@ struct UpComingView: View {
 struct RoundCorner: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invites {
+        if rideAction == .invities {
             content
                 .overlay(
                     RoundedRectangle(cornerRadius: 15)
@@ -324,7 +337,7 @@ struct RoundCorner: ViewModifier {
 struct ButtonWidth: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invites {
+        if rideAction == .invities {
             content
                 .frame(maxWidth: .infinity)
         } else {
@@ -337,7 +350,7 @@ struct ButtonWidth: ViewModifier {
 struct ButtonBackground: ViewModifier {
     let rideAction: RideAction
     func body(content: Content) -> some View {
-        if rideAction == .invites {
+        if rideAction == .invities {
             content
                 .background(AppColor.red)
                 .foregroundStyle(AppColor.white)
@@ -355,6 +368,7 @@ struct ButtonBackground: ViewModifier {
         }
     }
 }
+
 
 #Preview {
     UpcomingRideView()
