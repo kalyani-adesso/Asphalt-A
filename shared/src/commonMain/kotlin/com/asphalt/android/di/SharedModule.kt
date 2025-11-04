@@ -2,6 +2,7 @@ package com.asphalt.android.di
 
 
 import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.places.PlacesServiceImpl
 import com.asphalt.android.network.profile.ProfileAPIService
 import com.asphalt.android.network.profile.ProfileAPIServiceImpl
 import com.asphalt.android.network.queries.QueryAPIService
@@ -33,4 +34,5 @@ val sharedModule: Module = module {
     single { RidesRepository(get()) }
     single { UserRepository(get()) }
     single { ProfileRepository(get()) }
+    single { PlacesServiceImpl(get()) }
 }

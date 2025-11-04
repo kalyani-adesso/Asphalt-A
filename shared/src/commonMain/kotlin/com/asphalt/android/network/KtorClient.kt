@@ -31,9 +31,9 @@ class KtorClient {
             }
 
             install(HttpTimeout) {
-                socketTimeoutMillis = 3000
-                connectTimeoutMillis = 3000
-                requestTimeoutMillis = 3000
+                socketTimeoutMillis = 35000
+                connectTimeoutMillis = 35000
+                requestTimeoutMillis = 35000
             }
             install(Logging) {
                 logger = Logger.SIMPLE

@@ -1,7 +1,6 @@
 package com.asphalt.createride.ui
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.network.places.PlacesServiceImpl
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -38,7 +39,6 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.createride.ui.composables.DetailsSection
 import com.asphalt.createride.ui.composables.ParticipantSection
@@ -48,6 +48,7 @@ import com.asphalt.createride.ui.composables.ShareSection
 import com.asphalt.createride.ui.composables.TabSelection
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun CreateRideScreen(
@@ -55,6 +56,13 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     clickDone: () -> Unit
 ) {
+    val places: PlacesServiceImpl = koinInject()
+    val scope= rememberCoroutineScope()
+   /* LaunchedEffect(Unit) {
+        scope.launch {
+            places.getAllPlaces("Kurichithanam")
+        }
+    }*/
     viewModel.getUsers()
     val scrollState = rememberScrollState()
     setTopAppBarState(
@@ -163,9 +171,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 BorderedButton(
                     modifier = Modifier.weight(1f), onClick = {
                         if (viewModel.tabSelectState.value > 1) {
-                            if(viewModel.tabSelectState.value == Constants.TAB_REVIEW
-                                && !viewModel.show_participant_Tab.value)
-                            viewModel.updateTab(-2)
+                            if (viewModel.tabSelectState.value == Constants.TAB_REVIEW
+                                && !viewModel.show_participant_Tab.value
+                            )
+                                viewModel.updateTab(-2)
                             else
                                 viewModel.updateTab(-1)
                         }
@@ -189,10 +198,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
-                                if (viewModel.routeFieldValidation()){
-                                    if(viewModel.show_participant_Tab.value){
+                                if (viewModel.routeFieldValidation()) {
+                                    if (viewModel.show_participant_Tab.value) {
                                         viewModel.updateTab(1)
-                                    }else{
+                                    } else {
                                         viewModel.updateTab(2)
                                     }
 
