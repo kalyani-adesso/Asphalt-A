@@ -40,6 +40,7 @@ struct RideModel: Identifiable,Hashable {
     var rideAction: RideAction
     let date: String
     let riderCount: Int
+    let createdBy: String
 }
 
 
@@ -50,33 +51,45 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var upcomingRides: [RideModel] = []
     @Published var historyRides: [RideModel] = []
     @Published var inviteRides: [RideModel] = []
+    @Published var usersById: [String: String] = [:]
     @Published var isRideLoading = false
+    @Published var userName: String = ""
+    @Published var selectedTab: RideAction = .upcoming
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
+    private let userRepo: UserRepository
     
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
+        let userApiService = UserAPIServiceImpl(client: KtorClient())
+        self.userRepo = UserRepository(apiService: userApiService)
     }
     
     // MARK: - Get all rides
     @MainActor
     func fetchAllRides() async {
         do {
-            self.isRideLoading = true
+            isRideLoading = true
+            
             let result = try await rideRepository.getAllRide()
             
             guard let success = result as? APIResultSuccess<AnyObject>,
                   let rideArray = success.data as? [RidesData] else {
                 print("Error parsing rides")
+                isRideLoading = false
                 return
             }
             
             let currentUserID = MBUserDefaults.userIdStatic ?? ""
-            var filteredRides: [RideModel] = []
+            
+            var upcoming: [RideModel] = []
+            var history: [RideModel] = []
+            var invites: [RideModel] = []
             
             for ride in rideArray {
                 guard let startEpoch = ride.startDate else { continue }
+                
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
@@ -88,29 +101,32 @@ class UpcomingRideViewModel: ObservableObject {
                 var rideStatus: RideStatus
                 
                 if ride.createdBy == currentUserID {
-                    // Upcoming rides I created
+                    //upcoming Ride that I have created
                     if startDate >= Calendar.current.startOfDay(for: Date()) {
                         rideStatus = participantCount > 0 ? .queue : .upcoming
                         rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
                         rideAction = .upcoming
                     } else {
-                        // History of rides I created
                         rideStatus = .complete
                         rideAction = .history
                         rideViewAction = .shareExperience
                     }
+                    //Invites
                 } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
-                    // invites
                     rideAction = .invities
                     rideStatus = .invite
                     rideViewAction = .decline
+                    //accepted invites
+                } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 1 {
+                    rideAction = .upcoming
+                    rideStatus = .upcoming
+                    rideViewAction = .viewDetails
+                    //history
                 } else if isParticipant {
-                    // History of rides I participated in
                     rideAction = .history
                     rideStatus = .complete
                     rideViewAction = .shareExperience
                 } else {
-                    // Skip rides that I have not created
                     continue
                 }
                 
@@ -123,23 +139,105 @@ class UpcomingRideViewModel: ObservableObject {
                     rideViewAction: rideViewAction,
                     rideAction: rideAction,
                     date: dateString,
-                    riderCount: participantCount
+                    riderCount: participantCount,
+                    createdBy: ride.createdBy ?? ""
                 )
                 
-                filteredRides.append(mapped)
+                switch rideAction {
+                case .upcoming: upcoming.append(mapped)
+                case .history: history.append(mapped)
+                case .invities: invites.append(mapped)
+                }
             }
-            await MainActor.run {
-                self.rides = filteredRides
-                self.isRideLoading = false
-            }
+            
+            upcomingRides = upcoming
+            historyRides = history
+            inviteRides = invites
+            
+            self.rides = upcoming + history + invites
+            
+            isRideLoading = false
+            
         } catch {
             print("Error fetching rides:", error)
-            self.isRideLoading = false
+            isRideLoading = false
         }
     }
 
+    
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter.string(from: date) }
+        return formatter.string(from: date)
+    }
+    
+    // MARK: - Change invite status- API
+    
+    @MainActor
+    func changeRideInviteStatus(rideId: String, accepted: Bool) async {
+        do {
+            isRideLoading = true
+            
+            let result = try await rideRepository.changeRideInviteStatus(
+                rideID: rideId,
+                currentUid: MBUserDefaults.userIdStatic ?? "",
+                inviteStatus: accepted ? 1 : 2
+            )
+            
+            guard result is APIResultSuccess<GenericResponse> else {
+                return
+            }
+
+            print("Invite Responded successfully!")
+            
+            if let index = inviteRides.firstIndex(where: { $0.id == rideId }) {
+                var ride = inviteRides[index]
+                inviteRides.remove(at: index)
+                
+                if accepted {
+                    ride.rideAction = .upcoming
+                    ride.status = .upcoming
+                    ride.rideViewAction = .viewDetails
+                    upcomingRides.append(ride)
+                    
+                    selectedTab = .upcoming
+                }
+            }
+            
+            Task {
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                await fetchAllRides()
+            }
+            
+            
+        } catch {
+            print("Error:", error)
+            isRideLoading = false
+        }
+    }
+
+
+    
+    // MARK: - Fetch Users
+    @MainActor
+    func fetchAllUsers() async {
+        do {
+            let result = try await userRepo.getAllUsers()
+            
+            if let success = result as? APIResultSuccess<AnyObject>,
+               let users = success.data as? [UserDomain] {
+                var dict: [String: String] = [:]
+                for user in users {
+                    dict[user.uid] = user.name
+                }
+                self.usersById = dict
+            } else {
+                print("Unexpected user data type")
+            }
+        } catch {
+            print("Error fetching users:", error)
+        }
+    }
+    
+    
 }

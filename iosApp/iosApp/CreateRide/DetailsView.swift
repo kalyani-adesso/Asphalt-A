@@ -66,9 +66,9 @@ struct DetailsView: View {
                     TextField("Describe the vibe...", text: $viewModel.ride.description, axis: .vertical)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
-                        .padding()
-                        .padding(.bottom,50)
-                        .frame(height: 100)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)    
+                        .frame(minHeight: 100, alignment: .topLeading)
                         .background(Color.white)
                         .cornerRadius(10)
                     
