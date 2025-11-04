@@ -12,7 +12,7 @@ struct DetailsView: View {
     @ObservedObject var viewModel: CreateRideViewModel
     @State private var showDatePicker = false
     @State private var showTimePicker = false
-
+    
     
     var body: some View {
         VStack(spacing: 20) {
@@ -66,9 +66,9 @@ struct DetailsView: View {
                     TextField("Describe the vibe...", text: $viewModel.ride.description, axis: .vertical)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
-                        .padding()
-                        .padding(.bottom,50)
-                        .frame(height: 100)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)    
+                        .frame(minHeight: 100, alignment: .topLeading)
                         .background(Color.white)
                         .cornerRadius(10)
                     
@@ -159,7 +159,9 @@ struct DetailsView: View {
         HStack(spacing: 32) {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: true)
             StepIndicator(icon: AppIcon.CreateRide.route, title: "Route")
-            StepIndicator(icon: AppIcon.Home.group, title: "Participants")
+            if viewModel.ride.type?.rawValue != "Solo Ride" {
+                StepIndicator(icon: AppIcon.Home.group, title: "Participants")
+            }
             StepIndicator(icon: AppIcon.CreateRide.review, title: "Review")
             StepIndicator(icon: AppIcon.CreateRide.share, title: "Share")
         }
