@@ -5,7 +5,6 @@ import android.icu.util.Calendar
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -49,6 +48,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val _showRideTimeError = mutableStateOf(false)
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
+    val show_participant_Tab = mutableStateOf(true)
 
 
     private val _fullList = mutableStateOf(ArrayList<RidersList>())
@@ -182,6 +182,10 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         show_timePicker.value = isShow
     }
 
+    fun updateParticipantTab(showTab: Boolean) {
+        show_participant_Tab.value = showTab
+    }
+
 
     fun getRideType(context: Context): ArrayList<RideType> {
         var type =
@@ -244,7 +248,9 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                     .map {
                                         RidersList(
                                             name = it.name,
-                                            id = it.uid, bike = "Unicorn", job = if(it.isMechanic)
+                                            id = it.uid,
+                                            bike = it.primaryBike,
+                                            job = if (it.isMechanic)
                                                 "Mechanic" else ""
                                         )
                                     })

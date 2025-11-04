@@ -12,16 +12,17 @@ object APIHelperUI {
     inline fun <reified T> handleApiResult(
         apiResult: APIResult<T>,
         scope: CoroutineScope,
+        showError: Boolean = true,
         onSuccess: (data: T) -> Unit
     ) {
         when (apiResult) {
             is APIResult.Error -> {
                 val uIStateError =
                     UIState.Error(apiResult.exception.message ?: GENERIC_ERROR_MSG)
-                scope.launch {
-                    UIStateHandler.sendEvent(uIStateError)
-
-                }
+                if (showError)
+                    scope.launch {
+                        UIStateHandler.sendEvent(uIStateError)
+                    }
 
             }
 

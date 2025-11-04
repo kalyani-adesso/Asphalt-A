@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun YourVehiclesSection(yourVehiclesVM: YourVehiclesVM = koinViewModel()) {
     val yourVehiclesList = yourVehiclesVM.vehiclesList.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        yourVehiclesVM.getVehicles()
+    }
     var showPopup by remember { mutableStateOf(false) }
     ComposeUtils.CommonContentBox {
         Column(

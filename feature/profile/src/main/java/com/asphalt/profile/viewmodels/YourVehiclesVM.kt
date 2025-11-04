@@ -15,15 +15,14 @@ import kotlinx.coroutines.launch
 
 class YourVehiclesVM(
     val profileRepository: ProfileRepository,
-    androidUserVM: AndroidUserVM
+    val androidUserVM: AndroidUserVM
 ) : ViewModel() {
     private val _vehiclesList = MutableStateFlow<List<VehicleData>>(emptyList())
     val vehiclesList: StateFlow<List<VehicleData>> = _vehiclesList
-    private val userUID = androidUserVM.userState.value?.uid ?: ""
+    private val userUID: String
+        get() = androidUserVM.getCurrentUserUID()
 
-    init {
-        getVehicles()
-    }
+
 
     fun addToVehicleList(newVehicle: VehicleData) {
         _vehiclesList.update { currentList ->

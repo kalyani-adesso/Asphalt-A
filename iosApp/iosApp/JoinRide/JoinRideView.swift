@@ -22,8 +22,8 @@ struct JoinRideView: View {
                 searchBarView
                     .font(KlavikaFont.regular.font(size: 14))
                     .padding(.top)
-                List(viewModel.rides, id: \.id) { ride in
-                    JoinRideRow(ride: ride, showConnectedRides: $showConnectedRides)
+                List(viewModel.filteredRides, id: \.id) { ride in
+                    JoinRideRow(ride: ride, viewModel: viewModel, showConnectedRides: $showConnectedRides)
                         .listRowSeparator(.hidden)
                 }
                 .listStyle(.plain)
@@ -33,6 +33,12 @@ struct JoinRideView: View {
             .navigationDestination(isPresented: $showHomeView, destination: {
                 BottomNavBar()
             })
+            .onAppear {
+                viewModel.getRides()
+            }
+            .refreshable {
+                viewModel.getRides()
+            }
             .navigationDestination(isPresented: $showConnectedRides, destination: {
                 ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
                     title: "Weekend Coast Ride",
@@ -41,46 +47,44 @@ struct JoinRideView: View {
                     route: "Kochi - Kanyakumari",
                     distance: "280km",
                     date: "Sun, Oct 21",
-                    time: "09:00 AM",
                     ridersCount: "3",
                     maxRiders: "8",
                     riderImage: "rider_avatar"
                 ))
             })
-            
         }
     }
-        @ViewBuilder var searchBarView: some View {
-            HStack(spacing: 6) {
-                AppIcon.JoinRide.search
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .background(AppColor.whiteGray)
-                    .padding(.leading)
-                TextField(AppStrings.JoinRide.searcRide, text: $searchQuery)
-                    .font(KlavikaFont.regular.font(size: 14))
-                    .foregroundColor(.stoneGray)
-                    .background(.clear)
-                    .background(AppColor.whiteGray)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.listGray)
-            )
-            .padding([.leading, .trailing],16)
+    @ViewBuilder var searchBarView: some View {
+        HStack(spacing: 6) {
+            AppIcon.JoinRide.search
+                .resizable()
+                .frame(width: 20, height: 20)
+                .background(AppColor.whiteGray)
+                .padding(.leading)
+            TextField(AppStrings.JoinRide.searcRide, text: $viewModel.searchQuery)
+                .font(KlavikaFont.regular.font(size: 14))
+                .foregroundColor(.stoneGray)
+                .background(.clear)
+                .background(AppColor.whiteGray)
         }
-    
+        .frame(maxWidth: .infinity)
+        .frame(height: 50)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.listGray)
+        )
+        .padding([.leading, .trailing],16)
+    }
 }
 
 struct JoinRideRow: View {
     var ride:JoinRideModel
+    @ObservedObject var viewModel:JoinRideViewModel
     @Binding var showConnectedRides: Bool
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 11) {
-                 AppIcon.Profile.profile
+                AppIcon.Profile.profile
                     .resizable()
                     .overlay(
                         RoundedRectangle(cornerRadius: 15)
@@ -163,7 +167,6 @@ struct JoinRideRow: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(AppColor.darkGray, lineWidth: 2)
                     )
-                  
                 }
                 .padding(.bottom,20)
                 .buttonStyle(.plain)

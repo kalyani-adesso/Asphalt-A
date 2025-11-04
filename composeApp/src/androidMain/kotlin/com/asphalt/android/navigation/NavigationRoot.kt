@@ -326,7 +326,7 @@ fun NavigationRoot(
                         )
                     }
                     entry<AppNavKey.RidesScreenNav> { key ->
-                        RidesScreen(setTopAppBarState)
+                        RidesScreen(setTopAppBarState=setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
                         QueriesScreen(setTopAppBarState = setTopAppBarState)
@@ -395,6 +395,7 @@ fun NavigationRoot(
                 Constants.LOGOUT_CLICK -> {
                     scope.launch {
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        androidUserVM.initialiseUserData()
                         datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)

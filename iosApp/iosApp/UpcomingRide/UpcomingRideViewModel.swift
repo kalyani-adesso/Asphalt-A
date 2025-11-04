@@ -54,9 +54,7 @@ class UpcomingRideViewModel: ObservableObject {
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     
-    
     init() {
-        
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
     }
@@ -130,23 +128,18 @@ class UpcomingRideViewModel: ObservableObject {
                 
                 filteredRides.append(mapped)
             }
-         
             await MainActor.run {
                 self.rides = filteredRides
                 self.isRideLoading = false
             }
-            print("rides \(self.rides)")
         } catch {
             print("Error fetching rides:", error)
             self.isRideLoading = false
         }
     }
 
-
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date) }
-    
-    
 }

@@ -168,7 +168,6 @@ struct ConnectedRideMapView: View {
                     route: "Kochi - Kanyakumari",
                     distance: "280km",
                     date: "Sun, Oct 21",
-                    time: "09:00 AM",
                     ridersCount: "3",
                     maxRiders: "8",
                     riderImage: "rider_avatar"

@@ -37,14 +37,23 @@ class AndroidUserVM(
 
     private fun getAllUsers() {
         viewModelScope.launch {
-            APIHelperUI.handleApiResult(userAPIRepository.getAllUsers(), viewModelScope) {
+            APIHelperUI.handleApiResult(
+                userAPIRepository.getAllUsers(),
+                viewModelScope,
+                showError = false
+            ) {
                 _userList.value = it
             }
         }
 
     }
-    fun getUser(userID:String): UserDomain?{
-        return UserDataHelper.getUserDataFromCurrentList(_userList.value,userID)
+
+    fun getUser(userID: String): UserDomain? {
+        return UserDataHelper.getUserDataFromCurrentList(_userList.value, userID)
+    }
+
+    fun getCurrentUserUID(): String {
+        return userState.value?.uid.orEmpty()
     }
 
     fun initialiseUserData() {
@@ -55,6 +64,7 @@ class AndroidUserVM(
         val jsonString = Json.encodeToString(currentUser)
         dataStoreManager.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
         initialiseUserData()
+        getAllUsers()
     }
 
 }
