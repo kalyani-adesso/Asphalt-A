@@ -16,18 +16,18 @@ struct ActionButtonView: View {
             
             ButtonView( title: AppStrings.HomeLabel.createRide.rawValue,
                         icon: AppIcon.Home.createRide,
-                        showShadow: false , onTap: {
+                        fontSize: 16, showShadow: false,  onTap: {
                     isPresented = true
                 }
             )
             ButtonView( title: AppStrings.HomeLabel.joinRide.rawValue,
                         icon: AppIcon.Home.group,
-                        background: LinearGradient(
-                                    gradient: Gradient(colors: [.white, .white]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing),
+                        fontSize: 16, background: LinearGradient(
+                            gradient: Gradient(colors: [.white, .white]),
+                            startPoint: .leading,
+                            endPoint: .trailing),
                         foregroundColor: AppColor.celticBlue,
-                        showShadow: false ,
+                        showShadow: false,
                         borderColor: AppColor.celticBlue,onTap: {
                showJoinRide = true
             })

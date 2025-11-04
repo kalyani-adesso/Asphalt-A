@@ -52,6 +52,10 @@ class AndroidUserVM(
         return UserDataHelper.getUserDataFromCurrentList(_userList.value, userID)
     }
 
+    fun getCurrentUserUID(): String {
+        return userState.value?.uid.orEmpty()
+    }
+
     fun initialiseUserData() {
         sharedVM.fetchDetails()
     }
@@ -60,6 +64,7 @@ class AndroidUserVM(
         val jsonString = Json.encodeToString(currentUser)
         dataStoreManager.saveValue(PreferenceKeys.USER_DETAILS, jsonString)
         initialiseUserData()
+        getAllUsers()
     }
 
 }

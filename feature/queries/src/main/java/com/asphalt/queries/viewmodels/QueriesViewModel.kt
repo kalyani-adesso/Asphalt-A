@@ -8,7 +8,6 @@ import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.queries.AnswerDomain
 import com.asphalt.android.model.queries.QueryDomain
 import com.asphalt.android.repository.queries.QueryRepository
-import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
@@ -26,18 +25,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QueriesVM(
-    androidUserVM: AndroidUserVM,
+    val androidUserVM: AndroidUserVM,
     val queryRepository: QueryRepository
 ) : ViewModel() {
     fun setFilterCategory(categoryID: Int) {
         filterCategory.value = categoryID
     }
 
-    private val currentUid = androidUserVM.userState.value?.uid
+    private val currentUid: String
+        get() = androidUserVM.getCurrentUserUID()
     private val searchText = MutableStateFlow("")
 
 
-    private val userList = androidUserVM.userList
+    private val userList
+        get() = androidUserVM.userList
+
     fun getCurrentUserData(): UserDomain? {
 
         return UserDataHelper.getUserDataFromCurrentList(userList.value, currentUid ?: "")
@@ -71,11 +73,6 @@ class QueriesVM(
         )
 
 
-    init {
-        viewModelScope.launch {
-            loadQueries()
-        }
-    }
 
 
 

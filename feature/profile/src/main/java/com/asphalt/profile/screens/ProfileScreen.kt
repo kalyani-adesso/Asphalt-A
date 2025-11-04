@@ -14,38 +14,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.profile.mapper.toCurrentUserModel
 import com.asphalt.profile.screens.components.EditProfile
 import com.asphalt.profile.screens.sections.AchievementsSection
 import com.asphalt.profile.screens.sections.ProfileSection
 import com.asphalt.profile.screens.sections.TotalStatisticsSection
 import com.asphalt.profile.screens.sections.YourVehiclesSection
 import com.asphalt.profile.viewmodels.ProfileSectionVM
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    androidUserVM: AndroidUserVM = koinViewModel(),
     profileSectionVM: ProfileSectionVM = koinActivityViewModel(),
     setTopAppBarState: (AppBarState) -> Unit
 ) {
-    val user = androidUserVM.userState.collectAsStateWithLifecycle()
     var showEditProfile by remember { mutableStateOf(false) }
-    LaunchedEffect(user.value) {
-        profileSectionVM.getProfileData(user.value?.uid)
-    }
-    val profileData = profileSectionVM.profileData.collectAsStateWithLifecycle()
-    LaunchedEffect(profileData.value) {
-        profileData.value?.let { androidUserVM.updateUserData(it.toCurrentUserModel()) }
+    LaunchedEffect(Unit) {
+        profileSectionVM.getProfileData()
     }
 
 
@@ -74,7 +64,6 @@ fun ProfileScreen(
 
             }, onSaveChanges = { name, email, contact, license, emergencyContact, isMechanic ->
                 profileSectionVM.editProfile(
-                    user.value?.uid,
                     name,
                     email,
                     contact,

@@ -82,13 +82,13 @@ extension JoinRideViewModel {
     }
     
     func updateRideJoinStatus(rideId: String, userID: String, joinCount: Int32) {
-        rideRepository.updateRides(rideID: rideId, userID: userID, joinCount: joinCount, completionHandler: { result, error in
-            if let error = error {
-                print("Failed to update ride status: \(error.localizedDescription)")
-            } else {
-                print("Rides updated.")
-            }
-        })
+//        rideRepository.updateRides(rideID: rideId, userID: userID, joinCount: joinCount, completionHandler: { result, error in
+//            if let error = error {
+//                print("Failed to update ride status: \(error.localizedDescription)")
+//            } else {
+//                print("Rides updated.")
+//            }
+//        })
     }
     
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()

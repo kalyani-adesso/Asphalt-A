@@ -22,10 +22,11 @@ class DashboardRideInviteViewModel(
     ViewModel() {
 
     private val currentUid: String?
-        get() = androidUserVM.userState.value?.uid
+        get() = androidUserVM.getCurrentUserUID()
     private val _dashboardRideInvites =
         MutableStateFlow<List<DashboardRideInviteUIModel>>(emptyList())
-    private val userList = androidUserVM.userList
+    private val userList
+        get() = androidUserVM.userList
 
     val dashboardRideInviteList: StateFlow<List<DashboardRideInviteUIModel>> = _dashboardRideInvites
 
