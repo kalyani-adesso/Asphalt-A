@@ -10,6 +10,11 @@ import SwiftUI
 import Combine
 import shared
 
+enum RideAction: String {
+    case upcoming = "Upcoming"
+    case history = "History"
+    case invities = "Invities"
+}
 
 enum RideViewAction: String {
     case checkResponse = "Check Response"
@@ -20,15 +25,9 @@ enum RideViewAction: String {
 
 enum RideStatus: String {
     case upcoming = "Upcoming"
-    case history = "History"
-    case invites = "Invites"
     case queue = "Queue"
-}
-
-enum RideAction {
-    case upcoming
-    case history
-    case invites
+    case complete = "Completed"
+    case invite = "Invite"
 }
 
 struct RideModel: Identifiable,Hashable {
@@ -43,9 +42,10 @@ struct RideModel: Identifiable,Hashable {
     let riderCount: Int
 }
 
+
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
-    @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invites]
+    @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invities]
     @Published var rideViewActions: [RideViewAction]  = [.checkResponse, .viewDetails, .shareExperience]
     @Published var upcomingRides: [RideModel] = []
     @Published var historyRides: [RideModel] = []
@@ -70,80 +70,77 @@ class UpcomingRideViewModel: ObservableObject {
             
             guard let success = result as? APIResultSuccess<AnyObject>,
                   let rideArray = success.data as? [RidesData] else {
-                print("Error")
+                print("Error parsing rides")
                 return
             }
             
             let currentUserID = MBUserDefaults.userIdStatic ?? ""
-            var upcoming: [RideModel] = []
-            var invites: [RideModel] = []
-            var history: [RideModel] = []
+            var filteredRides: [RideModel] = []
             
             for ride in rideArray {
                 guard let startEpoch = ride.startDate else { continue }
-
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
-                
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-
-                var mapped = RideModel(
-                    id: ride.ridesID ?? "",
+                
+                var rideAction: RideAction
+                var rideViewAction: RideViewAction
+                var rideStatus: RideStatus
+                
+                if ride.createdBy == currentUserID {
+                    // Upcoming rides I created
+                    if startDate >= Calendar.current.startOfDay(for: Date()) {
+                        rideStatus = participantCount > 0 ? .queue : .upcoming
+                        rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
+                        rideAction = .upcoming
+                    } else {
+                        // History of rides I created
+                        rideStatus = .complete
+                        rideAction = .history
+                        rideViewAction = .shareExperience
+                    }
+                } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
+                    // invites
+                    rideAction = .invities
+                    rideStatus = .invite
+                    rideViewAction = .decline
+                } else if isParticipant {
+                    // History of rides I participated in
+                    rideAction = .history
+                    rideStatus = .complete
+                    rideViewAction = .shareExperience
+                } else {
+                    // Skip rides that I have not created
+                    continue
+                }
+                
+                let mapped = RideModel(
+                    id: ride.ridesID ?? UUID().uuidString,
                     title: ride.rideTitle ?? "",
                     routeStart: ride.startLocation ?? "",
                     routeEnd: ride.endLocation ?? "",
-                    status: .upcoming,
-                    rideViewAction: .checkResponse,
-                    rideAction: .upcoming,
+                    status: rideStatus,
+                    rideViewAction: rideViewAction,
+                    rideAction: rideAction,
                     date: dateString,
                     riderCount: participantCount
                 )
-
-                // Upcoming
-                if (ride.createdBy == currentUserID) && startDate >= Calendar.current.startOfDay(for: Date()) {
-                    if ride.participants.count > 0 {
-                        mapped.status = .queue
-                        mapped.rideViewAction = .checkResponse
-                    }
-                    else{
-                        mapped.status = .upcoming
-                        mapped.rideViewAction = .viewDetails
-                    }
-                    mapped.rideAction = .upcoming
-                    upcoming.append(mapped)
-                }
                 
-                // Invites
-                if ride.createdBy != currentUserID, isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
-                    mapped.status = .invites
-                    mapped.rideAction = .invites
-                    mapped.rideViewAction = .decline
-                    invites.append(mapped)
-                }
-
-                // History
-                if isParticipant, startDate < Calendar.current.startOfDay(for: Date()) || ride.rideType == "completed" {
-                    mapped.status = .history
-                    mapped.rideAction = .history
-                    mapped.rideViewAction = .shareExperience
-                    history.append(mapped)
-                }
+                filteredRides.append(mapped)
             }
-            
+         
             await MainActor.run {
-                self.upcomingRides = upcoming
-                self.inviteRides = invites
-                self.historyRides = history
+                self.rides = filteredRides
                 self.isRideLoading = false
             }
-            
+            print("rides \(self.rides)")
         } catch {
-            print("Error :", error)
+            print("Error fetching rides:", error)
+            self.isRideLoading = false
         }
     }
-
 
 
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
