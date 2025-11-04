@@ -35,19 +35,16 @@ enum class BannerType {
 
 @Composable
 fun StatusBanner(
-    modifier: Modifier = Modifier,
     type: BannerType = BannerType.SUCCESS,
     message: String,
     showBanner: Boolean,
     autoDismissMillis: Long = 2500L,
-    onDismiss: () -> Unit
 ) {
 
 
     LaunchedEffect(showBanner) {
         if (showBanner && autoDismissMillis > 0) {
             delay(autoDismissMillis)
-            onDismiss()
         }
     }
 

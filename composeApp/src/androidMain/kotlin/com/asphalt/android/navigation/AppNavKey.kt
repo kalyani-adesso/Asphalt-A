@@ -33,10 +33,20 @@ sealed interface AppNavKey : NavKey {
     object CreatPasswordNav : AppNavKey
     @Serializable
     object JoinRideNavKey : AppNavKey
+
+    @Serializable
+    object ConnectedRideMapNavKey : AppNavKey
     @Serializable
     object ConnectedRideNavKey : AppNavKey
+
+    @Serializable
+    object RideProgressNavKey : AppNavKey
     @Serializable
     object ConnectedRideEndNavKey : AppNavKey
+    @Serializable
+    object RatingRideNavKEy : AppNavKey
+    @Serializable
+    object EndRideLoaderNavKey : AppNavKey
 }
 data class BottomNavItems(
     val key: AppNavKey,

@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -25,6 +26,7 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -34,8 +36,12 @@ import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
-import com.asphalt.joinaride.ConnectedRideScreen
+import com.asphalt.joinaride.ConnectedRideEnd
+import com.asphalt.joinaride.ConnectedRideMap
+import com.asphalt.joinaride.EndRidersScreenLoader
+import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.joinaride.JoinRideScreen
+import com.asphalt.joinaride.RideProgress
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
@@ -60,6 +66,8 @@ fun NavigationRoot(
 ) {
     val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()
+    val context = LocalContext.current
+    val locationProvider = remember { AndroidLocationProvider(context.applicationContext) }
 
     val showBottomBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
@@ -75,7 +83,10 @@ fun NavigationRoot(
         AppNavKey.CreateRideNav,
         AppNavKey.NotificationNav,
         AppNavKey.JoinRideNavKey,
-        AppNavKey.ConnectedRideNavKey
+        AppNavKey.ConnectedRideNavKey,
+        AppNavKey.ConnectedRideMapNavKey,
+        AppNavKey.ConnectedRideEndNavKey,
+        AppNavKey.EndRideLoaderNavKey
     )
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -291,6 +302,9 @@ fun NavigationRoot(
                             navigateToConnectedRide = {
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
                                 // backStack.add(AppNavKey.DashboardNavKey)
+                            },
+                            navigateToEndRide = {
+                                backStack.add(AppNavKey.ConnectedRideEndNavKey)
                             })
                     }
                     entry<AppNavKey.ForgotPasswordNav> { key ->
@@ -313,11 +327,51 @@ fun NavigationRoot(
                         })
                     }
                     entry(AppNavKey.ConnectedRideNavKey) { key ->
-                        ConnectedRideScreen(
+                        RidersScreenLoader(
                             setTopAppBarState = setTopAppBarState,
-                            onBackButton = {
+                            onNavigateToMapScreen = {
                                 backStack.remove(AppNavKey.ConnectedRideNavKey)
+                                backStack.add(AppNavKey.ConnectedRideMapNavKey)
 
+                            }
+                        )
+                    }
+                    entry(AppNavKey.RideProgressNavKey) { key ->
+                        RideProgress(
+                            onClickEndRide =  {
+                                backStack.remove(AppNavKey.RideProgressNavKey)
+                                backStack.add(AppNavKey.ConnectedRideNavKey)
+                            },
+                        )
+                    }
+                    entry(AppNavKey.ConnectedRideMapNavKey) { key ->
+                        ConnectedRideMap(
+                            setTopAppBarState = setTopAppBarState,
+//                            onNavigateToMapScreen = {
+//                                backStack.add(AppNavKey.ConnectedRideMapNavKey),
+                            locationProvider = locationProvider,
+                            onClick = {
+                                backStack.add(AppNavKey.ConnectedRideMapNavKey)
+                                backStack.remove(AppNavKey.ConnectedRideMapNavKey)
+                                backStack.add(AppNavKey.EndRideLoaderNavKey)
+                            }
+                        )
+                    }
+                    entry(AppNavKey.EndRideLoaderNavKey) { key ->
+                        EndRidersScreenLoader(
+                            setTopAppBarState = setTopAppBarState,
+                            onNavigateToSummaryEndRide = {
+                                backStack.remove(AppNavKey.EndRideLoaderNavKey)
+                                backStack.add(AppNavKey.ConnectedRideEndNavKey)
+                            }
+                        )
+                    }
+                    entry(AppNavKey.ConnectedRideEndNavKey) { key ->
+                        ConnectedRideEnd(
+                            setTopAppBarState = setTopAppBarState,
+                            onNavigateToDashboard = {
+                                backStack.remove(AppNavKey.ConnectedRideEndNavKey)
+                                backStack.add(AppNavKey.DashboardNavKey)
                             }
                         )
                     }

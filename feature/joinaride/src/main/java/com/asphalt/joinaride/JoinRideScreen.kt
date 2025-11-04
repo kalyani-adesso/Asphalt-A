@@ -30,6 +30,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -65,6 +66,9 @@ import com.asphalt.android.viewmodel.joinridevm.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.NeutralBlack
+import com.asphalt.commonui.theme.NeutralGrey30
+import com.asphalt.commonui.theme.NeutralGrey80
+import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.SafetyOrange
@@ -87,7 +91,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun JoinRideScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    navigateToConnectedRide:() -> Unit
+    navigateToConnectedRide:() -> Unit,
+    navigateToEndRide : () -> Unit
 )
 {
     var isLoading by remember { mutableStateOf(false) }
@@ -101,27 +106,30 @@ fun JoinRideScreen(
         Column(modifier = Modifier
             .fillMaxSize()
             .background(
-                color = NeutralLightPaper,
-                shape = RoundedCornerShape(Dimensions.size10)
+                color = NeutralWhite,
             )) {
-            JoinRide(viewModel, navigateToConnectedRide = {navigateToConnectedRide.invoke()})
-
+            JoinRide(viewModel,
+                navigateToConnectedRide = {navigateToConnectedRide.invoke()},
+                navigateToEndRide = { navigateToEndRide.invoke()})
         }
 }
 
 @Composable
 fun JoinRide(viewModel: JoinRideViewModel,
-             navigateToConnectedRide:() -> Unit) {
+             navigateToConnectedRide:() -> Unit,
+             navigateToEndRide: () -> Unit) {
 
     val query by viewModel.searchQuery.collectAsState()
     val riders by viewModel.filteredList.collectAsState()
 
-    Column(modifier = Modifier
-        .fillMaxSize()) {
-
+    Column {
 
         SearchView(
             query = query,
+            modifier = Modifier.fillMaxWidth()
+                .padding(top = Dimensions.padding20, start = Dimensions.padding16, end = Dimensions.padding16)
+                .background(NeutralLightPaper,
+                    shape = RoundedCornerShape(size = Dimensions.size10)),
             onQueryChange = { viewModel.onSearchQueryChanged(it)},
             onClearClick = { viewModel.onSearchQueryChanged("")},
             placeholder = "Search rides by location.."
@@ -134,8 +142,8 @@ fun JoinRide(viewModel: JoinRideViewModel,
         else {
             LazyColumn {
                 items(riders) { rider ->
-                    RiderCard(rider, navigateToConnectedRide = {navigateToConnectedRide.invoke()})
-
+                    RiderCard(rider, navigateToConnectedRide = {navigateToConnectedRide.invoke()},
+                        navigateToEndRide = { navigateToEndRide.invoke() })
                 }
             }
         }
@@ -143,8 +151,10 @@ fun JoinRide(viewModel: JoinRideViewModel,
 }
 
 @Composable
-fun RiderCard(rider: JoinRideModel,
-              navigateToConnectedRide:() -> Unit) {
+fun RiderCard(
+    rider: JoinRideModel,
+    navigateToConnectedRide:() -> Unit,
+    navigateToEndRide:() -> Unit) {
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -288,7 +298,7 @@ fun RiderCard(rider: JoinRideModel,
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(
-                                id = R.drawable.ic_person
+                                id = R.drawable.ic_group_white
                             ),
                             contentDescription = "Riders icon",
                             tint = GreenDark,
@@ -313,14 +323,15 @@ fun RiderCard(rider: JoinRideModel,
                     ), modifier = Modifier.fillMaxWidth()
                 ) {
 
-                    Button(
+                    ElevatedButton(
                         onClick = {
-                            //TODO:call ride
+                            navigateToEndRide.invoke()
 
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = NeutralDarkGrey),
+                        colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                         modifier = Modifier
                             .weight(1f)
+                            .padding(end = Dimensions.padding10)
                             .height(Dimensions.size50),
                         shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS)
                     ) {
@@ -348,7 +359,8 @@ fun RiderCard(rider: JoinRideModel,
                         contentPadding = PaddingValues(Dimensions.size0)
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(start = Dimensions.padding10),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
@@ -380,5 +392,6 @@ fun JoinRideScrenPreview() {
 
     JoinRideScreen(setTopAppBarState = {},
         viewModel = viewModel(),
-        navigateToConnectedRide = {})
+        navigateToConnectedRide = {},
+        navigateToEndRide = {})
 }

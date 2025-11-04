@@ -46,7 +46,6 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.androidx.credentials.play.services.auth)
             //  implementation(libs.google.firebase.firestore.ktx)
-
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -64,6 +63,9 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        val mapsApiKey : String? = project.findProperty("MAPS_API_KEY") as String?
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey ?: ""
     }
     packaging {
         resources {
@@ -122,7 +124,4 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.viewmodel.navigation)
-
-
 }
-
