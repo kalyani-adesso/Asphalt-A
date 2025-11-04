@@ -4,32 +4,37 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.repository.profile.ProfileRepository
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.profile.data.ProfileUIModel
+import com.asphalt.profile.mapper.toCurrentUserModel
 import com.asphalt.profile.mapper.toProfileUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProfileSectionVM(val profileRepository: ProfileRepository) :
+class ProfileSectionVM(val profileRepository: ProfileRepository,val androidUserVM: AndroidUserVM) :
     ViewModel() {
 
     private val _profileData = MutableStateFlow<ProfileUIModel?>(null)
     val profileData = _profileData.asStateFlow()
-    fun getProfileData(uid: String?) {
+    private val userUID: String
+        get() = androidUserVM.getCurrentUserUID()
+    fun getProfileData() {
         viewModelScope.launch {
             APIHelperUI.handleApiResult(APIHelperUI.runWithLoader {
                 profileRepository.getProfile(
-                    uid ?: ""
+                    userUID
                 )
             }, this) {
-                _profileData.value = it.toProfileUIModel()
+                val profileUIModel = it.toProfileUIModel()
+                _profileData.value = profileUIModel
+                androidUserVM.updateUserData(profileUIModel.toCurrentUserModel())
             }
 
         }
     }
 
     fun editProfile(
-        uid: String?,
         userName: String,
         email: String,
         contact: String,
@@ -38,11 +43,11 @@ class ProfileSectionVM(val profileRepository: ProfileRepository) :
         isMechanic: Boolean
     ) {
         viewModelScope.launch {
-            uid?.let {
+            userUID.run {
                 APIHelperUI.handleApiResult(
                     APIHelperUI.runWithLoader {
                         profileRepository.editProfile(
-                            it, userName,
+                            this, userName,
                             email, contact,
                             emergencyNumber,
                             licenseNo,
@@ -50,7 +55,7 @@ class ProfileSectionVM(val profileRepository: ProfileRepository) :
                         )
                     }, viewModelScope
                 ) {
-                    getProfileData(uid)
+                    getProfileData()
                 }
 
             }

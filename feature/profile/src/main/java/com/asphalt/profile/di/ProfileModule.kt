@@ -13,7 +13,7 @@ import org.koin.dsl.module
 val profileModule = module {
     single { ProfilesDataRepo() }
     single { TotalStatsRepo() }
-    viewModel { ProfileSectionVM(get()) }
+    viewModel { ProfileSectionVM(get(),get()) }
     viewModel { YourVehiclesVM(get(), get()) }
     viewModel { TotalStatsVM(get()) }
     viewModel { AddBikesVM() }

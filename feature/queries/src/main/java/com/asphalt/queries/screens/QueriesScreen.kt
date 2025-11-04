@@ -50,6 +50,9 @@ fun QueriesScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 
 ) {
+    LaunchedEffect(Unit) {
+        queriesVM.loadQueries()
+    }
     val askQueryVM: AskQueryVM = koinViewModel()
     var showQueryPopup by remember { mutableStateOf(false) }
     val user = androidUserVM.userState.collectAsStateWithLifecycle()
