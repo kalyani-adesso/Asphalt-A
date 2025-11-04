@@ -41,6 +41,10 @@ struct HomeView: View {
             
             viewModel.isRideLoading = false
         }
+        .refreshable {
+            await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+        }
     }
 }
 

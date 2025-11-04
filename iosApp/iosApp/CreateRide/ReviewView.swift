@@ -85,7 +85,9 @@ struct ReviewView: View {
         HStack(spacing: 32) {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
             StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
-            StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
+            if viewModel.ride.type?.rawValue != "Solo Ride" {
+                StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: false)
+            }
             StepIndicator(icon: AppIcon.CreateRide.review, title: "Review",isActive: true, isCurrentPage: true)
             StepIndicator(icon: AppIcon.CreateRide.share, title: "Share")
         }
@@ -99,7 +101,7 @@ struct ReviewView: View {
         }
     
     var tagValue: String{
-        if viewModel.selectedParticipants.count > 1{
+        if viewModel.selectedParticipants.count > 0{
             return "Group ride"
         }
         else{

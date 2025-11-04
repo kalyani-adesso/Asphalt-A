@@ -120,6 +120,10 @@ struct UpcomingRideView: View {
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
         }
+        .refreshable {
+            await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+        }
     }
 }
 
