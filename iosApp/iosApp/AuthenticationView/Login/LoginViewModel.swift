@@ -9,22 +9,30 @@ import Foundation
 import SwiftUI
 import shared
 
-
 class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showToast: Bool = false
-    func didTapLogin(email: String, password: String, completion: @escaping ()->()) {
-        AuthenticatorImpl().signIn(email: email, password: password, completionHandler: { result,error in
-            if let result = result {
-                if let uid = result.uid {
-                    completion()
+    func didTapLogin(email: String, password: String, completion: @escaping ()->(), errorCompletion: @escaping ()->()) {
+        if isValidEmailAndPassword(email:email, password:password) {
+            AuthenticatorImpl().signIn(email: email, password: password, completionHandler: { result,error in
+                if let result = result {
+                    if let _ = result.uid {
+                        MBUserDefaults.rememberMeDataStatic = result.isSuccess
+                        completion()
+                    } else {
+                        self.errorMessage = result.errorMessage ?? ""
+                        self.showToast = true
+                        errorCompletion()
+                    }
                 } else {
+                    self.errorMessage = result?.errorMessage ?? ""
                     self.showToast = true
+                    errorCompletion()
                 }
-            } else {
-                self.showToast = true
-            }
-        })
+            })
+        } else {
+            errorCompletion()
+        }
     }
     
     func isValidPassword(_ password: String) -> Bool {

@@ -96,7 +96,6 @@ struct EditProfileView: View {
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .background(AppColor.darkgray)
-        .padding(.top,30)
         // TODO: Actual names are not finalized once get the actuall text to display then i will localize this.
         .confirmationDialog("Select Photo Source", isPresented: $showActionSheet) {
             Button("Take Photo") {

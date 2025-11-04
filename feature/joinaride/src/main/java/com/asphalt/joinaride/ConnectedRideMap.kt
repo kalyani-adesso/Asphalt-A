@@ -75,7 +75,7 @@ fun ConnectedRideMap(
     setTopAppBarState: (AppBarState) -> Unit,
     viewModel: RidersGroupViewModel = koinViewModel(),
     onClick : () -> Unit,
-    locationManager: LocationManager
+    locationProvider: LocationProvider
     ) {
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)

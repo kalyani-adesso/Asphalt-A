@@ -70,14 +70,18 @@ public struct AppStrings{
         case clubName = "adesso Rider’s Club"
         case emailOrPhone = "Email or Phone Number"
         case password = "Password"
-
+        case confirmPassword = "Confirm Password"
+        case updatePassword = "Update Password"
+        case createNewPassword = "Create New Password"
+        case enterYourNewPassword = "Enter your new password below."
+        case backToSignIn = "Back to Sign In"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
     enum SignInPlaceholder: String {
         case email = "Enter your email"
         case password = "Enter your password"
-
+        case confirmPassword = "Confirm your Password"
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
 
@@ -114,6 +118,7 @@ public struct AppStrings{
     enum ValidationMessage: String {
         case validatePassword = "Please enter a password"
         case validateEmail = "Please enter a valid email"
+        case validateConfirmPassword = "Passwords do not match"
     }
 
 
@@ -237,11 +242,10 @@ public struct AppStrings{
         case sportBike = "Sport Bike"
         case nakedBike = "Naked Bike"
         case touringBike = "Touring Bike"
-        case cruiser = "Cruiser"
         case adventureBike = "Adventure Bike"
+        case cruiser = "Cruiser"
         case scooter = "Scooter"
         case electric = "Electric"
-        case other = "Other"
 
         var id: String { rawValue }
 
@@ -328,6 +332,26 @@ public struct AppStrings{
         static let rateRide = "Rate This Ride"
         static let rideJoined = "Successfully joined the ride!"
         static let rideStarted = "Ride Started! Navigation active."
+        static let connectedRideTitle = "Connected Ride"
+        static let rideNameWeekendCoast = "Weekend Coast Ride"
+        static let rideInProgressTitle = "Ride in Progress"
+        static let groupNavigationActiveSubtitle = "Group navigation active"
+        static let groupStatusTitle = "Group Status"
+        static let emergencyActionsTitle = "Emergency Actions"
+        static let offlineAlertTitle = "Abhishek has been stopped for 5 minutes."
+        static let offlineAlertSubtitle = "Check if assistance is needed."
+        static let endRideButton = "END RIDE"
+        static let emergencySOSButton = "Emergency SOS"
+        static let shareLocationButton = "Share Location"
+        static let startTrackingButton = "Start Tracking"
+        static let stopTrackingButton = "Stop Tracking"
+        static let rideCompletedTitle = "Ride successfully completed"
+        static let rideCompletionProgressTitle = "Completing ride"
+        static let rideCompletionProgressSubtitle = "Saving your ride data and generating summary"
+        static let standard = "Standard"
+        static let rideMessage = "Completing ride"
+        static let skip = "skip"
+        static let submitRating = "Submit Rating"
     }
 }
 

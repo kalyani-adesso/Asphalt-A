@@ -64,7 +64,7 @@ import org.koin.compose.koinInject
 @Composable
 fun NavigationRoot(
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.JoinRideNavKey)
+    val backStack = rememberNavBackStack(AppNavKey.SplashKey)
     val datastore: DataStoreManager = koinInject()
     val context = LocalContext.current
     val locationProvider = remember { AndroidLocationProvider(context.applicationContext) }
@@ -141,19 +141,9 @@ fun NavigationRoot(
             manageSelectKeyOnBackPress()
         }
     }
-    RidersClubSideMenu(drawerState, itemClick = { item ->
-        when (item) {
-            Constants.LOGOUT_CLICK -> {
-                scope.launch {
-                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
-                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
-                    backStack.clear()
-                    backStack.add(AppNavKey.LoginScreenNavKey)
-                    drawerState.close()
-                }
-            }
-        }
-    }) {
+
+    @Composable
+    fun AppContent() {
         Scaffold(
 
             topBar = {
@@ -389,4 +379,22 @@ fun NavigationRoot(
             )
         }
     }
+    if (showTopAppBar)
+        RidersClubSideMenu(drawerState, itemClick = { item ->
+            when (item) {
+                Constants.LOGOUT_CLICK -> {
+                    scope.launch {
+                        datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        backStack.clear()
+                        backStack.add(AppNavKey.LoginScreenNavKey)
+                        drawerState.close()
+                    }
+                }
+            }
+        }) {
+            AppContent()
+        }
+    else AppContent()
+
 }

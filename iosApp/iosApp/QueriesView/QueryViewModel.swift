@@ -27,7 +27,7 @@ class QueryViewModel : ObservableObject {
     @Published var selectedFilter = "All"
     @Published var askQuery = AskQuery()
 
-        let queries: [Query] = [
+        var queries: [Query] = [
             Query(
                 title: "Best oil for Kawasaki Ninja 650?",
                 tags: ["Maintenance", "Answered"],
@@ -75,4 +75,5 @@ class QueryViewModel : ObservableObject {
                 comments: 02
             )
         ]
+
 }

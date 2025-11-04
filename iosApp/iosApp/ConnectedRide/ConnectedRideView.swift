@@ -13,7 +13,6 @@ struct ConnectedRideView: View {
     let subTitle:String
     let model:JoinRideModel
     @State var showView = false
-   // @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             HStack(spacing: 10) {
@@ -45,7 +44,7 @@ struct ConnectedRideView: View {
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showView, destination: {
-            if title == "Completing ride" {
+            if title == AppStrings.ConnectedRide.rideMessage {
                 ConnectedRideCompleteView(viewModel:model )
             } else {
                 ConnectedRideMapView()

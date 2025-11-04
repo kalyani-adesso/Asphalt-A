@@ -14,17 +14,27 @@ struct ConnectedRideCompleteView: View {
     @StateObject private var homeViewModel = HomeViewModel()
     @State var rating: Int = 0
     @State var showHome: Bool = false
+    @State var showPopup: Bool = false
     @State var showMapView:Bool = false
     var body: some View {
-        VStack(spacing: 16) {
-            SucessView(title: viewModel.title,
-                       subtitle: AppStrings.ConnectedRide.rideCompleted)
+        ZStack{
+            VStack(spacing: 16) {
+                SucessView(title: viewModel.title,
+                           subtitle: AppStrings.ConnectedRide.rideCompleted)
+                
+                RideDifficultyLevel
+                Spacer()
+                RideButtonsView
+            }
+            .padding(.horizontal,16)
             
-            RideDifficultyLevel
-            RateThisRide
-            RideButtonsView
+            if showPopup {
+                RatingSheetView(isPresented: $showPopup)
+                        .transition(.scale)
+                        .zIndex(1)
+                }
         }
-        .padding(.horizontal,16)
+        
         .navigationDestination(isPresented: $showHome, destination: {
             BottomNavBar()
         })
@@ -43,6 +53,14 @@ struct ConnectedRideCompleteView: View {
         .navigationDestination(isPresented: $showMapView, destination: {
             ConnectedRideMapView()
         })
+        .onAppear {
+            // Show rating sheet after 2 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                withAnimation(.spring()) {
+                    showPopup = true
+                }
+            }
+        }
     }
     
     @ViewBuilder var RideDifficultyLevel: some View {
@@ -73,27 +91,11 @@ struct ConnectedRideCompleteView: View {
                 .fill(AppColor.listGray)
         )
     }
-    
-    @ViewBuilder var RateThisRide: some View {
-        VStack(alignment:.leading, spacing: 20) {
-            Text(AppStrings.ConnectedRide.rateRide)
-                .font(KlavikaFont.bold.font(size: 16))
-                .foregroundStyle(AppColor.black)
-                .padding(.top, 30)
-            RatingView(rating: $rating, iconRate: AppIcon.ConnectedRide.rate, iconNotRate: AppIcon.ConnectedRide.notRate)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(AppColor.listGray)
-        )
-    }
-    
+       
     @ViewBuilder var RideButtonsView: some View {
         HStack(spacing: 20) {
             Button(action: {
-                
+               
             }) {
                 HStack {
                     Text(AppStrings.UpcomingRide.share.uppercased())
@@ -117,6 +119,8 @@ struct ConnectedRideCompleteView: View {
             })
             .frame(maxWidth: .infinity)
         }
+        .padding()
+        .padding(.bottom, 70)
     }
 }
 

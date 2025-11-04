@@ -39,6 +39,9 @@ struct SignInView: View {
                 ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
                     viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
                         hasLoggedIn = true
+                        MBUserDefaults.rememberMeDataStatic = true
+                    }, errorCompletion: {
+                        MBUserDefaults.rememberMeDataStatic = false
                     })
                 })
                 .padding(.bottom,20)
@@ -52,9 +55,6 @@ struct SignInView: View {
                 LoginSucessView()
             })
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
-        }
-        .onAppear() {
-            MBUserDefaults.rememberMeDataStatic = true
         }
     }
 }
@@ -120,8 +120,9 @@ extension SignInView {
                         .foregroundColor(.stoneGray)
                 }
             }
+            .disabled(emailOrPhone.isEmpty && password.isEmpty)
             Spacer()
-            NavigationLink(destination: ForgotPassword(email: emailOrPhone )) {
+            NavigationLink(destination: ForgotPassword()) {
                 Text(AppStrings.SignInAction.forgotPassword.localized)
                     .font(KlavikaFont.medium.font(size: 14))
                     .foregroundColor(.celticBlue)

@@ -9,6 +9,7 @@ import cocoapods.FirebaseDatabase.FIRDatabase
 import platform.Foundation.NSError
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.UIKit.UIDevice
+
 import kotlin.coroutines.resume
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
@@ -45,8 +46,7 @@ actual class AuthenticatorImpl actual constructor() {
             }
         }
     }
-
-
+    
     actual suspend fun signIn(email: String, password: String): LoginResult = suspendCancellableCoroutine { cont ->
         auth.signInWithEmail(email = email, password = password) { result: FIRAuthDataResult?, error: NSError? ->
             if (error != null) {

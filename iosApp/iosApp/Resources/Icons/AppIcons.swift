@@ -67,7 +67,13 @@ struct AppIcon {
         static let ride = Image("icon-ride")
         static let leftIcon = Image("icon-left")
         static let rightIcon = Image("icon-right")
-        static let sportsBike = Image("icon-sportsBike")
+        static let sportsBike = Image("icon-sportBike")
+        static let nakedBike = Image("icon-nakedBike")
+        static let cruiserBike = Image("icon-cruiser")
+        static let touringBike = Image("icon-touringBike")
+        static let adventureBike = Image("icon-adventureBike")
+        static let electric = Image("icon-electric")
+        static let scooter = Image("icon-scooter")
         static let mechanic = Image("icon-mechanic")
         static let camera = Image("icon-camera")
         static let addBike = Image("icon-addBike")
@@ -144,6 +150,7 @@ struct AppIcon {
         static let startLocation = UIImage(named: "icon-startLocation")
         static let endLocation = UIImage(named: "icon-endLocation")
         static let intermediate = UIImage(named: "icon-intermediate")
+        static let rateLogo = Image("icon-rateLogo")
     }
     
     struct Queries {

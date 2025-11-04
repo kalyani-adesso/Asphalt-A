@@ -13,19 +13,20 @@ class SignUpViewModal: ObservableObject {
     @Published var showToast: Bool = false
     var emailorPhoneNumber: String?
     @Published var errorMessage: String?
-    func getEmailorPhoneNumber(emailorPhoneNumber: String, onSucess: @escaping () -> Void)  {
+    func getEmailorPhoneNumber(emailorPhoneNumber: String,password: String, confirmPassword: String, onSucess: @escaping () -> Void)  {
         
-//        Auth.auth().sendPasswordReset(withEmail: emailorPhoneNumber, completion: { error in
-//            if let error = error {
-//                print("Error sending password reset: \(error.localizedDescription)")
-//                self.showToast = true
-//                self.errorMessage = error.localizedDescription
-//            } else {
-//                print("Password reset email sent.")
-//                onSucess()
-//            }
-//        })
-        
+        if isValidEmailAndPassword(email: emailorPhoneNumber, password: password, confirmPassword: confirmPassword) {
+            //        Auth.auth().sendPasswordReset(withEmail: emailorPhoneNumber, completion: { error in
+            //            if let error = error {
+            //                print("Error sending password reset: \(error.localizedDescription)")
+            //                self.showToast = true
+            //                self.errorMessage = error.localizedDescription
+            //            } else {
+            //                print("Password reset email sent.")
+            //                onSucess()
+            //            }
+            //        })
+        }
     }
     
     func didTapSignUp(email: String, username: String, password: String,confirmPassword:String, onSuccess: @escaping () -> Void) {
@@ -38,7 +39,7 @@ class SignUpViewModal: ObservableObject {
             }
         })
     }
-
+    
     func checkEmailDomainExists(_ email: String) async -> Bool {
         guard let domain = email.split(separator: "@").last else {
             await MainActor.run {
@@ -70,6 +71,29 @@ class SignUpViewModal: ObservableObject {
                 self.showToast = true
             }
             return false
+        }
+    }
+    
+    func isValidPassword(_ password: String) -> Bool {
+        return !password.isEmpty
+    }
+    
+    func isValidEmailAndPassword(email: String, password: String, confirmPassword: String) -> Bool {
+        if email.isEmpty || !email.isValidEmail {
+            errorMessage = AppStrings.ValidationMessage.validateEmail.rawValue
+            self.showToast = true
+            return false
+        } else if password.isEmpty {
+            self.showToast = true
+            errorMessage = AppStrings.ValidationMessage.validatePassword.rawValue
+            return false
+        } else if password != confirmPassword {
+            errorMessage = AppStrings.ValidationMessage.validateConfirmPassword.rawValue
+            self.showToast = true
+            return false
+        } else {
+            self.showToast = false
+            return email.isValidEmail && isValidPassword(password)
         }
     }
 }
