@@ -12,6 +12,8 @@ import shared
 
 struct JoinRideModel: Identifiable {
     let id = UUID()
+    let userId: String
+    let rideId: String
     let title: String
     let organizer: String
     let description: String
@@ -79,18 +81,20 @@ extension JoinRideViewModel {
                 
                 // Fetch user name asynchronously
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
-                let acceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
+                let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
+                        userId:ride.createdBy ?? "",
+                        rideId: ride.ridesID ?? "",
                         title: ride.rideTitle ?? "",
                         organizer: userName?.0 ?? "",
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
                         date: dateString,
-                        ridersCount: "0",
-                        maxRiders: "\(acceptedCount)",
+                        ridersCount: "\(joinedCount)",
+                        maxRiders: "\(ride.participants.count)",
                         riderImage: "rider_avatar",
                         contactNumber: userName?.1 ?? ""
                     )
@@ -142,15 +146,18 @@ extension JoinRideViewModel {
         }
     }
 
-    
-    func updateRideJoinStatus(rideId: String, userID: String, joinCount: Int32) {
-        //        rideRepository.updateRides(rideID: rideId, userID: userID, joinCount: joinCount, completionHandler: { result, error in
-        //            if let error = error {
-        //                print("Failed to update ride status: \(error.localizedDescription)")
-        //            } else {
-        //                print("Rides updated.")
-        //            }
-        //        })
+    func getRideInvites(rideId:String, userId:String, inviteStatus:Int32) {
+        rideRepository.changeRideInviteStatus(
+            rideID: rideId,
+            currentUid: userId,
+            inviteStatus: inviteStatus
+        ) { result, error in
+            if let error = error {
+                print("Failed to update joined riders count: \(error.localizedDescription)")
+            } else {
+                print("Joined riders count updated successfully.")
+            }
+        }
     }
     
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()

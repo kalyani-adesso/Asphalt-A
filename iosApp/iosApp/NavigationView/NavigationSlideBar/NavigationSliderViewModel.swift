@@ -36,6 +36,7 @@ final class NavigationSliderViewModel: ObservableObject {
     private func loadData() {
         sections = [
             MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.black, title: AppStrings.NavigationSlider.connectedRide, destination: AnyView(ConnectedRideView(notificationTitle: AppStrings.ConnectedRide.rideCompleted, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model:JoinRideModel(
+                userId: "", rideId: "",
                 title: "Weekend Coast Ride",
                 organizer: "Sooraj",
                 description: "Join us for a beautiful sunrise ride along the coastal highway",
