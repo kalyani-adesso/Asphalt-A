@@ -44,7 +44,7 @@ final class NavigationSliderViewModel: ObservableObject {
                 date: "Sun, Oct 21",
                 ridersCount: "3",
                 maxRiders: "8",
-                riderImage: "rider_avatar"
+                riderImage: "rider_avatar", contactNumber: ""
             )))),
             MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.black, title: AppStrings.NavigationSlider.marketplace, destination: AnyView(UpcomingRideView())),
             MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.black, title: AppStrings.NavigationSlider.settings, destination: AnyView(CreateRideView())),

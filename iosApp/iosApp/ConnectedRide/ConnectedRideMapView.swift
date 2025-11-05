@@ -170,7 +170,7 @@ struct ConnectedRideMapView: View {
                     date: "Sun, Oct 21",
                     ridersCount: "3",
                     maxRiders: "8",
-                    riderImage: "rider_avatar"
+                    riderImage: "rider_avatar", contactNumber: ""
                 ))
             })
             .onAppear() {

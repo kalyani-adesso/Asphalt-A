@@ -52,7 +52,7 @@ struct JoinRideView: View {
                         date: "Sun, Oct 21",
                         ridersCount: "3",
                         maxRiders: "8",
-                        riderImage: "rider_avatar"
+                        riderImage: "rider_avatar", contactNumber: ""
                     ))
                 })
             }
@@ -161,7 +161,7 @@ struct JoinRideRow: View {
             
             HStack(spacing: 15) {
                 Button(action: {
-                    
+                    viewModel.callToRider(contactNumber: ride.contactNumber)
                 }) {
                     HStack {
                         AppIcon.NavigationSlider.call

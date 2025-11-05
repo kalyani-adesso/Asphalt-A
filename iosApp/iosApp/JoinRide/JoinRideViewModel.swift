@@ -21,6 +21,7 @@ struct JoinRideModel: Identifiable {
     let ridersCount: String
     let maxRiders: String
     let riderImage: String
+    let contactNumber: String
 }
 
 @MainActor
@@ -47,8 +48,12 @@ final class JoinRideViewModel: ObservableObject {
         userRepository = UserRepository(apiService: userAPIService)
     }
     
-    private func loadSampleRides() {
-        rides = []
+    func callToRider(contactNumber:String) {
+        if #available(iOS 10.0, *) {
+            UIApplication.shared.open(URL(string: "tel://\(contactNumber)")!)
+        } else {
+            print("App version older than iOS 10.0")
+        }
     }
 }
 
@@ -79,14 +84,15 @@ extension JoinRideViewModel {
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         title: ride.rideTitle ?? "",
-                        organizer: userName ?? "",
+                        organizer: userName?.0 ?? "",
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
                         date: dateString,
                         ridersCount: "0",
                         maxRiders: "\(acceptedCount)",
-                        riderImage: "rider_avatar"
+                        riderImage: "rider_avatar",
+                        contactNumber: userName?.1 ?? ""
                     )
                     joinRideModels.append(model)
                 }
@@ -119,19 +125,23 @@ extension JoinRideViewModel {
         }
     }
     
-    func getAllUsers(createdBy: String) async -> String? {
+    func getAllUsers(createdBy: String) async -> (String, String)? {
         await withCheckedContinuation { continuation in
             userRepository.getAllUsers { result, error in
                 if let success = result as? APIResultSuccess<AnyObject>,
                    let domainList = success.data as? [UserDomain],
                    let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
-                    continuation.resume(returning: matchedUser.name)
+
+                    let userName = matchedUser.name
+                    let contactNumber = matchedUser.phoneNumber
+                    continuation.resume(returning: (userName, contactNumber))
                 } else {
                     continuation.resume(returning: nil)
                 }
             }
         }
     }
+
     
     func updateRideJoinStatus(rideId: String, userID: String, joinCount: Int32) {
         //        rideRepository.updateRides(rideID: rideId, userID: userID, joinCount: joinCount, completionHandler: { result, error in
