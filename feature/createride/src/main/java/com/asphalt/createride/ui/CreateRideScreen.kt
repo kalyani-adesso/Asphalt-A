@@ -1,6 +1,6 @@
 package com.asphalt.createride.ui
 
-import TextFieldWithListInBottomSheet
+import PlacesBottomSheet
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,9 +58,8 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     clickDone: () -> Unit
 ) {
-    val places: PlacesServiceImpl = koinInject()
     val scope= rememberCoroutineScope()
-    //TextFieldWithListInBottomSheet(true)
+    PlacesBottomSheet(true)
    /* LaunchedEffect(Unit) {
         scope.launch {
             places.getAllPlaces("Kurichithanam")

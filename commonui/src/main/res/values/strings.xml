@@ -241,6 +241,7 @@
     <string name="share_location">Share Location</string>
     <string name="skip">Skip</string>
     <string name="submit_rating">Submit Rating</string>
+    <string name="search_location">Search your location</string>
 
 
 </resources>
