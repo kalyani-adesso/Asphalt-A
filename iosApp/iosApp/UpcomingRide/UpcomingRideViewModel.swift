@@ -41,6 +41,7 @@ struct RideModel: Identifiable,Hashable {
     let date: String
     let riderCount: Int
     let createdBy: String
+    var hasPhotos: Bool = false
 }
 
 
@@ -55,6 +56,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var isRideLoading = false
     @Published var userName: String = ""
     @Published var selectedTab: RideAction = .upcoming
+    @Published var hasPhotos: Bool = false
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private let userRepo: UserRepository

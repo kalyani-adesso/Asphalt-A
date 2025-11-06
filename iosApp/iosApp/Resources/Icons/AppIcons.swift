@@ -119,6 +119,7 @@ struct AppIcon {
         static let group = Image("icon-group")
         static let queueRide = Image("icon-queueRide")
         static let message = Image("icon-message")
+        static let imagePlaceholder = Image("icon-ImagePlaceholder")
     }
     
     struct JoinRide {
