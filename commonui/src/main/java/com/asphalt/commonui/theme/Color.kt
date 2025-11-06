@@ -79,3 +79,15 @@ val PaleMintyBlue30 = Color(0x4DEFF6FF)
 val PaleLavenderBlue30 = Color(0x4DEEF2FF)
 
 val LightGreen = Color(0xFFBFFDD9)
+
+val StarBackGround = Color(0xFFDCEFFF)
+
+val NeutralPink = Color(0xFFD20755)
+
+val NeutralBrown = Color(0xFF884B00)
+
+val DarkBrown = Color(0xFF9D0814)
+
+val LightYellow = Color(0xFFF7F3C1)
+
+val LightPink = Color(0xFFF7DBDE)

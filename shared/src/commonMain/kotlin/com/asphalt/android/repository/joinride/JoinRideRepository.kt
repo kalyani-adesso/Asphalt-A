@@ -10,7 +10,6 @@ class JoinRideRepository {
             destination = "Kochi-KanyaKumari", distance = "280km",
             dateTime = "Sun, Nov-9 - 9:00AM", riders = "3/8 Riders"
         ),
-
         JoinRideModel(
             rideType = "Solo Ride", byWhom = "by Sooraj",
             destination = "Kochi-KanyaKumari", distance = "280km",

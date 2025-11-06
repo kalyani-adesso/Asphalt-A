@@ -9,7 +9,6 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
-import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
@@ -20,7 +19,7 @@ import kotlinx.serialization.json.Json
 
 class KtorClient {
 
-    fun getClient(): HttpClient {
+    fun getClient(baseUrl: String = BASE_URL, passHeaders: Boolean = false): HttpClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(Json {
@@ -44,23 +43,20 @@ class KtorClient {
             install(DefaultRequest) {
                 url {
                     // api call
-                    host = BASE_URL
+                    host = baseUrl
                     protocol = URLProtocol.HTTPS
-                    headers {
-                        append(name = HttpHeaders.Authorization, value = "")
-                    }
+                    if (passHeaders)
+                        headers {
+                            append(
+                                name = HttpHeaders.UserAgent,
+                                value = "adessomotorbiker@gmail.com"
+                            )
+                        }
                     // json format
                     contentType(type = ContentType.Application.Json)
                 }
             }
         }
-    }
-
-
-    suspend fun Registration() {
-        getClient()
-            .get(urlString = "") // mention end point
-        //.body<>()
     }
 
 

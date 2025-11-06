@@ -19,7 +19,11 @@ struct CreateRideView: View {
                 case 2:
                     RouteView(viewModel: viewModel)
                 case 3:
-                    ParticipantsView(viewModel: viewModel)
+                    AnyView(
+                        viewModel.ride.type?.rawValue == "Solo Ride"
+                        ? AnyView(ReviewView(viewModel: viewModel))
+                        : AnyView(ParticipantsView(viewModel: viewModel))
+                    )
                 case 4:
                     ReviewView(viewModel: viewModel)
                 case 5:
@@ -31,9 +35,9 @@ struct CreateRideView: View {
             }
             .animation(.easeInOut, value: viewModel.currentStep)
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .navigationBar)
+                .navigationBarBackButtonHidden(true)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(.hidden, for: .navigationBar)
     }
 }
 

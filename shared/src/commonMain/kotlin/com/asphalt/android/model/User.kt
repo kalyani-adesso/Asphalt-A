@@ -22,6 +22,6 @@ data class UserDomain(
     val profilePic: String,
     val isMechanic:Boolean,
     val primaryBike: String,
-    var phoneNumber: String
+    val contactNumber:String,
 )
 

@@ -27,7 +27,7 @@ import com.asphalt.commonui.theme.TypographyBold
 fun AppLoader(
     logoRes: Int = R.drawable.ic_app_icon,
     title: String = "Loading",
-    description: String = "please wait while we process your requrest",
+    description: String = "please wait while we process your request",
     showProgress: Boolean = true
 )
 {

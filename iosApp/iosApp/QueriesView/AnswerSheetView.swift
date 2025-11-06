@@ -158,8 +158,13 @@ struct AnswerSheetView: View {
                                 .font(KlavikaFont.medium.font(size: 14))
                                 .foregroundColor(.white)
                             }
+                            .disabled(viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                             .frame(width: 132, height: 36)
-                            .background(AppColor.celticBlue)
+                            .background(
+                                   viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                   ? AppColor.celticBlue.opacity(0.4)
+                                   : AppColor.celticBlue               
+                               )
                             .cornerRadius(8)
                         }
                         .padding(.top, 10)

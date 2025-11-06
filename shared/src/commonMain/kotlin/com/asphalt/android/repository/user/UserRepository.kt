@@ -19,12 +19,12 @@ class UserRepository(private val apiService: UserAPIService) {
             val bikeDomain = profileDTO.bikes.toBikeListDomain().orEmpty().firstOrNull()
             UserDomain(
                 uid = id,
-                email = profileDTO.email ?: "",
-                name = profileDTO.userName ?: "",
+                email = profileDTO.email,
+                name = profileDTO.userName,
                 profilePic = profileDTO.profilePicUrl,
                 isMechanic = profileDTO.isMechanic,
-                primaryBike = bikeDomain?.let { it.make  + " " + it.model  } ?: "",
-                phoneNumber = profileDTO.phoneNumber
+                primaryBike = bikeDomain?.let { it.make  + " " + it.model  }.orEmpty(),
+                contactNumber = profileDTO.phoneNumber
             )
         }
     }

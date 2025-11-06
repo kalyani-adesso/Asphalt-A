@@ -96,7 +96,7 @@ fun DashBoardScreen(
         }
     }
     val helloUser = stringResource(R.string.hello_user)
-    LaunchedEffect(Unit) {
+    LaunchedEffect(Unit,locationStatus) {
 
         setTopAppBarState(
             AppBarState(

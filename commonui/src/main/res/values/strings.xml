@@ -231,7 +231,16 @@
     <string name="connected_ride">Connected Ride</string>
     <string name="duration">Duration</string>
     <string name="ride_difficulty">Ride Difficulty Level</string>
+    <string name="rate_ride">Rate Your Ride</string>
+    <string name="home">HOME</string>
     <string name="riders">Riders</string>
+    <string name="kms">KM</string>
+    <string name="live">Live</string>
+    <string name="timer">00:00:49</string>
+    <string name="sos">Emergency SOS</string>
+    <string name="share_location">Share Location</string>
+    <string name="skip">Skip</string>
+    <string name="submit_rating">Submit Rating</string>
 
 
 </resources>

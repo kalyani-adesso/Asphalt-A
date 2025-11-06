@@ -67,11 +67,7 @@ struct QueriesView: View {
                     // Scrollable content
                     ScrollView {
                         VStack(spacing: 20) {
-                            if viewModel.isLoading {
-                                ProgressView("Loading...")
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .padding(.top, 100)
-                            } else if viewModel.filteredQueries.isEmpty {
+                            if viewModel.filteredQueries.isEmpty {
                                 VStack(spacing: 12) {
                                     Image(systemName: "tray")
                                         .resizable()
@@ -98,24 +94,26 @@ struct QueriesView: View {
                     }
                 }
                 
+                
                 // Overlay popup
                 if showAskPopup {
                     QueryPopupView(isPresented: $showAskPopup, viewModel: viewModel)
                         .transition(.scale)
                         .zIndex(2)
                 }
+                if viewModel.isLoading {
+                    ProgressViewReusable(title: "Loading Queries...", color: AppColor.stoneGray)
+                }
                 if viewModel.isLiking {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                    ProgressView("Loading...")
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .padding(.top, 100)
-                        .foregroundColor(.white)
+                    ProgressViewReusable(title: "Loading Queries...")
                 }
             }
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
+            viewModel.fetchAllQueries()
+        }
+        .refreshable {
             viewModel.fetchAllQueries()
         }
         
