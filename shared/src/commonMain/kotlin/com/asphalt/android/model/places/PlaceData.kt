@@ -9,8 +9,8 @@ data class PlaceData(
     @SerialName("licence") val licence: String? = null,
     @SerialName("osm_type") val osmType: String? = null,
     @SerialName("osm_id") val osmId: Long? = null,
-    @SerialName("lat") val lat: String? = null,
-    @SerialName("lon") val lon: String? = null,
+    @SerialName("lat") val lat: Double? = null,
+    @SerialName("lon") val lon: Double? = null,
     @SerialName("class") val clazz: String? = null,  // 'class' is a reserved keyword
     @SerialName("type") val type: String? = null,
     @SerialName("place_rank") val placeRank: Int? = null,

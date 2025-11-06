@@ -18,6 +18,9 @@ class PlacesViewModel(val placesRepo: PlacesRepository) : ViewModel() {
     private val showLoader = mutableStateOf(false)
     val _showLoader: State<Boolean> = showLoader
 
+    fun clearList(){
+        placesMutableState.value = emptyList()
+    }
     fun getPlaces(location: String) {
         viewModelScope.launch {
             showLoader.value = true

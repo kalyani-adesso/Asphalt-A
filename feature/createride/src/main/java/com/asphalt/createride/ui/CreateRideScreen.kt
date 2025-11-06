@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.asphalt.android.network.places.PlacesServiceImpl
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -41,7 +39,6 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
-
 import com.asphalt.createride.ui.composables.DetailsSection
 import com.asphalt.createride.ui.composables.ParticipantSection
 import com.asphalt.createride.ui.composables.ReviewSection
@@ -50,7 +47,6 @@ import com.asphalt.createride.ui.composables.ShareSection
 import com.asphalt.createride.ui.composables.TabSelection
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @Composable
 fun CreateRideScreen(
@@ -58,13 +54,7 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     clickDone: () -> Unit
 ) {
-    val scope= rememberCoroutineScope()
-    PlacesBottomSheet(true)
-   /* LaunchedEffect(Unit) {
-        scope.launch {
-            places.getAllPlaces("Kurichithanam")
-        }
-    }*/
+    val scope = rememberCoroutineScope()
     viewModel.getUsers()
     val scrollState = rememberScrollState()
     setTopAppBarState(

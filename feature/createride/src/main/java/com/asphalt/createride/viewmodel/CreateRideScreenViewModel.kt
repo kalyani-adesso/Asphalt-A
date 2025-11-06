@@ -17,6 +17,7 @@ import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.util.LocationUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
@@ -169,6 +170,16 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(endLocation = loc)
     }
 
+    fun updateStartLocation(lat: Double, lon: Double) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(startLat = lat, startLon = lon)
+    }
+
+    fun updateEndLocation(lat: Double, lon: Double) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(endLat = lat, endLon = lon)
+    }
+
     fun updateTab(tab: Int) {
 
         _tabSelectMutableState.value += tab
@@ -221,7 +232,15 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             startLocation = _rideDetailsMutableState.value.startLocation,
             endLocation = _rideDetailsMutableState.value.endLocation,
             createdDate = cal.timeInMillis,
-            participants = map
+            participants = map,
+            startLatitude = _rideDetailsMutableState.value.startLat ?: 0.0,
+            startLongitude = _rideDetailsMutableState.value.startLon ?: 0.0,
+            endLatitude = _rideDetailsMutableState.value.endLat ?: 0.0,
+            endLongitude = _rideDetailsMutableState.value.endLon ?: 0.0,
+            distance = LocationUtils.getDistance(_rideDetailsMutableState.value.startLat ?: 0.0,
+                _rideDetailsMutableState.value.startLon ?: 0.0,
+                _rideDetailsMutableState.value.endLat ?: 0.0,
+                _rideDetailsMutableState.value.endLon ?: 0.0)
         )
 
         val apiResult = APIHelperUI.runWithLoader {

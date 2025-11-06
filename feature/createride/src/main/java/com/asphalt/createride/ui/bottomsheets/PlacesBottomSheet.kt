@@ -47,25 +47,36 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlacesBottomSheet(show: Boolean, placesVM: PlacesViewModel = koinViewModel()) {
+fun PlacesBottomSheet(
+    show: Boolean,
+    placesVM: PlacesViewModel = koinViewModel(),
+    latLon: (lat: Double, lon: Double, placeName: String) -> Unit,
+    onDismiss: () -> Unit
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(show) }
-    var text by remember { mutableStateOf("") }
 
 
     if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            sheetState = sheetState
+            onDismissRequest = {
+                showBottomSheet = false
+                onDismiss.invoke()
+                placesVM.clearList()
+            }, sheetState = sheetState
         ) {
             // Sheet content
-            BottomSheetLayout(placesVM)
+            BottomSheetLayout(placesVM, latLon)
         }
     }
 }
 
 @Composable
-fun BottomSheetLayout(placesVM: PlacesViewModel?) {
+fun BottomSheetLayout(
+    placesVM: PlacesViewModel?, latLon: (
+        lat: Double, lon: Double, placeName: String
+    ) -> Unit
+) {
     if (placesVM?._showLoader?.value ?: false) {
         BouncingCirclesLoader()
     }
@@ -75,9 +86,8 @@ fun BottomSheetLayout(placesVM: PlacesViewModel?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(Dimensions.padding16)
     ) {
-
 
         Row(
             modifier = Modifier
@@ -144,25 +154,27 @@ fun BottomSheetLayout(placesVM: PlacesViewModel?) {
         ) {
             items(placesVM?.placeData?.value ?: emptyList()) { item ->
                 Box(
-                    modifier = Modifier.padding(
-                    ),
+                    modifier = Modifier.clickable {
+                        latLon.invoke(item.lat ?: 0.0, item.lon ?: 0.0, item.name ?: "")
+                        placesVM?.clearList()
+                    },
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                color = NeutralWhite,
-                                shape = RoundedCornerShape(Dimensions.size10)
+                                color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
                             )
-                            .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding15),
+                            .padding(
+                                horizontal = Dimensions.padding16, vertical = Dimensions.padding15
+                            ),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
                         Row(modifier = Modifier.fillMaxWidth()) {
                             ColorIconRounded(
-                                backColor = GreenLIGHT,
-                                resId = R.drawable.ic_route_white
+                                backColor = GreenLIGHT, resId = R.drawable.ic_route_white
                             )
                             Spacer(modifier = Modifier.width(Dimensions.size8))
                             Column {
@@ -195,5 +207,5 @@ fun BottomSheetLayout(placesVM: PlacesViewModel?) {
 @Preview
 @Composable
 fun previewBorrom() {
-    BottomSheetLayout(null)
+    BottomSheetLayout(null, { lat, lon, name -> })
 }

@@ -11,5 +11,11 @@ data class CreateRideModel(
     var isAm: Boolean = false,
     var displayTime: String? = null,
     var startLocation: String? = null,
-    var endLocation: String? = null
+    var endLocation: String? = null,
+
+    var startLat: Double? = 0.0,
+    var startLon: Double? = 0.0,
+    var endLat: Double? = 0.0,
+    var endLon: Double? = 0.0
+
 )
