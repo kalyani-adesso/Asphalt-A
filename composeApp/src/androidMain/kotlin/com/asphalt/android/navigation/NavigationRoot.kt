@@ -113,7 +113,8 @@ fun NavigationRoot(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
-        AppNavKey.ProfileKey
+        AppNavKey.ProfileKey,
+        AppNavKey.RideDetails,
     )
     val showTopAppBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
