@@ -1,5 +1,6 @@
 package com.asphalt.profile.screens.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.commonui.CombinedCameraGalleryLauncher
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -71,9 +77,18 @@ fun EditProfile(
         val phoneNumberError = editProfileVM.phoneNumberError.collectAsStateWithLifecycle()
         val licenseError = editProfileVM.licenseError.collectAsStateWithLifecycle()
         val emergencyNoError = editProfileVM.emergencyNoError.collectAsStateWithLifecycle()
+        var imageUrl by remember { mutableStateOf(profileData.value?.profilePicUrl) }
+
         LaunchedEffect(profileData.value) {
+            imageUrl = profileData.value?.profilePicUrl
             editProfileVM.setCurrentProfile(profileData.value)
         }
+        var launchPicker: (() -> Unit)? by remember { mutableStateOf(null) }
+        CombinedCameraGalleryLauncher(onMediaPicked = {
+            imageUrl = it.toString()
+        }, trigger = { launch ->
+            launchPicker = launch
+        })
 
         Box(
             modifier = Modifier
@@ -129,7 +144,7 @@ fun EditProfile(
                             CircularNetworkImage(
                                 modifier = Modifier
                                     .align(Alignment.Center),
-                                imageUrl = profileData.value?.profilePicUrl ?: ""
+                                imageUrl = imageUrl.orEmpty()
                             )
                         }
                         ComposeUtils.ColorIconRounded(
@@ -142,11 +157,14 @@ fun EditProfile(
                                     Alignment.BottomEnd
                                 )
                                 .offset(Dimensions.spacing15, y = Dimensions.spacingNeg8)
-                                .clickable {
-
+                                .clickable(enabled = launchPicker != null) {
+                                    scope.launch {
+                                        launchPicker?.invoke()
+                                    }
                                 }
                         )
                     }
+
                     HeaderWithInputField(
                         stringResource(R.string.full_name),
                         fullName.value,
