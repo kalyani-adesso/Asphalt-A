@@ -1,5 +1,6 @@
 package com.asphalt.android.network
 
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.APIResult
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -13,7 +14,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.JsonConvertException
 
-abstract class BaseAPIService(private val client: KtorClient)  {
+abstract class BaseAPIService(private val client: KtorClient) {
 
     protected suspend fun <T> safeApiCall(apiCall: suspend () -> T): APIResult<T> {
         return try {
@@ -62,6 +63,10 @@ abstract class BaseAPIService(private val client: KtorClient)  {
         return client.getClient().patch(buildUrl(url)) {
             setBody(body)
         }
+    }
+
+    protected suspend fun getPlaces(url: String): HttpResponse {
+        return client.getClient(APIConstants.BASE_URL_PlACES, true).get(url)
     }
 
     protected fun buildUrl(url: String): String {
