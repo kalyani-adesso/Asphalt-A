@@ -147,7 +147,8 @@ struct UpcomingRideView: View {
                 withAnimation { activePopup = .previewSelected }
             }
         }) {
-            PhotoPicker(images: $selectedImages)
+            //TODO: Check photo picker file is missing.
+//            PhotoPicker(images: $selectedImages)
         }
         .zIndex(showpopup ? 2 : 0)
         .task{
