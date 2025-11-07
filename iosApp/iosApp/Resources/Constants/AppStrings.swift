@@ -349,6 +349,9 @@ public struct AppStrings{
         static let searcRide = "Search rides by location, theme..."
         static let joinRide = "Join Ride"
         static let callRider = "Call Rider"
+        static let joinaRideTitle = "Join a Ride"
+        static let reJoinRideTitle = "ReJoin Ride"
+        static let rideActive = "Ride Started! Navigation active."
     }
     
     enum ConnectedRide {

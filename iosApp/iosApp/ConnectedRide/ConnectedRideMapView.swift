@@ -7,31 +7,30 @@
 
 import SwiftUI
 import MapKit
+import Combine
 
+@available(iOS 17.0, *)
 struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
+    @StateObject var locationManager = LocationManager()
     @State private var rideComplted: Bool = false
     @State private var startTrack: Bool = false
     @State private var showToast: Bool = true
     @State var showJoinRideView:Bool = false
-    
-    let rideStops: [RideStop] = [
-           RideStop(name: "Kochi Center", coordinate: CLLocationCoordinate2D(latitude: 9.9312, longitude: 76.2673)),
-           RideStop(name: "Vyttila", coordinate: CLLocationCoordinate2D(latitude: 9.9622, longitude: 76.3185)),
-           RideStop(name: "Edappally", coordinate: CLLocationCoordinate2D(latitude: 10.0280, longitude: 76.3080)),
-           RideStop(name: "Kakkanad", coordinate: CLLocationCoordinate2D(latitude: 10.0158, longitude: 76.3419)),
-           RideStop(name: "Aluva", coordinate: CLLocationCoordinate2D(latitude: 10.1081, longitude: 76.3516))
-       ]
+    @State var showMapViewFullScreen:Bool = false
+    @State private var position: MapCameraPosition = .automatic
+    @State private var elapsedSeconds = 0
+    @State var timer:Timer?
+    var rideModel: JoinRideModel
     
     var body: some View {
         List {
             Section {
                 VStack {
                     ZStack(alignment: .topLeading) {
-                        PolylineMapView(coordinates: rideStops.map { $0.coordinate })
-                                        .frame(height: 534)
-                                        .cornerRadius(12)
-                                        .ignoresSafeArea(edges: .top)
+                        BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel)
+                            .cornerRadius(12)
+                            .ignoresSafeArea(edges: .top)
                         VStack {
                             ZStack {
                                 HStack {
@@ -49,7 +48,7 @@ struct ConnectedRideMapView: View {
                             }
                         }
                     }
-                    .frame( height: 534)
+                    .frame(height: showMapViewFullScreen ? 760 : 534)
                     Spacer()
                 }
             }
@@ -61,9 +60,9 @@ struct ConnectedRideMapView: View {
             Section {
                 VStack(spacing: 18) {
                     ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-                    ForEach(viewModel.activeRider, id: \.id) { rider in
-                        ActiveRiderView( title: rider.name, speed: "\(rider.speed) km", startTrack: $startTrack)
-                    }
+                    
+                    ActiveRiderView( title: MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", startTrack: $startTrack)
+                    
                     Button(action: {
                         self.rideComplted = true
                     }, label: {
@@ -171,7 +170,11 @@ struct ConnectedRideMapView: View {
                     date: "Sun, Oct 21",
                     ridersCount: "3",
                     maxRiders: "8",
-                    riderImage: "rider_avatar", contactNumber: ""
+                    riderImage: "rider_avatar", contactNumber: "",
+                    startLat: 0.0,
+                    startLong: 0.0,
+                    endLat: 0.0,
+                    endLong: 0.0, rideJoined: false
                 ))
             })
             .onAppear() {
@@ -179,20 +182,31 @@ struct ConnectedRideMapView: View {
                     showToast = false
                 }
             }
+            .onChange(of: startTrack) { isTracking in
+                if !isTracking{
+                    stopTimer()
+                } else {
+                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                        self.elapsedSeconds += 1
+                    }
+                }
+                
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     HStack() {
                         Button {
                             print("Menu tapped")
                         } label: {
-                            HStack(spacing: 10) {
+                            HStack(alignment:.center, spacing: 6) {
                                 Rectangle()
-                                    .fill(AppColor.spanishGreen)
+                                    .fill(startTrack ? .spanishGreen : .grayishBlue)
                                     .frame(width: 9, height: 9)
                                 
-                                Text("LIVE")
+                                Text(startTrack ? TrackingStatus.Live.rawValue.uppercased() : TrackingStatus.Paused.rawValue.uppercased())
                                     .font(KlavikaFont.regular.font(size: 12))
-                                    .foregroundStyle(.spanishGreen)
+                                    .foregroundStyle(startTrack ? .spanishGreen : .grayishBlue)
+                                    .frame(height: 9)
                             }
                             .frame(width: 69, height: 30)
                             .background(
@@ -201,7 +215,7 @@ struct ConnectedRideMapView: View {
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(AppColor.spanishGreen, lineWidth: 1)
+                                    .stroke(startTrack ? .spanishGreen : .grayishBlue, lineWidth: 1)
                             )
                         }
                         Button {
@@ -211,7 +225,7 @@ struct ConnectedRideMapView: View {
                                 AppIcon.ConnectedRide.rideDuration
                                     .resizable()
                                     .frame(width:12,height: 12)
-                                Text("00:00:49")
+                                Text(formatTime(elapsedSeconds))
                                     .font(KlavikaFont.regular.font(size: 12))
                                     .foregroundStyle(AppColor.celticBlue)
                             }
@@ -240,10 +254,9 @@ struct ConnectedRideMapView: View {
                                 .font(KlavikaFont.bold.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             
-                            Text(AppStrings.ConnectedRide.rideNameWeekendCoast)
+                            Text(rideModel.title)
                                 .font(KlavikaFont.regular.font(size: 12))
                                 .foregroundColor(AppColor.black)
-                            
                         }
                     }
                 }
@@ -253,36 +266,50 @@ struct ConnectedRideMapView: View {
             })
     }
     
+    func formatTime(_ totalSeconds: Int) -> String {
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+        func stopTimer() {
+            self.timer?.invalidate()
+            self.timer = nil
+        }
+    
     @ViewBuilder func mapActionButton() -> some View {
         Button(action: {
-            
+            showMapViewFullScreen.toggle()
         }) {
             AppIcon.ConnectedRide.zoom
                 .resizable()
                 .frame(width: 50, height: 50)
                 .padding([.top, .leading],15)
         }
-        Spacer()
-        Button(action: {
-            
-        }) {
-            HStack(alignment: .center) {
-                Text(AppStrings.ConnectedRide.standard)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundStyle(AppColor.stoneGray)
-            }
-            .frame(width: 69, height: 24)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.white)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(AppColor.darkGray, lineWidth: 2)
-            )
-        }
         .buttonStyle(.plain)
-        .padding([.top,.trailing])
+        Spacer()
+        Picker("", selection: $viewModel.selectedType) {
+            ForEach(MapType.allCases, id: \.self) { type in
+                HStack(alignment: .center) {
+                    Text(type.rawValue)
+                        .font(KlavikaFont.regular.font(size: 12))
+                        .foregroundStyle(AppColor.stoneGray)
+                }
+            }
+        }
+        .pickerStyle(.automatic)
+        .frame(width: 96, height: 24)
+        .padding([.trailing,.bottom])
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.white)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(AppColor.darkGray, lineWidth: 2)
+        )
+        .padding(.trailing)
     }
     
     @ViewBuilder func showToast(title:String) -> some View {
@@ -310,7 +337,7 @@ struct ConnectedRideMapView: View {
     
     @ViewBuilder func distanceAndETA() -> some View {
         VStack(alignment: .center) {
-            Text("25")
+            Text("\(Int(locationManager.speedInKph ?? 0.0))")
                 .font(KlavikaFont.bold.font(size: 20))
                 .foregroundStyle(AppColor.black)
             Text("kph")
@@ -328,14 +355,32 @@ struct ConnectedRideMapView: View {
     @ViewBuilder func floatingButton() -> some View {
         HStack(spacing: 10) {
             ButtonView(title: "", icon: AppIcon.ConnectedRide.refresh ,onTap: {
-                
+                recenterMap()
             })
             ButtonView(title: "", icon: AppIcon.ConnectedRide.nearMe,onTap: {
-                
+                updateCameraFollow()
             })
         }
         .frame(width: 198)
         .padding(.trailing)
+    }
+    
+    func recenterMap() {
+        if let userLocation = locationManager.manager.location?.coordinate {
+            withAnimation {
+                position = .region(MKCoordinateRegion(
+                    center: userLocation,
+                    span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                ))
+            }
+        }
+    }
+    
+    func updateCameraFollow() {
+        guard let userLocation = locationManager.lastLocation?.coordinate else { return }
+        withAnimation(.easeInOut(duration: 0.4)) {
+            position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
+        }
     }
 }
 
@@ -432,13 +477,13 @@ struct ActiveRiderView: View {
             Button(action: {
                 startTrack.toggle()
             }) {
-                Text(!startTrack ? AppStrings.ConnectedRide.stopTrackingButton.uppercased() : AppStrings.ConnectedRide.startTrackingButton.uppercased())
+                Text(startTrack ? AppStrings.ConnectedRide.stopTrackingButton.uppercased() : AppStrings.ConnectedRide.startTrackingButton.uppercased())
                     .font(KlavikaFont.bold.font(size: 12))
                     .foregroundColor(AppColor.white)
                     .frame(width: 120, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(startTrack ? AppColor.green : AppColor.red)
+                            .fill(!startTrack ? AppColor.green : AppColor.red)
                     )
             }
             .padding(.trailing, 16)
@@ -560,11 +605,5 @@ struct CustomCornerRadius: ViewModifier {
                 .clipShape(Circle())
                 .overlay(Circle().stroke(AppColor.aeroGreen, lineWidth: 1.5))
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ConnectedRideMapView()
     }
 }

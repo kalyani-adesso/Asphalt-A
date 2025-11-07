@@ -25,6 +25,11 @@ enum RiderStatus: String {
     case stopped = "Stopped"
 }
 
+enum TrackingStatus:String {
+    case Live
+    case Paused
+}
+
 struct Rider: Identifiable {
     let id = UUID()
     let name: String
@@ -40,8 +45,11 @@ struct RideStop: Identifiable {
     let coordinate: CLLocationCoordinate2D
 }
 
-
-import Foundation
+enum MapType: String, CaseIterable, Hashable {
+    case standard
+    case hybrid
+    case imagery
+}
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
@@ -52,6 +60,17 @@ final class ConnectedRideViewModel: ObservableObject {
     init () {
         loadData()
     }
+    
+    @Published var selectedType: MapType = .standard
+    
+    @available(iOS 17.0, *)
+    var currentMapStyle: MapStyle {
+           switch selectedType {
+           case .standard: return .standard
+           case .hybrid: return .hybrid
+           case .imagery: return .imagery
+           }
+       }
     
     func loadData() {
         rideCompleteModel =   [
