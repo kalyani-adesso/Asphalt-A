@@ -37,10 +37,10 @@ import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
-import com.asphalt.commonui.theme.GrayLight10
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.LightBlue
 import com.asphalt.commonui.theme.LightGreen30
+import com.asphalt.commonui.theme.LightGreen40
 import com.asphalt.commonui.theme.LightOrange
 import com.asphalt.commonui.theme.MagentaDeep
 import com.asphalt.commonui.theme.NeutralBlack
@@ -86,13 +86,37 @@ fun RidesDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
                 UsersList()
                 Spacer(Modifier.height(Dimensions.size50))
             }
+
             GradientButton(
                 onClick = {},
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) { }
+                startColor = LightGreen40,
+                endColor = LightGreen40,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_navigate),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size10))
+                    Text(
+                        "Start Ride".uppercase(),
+                        color = NeutralWhite,
+                        fontSize = Dimensions.textSize18,
+                        style = TypographyBold.labelLarge,
+                    )
+                }
+            }
         }
-
     }
+
+
 }
 
 @Composable
@@ -105,7 +129,7 @@ fun UsersList() {
             )
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
-        for(i in 1 .. 100){
+        for (i in 1..4) {
             UserRow()
             Spacer(modifier = Modifier.height(Dimensions.padding16))
         }
@@ -114,7 +138,7 @@ fun UsersList() {
 }
 
 @Composable
-fun UserRow(){
+fun UserRow() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
