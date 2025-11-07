@@ -137,7 +137,7 @@ extension JoinRideViewModel {
                    let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
 
                     let userName = matchedUser.name
-                    let contactNumber = matchedUser.phoneNumber
+                    let contactNumber = matchedUser.contactNumber
                     continuation.resume(returning: (userName, contactNumber))
                 } else {
                     continuation.resume(returning: nil)
