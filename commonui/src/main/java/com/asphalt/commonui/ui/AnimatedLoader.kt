@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,8 +35,8 @@ fun BouncingCirclesLoader(
     animationDuration: Int = 300,
     animationDelay: Int = 150
 ) {
-    val baseSizes = remember { listOf(16.dp, 18.dp, 22.dp) }
-    val bounceHeight = 6.dp
+    val baseSizes = remember { listOf(Dimensions.size10, Dimensions.size14, Dimensions.size22) }
+    val bounceHeight = Dimensions.size4
     val yOffsets = remember { mutableStateOf(baseSizes.map { 0f }) }
     val density = LocalDensity.current
 
@@ -88,7 +89,7 @@ fun BouncingCirclesLoader(
                         .background(color = circleColor, shape = CircleShape)
                 )
                 if (index < baseSizes.size - 1) {
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(Dimensions.size10))
                 }
             }
         }

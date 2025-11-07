@@ -11,6 +11,7 @@ struct BottomNavBar: View {
     @State private var selectedTab = 0
     @Namespace private var animation
     @StateObject private var homeViewModel = HomeViewModel()
+    @StateObject private var upcomingRideViewModel = UpcomingRideViewModel()
     
     var body: some View {
         NavigationStack {
@@ -20,8 +21,11 @@ struct BottomNavBar: View {
                     case 0:
                         HomeView()
                             .environmentObject(homeViewModel)
+                            .environmentObject(upcomingRideViewModel)
                     case 1:
                         UpcomingRideView(onBackToHome: { selectedTab = 0 })
+                            .environmentObject(upcomingRideViewModel)
+                            .environmentObject(homeViewModel)
                     case 2:
                         QueriesView(onBackToHome: { selectedTab = 0 })
                     case 3:
@@ -29,6 +33,7 @@ struct BottomNavBar: View {
                     default:
                         HomeView()
                             .environmentObject(homeViewModel)
+                            .environmentObject(upcomingRideViewModel)
                     }
                 }
                 .frame(maxHeight: .infinity)

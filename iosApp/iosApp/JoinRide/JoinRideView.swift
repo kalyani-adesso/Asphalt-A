@@ -44,7 +44,7 @@ struct JoinRideView: View {
                 }
                 .navigationDestination(isPresented: $showConnectedRides, destination: {
                     ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
-                        title: "Weekend Coast Ride",
+                        userId: "", rideId: "", title: "Weekend Coast Ride",
                         organizer: "Sooraj",
                         description: "Join us for a beautiful sunrise ride along the coastal highway",
                         route: "Kochi - Kanyakumari",
@@ -52,7 +52,7 @@ struct JoinRideView: View {
                         date: "Sun, Oct 21",
                         ridersCount: "3",
                         maxRiders: "8",
-                        riderImage: "rider_avatar"
+                        riderImage: "rider_avatar", contactNumber: ""
                     ))
                 })
             }
@@ -161,7 +161,7 @@ struct JoinRideRow: View {
             
             HStack(spacing: 15) {
                 Button(action: {
-                    
+                    viewModel.callToRider(contactNumber: ride.contactNumber)
                 }) {
                     HStack {
                         AppIcon.NavigationSlider.call
@@ -185,6 +185,7 @@ struct JoinRideRow: View {
                 .buttonStyle(.plain)
                 ButtonView(title: AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation,onTap: {
                     showConnectedRides = true
+                    viewModel.getRideInvites(rideId: ride.rideId, userId: ride.userId, inviteStatus: 3)
                 })
                 .frame(maxWidth: .infinity)
                 .padding(.bottom,20)

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
  data class UserInvites(
 
     @SerialName("acceptInvite")
-    var acceptInvite: Int = APIConstants.RIDE_INVITED // 0 - invite sent,1- invite accept, 2- invite declined
+    var acceptInvite: Int = APIConstants.RIDE_INVITED // 0 - invite sent,1- invite accept, 2- invite declined, 3 - participant joined.
 )
 
 data class RideInvitesDomain(

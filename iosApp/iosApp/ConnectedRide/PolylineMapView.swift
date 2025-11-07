@@ -52,7 +52,7 @@ struct PolylineMapView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
-        let coordinates: [CLLocationCoordinate2D]  // store a reference to parent’s coordinates
+        let coordinates: [CLLocationCoordinate2D]
 
         init(coordinates: [CLLocationCoordinate2D]) {
             self.coordinates = coordinates
