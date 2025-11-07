@@ -35,7 +35,7 @@ struct UpcomingRidesView: View {
         }
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
-            UpcomingRideView()
+            UpcomingRideView(startingTab: .invities)
                 .environmentObject(viewModel)
                        .environmentObject(home)
         })
