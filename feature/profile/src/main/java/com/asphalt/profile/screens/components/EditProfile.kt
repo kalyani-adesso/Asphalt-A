@@ -1,6 +1,5 @@
 package com.asphalt.profile.screens.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -84,8 +83,10 @@ fun EditProfile(
             editProfileVM.setCurrentProfile(profileData.value)
         }
         var launchPicker: (() -> Unit)? by remember { mutableStateOf(null) }
-        CombinedCameraGalleryLauncher(onMediaPicked = {
-            imageUrl = it.toString()
+        CombinedCameraGalleryLauncher(onMediaPicked = { url ->
+            url?.let {
+                imageUrl = it.toString()
+            }
         }, trigger = { launch ->
             launchPicker = launch
         })
