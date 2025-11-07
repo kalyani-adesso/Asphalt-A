@@ -66,7 +66,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         CustomTimePickerDialog(onDismiss = {
             viewModel.showTimePicker(false)
         }, onTimeSelected = { hr, min, isAm ->
-            var time_text = "$hr : $min ${
+            var time_text = "$hr:${String.format("%02d", min)} ${
                 if (isAm) {
                     am
                 } else {

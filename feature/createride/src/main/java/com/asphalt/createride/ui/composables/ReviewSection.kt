@@ -150,12 +150,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = (viewModel.rideDetailsState.value.dateString ?: "") +"-"+
-                            viewModel.rideDetailsState.value.hour + ":" +
-                            viewModel.rideDetailsState.value.mins + " " + "${
-                                if (viewModel.rideDetailsState.value.isAm) stringResource(R.string.am)
-                                else stringResource(R.string.pm)
-                            }",
+                            text = (viewModel.rideDetailsState.value.dateString ?: "") +" - "+
+                            viewModel.rideDetailsState.value.displayTime ,
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )

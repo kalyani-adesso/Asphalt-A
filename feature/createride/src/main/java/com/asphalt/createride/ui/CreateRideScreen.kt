@@ -1,7 +1,7 @@
 package com.asphalt.createride.ui
 
+import PlacesBottomSheet
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +38,6 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.createride.ui.composables.DetailsSection
 import com.asphalt.createride.ui.composables.ParticipantSection
@@ -55,6 +54,7 @@ fun CreateRideScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     clickDone: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     viewModel.getUsers()
     val scrollState = rememberScrollState()
     setTopAppBarState(
@@ -163,9 +163,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 BorderedButton(
                     modifier = Modifier.weight(1f), onClick = {
                         if (viewModel.tabSelectState.value > 1) {
-                            if(viewModel.tabSelectState.value == Constants.TAB_REVIEW
-                                && !viewModel.show_participant_Tab.value)
-                            viewModel.updateTab(-2)
+                            if (viewModel.tabSelectState.value == Constants.TAB_REVIEW
+                                && !viewModel.show_participant_Tab.value
+                            )
+                                viewModel.updateTab(-2)
                             else
                                 viewModel.updateTab(-1)
                         }
@@ -189,10 +190,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
-                                if (viewModel.routeFieldValidation()){
-                                    if(viewModel.show_participant_Tab.value){
+                                if (viewModel.routeFieldValidation()) {
+                                    if (viewModel.show_participant_Tab.value) {
                                         viewModel.updateTab(1)
-                                    }else{
+                                    } else {
                                         viewModel.updateTab(2)
                                     }
 
