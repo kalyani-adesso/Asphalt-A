@@ -91,3 +91,6 @@ val DarkBrown = Color(0xFF9D0814)
 val LightYellow = Color(0xFFF7F3C1)
 
 val LightPink = Color(0xFFF7DBDE)
+val LightGreen30 = Color(0xFF00A63E)
+val LightOrange = Color(0xFFE17100)
+val RedLight = Color(0xFFEE4445)

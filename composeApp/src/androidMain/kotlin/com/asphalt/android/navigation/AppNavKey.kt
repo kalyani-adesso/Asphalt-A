@@ -47,6 +47,9 @@ sealed interface AppNavKey : NavKey {
     object RatingRideNavKEy : AppNavKey
     @Serializable
     object EndRideLoaderNavKey : AppNavKey
+
+    @Serializable
+    object RideDetails : AppNavKey
 }
 data class BottomNavItems(
     val key: AppNavKey,

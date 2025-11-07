@@ -1,7 +1,5 @@
 package com.asphalt.android.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -44,24 +42,18 @@ import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralGrey80
-import com.asphalt.commonui.theme.NeutralLightGray25
-import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.NeutralWhite40
-import com.asphalt.commonui.theme.PaleMintyBlue30
-import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BouncingCirclesLoader
-import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
+import com.asphalt.dashboard.composables.screens.RidesDetailsScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.joinaride.ConnectedRideEnd
 import com.asphalt.joinaride.ConnectedRideMap
 import com.asphalt.joinaride.EndRidersScreenLoader
-import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.joinaride.JoinRideScreen
 import com.asphalt.joinaride.RideProgress
+import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.profile.screens.ProfileScreen
@@ -134,7 +126,8 @@ fun NavigationRoot(
         AppNavKey.ConnectedRideNavKey,
         AppNavKey.ConnectedRideMapNavKey,
         AppNavKey.ConnectedRideEndNavKey,
-        AppNavKey.EndRideLoaderNavKey
+        AppNavKey.EndRideLoaderNavKey,
+        AppNavKey.RideDetails,
     )
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -235,7 +228,7 @@ fun NavigationRoot(
             }
 
             if (showBanner)
-                Popup(offset = IntOffset(0,bannerPixelYOffset)) {
+                Popup(offset = IntOffset(0, bannerPixelYOffset)) {
                     StatusBanner(message = bannerMsg, type = bannerType, showBanner = showBanner) {
                         showBanner = false
                     }
@@ -269,7 +262,8 @@ fun NavigationRoot(
                         NavigationSplashScreen(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
-                                backStack.add(AppNavKey.LoginScreenNavKey)
+                               // backStack.add(AppNavKey.LoginScreenNavKey)
+                                backStack.add(AppNavKey.RideDetails)
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -337,7 +331,7 @@ fun NavigationRoot(
                         )
                     }
                     entry<AppNavKey.RidesScreenNav> { key ->
-                        RidesScreen(setTopAppBarState=setTopAppBarState)
+                        RidesScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry<AppNavKey.QueriesKey> { key ->
                         QueriesScreen(setTopAppBarState = setTopAppBarState)
@@ -397,7 +391,7 @@ fun NavigationRoot(
                     }
                     entry(AppNavKey.RideProgressNavKey) { key ->
                         RideProgress(
-                            onClickEndRide =  {
+                            onClickEndRide = {
                                 backStack.remove(AppNavKey.RideProgressNavKey)
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
                             },
@@ -434,11 +428,18 @@ fun NavigationRoot(
                             }
                         )
                     }
+
+                    entry(AppNavKey.RideDetails) { key ->
+                        RidesDetailsScreen(
+                            setTopAppBarState = setTopAppBarState,
+                        )
+                    }
                 }
+
             )
-            if (showLoader){
+            if (showLoader) {
 //                Box(modifier = Modifier.background(NeutralWhite40).padding(paddingValues).fillMaxSize()){
-                    BouncingCirclesLoader()
+                BouncingCirclesLoader()
 //                }
             }
         }
