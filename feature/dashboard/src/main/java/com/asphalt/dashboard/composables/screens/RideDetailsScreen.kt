@@ -255,7 +255,9 @@ fun UserRow(user: RidersList) {
                                 }
                             } else {
                                 Image(
-                                    painter = if (user.inviteStatus == APIConstants.RIDE_ACCEPTED)
+                                    painter = if (user.inviteStatus ==
+                                        APIConstants.RIDE_ACCEPTED||
+                                        user.inviteStatus == APIConstants.RIDE_JOINED)
                                         painterResource(R.drawable.ic_tick_accept)
                                     else if (user.inviteStatus == APIConstants.RIDE_INVITED)
                                         painterResource(R.drawable.ic_pending)
@@ -281,7 +283,10 @@ fun UserRow(user: RidersList) {
 fun CountSection(viewModel: RidesDetailsViewModel) {
     val participants = viewModel.ridesData.value?.participants ?: emptyList()
 
-    val acceptedCount = participants.count { it.inviteStatus == APIConstants.RIDE_ACCEPTED }
+    val acceptedCount = participants.count {
+        it.inviteStatus == APIConstants.RIDE_ACCEPTED ||
+                it.inviteStatus == APIConstants.RIDE_JOINED
+    }
     val pendingCount = participants.count { it.inviteStatus == APIConstants.RIDE_INVITED }
     val declinedCount = participants.count { it.inviteStatus == APIConstants.RIDE_DECLINED }
     Row(

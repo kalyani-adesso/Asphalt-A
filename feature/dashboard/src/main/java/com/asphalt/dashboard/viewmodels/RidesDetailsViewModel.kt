@@ -58,7 +58,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
                         displayStatusString =
                             when (participant.inviteStatus) {
                                 APIConstants.RIDE_INVITED -> R.string.waiting_response
-                                APIConstants.RIDE_ACCEPTED -> R.string.confirmed
+                                APIConstants.RIDE_ACCEPTED, APIConstants.RIDE_JOINED -> R.string.confirmed
                                 APIConstants.RIDE_DECLINED -> R.string.decline
                                 else -> R.string.empty_string
 
