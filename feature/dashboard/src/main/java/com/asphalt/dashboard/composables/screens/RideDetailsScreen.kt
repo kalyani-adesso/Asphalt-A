@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants
+import com.asphalt.android.model.RidersList
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -69,6 +70,7 @@ fun RidesDetailsScreen(
     viewModel: RidesDetailsViewModel = koinViewModel()
 ) {
     //val ridesData by viewModel.ridesData
+    //viewModel.getUserList()
     LaunchedEffect(Unit) {
         if (rideId != null)
             viewModel.getSingleRide(rideId)
@@ -134,7 +136,7 @@ fun RidesDetailsScreen(
 }
 
 @Composable
-fun UsersList(viewModel1: RidesDetailsViewModel) {
+fun UsersList(viewModel: RidesDetailsViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,16 +145,16 @@ fun UsersList(viewModel1: RidesDetailsViewModel) {
             )
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
-        for (i in 1..4) {
-            UserRow()
+        val userList = viewModel.ridersList.value
+        userList.forEach { user ->
+            UserRow(user)
             Spacer(modifier = Modifier.height(Dimensions.padding16))
         }
-
     }
 }
 
 @Composable
-fun UserRow() {
+fun UserRow(user: RidersList) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,7 +189,7 @@ fun UserRow() {
                                 shape = CircleShape
                             ),
                             size = Dimensions.padding40,
-                            imageUrl = "" ?: ""
+                            imageUrl = user.profilePic ?: ""
                         )
                         Image(
                             painter = painterResource(R.drawable.ic_online_icon),
@@ -206,7 +208,7 @@ fun UserRow() {
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Name",
+                                text = user.name,
                                 style = TypographyBold.bodySmall,
                                 color = NeutralBlack,
                                 maxLines = 1,
@@ -215,7 +217,7 @@ fun UserRow() {
                             Spacer(Modifier.height(Dimensions.size10))
 
                             Text(
-                                text = "Ride Creator",
+                                text = stringResource(user.displayStatusString),
                                 style = Typography.bodySmall,
                                 color = NeutralDarkGrey,
                                 maxLines = 1,
@@ -226,37 +228,54 @@ fun UserRow() {
                             modifier = Modifier.fillMaxHeight(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .background(
-                                        color = LightBlue,
-                                        shape = RoundedCornerShape(Dimensions.size5)
-                                    )
-                                    .padding(
-                                        vertical = Dimensions.size5,
-                                        horizontal = Dimensions.size10,
+                            if (user.isOrganizer) {
+                                Row(
+                                    modifier = Modifier
+                                        .background(
+                                            color = LightBlue,
+                                            shape = RoundedCornerShape(Dimensions.size5)
+                                        )
+                                        .padding(
+                                            vertical = Dimensions.size5,
+                                            horizontal = Dimensions.size10,
 //                                            top = Dimensions.size5,
 //                                             bottom =  Dimensions.size2pt5
-                                    ),
-                                verticalAlignment = Alignment.CenterVertically,
+                                        ),
+                                    verticalAlignment = Alignment.CenterVertically,
 
 
-                                ) {
+                                    ) {
 
-                                Text(
-                                    text = "Organizer",
-                                    style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
-                                    color = PrimaryDarkerLightB75,
+                                    Text(
+                                        text = stringResource(R.string.organizer),
+                                        style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
+                                        color = PrimaryDarkerLightB75,
+                                        modifier = Modifier
+                                    )
+                                }
+                            } else {
+                                Image(
+                                    painter = if (user.inviteStatus == APIConstants.RIDE_ACCEPTED)
+                                        painterResource(R.drawable.ic_tick_accept)
+                                    else if (user.inviteStatus == APIConstants.RIDE_INVITED)
+                                        painterResource(R.drawable.ic_pending)
+                                    else
+                                        painterResource(R.drawable.ic_declined),
+                                    contentDescription = "Online Status",
                                     modifier = Modifier
+                                        .size(Dimensions.size25)
+
                                 )
                             }
                         }
+
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun CountSection(viewModel: RidesDetailsViewModel) {
