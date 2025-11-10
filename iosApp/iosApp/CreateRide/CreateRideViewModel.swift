@@ -19,7 +19,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var selectedDate: Date? = nil
     @Published var isRideLoading = false
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
-
+    
     @Published var query = "" {
         didSet {
             completer.queryFragment = query
@@ -28,7 +28,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
     
     private var completer: MKLocalSearchCompleter
-
+    
     var isSelectingStart = true
     
     @Published  var participants: [Participant] = []
@@ -64,7 +64,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     func isSelected(_ id: String) -> Bool {
         selectedParticipants.contains(where: { $0.id == id })
     }
-
+    
     func toggle(_ id: String) {
         if let index = selectedParticipants.firstIndex(where: { $0.id == id }) {
             selectedParticipants.remove(at: index)
@@ -114,21 +114,21 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Error: \(error.localizedDescription)")
     }
-
+    
     func getDistance() {
         if let startLat = self.ride.startLat,
            let startLng = self.ride.startLng,
            let endLat = self.ride.endLat,
            let endLng = self.ride.endLng {
-
+            
             let startPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: startLat, longitude: startLng))
             let endPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: endLat, longitude: endLng))
-
+            
             let request = MKDirections.Request()
             request.source = MKMapItem(placemark: startPlacemark)
             request.destination = MKMapItem(placemark: endPlacemark)
             request.transportType = .automobile
-
+            
             let directions = MKDirections(request: request)
             directions.calculate { response, error in
                 if let route = response?.routes.first {
@@ -197,6 +197,7 @@ extension CreateRideViewModel {
                let data = success.data as? GenericResponse {
                 Task { @MainActor in
                     self.isRideLoading = false
+                    self.nextStep()
                     print("ride id:\(data.name)")
                     MBUserDefaults.rideIdStatic = data.name
                     completion(true)
@@ -204,26 +205,26 @@ extension CreateRideViewModel {
             }
         })
     }
-
+    
     // MARK: - Epoch converter
     
     func combine(date: Date?, time: Date?) -> Date? {
         guard let date = date, let time = time else { return nil }
-
+        
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
         let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
-
+        
         var merged = DateComponents()
         merged.year = dateComponents.year
         merged.month = dateComponents.month
         merged.day = dateComponents.day
         merged.hour = timeComponents.hour
         merged.minute = timeComponents.minute
-
+        
         return calendar.date(from: merged)
     }
-
+    
     // MARK: - Details View validation
     var isDetailsValid: Bool {
         guard let type = ride.type,
@@ -234,7 +235,7 @@ extension CreateRideViewModel {
         else { return false }
         return true
     }
-
+    
     // MARK: - Route View validation
     var isRouteValid: Bool {
         !ride.startLocation.trimmingCharacters(in: .whitespaces).isEmpty &&

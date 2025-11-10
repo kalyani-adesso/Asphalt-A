@@ -97,9 +97,9 @@ struct ParticipantsView: View {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
             StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: false)
             if viewModel.ride.type?.rawValue != "Solo Ride" {
-                       StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: true)
-                   }
-           
+                StepIndicator(icon: AppIcon.Home.group, title: "Participants",isActive: true, isCurrentPage: true)
+            }
+            
             StepIndicator(icon: AppIcon.CreateRide.review, title: "Review")
             StepIndicator(icon: AppIcon.CreateRide.share, title: "Share")
         }

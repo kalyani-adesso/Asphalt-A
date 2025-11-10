@@ -35,9 +35,9 @@ struct CreateRideView: View {
             }
             .animation(.easeInOut, value: viewModel.currentStep)
         }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
