@@ -23,9 +23,16 @@ class RidesRepository(val apiService: RidesApIService) {
             response?.toRides().orEmpty()
         }
     }
-    suspend fun getRideInvites(userID:String): APIResult<List<RideInvitesDomain>>{
-       return apiService.getAllRide().mapApiResult {
-              it.toRides().toRideInviteListDomain(userID)
+
+    suspend fun getRideInvites(userID: String): APIResult<List<RideInvitesDomain>> {
+        return apiService.getAllRide().mapApiResult {
+            it.toRides().toRideInviteListDomain(userID)
+        }
+    }
+
+    suspend fun getSingeRide(rideID: String): APIResult<RidesData> {
+        return apiService.getSingleRide(rideID).mapApiResult {
+            it.toSingleRide(rideID)
         }
     }
 
@@ -65,4 +72,32 @@ class RidesRepository(val apiService: RidesApIService) {
         } ?: emptyList()
 
     }
+
+    fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
+        return RidesData(
+            ridesID = rideId,
+            createdBy = this.userID,
+            rideType = this.rideType,
+            rideTitle = this.rideTitle,
+            description = this.description,
+            startDate = this.startDate,
+            startLocation = this.startLocation,
+            endLocation = this.endLocation,
+            createdDate = this.createdDate,
+            participants = this.participants?.map { (id, data) ->
+                ParticipantData(
+                    userId = id,
+                    inviteStatus = data.acceptInvite
+                )
+            } ?: emptyList(),
+            startLatitude = this.startLatitude,
+            startLongitude = this.startLongitude,
+            endLatitude = this.endLatitude,
+            endLongitude = this.endLongitude,
+            rideDistance = this.distance
+        )
+
+
+    }
+
 }
