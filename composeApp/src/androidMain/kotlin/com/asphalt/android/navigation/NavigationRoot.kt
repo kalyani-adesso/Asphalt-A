@@ -109,14 +109,14 @@ fun NavigationRoot(
         }
     }
 
-    val showBottomBar = backStack.lastOrNull() in listOf(
+   /* val showBottomBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
         AppNavKey.ProfileKey,
-        AppNavKey.RideDetails,
-    )
-    val showTopAppBar = backStack.lastOrNull() in listOf(
+        AppNavKey.RideDetails(null),
+    )*/
+    /*val showTopAppBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
         AppNavKey.QueriesKey,
@@ -128,8 +128,34 @@ fun NavigationRoot(
         AppNavKey.ConnectedRideMapNavKey,
         AppNavKey.ConnectedRideEndNavKey,
         AppNavKey.EndRideLoaderNavKey,
-        AppNavKey.RideDetails,
-    )
+        AppNavKey.RideDetails(null),
+    )*/
+
+    val key = backStack.lastOrNull()
+    val showBottomBar = when (key) {
+        is AppNavKey.DashboardNavKey,
+        is AppNavKey.RidesScreenNav,
+        is AppNavKey.QueriesKey,
+        is AppNavKey.ProfileKey,
+        is AppNavKey.RideDetails -> true
+        else -> false
+    }
+
+    val showTopAppBar = when (key) {
+        is AppNavKey.DashboardNavKey,
+        is AppNavKey.RidesScreenNav,
+        is AppNavKey.QueriesKey,
+        is AppNavKey.ProfileKey,
+        is AppNavKey.CreateRideNav,
+        is AppNavKey.NotificationNav,
+        is AppNavKey.JoinRideNavKey,
+        is AppNavKey.ConnectedRideNavKey,
+        is AppNavKey.ConnectedRideMapNavKey,
+        is AppNavKey.ConnectedRideEndNavKey,
+        is AppNavKey.EndRideLoaderNavKey,
+        is AppNavKey.RideDetails -> true 
+        else -> false
+    }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -263,8 +289,8 @@ fun NavigationRoot(
                         NavigationSplashScreen(
                             onNavigateToLogin = {
                                 backStack.remove(SplashKey)
-                               // backStack.add(AppNavKey.LoginScreenNavKey)
-                                backStack.add(AppNavKey.RideDetails)
+                                backStack.add(AppNavKey.LoginScreenNavKey)
+
                             },
                             onNavigateToWelcome = {
                                 backStack.remove(SplashKey)
@@ -332,7 +358,11 @@ fun NavigationRoot(
                         )
                     }
                     entry<AppNavKey.RidesScreenNav> { key ->
-                        RidesScreen(setTopAppBarState = setTopAppBarState)
+                        RidesScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            upComingViewDetails = { ridesID ->
+                                backStack.add(AppNavKey.RideDetails(ridesID))
+                            })
                     }
                     entry<AppNavKey.QueriesKey> { key ->
                         QueriesScreen(setTopAppBarState = setTopAppBarState)
@@ -430,8 +460,9 @@ fun NavigationRoot(
                         )
                     }
 
-                    entry(AppNavKey.RideDetails) { key ->
+                    entry<AppNavKey.RideDetails> { key ->
                         RidesDetailsScreen(
+                            rideId = key.ridesID,
                             setTopAppBarState = setTopAppBarState,
                         )
                     }

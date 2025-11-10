@@ -58,7 +58,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 
 @Composable
-fun RidesDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
+fun RidesDetailsScreen(rideId: String?, setTopAppBarState: (AppBarState) -> Unit) {
     val scrollState = rememberScrollState()
     setTopAppBarState(
         AppBarState(
@@ -380,5 +380,5 @@ fun HeaderSection() {
 @Preview
 @Composable
 fun RideDetailsPreview() {
-    RidesDetailsScreen(setTopAppBarState = {})
+    RidesDetailsScreen(null, setTopAppBarState = {})
 }
