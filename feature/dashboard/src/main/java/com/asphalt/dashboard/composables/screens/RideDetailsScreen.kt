@@ -200,7 +200,15 @@ fun UserRow(user: RidersList) {
                             imageUrl = user.profilePic ?: ""
                         )
                         Image(
-                            painter = painterResource(R.drawable.ic_online_icon),
+                            painter =
+                                if (user.inviteStatus ==
+                                    APIConstants.RIDE_ACCEPTED||
+                                    user.inviteStatus == APIConstants.RIDE_JOINED)
+                                    painterResource(R.drawable.ic_online_icon)
+                                else if (user.inviteStatus == APIConstants.RIDE_INVITED)
+                                    painterResource(R.drawable.ic_online_icon_orange)
+                                else
+                                    painterResource(R.drawable.ic_online_icon_red),
                             contentDescription = "Online Status",
                             modifier = Modifier
                                 .size(Dimensions.size14)
