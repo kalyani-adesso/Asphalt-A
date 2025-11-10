@@ -53,6 +53,7 @@ import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
+import com.asphalt.commonui.theme.REDLIGHT
 import com.asphalt.commonui.theme.RedLight
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
@@ -185,7 +186,14 @@ fun UserRow(user: RidersList) {
                         CircularNetworkImage(
                             modifier = Modifier.border(
                                 width = Dimensions.size2pt5,
-                                color = GreenLIGHT,
+                                color = if (user.inviteStatus ==
+                                    APIConstants.RIDE_ACCEPTED||
+                                    user.inviteStatus == APIConstants.RIDE_JOINED)
+                                    GreenLIGHT
+                                else if (user.inviteStatus == APIConstants.RIDE_INVITED)
+                                    LightOrange
+                                else
+                                    REDLIGHT,
                                 shape = CircleShape
                             ),
                             size = Dimensions.padding40,
