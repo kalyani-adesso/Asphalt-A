@@ -33,4 +33,10 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             patch(userInvites, "$RIDES_URL/$rideID$PARTICIPANTS_URL/$userID").body()
         }
     }
+
+    override suspend fun getSingleRide(rideID: String): APIResult<CreateRideRoot> {
+        return safeApiCall {
+            get(url = RIDES_URL+"/${rideID}").body()
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.composables.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +25,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
@@ -56,13 +59,24 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.commonui.utils.Utils
+import com.asphalt.dashboard.viewmodels.RidesDetailsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RidesDetailsScreen(rideId: String?, setTopAppBarState: (AppBarState) -> Unit) {
+fun RidesDetailsScreen(
+    rideId: String?, setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: RidesDetailsViewModel = koinViewModel()
+) {
+    //val ridesData by viewModel.ridesData
+    LaunchedEffect(Unit) {
+        if (rideId != null)
+            viewModel.getSingleRide(rideId)
+    }
     val scrollState = rememberScrollState()
     setTopAppBarState(
         AppBarState(
-            title = stringResource(R.string.create_a_ride),
+            title = viewModel.ridesData.value?.rideTitle ?: ""
         )
     )
     AsphaltTheme {
@@ -79,11 +93,11 @@ fun RidesDetailsScreen(rideId: String?, setTopAppBarState: (AppBarState) -> Unit
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
                 Spacer(Modifier.height(Dimensions.size30))
-                HeaderSection()
+                HeaderSection(viewModel)
                 Spacer(Modifier.height(Dimensions.size20))
-                CountSection()
+                CountSection(viewModel)
                 Spacer(Modifier.height(Dimensions.size20))
-                UsersList()
+                UsersList(viewModel)
                 Spacer(Modifier.height(Dimensions.size50))
             }
 
@@ -120,7 +134,7 @@ fun RidesDetailsScreen(rideId: String?, setTopAppBarState: (AppBarState) -> Unit
 }
 
 @Composable
-fun UsersList() {
+fun UsersList(viewModel1: RidesDetailsViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -245,23 +259,41 @@ fun UserRow() {
 }
 
 @Composable
-fun CountSection() {
+fun CountSection(viewModel: RidesDetailsViewModel) {
+    val participants = viewModel.ridesData.value?.participants ?: emptyList()
+
+    val acceptedCount = participants.count { it.inviteStatus == APIConstants.RIDE_ACCEPTED }
+    val pendingCount = participants.count { it.inviteStatus == APIConstants.RIDE_INVITED }
+    val declinedCount = participants.count { it.inviteStatus == APIConstants.RIDE_DECLINED }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.padding16)
     ) {
-        for (i in 1..3)
-            when (i) {
-                1 -> CountRow(LightGreen30)
-                2 -> CountRow(LightOrange)
-                3 -> CountRow(RedLight)
-            }
 
+        CountRow(
+            LightGreen30,
+            acceptedCount,
+            stringResource(R.string.confirmed)
+        )
+
+        CountRow(
+            LightOrange,
+            pendingCount,
+            stringResource(R.string.pending)
+        )
+
+        CountRow(
+            RedLight,
+            declinedCount,
+            stringResource(R.string.decline)
+        )
     }
+
 }
 
+
 @Composable
-fun RowScope.CountRow(textColor: Color) {
+fun RowScope.CountRow(textColor: Color, count: Int, label: String) {
     Box(
         modifier = Modifier
             .border(
@@ -282,15 +314,15 @@ fun RowScope.CountRow(textColor: Color) {
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("2", style = TypographyBold.bodyMedium, color = textColor)
+            Text(text = count.toString(), style = TypographyBold.bodyMedium, color = textColor)
             Spacer(modifier = Modifier.height(Dimensions.size5))
-            Text("Confirmed", style = Typography.bodySmall, color = textColor)
+            Text(label, style = Typography.bodySmall, color = textColor)
         }
     }
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(viewModel: RidesDetailsViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -319,14 +351,15 @@ fun HeaderSection() {
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        text = "TiTle" ?: "",
+                        text = viewModel.ridesData.value?.rideTitle ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(Modifier.height(Dimensions.size3))
                     Text(
-                        text = "Place" ?: "",
+                        text = ("${viewModel.ridesData.value?.startLocation ?: ""} - " +
+                                "${viewModel.ridesData.value?.endLocation ?: ""}"),
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey,
                         maxLines = 1,
@@ -351,7 +384,11 @@ fun HeaderSection() {
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Text(
-                    text = "Sun, Oct 21 - 09:00 AM" ?: "",
+                    text = viewModel.ridesData.value?.startDate?.let {
+                        Utils.getDateWithTime(
+                            viewModel.ridesData.value?.startDate
+                        )
+                    } ?: "",
                     style = Typography.bodyMedium,
                     color = GrayDark
                 )
@@ -367,7 +404,9 @@ fun HeaderSection() {
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Text(
-                    text = "${3}" + " " + stringResource(R.string.riders),
+                    text = "${viewModel.ridesData.value?.participants?.size ?: ""}" + " " + stringResource(
+                        R.string.riders
+                    ),
                     style = Typography.bodyMedium,
                     color = GrayDark
                 )
@@ -377,8 +416,10 @@ fun HeaderSection() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun RideDetailsPreview() {
-    RidesDetailsScreen(null, setTopAppBarState = {})
+    val viewModel = RidesDetailsViewModel()
+    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel)
 }

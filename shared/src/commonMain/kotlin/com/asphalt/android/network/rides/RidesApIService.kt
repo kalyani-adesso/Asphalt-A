@@ -12,4 +12,6 @@ interface RidesApIService {
 
     suspend fun getAllRide() :  APIResult<Map<String, CreateRideRoot>>
     suspend fun changeRideInviteStatus(rideID:String,userID:String,userInvites: UserInvites): APIResult<Unit>
+
+    suspend fun getSingleRide(rideID:String) : APIResult<CreateRideRoot>
 }
