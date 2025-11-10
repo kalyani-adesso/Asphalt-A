@@ -45,5 +45,8 @@ class CreateRideRoot(
     var endLongitude: Double = 0.0,
 
     @SerialName("distance")
-    var distance: Double = 0.0
+    var distance: Double = 0.0,
+
+    @SerialName("rideStatus")
+    var rideStatus: Int = 0 //0 not started, 3 Join ride 4 end Ride
 )
