@@ -20,7 +20,7 @@ struct UpcomingRidesView: View {
                 Button("View All") {
                     showAllRides = true
                 }
-                    .font(KlavikaFont.bold.font(size: 13))
+                .font(KlavikaFont.bold.font(size: 13))
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -37,7 +37,7 @@ struct UpcomingRidesView: View {
         .navigationDestination(isPresented:$showAllRides , destination: {
             UpcomingRideView(startingTab: .invities)
                 .environmentObject(viewModel)
-                       .environmentObject(home)
+                .environmentObject(home)
         })
         .task{
             await viewModel.fetchAllRides()
@@ -49,8 +49,8 @@ struct UpcomingRideCard: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
     var hostName: String {
-           viewModel.usersById[ride.createdBy] ?? "Unknown"
-       }
+        viewModel.usersById[ride.createdBy] ?? "Unknown"
+    }
     let totalCount = 5
     
     var body: some View {
@@ -63,7 +63,7 @@ struct UpcomingRideCard: View {
                         RoundedRectangle(cornerRadius: 32.5)
                             .stroke(AppColor.celticBlue, lineWidth: 2.5)
                     )
-                   .overlay(Text(initials(from: hostName)).font(.headline))
+                    .overlay(Text(initials(from: hostName)).font(.headline))
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Invite from  \(hostName)")
                         .font(KlavikaFont.bold.font(size: 16))

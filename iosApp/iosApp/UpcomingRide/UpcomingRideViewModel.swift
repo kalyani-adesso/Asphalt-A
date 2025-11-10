@@ -165,7 +165,7 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-
+    
     
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
@@ -189,7 +189,7 @@ class UpcomingRideViewModel: ObservableObject {
             guard result is APIResultSuccess<GenericResponse> else {
                 return
             }
-
+            
             print("Invite Responded successfully!")
             
             if let index = inviteRides.firstIndex(where: { $0.id == rideId }) {
@@ -217,8 +217,8 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-
-
+    
+    
     
     // MARK: - Fetch Users
     @MainActor

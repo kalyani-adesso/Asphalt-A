@@ -11,7 +11,7 @@ struct AnswerSheetView: View {
     @Environment(\.dismiss) var dismiss
     var query: Query
     @ObservedObject var viewModel: QueryViewModel
-
+    
     var body: some View {
         VStack(spacing: 20) {
             // MARK: Header
@@ -161,10 +161,10 @@ struct AnswerSheetView: View {
                             .disabled(viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                             .frame(width: 132, height: 36)
                             .background(
-                                   viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                   ? AppColor.celticBlue.opacity(0.4)
-                                   : AppColor.celticBlue               
-                               )
+                                viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                ? AppColor.celticBlue.opacity(0.4)
+                                : AppColor.celticBlue               
+                            )
                             .cornerRadius(8)
                         }
                         .padding(.top, 10)

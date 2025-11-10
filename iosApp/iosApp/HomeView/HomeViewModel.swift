@@ -15,21 +15,21 @@ class HomeViewModel: ObservableObject {
     @Published var location: String = "Kochi, Infopark"
     
     private let userRepo = UserRepoImpl()
-
+    
     // MARK: - Dashboard
     @Published var stats: [RideStat] = [
         RideStat(title: "Total Rides", value: 25, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
         RideStat(title: "Locations", value: 12, color: AppColor.skyBlue, icon: AppIcon.Home.location),
         RideStat(title: "Total KMs", value: 1850, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
     ]
-
+    
     // MARK: - Upcoming Rides
     @Published var upcomingRides: [UpcomingRide] = [
         UpcomingRide(hostName: "Sooraj", route: "Kochi - Kanyakumari", date: Calendar.current.date(byAdding: .day, value: 20, to: Date())!, joinedAvatars: ["SR","AL","VM"], joinedCount: 5),
         UpcomingRide(hostName: "Neha", route: "Kochi - Munnar", date: Calendar.current.date(byAdding: .day, value: 35, to: Date())!, joinedAvatars: ["NN","AR"], joinedCount: 3),
         UpcomingRide(hostName: "Aromal", route: "Kochi - Kashmir", date: Calendar.current.date(byAdding: .day, value: 35, to: Date())!, joinedAvatars: ["NN","AR"], joinedCount: 3)
     ]
-
+    
     // MARK: - Donut chart
     @Published var journeySlices: [JourneySlice] = [
         JourneySlice(category: "Total Rides", value: 50, color: AppColor.strongCyan),
@@ -84,12 +84,12 @@ class HomeViewModel: ObservableObject {
             return journeySlices
         }
     }
-
-
+    
+    
     // MARK: - Bar chart
     @Published var selectedMonth: PlacesMonth? = nil
     
-   
+    
     @Published var placesByMonth: [PlacesMonth] = [
         PlacesMonth(month: "Mar", placesCount: 5),
         PlacesMonth(month: "Apr", placesCount: 2),
@@ -105,33 +105,33 @@ class HomeViewModel: ObservableObject {
         var month: String
         var placesCount: Int
     }
-
-
+    
+    
     init() {
         loadUserName()
         locationManager.requestLocation()
-            
-            // Observe location updates
-            Task {
-                for await address in locationManager.$currentAddress.values {
-                    self.location = address
-                }
+        
+        // Observe location updates
+        Task {
+            for await address in locationManager.$currentAddress.values {
+                self.location = address
             }
+        }
     }
     @MainActor
     func loadUserName() {
-           Task {
-               do {
-                   if let currentUser = try await userRepo.getUserDetails() {
-                       DispatchQueue.main.async {
-                           MBUserDefaults.userNameStatic = currentUser.name!
-                       }
-                   }
-               } catch {
-                   print("Error fetching user: \(error)")
-               }
-           }
-       }
-
-
+        Task {
+            do {
+                if let currentUser = try await userRepo.getUserDetails() {
+                    DispatchQueue.main.async {
+                        MBUserDefaults.userNameStatic = currentUser.name!
+                    }
+                }
+            } catch {
+                print("Error fetching user: \(error)")
+            }
+        }
+    }
+    
+    
 }

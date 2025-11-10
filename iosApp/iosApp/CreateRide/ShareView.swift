@@ -70,7 +70,7 @@ struct ShareView: View {
                     UpcomingRideView(showpopup: true)
                         .environmentObject(UpcomingViewModel)
                         .environmentObject(home)
-
+                    
                 })
                 
             }

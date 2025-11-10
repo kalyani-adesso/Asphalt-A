@@ -13,73 +13,73 @@ struct ReviewView: View {
     var body: some View {
         ZStack{
             VStack{
-            VStack(spacing: 20) {
-                stepIndicator
-                VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Text("Review Your Ride")
-                            .font(KlavikaFont.medium.font(size: 16))
+                VStack(spacing: 20) {
+                    stepIndicator
+                    VStack(alignment: .leading, spacing: 20) {
+                        HStack {
+                            Text("Review Your Ride")
+                                .font(KlavikaFont.medium.font(size: 16))
+                        }
+                        ReviewCard(
+                            icon: AppIcon.Home.nearMe,
+                            iconColor: AppColor.lightBlue,
+                            title: viewModel.ride.title,
+                            subtitle: viewModel.ride.description,
+                            tag: tagValue)
+                        ReviewCard(
+                            icon: AppIcon.Home.calender,
+                            iconColor: AppColor.darkOrange,
+                            title: "Date and Time",
+                            subtitle: formattedDateTime)
+                        ReviewCard(
+                            icon: AppIcon.CreateRide.route,
+                            iconColor: AppColor.purple,
+                            title: "Route",
+                            subtitle: "\(viewModel.ride.startLocation) - \(viewModel.ride.endLocation)")
+                        ReviewCard(
+                            icon: AppIcon.Home.group,
+                            iconColor: AppColor.lightOrange,
+                            title: "Participants",
+                            subtitle:"\(viewModel.selectedParticipants.count) riders selected")
                     }
-                    ReviewCard(
-                        icon: AppIcon.Home.nearMe,
-                        iconColor: AppColor.lightBlue,
-                        title: viewModel.ride.title,
-                        subtitle: viewModel.ride.description,
-                        tag: tagValue)
-                    ReviewCard(
-                        icon: AppIcon.Home.calender,
-                        iconColor: AppColor.darkOrange,
-                        title: "Date and Time",
-                        subtitle: formattedDateTime)
-                    ReviewCard(
-                        icon: AppIcon.CreateRide.route,
-                        iconColor: AppColor.purple,
-                        title: "Route",
-                        subtitle: "\(viewModel.ride.startLocation) - \(viewModel.ride.endLocation)")
-                    ReviewCard(
-                        icon: AppIcon.Home.group,
-                        iconColor: AppColor.lightOrange,
-                        title: "Participants",
-                        subtitle:"\(viewModel.selectedParticipants.count) riders selected")
+                    .frame(width: 343, height: 430)
+                    .padding()
+                    .background(AppColor.backgroundLight)
+                    .cornerRadius(10)
                 }
-                .frame(width: 343, height: 430)
-                .padding()
-                .background(AppColor.backgroundLight)
-                .cornerRadius(10)
-            }
-            
-            Spacer()
-            
-            HStack(spacing: 15) {
-                ButtonView( title: AppStrings.CreateRide.previous.rawValue,
-                            background: LinearGradient(
-                                gradient: Gradient(colors: [.white, .white]),
-                                startPoint: .leading,
-                                endPoint: .trailing),
-                            foregroundColor: AppColor.celticBlue,
-                            showShadow: false ,
-                            borderColor: AppColor.celticBlue , onTap: {
-                    viewModel.previousStep()
-                })
                 
-                ButtonView( title: AppStrings.CreateRide.create.rawValue,
-                            showShadow: false , onTap: {
-                    viewModel.createRide(completion: {success in
-                        if success {
-                            viewModel.nextStep()
-                        }
+                Spacer()
+                
+                HStack(spacing: 15) {
+                    ButtonView( title: AppStrings.CreateRide.previous.rawValue,
+                                background: LinearGradient(
+                                    gradient: Gradient(colors: [.white, .white]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing),
+                                foregroundColor: AppColor.celticBlue,
+                                showShadow: false ,
+                                borderColor: AppColor.celticBlue , onTap: {
+                        viewModel.previousStep()
                     })
-                }
-                )
-            }
-            .padding()
-        }
-            
-                        if viewModel.isRideLoading {
-                            ProgressViewReusable(title: "Loading ...")
-                        }
+                    
+                    ButtonView( title: AppStrings.CreateRide.create.rawValue,
+                                showShadow: false , onTap: {
+                        viewModel.createRide(completion: {success in
+                            if success {
+                                viewModel.nextStep()
+                            }
+                        })
                     }
+                    )
+                }
+                .padding()
+            }
             
+            if viewModel.isRideLoading {
+                ProgressViewReusable(title: "Loading ...")
+            }
+        }
+        
     }
     var stepIndicator: some View {
         HStack(spacing: 32) {
@@ -93,12 +93,12 @@ struct ReviewView: View {
         }
     }
     // MARK: Date formatting helper
-        var formattedDateTime: String {
-            let date = viewModel.ride.date
-            let formatter = DateFormatter()
-            formatter.dateFormat = "E, MMM d - hh:mm a"
-            return formatter.string(from: date ?? Date())
-        }
+    var formattedDateTime: String {
+        let date = viewModel.ride.date
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM d - hh:mm a"
+        return formatter.string(from: date ?? Date())
+    }
     
     var tagValue: String{
         if viewModel.selectedParticipants.count > 0{
