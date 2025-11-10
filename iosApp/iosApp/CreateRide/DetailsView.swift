@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailsView: View {
     
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showDatePicker = false
     @State private var showTimePicker = false
     
@@ -184,5 +184,5 @@ extension DateFormatter {
 
 
 #Preview {
-    DetailsView(viewModel: CreateRideViewModel.init())
+    DetailsView()
 }

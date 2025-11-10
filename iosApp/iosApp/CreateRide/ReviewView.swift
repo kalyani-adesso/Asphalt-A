@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ReviewView: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     
     var body: some View {
         ZStack{
@@ -111,5 +111,5 @@ struct ReviewView: View {
 }
 
 #Preview {
-    ReviewView(viewModel: CreateRideViewModel.init())
+    ReviewView()
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ParticipantsView: View {
     @State private var searchText = ""
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -107,5 +107,5 @@ struct ParticipantsView: View {
 }
 
 #Preview {
-    ParticipantsView(viewModel: CreateRideViewModel.init())
+    ParticipantsView()
 }
