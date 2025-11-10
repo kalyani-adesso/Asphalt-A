@@ -35,7 +35,7 @@ struct QueryPopupView: View {
                             .padding(.trailing,15)
                     }
                 }
-
+                
                 // Text fields
                 VStack(alignment: .leading, spacing: 20) {
                     
@@ -92,29 +92,29 @@ struct QueryPopupView: View {
                         .cornerRadius(10)
                     
                 }
-                    // Buttons
-                    
-                    HStack(spacing: 19) {
-                        ButtonView( title: "CANCEL",
-                                    background: LinearGradient(
-                                        gradient: Gradient(colors: [.white, .white]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing),
-                                    foregroundColor: AppColor.darkRed,
-                                    showShadow: false ,
-                                    borderColor: AppColor.darkRed, onTap: {
-                            isPresented = false
-                        })
-                        ButtonView( title: "ASK QUESTION",
-                                    showShadow: false,onTap: {
-                            Task {
-                                        await viewModel.addQuery()
-                                        await MainActor.run {
-                                            isPresented = false
-                                        }
-                                    }
+                // Buttons
+                
+                HStack(spacing: 19) {
+                    ButtonView( title: "CANCEL",
+                                background: LinearGradient(
+                                    gradient: Gradient(colors: [.white, .white]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing),
+                                foregroundColor: AppColor.darkRed,
+                                showShadow: false ,
+                                borderColor: AppColor.darkRed, onTap: {
+                        isPresented = false
+                    })
+                    ButtonView( title: "ASK QUESTION",
+                                showShadow: false,onTap: {
+                        Task {
+                            await viewModel.addQuery()
+                            await MainActor.run {
+                                isPresented = false
+                            }
                         }
-                        )
+                    }
+                    )
                     
                 }
             }

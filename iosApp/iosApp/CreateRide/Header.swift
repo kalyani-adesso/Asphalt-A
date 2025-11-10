@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Header: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var goToHome = false
     var body: some View {
@@ -57,5 +57,5 @@ struct Header: View {
 }
 
 #Preview {
-    Header(viewModel: CreateRideViewModel.init())
+    Header()
 }

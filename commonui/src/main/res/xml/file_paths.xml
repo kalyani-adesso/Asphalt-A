@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Use the 'cache-path' element to grant permission for files in the context.cacheDir/ directory -->
+    <cache-path name="temp_photos" path="/" />
+</paths>

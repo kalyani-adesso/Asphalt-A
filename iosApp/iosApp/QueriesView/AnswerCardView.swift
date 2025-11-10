@@ -11,14 +11,14 @@ struct AnswerCardView: View {
     @ObservedObject var viewModel: QueryViewModel
     let answer: Answer
     var query: Query
-  
+    
     var isLiked: Bool {
-           viewModel.likedAnswers.contains(answer.apiId)
-       }
-
-       var isDisliked: Bool {
-           viewModel.disLikedAnswers.contains(answer.apiId)
-       }
+        viewModel.likedAnswers.contains(answer.apiId)
+    }
+    
+    var isDisliked: Bool {
+        viewModel.disLikedAnswers.contains(answer.apiId)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
