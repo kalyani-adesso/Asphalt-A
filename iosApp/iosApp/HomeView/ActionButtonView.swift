@@ -10,7 +10,7 @@ import SwiftUI
 struct ActionButtonView: View {
     @State private var isPresented: Bool = false
     @State private var showJoinRide: Bool = false
-    
+    @StateObject var viewModel = CreateRideViewModel()
     var body: some View {
         HStack(spacing: 12) {
             
@@ -35,6 +35,7 @@ struct ActionButtonView: View {
         .padding(.vertical,10)
         .navigationDestination(isPresented: $isPresented, destination: {
             CreateRideView()
+                .environmentObject(viewModel)
         })
         .navigationDestination(isPresented: $showJoinRide, destination: {
             JoinRideView()

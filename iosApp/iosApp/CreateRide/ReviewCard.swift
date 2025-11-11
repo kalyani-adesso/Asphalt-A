@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ReviewCard: View {
-
+    
     let icon: Image
     let iconColor: Color
     let title: String

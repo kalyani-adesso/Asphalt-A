@@ -29,7 +29,7 @@ struct QueriesView: View {
                         FormFieldView(
                             label: " ",
                             icon: AppIcon.CreateRide.searchLens,
-                            placeholder: "Search questions ...",
+                            placeholder: AppStrings.Query.searchLabel,
                             iconColor: AppColor.celticBlue,
                             value: $viewModel.searchText,
                             isValidEmail: .constant(false),
@@ -74,10 +74,10 @@ struct QueriesView: View {
                                         .scaledToFit()
                                         .frame(width: 60, height: 60)
                                         .foregroundColor(.gray.opacity(0.5))
-                                    Text("No queries found")
+                                    Text(AppStrings.Query.emptyQuery)
                                         .font(KlavikaFont.bold.font(size: 18))
                                         .foregroundColor(.gray)
-                                    Text("Try changing filters or ask a new question.")
+                                    Text(AppStrings.Query.emptySubQuery)
                                         .font(KlavikaFont.regular.font(size: 14))
                                         .foregroundColor(.gray.opacity(0.8))
                                 }

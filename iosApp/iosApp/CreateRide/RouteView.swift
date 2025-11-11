@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RouteView: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showLocationPicker = false
     @State private var searchText = ""
     @State private var isSelectingStart = true
@@ -46,7 +46,6 @@ struct RouteView: View {
             }
             .sheet(isPresented: $showLocationPicker) {
                 PlaceSearchView(
-                    viewModel: viewModel,
                     searchText: searchText,
                     isSelectingStart: isSelectingStart,
                     dismiss: { showLocationPicker = false }
@@ -61,7 +60,7 @@ struct RouteView: View {
         Spacer()
         HStack(spacing: 15) {
             ButtonView(
-                title: AppStrings.CreateRide.previous.rawValue,
+                title: AppStrings.CreateRideButton.previous.rawValue,
                 background: LinearGradient(
                     gradient: Gradient(colors: [.white, .white]),
                     startPoint: .leading,
@@ -76,7 +75,7 @@ struct RouteView: View {
             )
             
             ButtonView(
-                title: AppStrings.CreateRide.next.rawValue,
+                title: AppStrings.CreateRideButton.next.rawValue,
                 showShadow: false,
                 onTap: {
                     viewModel.getDistance()
@@ -152,5 +151,5 @@ struct LocationFieldView: View {
 }
 
 #Preview {
-    RouteView(viewModel: CreateRideViewModel.init())
+    RouteView()
 }

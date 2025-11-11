@@ -278,7 +278,8 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                             id = it.uid,
                                             bike = it.primaryBike,
                                             job = if (it.isMechanic)
-                                                "Mechanic" else ""
+                                                "Mechanic" else "",
+                                            imgUrl=it.profilePic
                                         )
                                     })
                         _ridersListMutable.value = _fullList.value

@@ -71,13 +71,13 @@ struct JourneyCardView: View {
         )
         .padding(.top,20)
         .onAppear {
-                    currentSlices = home.getJourneySlices(for: selectedOption)
-                }
-                .onChange(of: selectedOption) { newValue in
-                    withAnimation {
-                        currentSlices = home.getJourneySlices(for: newValue)
-                    }
-                }
+            currentSlices = home.getJourneySlices(for: selectedOption)
+        }
+        .onChange(of: selectedOption) { newValue in
+            withAnimation {
+                currentSlices = home.getJourneySlices(for: newValue)
+            }
+        }
     }
 }
 

@@ -95,8 +95,8 @@ struct UpcomingRideView: View {
                 BottomNavBar()
             })
             .onAppear {
-                    viewModel.selectedTab = startingTab
-                    }
+                viewModel.selectedTab = startingTab
+            }
             
             // Popup overlay (always stays above)
             if showpopup {
@@ -164,16 +164,16 @@ struct UpcomingRideView: View {
     
     private func handleUpload() {
         guard let rideId = selectedRideId else { return }
-
+        
         if let index = viewModel.rides.firstIndex(where: { $0.id == rideId }) {
             var ride = viewModel.rides[index]
             ride.hasPhotos = true
             viewModel.rides[index] = ride
         }
-
+        
         withAnimation {
-               selectedRideId = nil
-           }
+            selectedRideId = nil
+        }
     }
 }
 

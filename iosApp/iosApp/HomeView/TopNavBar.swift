@@ -30,8 +30,8 @@ struct TopNavBar: View {
                         Text(home.location == "Location access denied"
                              ? "Location access denied"
                              : home.location)
-                            .font(.system(size: 13))
-                            .foregroundColor(.gray)
+                        .font(.system(size: 13))
+                        .foregroundColor(.gray)
                     }
                 }
                 
@@ -57,7 +57,7 @@ struct TopNavBar: View {
             NotificationView()
         })
         .task{
-             home.loadUserName()
+            home.loadUserName()
         }
     }
 }

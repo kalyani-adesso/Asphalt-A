@@ -23,4 +23,6 @@ interface RidesApIService {
     suspend fun getJoinedRides(rideId: String): APIResult<ConnectedRideDTO>
 
     suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit>
+
+    suspend fun getSingleRide(rideID:String) : APIResult<CreateRideRoot>
 }

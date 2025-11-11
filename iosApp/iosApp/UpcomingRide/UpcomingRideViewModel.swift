@@ -42,6 +42,8 @@ struct RideModel: Identifiable,Hashable {
     let riderCount: Int
     let createdBy: String
     var hasPhotos: Bool = false
+    let startDate: Date
+    let participantAcceptedCount: Int
 }
 
 
@@ -93,45 +95,65 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
+                let now = Date()
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
+                let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+            
                 
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
                 
-                if ride.createdBy == currentUserID {
-                    //upcoming Ride that I have created
-                    if startDate >= Calendar.current.startOfDay(for: Date()) {
-                        rideStatus = participantCount > 0 ? .queue : .upcoming
-                        rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
-                        rideAction = .upcoming
-                    } else {
-                        rideStatus = .complete
-                        rideAction = .history
-                        rideViewAction = .shareExperience
+                if startDate <= now {
+                    // If user was invited but never accepted, skip adding to history
+                    if isParticipant, let inviteStatus = myInviteStatus, inviteStatus != 1 {
+                        continue
                     }
-                    //Invites
-                } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
-                    rideAction = .invities
-                    rideStatus = .invite
-                    rideViewAction = .decline
-                    //accepted invites
-                } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 1 {
-                    rideAction = .upcoming
-                    rideStatus = .upcoming
-                    rideViewAction = .viewDetails
-                    //history
-                } else if isParticipant {
+                    
                     rideAction = .history
                     rideStatus = .complete
                     rideViewAction = .shareExperience
-                } else {
-                    continue
                 }
                 
+                else {
+                    if ride.createdBy == currentUserID {
+                        //upcoming Ride that I have created
+                        if startDate >= now {
+                            rideStatus = participantCount > 0 ? .queue : .upcoming
+                            rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
+                            rideAction = .upcoming
+                        } else {
+                            rideStatus = .complete
+                            rideAction = .history
+                            rideViewAction = .shareExperience
+                        }
+                        //Invites
+                    } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
+                        if startDate >= now {
+                            rideAction = .invities
+                            rideStatus = .invite
+                            rideViewAction = .decline
+                        } else {
+                            continue 
+                        }
+                        
+                        //accepted invites
+                    } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 1 {
+                        rideAction = .upcoming
+                        rideStatus = .upcoming
+                        rideViewAction = .viewDetails
+                        //history
+                    } else if isParticipant {
+                        rideAction = .history
+                        rideStatus = .complete
+                        rideViewAction = .shareExperience
+                    } else {
+                        continue
+                    }
+                }
                 let mapped = RideModel(
                     id: ride.ridesID ?? UUID().uuidString,
                     title: ride.rideTitle ?? "",
@@ -142,7 +164,9 @@ class UpcomingRideViewModel: ObservableObject {
                     rideAction: rideAction,
                     date: dateString,
                     riderCount: participantCount,
-                    createdBy: ride.createdBy ?? ""
+                    createdBy: ride.createdBy ?? "",
+                    startDate: startDate,
+                    participantAcceptedCount: participantAcceptedCount
                 )
                 
                 switch rideAction {
@@ -152,11 +176,14 @@ class UpcomingRideViewModel: ObservableObject {
                 }
             }
             
+            upcoming.sort { $0.startDate < $1.startDate }
             upcomingRides = upcoming
+            history.sort { $0.startDate > $1.startDate }
             historyRides = history
+            invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites
             
-            self.rides = upcoming + history + invites
+            self.rides = upcomingRides + historyRides + inviteRides
             
             isRideLoading = false
             
@@ -165,7 +192,7 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-
+    
     
     func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
@@ -189,7 +216,7 @@ class UpcomingRideViewModel: ObservableObject {
             guard result is APIResultSuccess<GenericResponse> else {
                 return
             }
-
+            
             print("Invite Responded successfully!")
             
             if let index = inviteRides.firstIndex(where: { $0.id == rideId }) {
@@ -217,8 +244,8 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-
-
+    
+    
     
     // MARK: - Fetch Users
     @MainActor

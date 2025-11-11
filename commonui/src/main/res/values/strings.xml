@@ -242,6 +242,12 @@
     <string name="skip">Skip</string>
     <string name="submit_rating">Submit Rating</string>
     <string name="search_location">Search your location</string>
+    <string name="confirmed">Confirmed</string>
+    <string name="pending">Pending</string>
+    <string name="declined">Declined</string>
+    <string name="waiting_response">Waiting for response</string>
+    <string name="ride_creator">Ride Creator</string>
+    <string name="organizer">Organizer</string>
 
 
 </resources>

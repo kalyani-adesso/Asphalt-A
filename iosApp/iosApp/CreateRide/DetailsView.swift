@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailsView: View {
     
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showDatePicker = false
     @State private var showTimePicker = false
     
@@ -21,7 +21,7 @@ struct DetailsView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Ride Type")
+                        Text(AppStrings.CreateRide.rideType)
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
                         
@@ -53,17 +53,17 @@ struct DetailsView: View {
                     }
                     
                     
-                    Text("Ride Title").font(KlavikaFont.medium.font(size: 16))
+                    Text(AppStrings.CreateRide.rideTitle).font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
-                    TextField("Enter ride name...", text: $viewModel.ride.title)
+                    TextField(AppStrings.CreateRide.rideTitleLabel, text: $viewModel.ride.title)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(10)
-                    Text("Description").font(KlavikaFont.medium.font(size: 16))
+                    Text(AppStrings.CreateRide.description).font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
-                    TextField("Describe the vibe...", text: $viewModel.ride.description, axis: .vertical)
+                    TextField(AppStrings.CreateRide.descriptionLabel, text: $viewModel.ride.description, axis: .vertical)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
                         .padding(.horizontal, 12)
@@ -74,7 +74,7 @@ struct DetailsView: View {
                     
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Date").font(KlavikaFont.medium.font(size: 16))
+                            Text(AppStrings.CreateRide.date).font(KlavikaFont.medium.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             Button {
                                 showDatePicker.toggle()
@@ -95,7 +95,7 @@ struct DetailsView: View {
                             }
                         }
                         VStack(alignment: .leading) {
-                            Text("Time").font(KlavikaFont.medium.font(size: 16))
+                            Text(AppStrings.CreateRide.time).font(KlavikaFont.medium.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             Button {
                                 showTimePicker.toggle()
@@ -124,7 +124,7 @@ struct DetailsView: View {
                 
             }
             Spacer()
-            ButtonView( title: AppStrings.CreateRide.nextStep.rawValue,
+            ButtonView( title: AppStrings.CreateRideButton.nextStep.rawValue,
                         showShadow: false , onTap: {
                 viewModel.nextStep()
             }
@@ -184,5 +184,5 @@ extension DateFormatter {
 
 
 #Preview {
-    DetailsView(viewModel: CreateRideViewModel.init())
+    DetailsView()
 }

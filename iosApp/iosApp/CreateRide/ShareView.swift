@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ShareView: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var UpcomingViewModel: UpcomingRideViewModel
+    @EnvironmentObject var home: HomeViewModel
     @State private var isPresented: Bool = false
     var body: some View {
         VStack(spacing: 20) {
@@ -17,7 +19,7 @@ struct ShareView: View {
                 VStack(spacing: 30) {
                     SucessView(title:"Ride Created!", subtitle: "Share your ride with friends")
                     VStack(alignment: .leading, spacing: 15) {
-                        Text("Share Link")
+                        Text(AppStrings.CreateRide.shareTitle)
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
                         
@@ -39,7 +41,7 @@ struct ShareView: View {
                         .cornerRadius(10)
                         Spacer() .frame(height: 0)
                         
-                        Text("Share Via")
+                        Text(AppStrings.CreateRide.shareSubTitle)
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
                         HStack(spacing: 15){
@@ -60,12 +62,15 @@ struct ShareView: View {
             
             HStack(spacing: 15) {
                 
-                ButtonView( title: AppStrings.CreateRide.done.rawValue,
+                ButtonView( title: AppStrings.CreateRideButton.done.rawValue,
                             showShadow: false , onTap: {
                     isPresented = true
                 }
                 ).navigationDestination(isPresented: $isPresented, destination: {
                     UpcomingRideView(showpopup: true)
+                        .environmentObject(UpcomingViewModel)
+                        .environmentObject(home)
+                    
                 })
                 
             }
@@ -102,5 +107,5 @@ struct ShareIconButton: View {
 }
 
 #Preview {
-    ShareView(viewModel: CreateRideViewModel.init())
+    ShareView()
 }

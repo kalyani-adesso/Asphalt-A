@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.network.KtorClient
@@ -76,7 +75,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RidesScreen(
     ridesScreenViewModel: RidesScreenViewModel = koinViewModel(),
-    setTopAppBarState: (AppBarState) -> Unit
+    setTopAppBarState: (AppBarState) -> Unit,
+    upComingViewDetails: (String) -> Unit
 ) {
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
@@ -96,8 +96,7 @@ fun RidesScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        start = Dimensions.padding16,
-                        end = Dimensions.padding16
+                        start = Dimensions.padding16, end = Dimensions.padding16
                     ), contentPadding = PaddingValues(bottom = Dimensions.size30)
             ) {
                 item {
@@ -111,7 +110,7 @@ fun RidesScreen(
                 when (ridesScreenViewModel.tabSelectFlow.value) {
                     RideStatConstants.UPCOMING_RIDE -> {
                         items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
-                            UpcomingRides(ridesScreenViewModel, upconing)
+                            UpcomingRides(ridesScreenViewModel, upconing, upComingViewDetails)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
 
@@ -140,13 +139,16 @@ fun RidesScreen(
 }
 
 @Composable
-fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRideDataModel) {
+fun UpcomingRides(
+    ridesScreenViewModel: RidesScreenViewModel,
+    upconing: YourRideDataModel,
+    upComingViewDetails: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                NeutralLightPaper,
-                shape = RoundedCornerShape(16.dp)
+                NeutralLightPaper, shape = RoundedCornerShape(16.dp)
             )
             .padding(
                 start = Dimensions.padding16,
@@ -189,8 +191,7 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
                     .then(
                         if (upconing.rideStatus == UPCOMING) {
                             Modifier.background(
-                                color = MagentaDeep,
-                                shape = RoundedCornerShape(Dimensions.size10)
+                                color = MagentaDeep, shape = RoundedCornerShape(Dimensions.size10)
                             )
                         } else {
                             Modifier.background(
@@ -277,22 +278,21 @@ fun UpcomingRides(ridesScreenViewModel: RidesScreenViewModel, upconing: YourRide
 //
             BorderedButton(
                 onClick = {
-
+                    upComingViewDetails.invoke(upconing.ridesId.toString())
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)
                     .background(NeutralWhite)
                     .weight(1.4f),
-                buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
                     text = if (upconing.rideStatus == UPCOMING) {
                         stringResource(R.string.view_details).uppercase()
                     } else {
                         stringResource(R.string.check_responses).uppercase()
-                    },
-                    style = TypographyMedium.bodySmall,
-                    color = PrimaryDarkerLightB75
+                    }, style = TypographyMedium.bodySmall, color = PrimaryDarkerLightB75
                 )
             }
 
@@ -307,8 +307,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                NeutralLightPaper,
-                shape = RoundedCornerShape(16.dp)
+                NeutralLightPaper, shape = RoundedCornerShape(16.dp)
             )
             .padding(
                 start = Dimensions.padding16,
@@ -343,8 +342,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                 modifier = Modifier
                     .height(Dimensions.size30)
                     .background(
-                        color = GreenDark,
-                        shape = RoundedCornerShape(Dimensions.size10)
+                        color = GreenDark, shape = RoundedCornerShape(Dimensions.size10)
                     )
                     .padding(
                         start = Dimensions.padding16,
@@ -409,7 +407,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     .height(Dimensions.size50)
                     .background(NeutralWhite)
                     .weight(1f),
-                buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
                     text = stringResource(R.string.view_photos).uppercase(),
@@ -428,7 +427,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     .height(Dimensions.size50)
                     .background(NeutralWhite)
                     .weight(1.4f),
-                buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
                     text = stringResource(R.string.share_exp).uppercase(),
@@ -446,8 +446,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                NeutralLightPaper,
-                shape = RoundedCornerShape(16.dp)
+                NeutralLightPaper, shape = RoundedCornerShape(16.dp)
             )
             .padding(
                 start = Dimensions.padding16,
@@ -458,14 +457,18 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             )
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(modifier = Modifier.weight(1.5f).fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .weight(1.5f)
+                    .fillMaxWidth()
+            ) {
 
                 CircularNetworkImage(
                     modifier = Modifier.border(
                         width = Dimensions.size2pt5,
                         color = PrimaryDarkerLightB75,
                         shape = CircleShape
-                    ), size = Dimensions.size32, imageUrl = invites.profileImageUrl?:""
+                    ), size = Dimensions.size32, imageUrl = invites.profileImageUrl ?: ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column(modifier = Modifier) {
@@ -542,15 +545,16 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             GradientButton(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    ridesScreenViewModel.acceptDeclined(invites.ridesId?:"",APIConstants.RIDE_ACCEPTED)
+                    ridesScreenViewModel.acceptDeclined(
+                        invites.ridesId ?: "", APIConstants.RIDE_ACCEPTED
+                    )
 
                 },
                 buttonHeight = Dimensions.size50,
                 contentPadding = PaddingValues(Dimensions.size0)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         stringResource(R.string.accept).uppercase(),
@@ -562,7 +566,9 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
             }
             Button(
                 {
-                    ridesScreenViewModel.acceptDeclined(invites.ridesId?:"",APIConstants.RIDE_DECLINED)
+                    ridesScreenViewModel.acceptDeclined(
+                        invites.ridesId ?: "", APIConstants.RIDE_DECLINED
+                    )
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                 modifier = Modifier
@@ -589,8 +595,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
             .fillMaxWidth()
             .height(Dimensions.size92)
             .background(
-                NeutralLightPaper,
-                shape = RoundedCornerShape(16.dp)
+                NeutralLightPaper, shape = RoundedCornerShape(16.dp)
             )
             .padding(start = Dimensions.size10, end = Dimensions.size10),
         verticalAlignment = Alignment.CenterVertically,
@@ -610,8 +615,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                         )
                     } else {
                         Modifier.background(
-                            color = NeutralWhite,
-                            shape = RoundedCornerShape(Dimensions.size10)
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
                 )
@@ -645,8 +649,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                         )
                     } else {
                         Modifier.background(
-                            color = NeutralWhite,
-                            shape = RoundedCornerShape(Dimensions.size10)
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
                 )
@@ -679,8 +682,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                         )
                     } else {
                         Modifier.background(
-                            color = NeutralWhite,
-                            shape = RoundedCornerShape(Dimensions.size10)
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
                         )
                     }
                 )
@@ -708,9 +710,10 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
 @Composable
 fun RidesPreview() {
     var dataStoreManager = DataStoreManager(LocalContext.current)
-    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager,
-        UserRepository(UserAPIServiceImpl(KtorClient())))
+    var androidVM = AndroidUserVM(
+        UserRepoImpl(), dataStoreManager, UserRepository(UserAPIServiceImpl(KtorClient()))
+    )
     var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
 
-    RidesScreen(ridesScreenViewModel,{})
+    RidesScreen(ridesScreenViewModel, {}, {})
 }

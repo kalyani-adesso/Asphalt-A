@@ -10,6 +10,9 @@ import Foundation
 public struct AppStrings{
     
     public enum WelcomeStrings {
+        
+        public static let getStarted = "GET STARTED"
+        
         public static let welcomeTitle = "Welcome to the Joy\nof Riding"
         public static let welcomeSubtitle = "Connect with fellow motorcycle enthusiasts and discover amazing rides in your area."
         
@@ -193,7 +196,7 @@ public struct AppStrings{
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
     
-    enum CreateRide: String {
+    enum CreateRideButton: String {
         
         case previous = "PREVIOUS"
         case next = "NEXT"
@@ -202,6 +205,26 @@ public struct AppStrings{
         case done = "DONE"
         
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
+    }
+    
+    enum CreateRide {
+        static let rideType = "Ride Type"
+        static let rideTitle = "Ride Title"
+        static let rideTitleLabel =  "Enter ride name..."
+        static let description = "Description"
+        static let descriptionLabel = "Describe the vibe..."
+        static let date = "Date"
+        static let time = "time"
+        static let createRide = "Create a Ride"
+        static let inviteContacts = "Invite Contacts"
+        static let search = "Search by name ,number or bike type..."
+        static let reviewSubTitle = "Review Your Ride"
+        static let reviewDate = "Date and Time"
+        static let reviewRoute = "Route"
+        static let reviewParticipants =  "Participants"
+        static let shareTitle =  "Share Link"
+        static let shareSubTitle =  "Share Via"
+        
     }
 
     enum Notification : String {
@@ -387,6 +410,42 @@ public struct AppStrings{
         static let rideMessage = "Completing ride"
         static let skip = "skip"
         static let submitRating = "Submit Rating"
+    }
+    
+    enum Rating {
+        static let rateTitle = "Rate Your Ride"
+        static let rateSubTitle = "How was your experience on this ride?"
+        static let rateFeedback = "Share your feedback (optional)"
+        static let rateFeedbackLabel = "Tell us about your ride experience..."
+    }
+    
+    enum Query {
+        static let answerTitle = "Answer to Query"
+        static let feedbackLabel = "Share your knowledge and help the community..."
+        static let cancel = "Cancel"
+        static let postAnswer = "Post Answer"
+        static let selectMake = "Select motorcycle"
+        static let model = "Model"
+        static let selectModel = "Select model"
+        static let searchLabel = "Search questions ..."
+        static let emptyQuery = "No queries found"
+        static let emptySubQuery = "Try changing filters or ask a new question."
+        static let qsButton = "ASK QUESTION"
+        static let qsTitle = "Question Title"
+        static let qsTitleLabel = "Brief Description of the question.."
+        static let qsCategory = "Category"
+        static let qsDescription = "Description"
+        static let qsDescriptionLabel = "Provide more details about your question..."
+        static let qsCancel =  "CANCEL"
+    }
+    
+    enum RidePopup {
+        static let photo = "Upload Photos from Gallery"
+        static let share = "Share your ride memories with the group"
+        static let photoTitle = "Ride Photos"
+        static let noPhoto = "No photos selected"
+        static let cancel =  "CANCEL"
+        static let addMore =  "ADD MORE"
     }
 }
 

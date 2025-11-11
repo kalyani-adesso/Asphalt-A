@@ -8,26 +8,26 @@
 import SwiftUI
 
 struct CreateRideView: View {
-    @StateObject private var viewModel = CreateRideViewModel()
+    @EnvironmentObject var viewModel: CreateRideViewModel
     var body: some View {
         NavigationStack {
-            Header(viewModel: viewModel)
+            Header()
             Group {
                 switch viewModel.currentStep {
                 case 1:
-                    DetailsView(viewModel: viewModel)
+                    DetailsView()
                 case 2:
-                    RouteView(viewModel: viewModel)
+                    RouteView()
                 case 3:
                     AnyView(
                         viewModel.ride.type?.rawValue == "Solo Ride"
-                        ? AnyView(ReviewView(viewModel: viewModel))
-                        : AnyView(ParticipantsView(viewModel: viewModel))
+                        ? AnyView(ReviewView())
+                        : AnyView(ParticipantsView())
                     )
                 case 4:
-                    ReviewView(viewModel: viewModel)
+                    ReviewView()
                 case 5:
-                    ShareView(viewModel: viewModel)
+                    ShareView()
                 default:
                     Text("Coming Soon...")
                         .font(.title)
@@ -35,9 +35,9 @@ struct CreateRideView: View {
             }
             .animation(.easeInOut, value: viewModel.currentStep)
         }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
