@@ -16,7 +16,7 @@ struct AnswerSheetView: View {
         VStack(spacing: 20) {
             // MARK: Header
             HStack {
-                Text("Answer to Query")
+                Text(AppStrings.Query.answerTitle)
                     .font(KlavikaFont.bold.font(size: 18))
                 Spacer()
                 Button {
@@ -120,7 +120,7 @@ struct AnswerSheetView: View {
                         )
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        TextField("Share your knowledge and help the community...", text: $viewModel.answerText, axis: .vertical)
+                        TextField(AppStrings.Query.feedbackLabel, text: $viewModel.answerText, axis: .vertical)
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundColor(AppColor.richBlack)
                             .padding()
@@ -135,7 +135,7 @@ struct AnswerSheetView: View {
                         
                         // Buttons under textfield
                         HStack(spacing: 12) {
-                            Button("Cancel") {
+                            Button(AppStrings.Query.cancel) {
                                 dismiss()
                             }
                             .font(KlavikaFont.medium.font(size: 14))
@@ -153,7 +153,7 @@ struct AnswerSheetView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "paperplane.fill")
-                                    Text("Post Answer")
+                                    Text(AppStrings.Query.postAnswer)
                                 }
                                 .font(KlavikaFont.medium.font(size: 14))
                                 .foregroundColor(.white)

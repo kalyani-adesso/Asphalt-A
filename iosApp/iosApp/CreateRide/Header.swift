@@ -33,7 +33,7 @@ struct Header: View {
                 
                 Spacer()
                 
-                Text("Create a Ride")
+                Text(AppStrings.CreateRide.createRide)
                     .font(KlavikaFont.bold.font(size: 19))
                     .foregroundColor(AppColor.black)
                 
