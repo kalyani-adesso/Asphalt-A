@@ -45,11 +45,11 @@ struct RidePopupView: View {
                         .resizable()
                         .frame(width: 64, height: 64)
                     
-                    Text("Upload Photos from Gallery")
+                    Text(AppStrings.RidePopup.photo)
                         .font(KlavikaFont.bold.font(size: 16))
                         .foregroundStyle(AppColor.richBlack)
                     
-                    Text("Share your ride memories with the group")
+                    Text(AppStrings.RidePopup.share)
                         .font(KlavikaFont.regular.font(size: 14))
                         .foregroundStyle(AppColor.stoneGray)
                 }
@@ -144,12 +144,12 @@ struct RidePopupView: View {
     // MARK: Preview Content
     private var previewContent: some View {
         VStack(spacing: 12) {
-            Text("Ride Photos")
+            Text(AppStrings.RidePopup.photoTitle)
                 .font(KlavikaFont.bold.font(size: 20))
                 .foregroundStyle(AppColor.richBlack)
             
             if selectedImages.isEmpty {
-                Text("No photos selected")
+                Text(AppStrings.RidePopup.noPhoto)
                     .font(.system(size: 14))
                     .foregroundColor(.gray)
             } else {
@@ -174,7 +174,7 @@ struct RidePopupView: View {
     private var footerButtons: some View {
         HStack(spacing: 12) {
             ButtonView(
-                title: "CANCEL" ,
+                title: AppStrings.RidePopup.cancel ,
                 fontSize: 16 ,
                 background: LinearGradient(
                     gradient: Gradient(colors: [.white, .white]),
@@ -190,7 +190,7 @@ struct RidePopupView: View {
             
             if activePopup == .previewSelected {
                 ButtonView(
-                    title: "ADD MORE",
+                    title: AppStrings.RidePopup.addMore,
                     fontSize: 16 ,
                     background: LinearGradient(
                         gradient: Gradient(colors: [AppColor.celticBlue, AppColor.celticBlue]),

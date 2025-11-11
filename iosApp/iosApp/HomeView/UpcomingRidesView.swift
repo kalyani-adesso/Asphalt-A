@@ -51,7 +51,6 @@ struct UpcomingRideCard: View {
     var hostName: String {
         viewModel.usersById[ride.createdBy] ?? "Unknown"
     }
-    let totalCount = 5
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -85,44 +84,33 @@ struct UpcomingRideCard: View {
                 HStack(spacing: 8) {
                     AppIcon.Home.group.resizable()
                         .frame(width: 15, height: 15)
-                    Text("5 people joined this ride")
+                    Text("\(ride.participantAcceptedCount) people joined this ride")
                         .font(KlavikaFont.regular.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
                 }
                 Spacer()
                 HStack{
-                    AppImage.Profile.profile.resizable()
-                        .frame(width: 19, height: 19)
-                        .clipShape(Circle())
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 32.5)
-                                .stroke(AppColor.green, lineWidth: 1.5)
-                        )
-                    AppImage.Profile.profile.resizable()
-                        .frame(width: 19, height: 19)
-                        .clipShape(Circle())
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 32.5)
-                                .stroke(AppColor.grayishBlue, lineWidth: 1.5)
-                        )
-                    AppImage.Profile.profile.resizable()
-                        .frame(width: 19, height: 19)
-                        .clipShape(Circle())
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 32.5)
-                                .stroke(AppColor.grayishBlue, lineWidth: 1.5)
-                        )
+                    let displayCount = min(ride.participantAcceptedCount, 3)
+                    ForEach(0..<displayCount, id: \.self) { index in
+                        AppImage.Profile.profile.resizable()
+                            .frame(width: 19, height: 19)
+                            .clipShape(Circle())
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 32.5)
+                                    .stroke(index == 0 ? AppColor.green : AppColor.grayishBlue, lineWidth: 1.5)
+                            )
+                    }
                 }
-                if totalCount > 3 {
+                if ride.participantAcceptedCount > 3 {
                     ZStack {
                         Circle()
-                            .fill(Color.celticBlue)
+                            .fill(AppColor.celticBlue)
                             .frame(width: 19, height: 19)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 32.5)
                                     .stroke(AppColor.grayishBlue, lineWidth: 1.5)
                             )
-                        Text("+\(totalCount - 3)")
+                        Text("+\(ride.participantAcceptedCount - 3)")
                             .font(KlavikaFont.bold.font(size: 12))
                             .foregroundColor(AppColor.white)
                     }

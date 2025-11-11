@@ -60,7 +60,7 @@ struct RouteView: View {
         Spacer()
         HStack(spacing: 15) {
             ButtonView(
-                title: AppStrings.CreateRide.previous.rawValue,
+                title: AppStrings.CreateRideButton.previous.rawValue,
                 background: LinearGradient(
                     gradient: Gradient(colors: [.white, .white]),
                     startPoint: .leading,
@@ -75,7 +75,7 @@ struct RouteView: View {
             )
             
             ButtonView(
-                title: AppStrings.CreateRide.next.rawValue,
+                title: AppStrings.CreateRideButton.next.rawValue,
                 showShadow: false,
                 onTap: {
                     viewModel.getDistance()

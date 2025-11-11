@@ -77,6 +77,5 @@ class ProfileRepository(private val apiService: ProfileAPIService) {
         return apiService.getBikeById(userId = userUID, bikeId).mapApiResult {
             it.toBikeDomain(bikeId)
         }
-
     }
 }
