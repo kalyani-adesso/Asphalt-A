@@ -65,6 +65,7 @@ struct ConnectedRideMapView: View {
                     
                     Button(action: {
                         self.rideComplted = true
+                        viewModel.endRide(rideId:rideModel.rideId)
                     }, label: {
                         Text(AppStrings.ConnectedRide.endRideButton)
                             .frame(maxWidth: .infinity,minHeight: 60)
@@ -181,6 +182,11 @@ struct ConnectedRideMapView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
                 }
+                if !rideModel.rideJoined {
+                    viewModel.joinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                } else {
+                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                }
             }
             .onChange(of: startTrack) { isTracking in
                 if !isTracking{
@@ -190,7 +196,6 @@ struct ConnectedRideMapView: View {
                         self.elapsedSeconds += 1
                     }
                 }
-                
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -273,10 +278,10 @@ struct ConnectedRideMapView: View {
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
     
-        func stopTimer() {
-            self.timer?.invalidate()
-            self.timer = nil
-        }
+    func stopTimer() {
+        self.timer?.invalidate()
+        self.timer = nil
+    }
     
     @ViewBuilder func mapActionButton() -> some View {
         Button(action: {
