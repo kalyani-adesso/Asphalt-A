@@ -34,6 +34,7 @@ import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.navigation.AppNavKey.SplashKey
+import com.asphalt.android.viewmodel.joinridevm.JoinRideViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.BannerType

@@ -23,10 +23,11 @@ class KtorClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(Json {
-                    ignoreUnknownKeys = true
+                    ignoreUnknownKeys = true // ignore extra fields in JSON
                     prettyPrint = true
-                    isLenient = true
+                    isLenient = true // accept non-strict JSON
                     encodeDefaults = true
+                    coerceInputValues= true // coerce missing primitive values to defaults
                 })
             }
 
@@ -58,6 +59,4 @@ class KtorClient {
             }
         }
     }
-
-
 }

@@ -197,7 +197,7 @@ fun ConnectedRideEnd(
             GradientButton(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    //TODO
+                    onNavigateToDashboard.invoke()
 
                 },
                 buttonHeight = Dimensions.size60,

@@ -13,6 +13,6 @@ val joinRideModule = module {
     viewModel { RatingViewModel() }
     viewModel { RidesDifficultyViewModel() }
     viewModel { RidersGroupViewModel(get()) }
-    single { JoinRideRepository() }
+    single { JoinRideRepository(get()) }
     single { RidersGroupRepo() }
 }

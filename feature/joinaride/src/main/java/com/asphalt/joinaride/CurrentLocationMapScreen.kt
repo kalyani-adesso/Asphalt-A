@@ -1,6 +1,8 @@
 package com.asphalt.joinaride
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,9 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.commonui.PermissionHandler
+import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 
@@ -61,12 +66,29 @@ fun CurrentLocationMapScreen(locationProvider: LocationProvider) {
 @Composable
 fun MapWithCurrentLocation(locationProvider: LocationProvider) {
 
+    val locations = listOf(
+        LatLng(18.5204,73.8567), // pune
+        LatLng(19.0760,72.8777), // mumbai
+        LatLng(12.9716,77.5946), // banglore
+        LatLng(28.6139,77.2090) // delhi
+    )
 
     val coroutineScope = rememberCoroutineScope()
     var cameraPositionState = rememberCameraPositionState()
 
-    var userLocation  by remember { mutableStateOf< com.google.android.gms.maps.model.LatLng?>(null) }
+    var userLocation  by remember { mutableStateOf<LatLng?>(null) }
     var loading by remember { mutableStateOf(true) }
+
+    // calculate distance
+    val totalDistance = FloatArray(2)
+    Location.distanceBetween(
+        locations[0].latitude, locations[0].longitude,
+        locations[1].latitude, locations[1].longitude,
+        totalDistance
+    )
+
+    val distanceKm = totalDistance[0]/1000 // convert meters -> km
+
 
     LaunchedEffect(Unit) {
         loading = true
@@ -75,7 +97,8 @@ fun MapWithCurrentLocation(locationProvider: LocationProvider) {
 
     if (userLocation != null) {
         cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(userLocation!!,18f)
+          //  position = CameraPosition.fromLatLngZoom(userLocation!!,18f)
+            position = CameraPosition.fromLatLngZoom(locations.first(),5f)
         }
         try {
         }catch (t: Throwable) {
@@ -90,9 +113,19 @@ fun MapWithCurrentLocation(locationProvider: LocationProvider) {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState) {
 
-            Marker(state = rememberUpdatedMarkerState( position = userLocation!!),
-                title = "You are here")
+            locations.forEach { latlng ->
+                Marker(state = rememberUpdatedMarkerState(
+                    position = latlng), title = "You are here ${latlng.latitude},${latlng.longitude}",
+                    snippet = "Example location")
+            }
 
+            Polyline(
+                points = locations,
+                color = PrimaryBrighterLightW75,
+                width = 8f
+            )
+
+            Log.d("TAG", "MapWithCurrentLocation: distance $distanceKm")
             Log.d("TAG", "MapWithCurrentLocation: ${userLocation!!.latitude},${userLocation!!.longitude}")
 
             if (loading) {

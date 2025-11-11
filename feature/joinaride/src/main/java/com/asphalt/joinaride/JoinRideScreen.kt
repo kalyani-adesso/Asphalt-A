@@ -1,52 +1,38 @@
 package com.asphalt.joinaride
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.model.joinride.JoinRideModel
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.SearchView
@@ -66,24 +53,13 @@ import com.asphalt.android.viewmodel.joinridevm.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.NeutralBlack
-import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralGrey80
-import com.asphalt.commonui.theme.NeutralLightGrey
-import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.SafetyOrange
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
-import com.asphalt.commonui.utils.ComposeUtils.getScreenWidth
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.dashboard.constants.DashboardInvitesConstants
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -100,6 +76,8 @@ fun JoinRideScreen(
 
     toolbarTitle = stringResource(R.string.join_ride)
 
+    viewModel.getAllRiders()
+
     setTopAppBarState(
         AppBarState(title = toolbarTitle)
     )
@@ -115,12 +93,14 @@ fun JoinRideScreen(
 }
 
 @Composable
-fun JoinRide(viewModel: JoinRideViewModel,
-             navigateToConnectedRide:() -> Unit,
-             navigateToEndRide: () -> Unit) {
+fun JoinRide(
+    viewModel: JoinRideViewModel,
+    navigateToConnectedRide: () -> Unit,
+    navigateToEndRide: () -> Unit
+) {
 
-    val query by viewModel.searchQuery.collectAsState()
-    val riders by viewModel.filteredList.collectAsState()
+    val rides by viewModel.rides.collectAsState()
+    var query by remember { mutableStateOf("") }
 
     Column {
 
@@ -128,22 +108,28 @@ fun JoinRide(viewModel: JoinRideViewModel,
             query = query,
             modifier = Modifier.fillMaxWidth()
                 .padding(top = Dimensions.padding20, start = Dimensions.padding16, end = Dimensions.padding16)
-                .background(NeutralLightPaper,
+                .background(color = NeutralLightPaper,
                     shape = RoundedCornerShape(size = Dimensions.size10)),
-            onQueryChange = { viewModel.onSearchQueryChanged(it)},
-            onClearClick = { viewModel.onSearchQueryChanged("")},
+            onQueryChange = { query = it},
+            onClearClick = { },
             placeholder = "Search rides by location.."
         )
         Spacer(modifier = Modifier.height(Dimensions.padding20))
 
-        if (riders.isEmpty()) {
-            Text("No Riders Found", style = MaterialTheme.typography.bodyLarge)
+        if (rides.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No Riders Found", style = MaterialTheme.typography.bodyLarge)
+            }
         }
         else {
             LazyColumn {
-                items(riders) { rider ->
-                    RiderCard(rider, navigateToConnectedRide = {navigateToConnectedRide.invoke()},
-                        navigateToEndRide = { navigateToEndRide.invoke() })
+                items(rides) { rider ->
+                    RiderCard( navigateToConnectedRide = {navigateToConnectedRide.invoke()},
+                        navigateToEndRide = { navigateToEndRide.invoke() },
+                        ridersList = rider)
                 }
             }
         }
@@ -152,9 +138,11 @@ fun JoinRide(viewModel: JoinRideViewModel,
 
 @Composable
 fun RiderCard(
-    rider: JoinRideModel,
-    navigateToConnectedRide:() -> Unit,
-    navigateToEndRide:() -> Unit) {
+    navigateToConnectedRide: () -> Unit,
+    navigateToEndRide: () -> Unit,
+    ridersList : RidesData
+) {
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -168,9 +156,7 @@ fun RiderCard(
 
         Column(
             modifier = Modifier
-                .padding(
-                    vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16
-                )
+                .padding(vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16)
                 .fillMaxSize()
         ) {
             Row(
@@ -192,19 +178,19 @@ fun RiderCard(
                         imageUrl = "dashboardRideInvite.inviterProfilePicUrl",
                         placeholderPainter = painterResource(R.drawable.profile_placeholder)
                     )
-                    Spacer(Modifier.width(Dimensions.size10))
+                    Spacer(Modifier.width(width = Dimensions.size10))
                     Column {
                         Text(
-                            text = (rider.rideType),
+                            text = (ridersList.rideType!!),
                             style = TypographyBold.titleMedium,
                             fontSize = Dimensions.textSize16,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(end = Dimensions.size10)
                         )
-                        Spacer(Modifier.height(Dimensions.size3))
+                        Spacer(Modifier.height(height = Dimensions.size3))
                         Text(
-                            text = (rider.byWhom),
+                            text = (ridersList.createdBy!!),
                             style = Typography.titleMedium,
                             color = NeutralDarkGrey,
                             fontSize = Dimensions.textSize12,
@@ -214,10 +200,10 @@ fun RiderCard(
                         )
                     }
 
-                    Spacer(Modifier.height(Dimensions.size17))
+                    Spacer(Modifier.height(height = Dimensions.size17))
                 }
             }
-            Spacer(Modifier.height(Dimensions.padding10))
+            Spacer(Modifier.height(height = Dimensions.padding10))
             Column {
                 Text(
                     text = ("Join us for a beautiful sunrise ride along with coastal highway"),
@@ -227,7 +213,7 @@ fun RiderCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = Dimensions.size10)
                 )
-                Spacer(Modifier.height(Dimensions.padding10))
+                Spacer(Modifier.height(height = Dimensions.padding10))
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -241,32 +227,24 @@ fun RiderCard(
                             contentDescription = "Email Icon",
                             tint = PrimaryDarkerLightB75,
                         )
-                        Spacer(Modifier.width(Dimensions.size5))
-
+                        Spacer(Modifier.width(width = Dimensions.size5))
                         Text(
-                            text =(rider.destination),
+                            text =(ridersList.description!!),
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
-
                     }
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(
-                                id = R.drawable.ic_rides
-                            ),
+                            painter = painterResource(id = R.drawable.ic_rides),
                             contentDescription = "Ride KM",
-                            tint = SafetyOrange,
-                        )
+                            tint = SafetyOrange)
                         Spacer(Modifier.width(Dimensions.size5))
-
                         Text(
-                            text =(rider.distance),
+                            text =(ridersList.rideTitle!!),
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
-
                     }
                 }
 
@@ -285,11 +263,12 @@ fun RiderCard(
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
+                        val timeStamp = ridersList.createdDate
                         Text(
                             text = Utils.formatDateTime(
-                                rider.dateTime,
-                                "dd/MM/yyyy HH:mm",
-                                "EEE, dd MMM yyyy - hh:mm a"
+                                input = timeStamp.toString(),
+                                inputFormat = "dd/MM/yyyy HH:mm",
+                                outputFormat = "EEE, dd MMM yyyy - hh:mm a"
                             ),
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
@@ -306,7 +285,7 @@ fun RiderCard(
                         Spacer(Modifier.width(Dimensions.size5))
                         Text(
                             text = Utils.formatDateTime(
-                                rider.riders,
+                                ridersList.rideType!!,
                                 "dd/MM/yyyy HH:mm",
                                 "EEE, dd MMM yyyy - hh:mm a"
                             ),
@@ -315,7 +294,6 @@ fun RiderCard(
                         )
                     }
                 }
-
                 Spacer(Modifier.height(height = Dimensions.size20))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(
@@ -390,8 +368,8 @@ fun RiderCard(
 @Preview
 fun JoinRideScrenPreview() {
 
-    JoinRideScreen(setTopAppBarState = {},
-        viewModel = viewModel(),
-        navigateToConnectedRide = {},
-        navigateToEndRide = {})
+//    JoinRideScreen(setTopAppBarState = {},
+//        viewModel = viewModel(),
+//        navigateToConnectedRide = {},
+//        navigateToEndRide = {})
 }
