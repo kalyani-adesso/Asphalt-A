@@ -16,6 +16,7 @@ import com.asphalt.dashboard.utils.RidesFilter
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.Calendar
 
 
 class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), KoinComponent {
@@ -40,6 +41,7 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
     fun getRides() {
 
         viewModelScope.launch {
+            val currentTime = Calendar.getInstance().timeInMillis
             var user = userRepoImpl.getUserDetails()
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
@@ -52,8 +54,13 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 var invite = RidesFilter.getInvites(sortedArray, user?.uid ?: "", androidUserVM)
                 var upcomiList = ArrayList<YourRideDataModel>()
                 var inviteList = ArrayList<YourRideDataModel>()
+
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
+                if (upcomiList.isNotEmpty()) {
+                    upcomiList.removeAll{ride ->
+                        ride.startDate?.let { it < currentTime } ?: false}
+                }
                 var ridesList =
                     YourRideRoot(
                         upcoming = upcomiList,

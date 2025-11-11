@@ -22,7 +22,8 @@ object RidesFilter {
                     if (ride.participants.isNullOrEmpty()) {
                         UPCOMING
                     } else {
-                        val participant = ride.participants.find { it.inviteStatus == APIConstants.RIDE_INVITED }
+                        val participant =
+                            ride.participants.find { it.inviteStatus == APIConstants.RIDE_INVITED }
                         if (participant == null) {
                             UPCOMING
                         } else {
@@ -54,7 +55,8 @@ object RidesFilter {
                 rideStatus = rideStatus,
                 date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
                 riders = ride.participants.size,
-                createdBy = ride.createdBy
+                createdBy = ride.createdBy,
+                startDate = ride.startDate
             )
         }
     }
