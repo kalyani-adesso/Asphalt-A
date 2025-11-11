@@ -162,6 +162,7 @@ struct ConnectedRideMapView: View {
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $rideComplted, destination: {
                 ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: JoinRideModel(
+                    userId: "", rideId: "",
                     title: "Weekend Coast Ride",
                     organizer: "Sooraj",
                     description: "Join us for a beautiful sunrise ride along the coastal highway",
@@ -170,7 +171,7 @@ struct ConnectedRideMapView: View {
                     date: "Sun, Oct 21",
                     ridersCount: "3",
                     maxRiders: "8",
-                    riderImage: "rider_avatar"
+                    riderImage: "rider_avatar", contactNumber: ""
                 ))
             })
             .onAppear() {

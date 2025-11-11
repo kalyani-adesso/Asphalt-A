@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 
 struct PlaceSearchView: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     var searchText: String
     var isSelectingStart: Bool
     var dismiss: () -> Void

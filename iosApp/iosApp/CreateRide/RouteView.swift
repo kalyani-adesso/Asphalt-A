@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct RouteView: View {
-    @ObservedObject var viewModel: CreateRideViewModel
+    @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showLocationPicker = false
     @State private var searchText = ""
     @State private var isSelectingStart = true
-
+    
     var body: some View {
         VStack(spacing: 20) {
             stepIndicator
@@ -30,7 +30,7 @@ struct RouteView: View {
                     isSelectingStart = true
                     showLocationPicker = true
                 }
-    
+                
                 LocationFieldView(
                     label: "Destination",
                     icon: AppIcon.CreateRide.route,
@@ -46,7 +46,6 @@ struct RouteView: View {
             }
             .sheet(isPresented: $showLocationPicker) {
                 PlaceSearchView(
-                    viewModel: viewModel,
                     searchText: searchText,
                     isSelectingStart: isSelectingStart,
                     dismiss: { showLocationPicker = false }
@@ -61,7 +60,7 @@ struct RouteView: View {
         Spacer()
         HStack(spacing: 15) {
             ButtonView(
-                title: AppStrings.CreateRide.previous.rawValue,
+                title: AppStrings.CreateRideButton.previous.rawValue,
                 background: LinearGradient(
                     gradient: Gradient(colors: [.white, .white]),
                     startPoint: .leading,
@@ -76,14 +75,14 @@ struct RouteView: View {
             )
             
             ButtonView(
-                title: AppStrings.CreateRide.next.rawValue,
+                title: AppStrings.CreateRideButton.next.rawValue,
                 showShadow: false,
                 onTap: {
                     viewModel.getDistance()
                     viewModel.nextStep()
                 }
             )
-           .disabled(!viewModel.isRouteValid)
+            .disabled(!viewModel.isRouteValid)
         }
         .padding()
     }
@@ -92,7 +91,9 @@ struct RouteView: View {
         HStack(spacing: 32) {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)
             StepIndicator(icon: AppIcon.CreateRide.route, title: "Route", isActive: true, isCurrentPage: true)
-            StepIndicator(icon: AppIcon.Home.group, title: "Participants")
+            if viewModel.ride.type?.rawValue != "Solo Ride" {
+                StepIndicator(icon: AppIcon.Home.group, title: "Participants")
+            }
             StepIndicator(icon: AppIcon.CreateRide.review, title: "Review")
             StepIndicator(icon: AppIcon.CreateRide.share, title: "Share")
         }
@@ -109,7 +110,7 @@ struct LocationFieldView: View {
     
     var backgroundColor: Color = AppColor.backgroundLight
     var onTap: (() -> Void)? = nil
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(label)
@@ -129,7 +130,7 @@ struct LocationFieldView: View {
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundStyle(AppColor.richBlack)
                         .disabled(true)
-                        
+                    
                     Rectangle()
                         .foregroundColor(.clear)
                         .contentShape(Rectangle())
@@ -150,5 +151,5 @@ struct LocationFieldView: View {
 }
 
 #Preview {
-    RouteView(viewModel: CreateRideViewModel.init())
+    RouteView()
 }

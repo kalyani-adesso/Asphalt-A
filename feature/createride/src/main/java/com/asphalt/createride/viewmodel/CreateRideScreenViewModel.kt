@@ -2,6 +2,8 @@ package com.asphalt.createride.viewmodel
 
 import android.content.Context
 import android.icu.util.Calendar
+import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +19,7 @@ import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.util.LocationUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
@@ -169,6 +172,16 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(endLocation = loc)
     }
 
+    fun updateStartLocation(lat: Double, lon: Double) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(startLat = lat, startLon = lon)
+    }
+
+    fun updateEndLocation(lat: Double, lon: Double) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(endLat = lat, endLon = lon)
+    }
+
     fun updateTab(tab: Int) {
 
         _tabSelectMutableState.value += tab
@@ -198,6 +211,13 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     }
 
     suspend fun createRide() {
+        val totalDistance = FloatArray(2)
+        Location.distanceBetween(_rideDetailsMutableState.value.startLat ?: 0.0,
+            _rideDetailsMutableState.value.startLon ?: 0.0,
+            _rideDetailsMutableState.value.endLat ?: 0.0,
+            _rideDetailsMutableState.value.endLon ?: 0.0,totalDistance)
+        val distanceKm : Double = (totalDistance[0]/1000).toDouble()
+        Log.d("TAG", "MapWithCurrentLocation: distance $distanceKm")
         val cal = Calendar.getInstance()
         val userDetails = userRepoImpl.getUserDetails()
         val map: Map<String, UserInvites> =
@@ -221,8 +241,15 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             startLocation = _rideDetailsMutableState.value.startLocation,
             endLocation = _rideDetailsMutableState.value.endLocation,
             createdDate = cal.timeInMillis,
-            participants = map
+            participants = map,
+            startLatitude = _rideDetailsMutableState.value.startLat ?: 0.0,
+            startLongitude = _rideDetailsMutableState.value.startLon ?: 0.0,
+            endLatitude = _rideDetailsMutableState.value.endLat ?: 0.0,
+            endLongitude = _rideDetailsMutableState.value.endLon ?: 0.0,
+            distance = distanceKm
         )
+
+
 
         val apiResult = APIHelperUI.runWithLoader {
             ridesRepo.createRide(createRide)
@@ -251,7 +278,8 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                             id = it.uid,
                                             bike = it.primaryBike,
                                             job = if (it.isMechanic)
-                                                "Mechanic" else ""
+                                                "Mechanic" else "",
+                                            imgUrl=it.profilePic
                                         )
                                     })
                         _ridersListMutable.value = _fullList.value

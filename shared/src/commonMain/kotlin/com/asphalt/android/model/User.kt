@@ -20,7 +20,17 @@ data class UserDomain(
     val email: String,
     val name: String,
     val profilePic: String,
-    val isMechanic:Boolean,
-    val primaryBike: String
+    val isMechanic: Boolean,
+    val primaryBike: String,
+    val contactNumber: String,
+)
+
+data class RidersList(
+    val uid: String,
+    val name: String,
+    val profilePic: String,
+    val isOrganizer: Boolean,
+    val inviteStatus : Int,
+    val displayStatusString : Int
 )
 
