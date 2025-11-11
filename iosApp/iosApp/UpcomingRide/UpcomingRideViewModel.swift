@@ -43,6 +43,7 @@ struct RideModel: Identifiable,Hashable {
     let createdBy: String
     var hasPhotos: Bool = false
     let startDate: Date
+    let participantAcceptedCount: Int
 }
 
 
@@ -94,21 +95,29 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
-                let now = Calendar.current.startOfDay(for: Date())
+                let now = Date()
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
+                let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+            
                 
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
                 
-                if startDate < now {
+                if startDate <= now {
+                    // If user was invited but never accepted, skip adding to history
+                    if isParticipant, let inviteStatus = myInviteStatus, inviteStatus != 1 {
+                        continue
+                    }
+                    
                     rideAction = .history
                     rideStatus = .complete
                     rideViewAction = .shareExperience
                 }
+                
                 else {
                     if ride.createdBy == currentUserID {
                         //upcoming Ride that I have created
@@ -123,9 +132,14 @@ class UpcomingRideViewModel: ObservableObject {
                         }
                         //Invites
                     } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
-                        rideAction = .invities
-                        rideStatus = .invite
-                        rideViewAction = .decline
+                        if startDate >= now {
+                            rideAction = .invities
+                            rideStatus = .invite
+                            rideViewAction = .decline
+                        } else {
+                            continue 
+                        }
+                        
                         //accepted invites
                     } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 1 {
                         rideAction = .upcoming
@@ -140,7 +154,6 @@ class UpcomingRideViewModel: ObservableObject {
                         continue
                     }
                 }
-                
                 let mapped = RideModel(
                     id: ride.ridesID ?? UUID().uuidString,
                     title: ride.rideTitle ?? "",
@@ -152,7 +165,8 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    startDate: startDate
+                    startDate: startDate,
+                    participantAcceptedCount: participantAcceptedCount
                 )
                 
                 switch rideAction {
@@ -164,7 +178,7 @@ class UpcomingRideViewModel: ObservableObject {
             
             upcoming.sort { $0.startDate < $1.startDate }
             upcomingRides = upcoming
-            history.sort { $0.startDate < $1.startDate }
+            history.sort { $0.startDate > $1.startDate }
             historyRides = history
             invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites
