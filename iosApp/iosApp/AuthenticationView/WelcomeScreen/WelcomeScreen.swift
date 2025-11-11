@@ -24,7 +24,7 @@ public struct WelcomeScreen: View {
                 VStack {
                     Spacer()
                     ZStack {
-                        Color("CelticBlue")
+                        AppColor.celticBlue
                             .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
                             .edgesIgnoringSafeArea(.bottom)
                     }
@@ -54,7 +54,7 @@ public struct WelcomeScreen: View {
                         showSignin = true
                     }) {
                         HStack {
-                            Text("GET STARTED")
+                            Text(AppStrings.WelcomeStrings.getStarted)
                             Spacer()
                             AppIcon.Welcome.arrow
                             

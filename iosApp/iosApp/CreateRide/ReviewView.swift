@@ -17,7 +17,7 @@ struct ReviewView: View {
                     stepIndicator
                     VStack(alignment: .leading, spacing: 20) {
                         HStack {
-                            Text("Review Your Ride")
+                            Text(AppStrings.CreateRide.reviewSubTitle)
                                 .font(KlavikaFont.medium.font(size: 16))
                         }
                         ReviewCard(
@@ -29,17 +29,17 @@ struct ReviewView: View {
                         ReviewCard(
                             icon: AppIcon.Home.calender,
                             iconColor: AppColor.darkOrange,
-                            title: "Date and Time",
+                            title: AppStrings.CreateRide.reviewDate,
                             subtitle: formattedDateTime)
                         ReviewCard(
                             icon: AppIcon.CreateRide.route,
                             iconColor: AppColor.purple,
-                            title: "Route",
+                            title:AppStrings.CreateRide.reviewRoute,
                             subtitle: "\(viewModel.ride.startLocation) - \(viewModel.ride.endLocation)")
                         ReviewCard(
                             icon: AppIcon.Home.group,
                             iconColor: AppColor.lightOrange,
-                            title: "Participants",
+                            title: AppStrings.CreateRide.reviewParticipants,
                             subtitle:"\(viewModel.selectedParticipants.count) riders selected")
                     }
                     .frame(width: 343, height: 430)
@@ -51,7 +51,7 @@ struct ReviewView: View {
                 Spacer()
                 
                 HStack(spacing: 15) {
-                    ButtonView( title: AppStrings.CreateRide.previous.rawValue,
+                    ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
                                 background: LinearGradient(
                                     gradient: Gradient(colors: [.white, .white]),
                                     startPoint: .leading,
@@ -62,7 +62,7 @@ struct ReviewView: View {
                         viewModel.previousStep()
                     })
                     
-                    ButtonView( title: AppStrings.CreateRide.create.rawValue,
+                    ButtonView( title: AppStrings.CreateRideButton.create.rawValue,
                                 showShadow: false , onTap: {
                         viewModel.createRide(completion: {success in
                             if success {

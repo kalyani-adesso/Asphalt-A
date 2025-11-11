@@ -17,7 +17,7 @@ struct ParticipantsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 
                 HStack {
-                    Text("Invite Contacts")
+                    Text(AppStrings.CreateRide.inviteContacts)
                         .font(KlavikaFont.medium.font(size: 16))
                     Spacer()
                     Text("\(viewModel.selectedParticipants.count) selected")
@@ -27,7 +27,7 @@ struct ParticipantsView: View {
                 FormFieldView(
                     label: " ",
                     icon:  AppIcon.CreateRide.searchLens,
-                    placeholder:"Search by name ,number or bike type...",
+                    placeholder:AppStrings.CreateRide.search,
                     iconColor: AppColor.celticBlue,
                     value: $searchText,
                     isValidEmail: .constant(false),
@@ -57,7 +57,7 @@ struct ParticipantsView: View {
         }
         Spacer()
         HStack(spacing: 15) {
-            ButtonView( title: AppStrings.CreateRide.previous.rawValue,
+            ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
                         background: LinearGradient(
                             gradient: Gradient(colors: [.white, .white]),
                             startPoint: .leading,
@@ -68,7 +68,7 @@ struct ParticipantsView: View {
                 viewModel.previousStep()
             }
             
-            ButtonView( title: AppStrings.CreateRide.next.rawValue,
+            ButtonView( title: AppStrings.CreateRideButton.next.rawValue,
                         showShadow: false , onTap: {
                 viewModel.nextStep()
             }

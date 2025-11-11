@@ -39,15 +39,15 @@ struct QueryPopupView: View {
                 // Text fields
                 VStack(alignment: .leading, spacing: 20) {
                     
-                    Text("Question Title").font(KlavikaFont.medium.font(size: 16))
+                    Text(AppStrings.Query.qsTitle).font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
-                    TextField("Brief Description of the question..", text: $viewModel.askQuery.question)
+                    TextField(AppStrings.Query.qsTitleLabel, text: $viewModel.askQuery.question)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(10)
-                    Text("Category")
+                    Text(AppStrings.Query.qsCategory)
                         .font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
                     
@@ -80,9 +80,9 @@ struct QueryPopupView: View {
                     
                     
                     
-                    Text("Description").font(KlavikaFont.medium.font(size: 16))
+                    Text(AppStrings.Query.qsDescription).font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
-                    TextField("Provide more details about your question...", text: $viewModel.askQuery.description, axis: .vertical)
+                    TextField(AppStrings.Query.qsDescriptionLabel, text: $viewModel.askQuery.description, axis: .vertical)
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
                         .padding()
@@ -95,7 +95,7 @@ struct QueryPopupView: View {
                 // Buttons
                 
                 HStack(spacing: 19) {
-                    ButtonView( title: "CANCEL",
+                    ButtonView( title: AppStrings.Query.qsCancel,
                                 background: LinearGradient(
                                     gradient: Gradient(colors: [.white, .white]),
                                     startPoint: .leading,
@@ -105,7 +105,7 @@ struct QueryPopupView: View {
                                 borderColor: AppColor.darkRed, onTap: {
                         isPresented = false
                     })
-                    ButtonView( title: "ASK QUESTION",
+                    ButtonView( title: AppStrings.Query.qsButton,
                                 showShadow: false,onTap: {
                         Task {
                             await viewModel.addQuery()

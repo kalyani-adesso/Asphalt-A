@@ -39,10 +39,10 @@ struct RatingSheetView: View {
                 VStack(spacing: 10) {
                     AppIcon.ConnectedRide.rateLogo
                
-                    Text("Rate Your Ride")
+                    Text(AppStrings.Rating.rateTitle)
                         .font(KlavikaFont.bold.font(size: 16))
                     
-                    Text("How was your experience on this ride?")
+                    Text(AppStrings.Rating.rateSubTitle)
                         .foregroundColor(AppColor.grey)
                         .font(KlavikaFont.regular.font(size: 16))
                 }
@@ -58,11 +58,11 @@ struct RatingSheetView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack{
                        Image(systemName:"bubble.left")
-                        Text("Share your feedback (optional)")
+                        Text(AppStrings.Rating.rateFeedback)
                             .foregroundColor(AppColor.grey)
                             .font(KlavikaFont.regular.font(size: 14))
                     }
-                    TextField("Tell us about your ride experience...", text: $feedback, axis: .vertical)
+                    TextField(AppStrings.Rating.rateFeedbackLabel, text: $feedback, axis: .vertical)
                         .foregroundColor(AppColor.grey)
                         .font(KlavikaFont.regular.font(size: 16))
                         .padding()
