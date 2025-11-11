@@ -51,7 +51,9 @@ struct ConnectedRideCompleteView: View {
             })
         }
         .navigationDestination(isPresented: $showMapView, destination: {
-            ConnectedRideMapView()
+            if #available(iOS 17.0, *) {
+                ConnectedRideMapView(rideModel: viewModel)
+            }
         })
         .onAppear {
             // Show rating sheet after 2 seconds

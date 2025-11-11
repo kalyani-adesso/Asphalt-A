@@ -4,6 +4,10 @@ import com.asphalt.android.mapApiResult
 import com.asphalt.android.mappers.toRideInviteListDomain
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.profile.BikeDTO
+import com.asphalt.android.model.profile.BikeDomain
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.RideInvitesDomain
@@ -68,9 +72,41 @@ class RidesRepository(val apiService: RidesApIService) {
                 endLongitude = rowData.endLongitude,
                 rideDistance = rowData.distance
             )
-
         } ?: emptyList()
+    }
 
+    suspend fun joinRide(joinRide: ConnectedRideRoot): APIResult<ConnectedRideDTO> {
+        return apiService.joinRide(joinRide).mapApiResult { response ->
+            ConnectedRideDTO(
+                rideJoinedID = response.name,
+                rideID = joinRide.rideID ?: "",
+                userID = joinRide.userID ?: "",
+                currentLat = joinRide.currentLat ?: 0.0,
+                currentLong = joinRide.currentLong ?: 0.0,
+                speedInKph = joinRide.speedInKph ?: 0.0,
+                dateTime = joinRide.dateTime ?: 0L,
+                isRejoined = joinRide.isRejoined ?: false
+            )
+        }
+    }
+
+    suspend fun reJoinRide(rejoinRide: ConnectedRideRoot,ongoingRideId: String): APIResult<ConnectedRideDTO> {
+            return apiService.rejoinRide(rejoinRide,ongoingRideId).mapApiResult { response ->
+                ConnectedRideDTO(
+                    rideJoinedID = response.name,
+                    rideID = rejoinRide.rideID ?: "",
+                    userID = rejoinRide.userID ?: "",
+                    currentLat = rejoinRide.currentLat ?: 0.0,
+                    currentLong = rejoinRide.currentLong ?: 0.0,
+                    speedInKph = rejoinRide.speedInKph ?: 0.0,
+                    dateTime = rejoinRide.dateTime ?: 0L,
+                    isRejoined = rejoinRide.isRejoined ?: false
+                )
+            }
+    }
+
+    suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit> {
+        return apiService.endRide(rideId, rideJoinedId)
     }
 
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
