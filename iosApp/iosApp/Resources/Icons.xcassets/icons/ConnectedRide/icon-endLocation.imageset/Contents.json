@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-endLocation.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

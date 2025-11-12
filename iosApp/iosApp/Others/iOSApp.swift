@@ -1,0 +1,38 @@
+import SwiftUI
+import FirebaseCore
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        
+        return true
+    }
+}
+
+@main
+struct iOSApp: App {
+    @AppStorage(AppStrings.userdefaultKeys.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var homeViewModel: HomeViewModel = .init()
+    @StateObject var upcomingVM: UpcomingRideViewModel = .init()
+    var body: some Scene {
+        WindowGroup {
+            if MBUserDefaults.rememberMeDataStatic == true  {
+                BottomNavBar()
+                    .environmentObject(homeViewModel)
+                    .environmentObject(upcomingVM)
+                
+            } else {
+                if MBUserDefaults.hasSeenOnboardingStatic {
+                    NavigationStack {
+                        SignInView()
+                    }
+                } else {
+                    WelcomeScreen()
+                }
+            }
+            
+        }
+    }
+}

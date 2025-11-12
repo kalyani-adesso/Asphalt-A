@@ -4,16 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.asphalt.android.navigation.NavigationRoot
+import com.asphalt.commonui.theme.AsphaltTheme
+import com.asphalt.profile.screens.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+        enableEdgeToEdge()
 
         setContent {
-            App()
+            AsphaltTheme {
+                Surface {
+                    NavigationRoot()
+//                    ProfileScreen()
+                }
+            }
         }
     }
 }
@@ -21,5 +33,8 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    AsphaltTheme {
+        // AsphaltApp()
+        NavigationRoot()
+    }
 }

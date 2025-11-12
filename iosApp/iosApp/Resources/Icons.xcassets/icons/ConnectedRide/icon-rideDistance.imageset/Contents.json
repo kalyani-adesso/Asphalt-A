@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-rideDistance.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

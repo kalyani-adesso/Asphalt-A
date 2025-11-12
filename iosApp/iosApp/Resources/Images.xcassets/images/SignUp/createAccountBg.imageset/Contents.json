@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "createAccountBg.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

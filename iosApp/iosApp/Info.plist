@@ -2,7 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is used to show nearby rides and routes.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Klavika-Light.otf</string>
+		<string>Klavika-Medium.otf</string>
+		<string>Klavika-Regular.otf</string>
+		<string>Klavika-Bold.otf</string>
+	</array>
 </dict>
 </plist>

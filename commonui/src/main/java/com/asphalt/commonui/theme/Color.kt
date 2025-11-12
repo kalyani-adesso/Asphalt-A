@@ -1,0 +1,98 @@
+package com.asphalt.commonui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val PrimaryDarkerLightB75 = Color(0xFF006EC7)
+val PrimaryDarkerLightB50 = Color(0xFF132F4F)
+val PrimaryLight = Color(0xFF027EFF)
+val PrimaryBrighterLightW75 = Color(0XFF266EB7)
+val PrimaryBrighterLightW25 = Color(0xFF419EFF)
+
+val NeutralWhite = Color(0xFFFFFFFF)
+val NeutralWhite25 = Color(0x40FFFFFF)
+val NeutralPaperGrey = Color(0xFFF5F5F5)
+val NeutralLightGrey = Color(0xFFE5E5E5)
+val NeutralMidGrey = Color(0xFFD6D6D6)
+val NeutralGrey = Color(0xFF999999)
+val NeutralDarkGrey = Color(0xFF887D75)
+val NeutralGrey30 = Color(0x4D9F9F9F)
+val NeutralGrey80 = Color(0xFF838A93)
+
+val NeutralBlackGrey = Color(0xFF262626)
+val NeutralBlack = Color(0xFF000000)
+val NeutralLightPaper = Color(0xFFF8F7FB)
+
+val PrimaryBrighterLightW90 = Color(0xFF8FEAFF)
+val MagentaDeep = Color(0xFFA928CC)
+val PrimaryBrighterLightW50 = Color(0xFF22C6EB)
+val BrightTeal = Color(0xFF17C6B9)
+val PrimaryBrighterLightW60 = Color(0xFF1F97F0)
+val PrimaryDeepBlue = Color(0xFF003661)
+val NeutralBlack10 = Color(0x1A000000)
+val VividRed = Color(0xFFF12225)
+
+val ScarletRed = Color(0xFFFF0C0C)
+val NeutralLightGray25 = Color(0xFFF8F7FB)
+val NeutralRed = Color(0XFFFF0000)
+val NaturalGreen = Color(0xFF6FCD38)
+val NeutralDeepBlack = Color(0xFF18273B)
+val PrimaryBrighterLightB33 = Color(0x33006EC7)
+
+val PalePink = Color(0xFFF7DBDE)
+val MutedRose = Color(0xFFE3B9BF)
+
+val VividOrange = Color(0xFFFF650C)
+val GrayDark = Color(0xFF513838)
+val GreenDark = Color(0xFF00A66C)
+val GreenLIGHT = Color(0xFF00C950)
+val GreenLIGHT10 = Color(0xFFDCFCE7)
+val GreenLIGHT25 = Color(0xFF016730)
+val REDLIGHT = Color(0xFFFB2C36)
+val BlueLight = Color(0xFF3779FF)
+val OrangeLight = Color(0xFFFF650C)
+val OrangeLight10 = Color(0xFFFE8D01)
+
+val BrightYellow = Color(0xFFFFD13C)
+val GrayLight10 = Color(0xFFEBEBED)
+val GreenLight20 = Color(0xFF34C779)
+val SemiTransparentDarkGray = Color(0x4D171717)
+val LightGrayishBlue = Color(0xFFE7EAEB)
+val LightGray28 = Color(0xFFEEEEEE)
+val ShamrockGreen = Color(0xFF3DD598)
+val SafetyOrange = Color(0xFFFF6900)
+val PaleOrange = Color(0xFFFFE9D9)
+val PaleGreen = Color(0xFFDCFCE7)
+val PaleMint = Color(0xFFE3FBEC)
+val LightSilver = Color(0xFFD7D7D7)
+val NeutralBlack25 = Color(0x40000000)
+val Charcoal = Color(0xFF1C1B1F)
+val ElectricGreen = Color(0xFF03D311)
+val BrightGray = Color(0xFFEAEAEA)
+val VividOrangeLight = Color(0xFFFF6900)
+val GrayLight15 = Color(0xFFE4F3FF)
+val NeutralBlack50 = Color(0x80000000)
+val NeutralLightGrayishBlue50 = Color(0x80E5E7EB)
+val ScienceBlue = Color(0xFF0167B9)
+val PrimaryBlue50 = Color(0x800167B9)
+val NeutralWhite40 = Color(0x66FFFFFF)
+val PaleMintyBlue30 = Color(0x4DEFF6FF)
+val PaleLavenderBlue30 = Color(0x4DEEF2FF)
+
+val LightGreen = Color(0xFFBFFDD9)
+
+val StarBackGround = Color(0xFFDCEFFF)
+
+val NeutralPink = Color(0xFFD20755)
+
+val NeutralBrown = Color(0xFF884B00)
+
+val DarkBrown = Color(0xFF9D0814)
+
+val LightYellow = Color(0xFFF7F3C1)
+
+val LightPink = Color(0xFFF7DBDE)
+val LightGreen30 = Color(0xFF00A63E)
+val LightOrange = Color(0xFFE17100)
+val RedLight = Color(0xFFEE4445)
+val LightBlue = Color(0xFFDBEAFE)
+val LightGreen40 = Color(0xFF019C65)
