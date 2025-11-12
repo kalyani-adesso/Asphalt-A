@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.asphalt.android.model.joinride.JoinRideModel
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -49,7 +48,7 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
-import com.asphalt.android.viewmodel.joinridevm.JoinRideViewModel
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.NeutralBlack
@@ -61,6 +60,8 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import org.koin.compose.viewmodel.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @Composable
@@ -76,8 +77,6 @@ fun JoinRideScreen(
 
     toolbarTitle = stringResource(R.string.join_ride)
 
-    viewModel.getAllRiders()
-
     setTopAppBarState(
         AppBarState(title = toolbarTitle)
     )
@@ -90,6 +89,8 @@ fun JoinRideScreen(
                 navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                 navigateToEndRide = { navigateToEndRide.invoke()})
         }
+    viewModel.getAllRiders()
+
 }
 
 @Composable
@@ -100,8 +101,16 @@ fun JoinRide(
 ) {
 
     val rides by viewModel.rides.collectAsState()
-    var query by remember { mutableStateOf("") }
+    var query = viewModel.searchQuery
 
+    // filter list
+    val filteredRides = remember(rides, query) {
+        if (query.isBlank()) rides
+        else rides.filter { ride ->
+            ride.rideTitle!!.contains(query, ignoreCase = true) ||
+                    ride.startLocation!!.contains(query, ignoreCase = true)
+        }
+    }
     Column {
 
         SearchView(
@@ -110,8 +119,8 @@ fun JoinRide(
                 .padding(top = Dimensions.padding20, start = Dimensions.padding16, end = Dimensions.padding16)
                 .background(color = NeutralLightPaper,
                     shape = RoundedCornerShape(size = Dimensions.size10)),
-            onQueryChange = { query = it},
-            onClearClick = { },
+            onQueryChange = { viewModel.onQueryChange(it) },
+            onClearClick = { viewModel.onQueryChange("") },
             placeholder = "Search rides by location.."
         )
         Spacer(modifier = Modifier.height(Dimensions.padding20))
@@ -126,7 +135,7 @@ fun JoinRide(
         }
         else {
             LazyColumn {
-                items(rides) { rider ->
+                items(filteredRides) { rider ->
                     RiderCard( navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                         navigateToEndRide = { navigateToEndRide.invoke() },
                         ridersList = rider)
@@ -181,7 +190,7 @@ fun RiderCard(
                     Spacer(Modifier.width(width = Dimensions.size10))
                     Column {
                         Text(
-                            text = (ridersList.rideType!!),
+                            text = (ridersList.rideTitle ?: ""),
                             style = TypographyBold.titleMedium,
                             fontSize = Dimensions.textSize16,
                             maxLines = 1,
@@ -190,7 +199,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.height(height = Dimensions.size3))
                         Text(
-                            text = (ridersList.createdBy!!),
+                            text = ("By" + " " + ridersList.createdBy ?: ""),
                             style = Typography.titleMedium,
                             color = NeutralDarkGrey,
                             fontSize = Dimensions.textSize12,
@@ -206,7 +215,7 @@ fun RiderCard(
             Spacer(Modifier.height(height = Dimensions.padding10))
             Column {
                 Text(
-                    text = ("Join us for a beautiful sunrise ride along with coastal highway"),
+                    text = ridersList.description ?: "",
                     style = Typography.titleSmall,
                     fontSize = Dimensions.textSize12,
                     maxLines = 2,
@@ -228,8 +237,10 @@ fun RiderCard(
                             tint = PrimaryDarkerLightB75,
                         )
                         Spacer(Modifier.width(width = Dimensions.size5))
+                        val startLocation = ridersList.startLocation
+                        val endLocation = ridersList.endLocation
                         Text(
-                            text =(ridersList.description!!),
+                            text = startLocation + "-" + endLocation ?: "",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
@@ -240,8 +251,9 @@ fun RiderCard(
                             contentDescription = "Ride KM",
                             tint = SafetyOrange)
                         Spacer(Modifier.width(Dimensions.size5))
+                        val distance = ridersList.rideDistance
                         Text(
-                            text =(ridersList.rideTitle!!),
+                            text = distance.toString() ?: "",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
@@ -259,14 +271,14 @@ fun RiderCard(
                             painter = painterResource(
                                 id = R.drawable.ic_calendar_blue
                             ),
-                            contentDescription = "Email Icon",
+                            contentDescription = "date Icon",
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
-                        val timeStamp = ridersList.createdDate
+                        val timeStamp = ridersList.startDate
                         Text(
                             text = Utils.formatDateTime(
-                                input = timeStamp.toString(),
+                                input =timeStamp.toString() ?: "",
                                 inputFormat = "dd/MM/yyyy HH:mm",
                                 outputFormat = "EEE, dd MMM yyyy - hh:mm a"
                             ),
@@ -284,11 +296,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.width(Dimensions.size5))
                         Text(
-                            text = Utils.formatDateTime(
-                                ridersList.rideType!!,
-                                "dd/MM/yyyy HH:mm",
-                                "EEE, dd MMM yyyy - hh:mm a"
-                            ),
+                            text =  "3/8 Riders",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )

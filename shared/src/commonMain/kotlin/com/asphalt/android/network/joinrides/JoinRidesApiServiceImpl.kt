@@ -1,6 +1,8 @@
 package com.asphalt.android.network.joinrides
 
 import com.asphalt.android.constants.APIConstants.RIDES_URL
+import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.network.BaseAPIService
 import com.asphalt.android.network.KtorClient
@@ -11,5 +13,11 @@ class JoinRidesApiServiceImpl(client: KtorClient) : BaseAPIService(client) ,Join
     override suspend fun getAllRide(): List<RidesData> {
         val response : Map<String, RidesData> = get(url = RIDES_URL).body()
         return response.values.toList()
+    }
+
+    override suspend fun getAllRiders(): APIResult<Map<String, CreateRideRoot>> {
+        return safeApiCall {
+            get(url = RIDES_URL).body()
+        }
     }
 }

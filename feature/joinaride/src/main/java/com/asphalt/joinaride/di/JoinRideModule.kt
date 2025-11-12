@@ -2,7 +2,7 @@ package com.asphalt.joinaride.di
 
 import com.asphalt.android.repository.joinride.JoinRideRepository
 import com.asphalt.android.repository.joinride.RidersGroupRepo
-import com.asphalt.android.viewmodel.joinridevm.JoinRideViewModel
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
 import com.asphalt.android.viewmodel.joinridevm.RidesDifficultyViewModel
 import com.asphalt.joinaride.viewmodel.RatingViewModel
