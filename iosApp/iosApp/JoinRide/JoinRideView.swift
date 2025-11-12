@@ -188,7 +188,9 @@ struct JoinRideRow: View {
                         endPoint: .trailing
                     ),onTap: {
                         selectedRide = ride
-                        viewModel.getRideInvites(rideId: ride.rideId, userId: ride.userId, inviteStatus: 3)
+                        if ride.userId != MBUserDefaults.userIdStatic {
+                            viewModel.changeRideInviteStatus(rideId: ride.rideId, userId: ride.userId, inviteStatus: 3)
+                        }
                     })
                     .navigationDestination(item: $selectedRide, destination: { ride in
                         ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride)

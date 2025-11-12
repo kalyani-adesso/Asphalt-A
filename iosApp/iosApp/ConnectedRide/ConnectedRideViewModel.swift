@@ -59,10 +59,14 @@ final class ConnectedRideViewModel: ObservableObject {
     private var ongoingRideId = ""
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
+    private var userAPIService: UserAPIService
+    private var userRepository: UserRepository
     init () {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
         self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
+        userAPIService = UserAPIServiceImpl(client: KtorClient())
+        userRepository = UserRepository(apiService: userAPIService)
         loadData()
     }
     
@@ -82,12 +86,6 @@ final class ConnectedRideViewModel: ObservableObject {
             RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDuration, value: "09:30:23", label: "Duration"),
             RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDistance, value: "78.5", label: "KM"),
             RideCompleteModel(iconName: AppIcon.ConnectedRide.riders, value: "3", label: "Riders")
-        ]
-        
-        groupRiders = [
-            Rider(name: "Sooraj Rajan", speed: 55, status: .connected, timeSinceUpdate: "Just now"),
-            Rider(name: "Abhishek", speed: 45, status: .delayed, timeSinceUpdate: "Just now"),
-            Rider(name: "Vyshnav", speed: 05, status: .stopped, timeSinceUpdate: "Just now")
         ]
     }
     func endRide() {
@@ -135,7 +133,7 @@ extension ConnectedRideViewModel {
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed),
+            speedInKph: KotlinDouble(value: speed), status: "Stopped",
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: false)
         )
@@ -161,7 +159,7 @@ extension ConnectedRideViewModel {
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed),
+            speedInKph: KotlinDouble(value: speed), status: "Stopped",
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: true)
         )
@@ -175,6 +173,42 @@ extension ConnectedRideViewModel {
         }
     }
     
+    func getOnGoingRides(rideId:String,userId:String) async {
+        await rideRepository.getOngoingRides(rideId: rideId, completionHandler: { result, error in
+            if let result = result as? APIResultSuccess<AnyObject>,
+               let ongoingRides = result.data as? [ConnectedRideDTO] {
+                Task {
+                    let userName = await self.getAllUsers(createdBy: ongoingRides.first(where: {$0.userID == userId })?.userID ?? "")
+                    self.groupRiders = ongoingRides.filter{$0.userID != MBUserDefaults.userIdStatic}.map { ride in
+                        Rider(
+                            name: ride.userID,
+                            speed: Int(ride.speedInKph),
+                            status: self.getStatus(from: ride),
+                            timeSinceUpdate: self.formatTime(from: ride.dateTime)
+                        )
+                    }
+                }
+            }
+        })
+    }
+    
+    func getAllUsers(createdBy: String) async  -> (String, String)? {
+        await withCheckedContinuation { continuation in
+            userRepository.getAllUsers { result, error in
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let domainList = success.data as? [UserDomain],
+                   let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
+
+                    let userName = matchedUser.name
+                    let contactNumber = matchedUser.contactNumber
+                    continuation.resume(returning: (userName, contactNumber))
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+    
     func endRide(rideId: String) {
         let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
         rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
@@ -183,6 +217,29 @@ extension ConnectedRideViewModel {
             } else {
                 print("Successfully ended ride")
             }
+        }
+    }
+    
+    func getStatus(from ride: ConnectedRideDTO) -> RiderStatus {
+        if ride.isRejoined {
+            return.delayed
+        } else if ride.speedInKph > 0 {
+            return .connected
+        } else {
+            return .stopped
+        }
+    }
+
+    func formatTime(from timestamp: Int64) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
+        let diff = Int(Date().timeIntervalSince(date))
+        
+        if diff < 60 {
+            return "\(diff)s ago"
+        } else if diff < 3600 {
+            return "\(diff / 60)m ago"
+        } else {
+            return "\(diff / 3600)h ago"
         }
     }
 }

@@ -20,7 +20,7 @@ interface RidesApIService {
 
     suspend fun rejoinRide(connectedRide: ConnectedRideRoot,ongoingRideId: String): APIResult<FirebasePushResponse>
 
-    suspend fun getJoinedRides(rideId: String): APIResult<ConnectedRideDTO>
+    suspend fun getJoinedRides(rideId: String): APIResult<Map<String, ConnectedRideRoot>>
 
     suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit>
 
