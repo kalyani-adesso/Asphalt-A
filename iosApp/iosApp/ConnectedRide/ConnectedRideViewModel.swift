@@ -141,6 +141,7 @@ extension ConnectedRideViewModel {
         rideRepository.joinRide(joinRide: connectedRideRoot) { result, error in
             if let result = result as? APIResultSuccess<ConnectedRideDTO> {
                 let ride = result.data
+                //TODO: Check here -
                 MBUserDefaults.isRideJoinedID = ride?.rideJoinedID ?? ""
                 self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
             } else if let error = error {
