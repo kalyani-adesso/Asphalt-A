@@ -47,9 +47,9 @@ struct ReviewView: View {
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
                 }
-                
+
                 Spacer()
-                
+
                 HStack(spacing: 15) {
                     ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
                                 background: LinearGradient(
@@ -61,7 +61,7 @@ struct ReviewView: View {
                                 borderColor: AppColor.celticBlue , onTap: {
                         viewModel.previousStep()
                     })
-                    
+
                     ButtonView( title: AppStrings.CreateRideButton.create.rawValue,
                                 showShadow: false , onTap: {
                         viewModel.createRide(completion: {success in
@@ -79,7 +79,7 @@ struct ReviewView: View {
                 ProgressViewReusable(title: "Loading ...")
             }
         }
-        
+
     }
     var stepIndicator: some View {
         HStack(spacing: 32) {

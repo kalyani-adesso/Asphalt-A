@@ -59,5 +59,6 @@ struct AppColor {
     static let paleOrange: Color = Color("PaleOrange")
     static let darkOrange: Color = Color("DarkOrange")
     static let grey: Color = Color("Grey")
+    static let vividGreen: Color = Color("VividGreen")
 }
 

@@ -32,9 +32,7 @@ struct ParticipantsView: View {
                     value: $searchText,
                     isValidEmail: .constant(false),
                     backgroundColor: AppColor.white)
-                
-                
-                
+
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(filteredParticipants) { participant in
@@ -90,8 +88,7 @@ struct ParticipantsView: View {
             }
         }
     }
-    
-    
+
     var stepIndicator: some View {
         HStack(spacing: 32) {
             StepIndicator(icon: AppIcon.Home.createRide, title: "Details", isActive: true, isCurrentPage: false)

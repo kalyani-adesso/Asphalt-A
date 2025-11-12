@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 import shared
 
-struct JoinRideModel: Identifiable {
+struct JoinRideModel: Identifiable,Hashable {
     let id = UUID()
     let userId: String
     let rideId: String
@@ -24,6 +24,11 @@ struct JoinRideModel: Identifiable {
     let maxRiders: String
     let riderImage: String
     let contactNumber: String
+    let startLat:Double
+    let startLong:Double
+    let endLat:Double
+    let endLong:Double
+    let rideJoined:Bool
 }
 
 @MainActor
@@ -82,7 +87,7 @@ extension JoinRideViewModel {
                 // Fetch user name asynchronously
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
-                
+                let rideJoinedStatus = ride.participants.first(where: {$0.userId == (MBUserDefaults.userIdStatic ?? "") })?.inviteStatus == 3
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
@@ -96,7 +101,12 @@ extension JoinRideViewModel {
                         ridersCount: "\(joinedCount)",
                         maxRiders: "\(ride.participants.count)",
                         riderImage: "rider_avatar",
-                        contactNumber: userName?.1 ?? ""
+                        contactNumber: userName?.1 ?? "",
+                        startLat: ride.startLatitude,
+                        startLong: ride.startLongitude,
+                        endLat: ride.endLatitude,
+                        endLong: ride.endLongitude, rideJoined: rideJoinedStatus
+                        
                     )
                     joinRideModels.append(model)
                 }
@@ -146,7 +156,7 @@ extension JoinRideViewModel {
         }
     }
 
-    func getRideInvites(rideId:String, userId:String, inviteStatus:Int32) {
+    func changeRideInviteStatus(rideId:String, userId:String, inviteStatus:Int32) {
         rideRepository.changeRideInviteStatus(
             rideID: rideId,
             currentUid: userId,

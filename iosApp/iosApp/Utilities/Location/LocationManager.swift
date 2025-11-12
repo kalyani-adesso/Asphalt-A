@@ -9,12 +9,14 @@ import Foundation
 import CoreLocation
 
 @MainActor
-class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    private let manager = CLLocationManager()
+class LocationManager: NSObject, ObservableObject, @preconcurrency CLLocationManagerDelegate {
+    let manager = CLLocationManager()
     private let geocoder = CLGeocoder()
     
     @Published var currentLocation: CLLocation?
     @Published var currentAddress: String = "Fetching location..."
+    @Published var speedInKph: Double?
+    @Published var lastLocation:CLLocation?
 
     override init() {
         super.init()
@@ -45,10 +47,20 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.first else { return }
-        currentLocation = location
-        reverseGeocode(location)
+    internal func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        if let location = locations.first {
+            currentLocation = location
+            reverseGeocode(location)
+        }
+        
+        if let speed = locations.last?.speed, speed >= 0  {
+            speedInKph = (speed * 3.6).rounded()
+        }
+       
+        if let lastLocation = locations.last  {
+            self.lastLocation = lastLocation
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

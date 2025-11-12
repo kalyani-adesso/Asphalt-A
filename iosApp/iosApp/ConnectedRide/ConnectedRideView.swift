@@ -47,7 +47,9 @@ struct ConnectedRideView: View {
             if title == AppStrings.ConnectedRide.rideMessage {
                 ConnectedRideCompleteView(viewModel:model )
             } else {
-                ConnectedRideMapView()
+                if #available(iOS 17.0, *) {
+                    ConnectedRideMapView(rideModel: model)
+                }
             }
         })
         .onAppear {

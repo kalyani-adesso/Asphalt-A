@@ -18,13 +18,13 @@ struct JoinRideView: View {
     var body: some View {
         ZStack {
             NavigationStack {
-                SimpleCustomNavBar(title: "Join a Ride", onBackToHome: {showHomeView = true})
+                SimpleCustomNavBar(title: AppStrings.JoinRide.joinaRideTitle, onBackToHome: {showHomeView = true})
                 VStack {
                     searchBarView
                         .font(KlavikaFont.regular.font(size: 14))
                         .padding(.top)
                     List(viewModel.filteredRides, id: \.id) { ride in
-                        JoinRideRow(ride: ride, viewModel: viewModel, showConnectedRides: $showConnectedRides)
+                        JoinRideRow(ride: ride, viewModel: viewModel)
                             .listRowSeparator(.hidden)
                     }
                     .listStyle(.plain)
@@ -42,19 +42,6 @@ struct JoinRideView: View {
                         await viewModel.getRides()
                     }
                 }
-                .navigationDestination(isPresented: $showConnectedRides, destination: {
-                    ConnectedRideView(notificationTitle: "Ride Started! Navigation active.", title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: JoinRideModel(
-                        userId: "", rideId: "", title: "Weekend Coast Ride",
-                        organizer: "Sooraj",
-                        description: "Join us for a beautiful sunrise ride along the coastal highway",
-                        route: "Kochi - Kanyakumari",
-                        distance: "280km",
-                        date: "Sun, Oct 21",
-                        ridersCount: "3",
-                        maxRiders: "8",
-                        riderImage: "rider_avatar", contactNumber: ""
-                    ))
-                })
             }
             if viewModel.isRideLoading {
                 Color.black.opacity(0.5)
@@ -93,7 +80,7 @@ struct JoinRideView: View {
 struct JoinRideRow: View {
     var ride:JoinRideModel
     @ObservedObject var viewModel:JoinRideViewModel
-    @Binding var showConnectedRides: Bool
+    @State private var selectedRide: JoinRideModel? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 11) {
@@ -183,12 +170,34 @@ struct JoinRideRow: View {
                 }
                 .padding(.bottom,20)
                 .buttonStyle(.plain)
-                ButtonView(title: AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation,onTap: {
-                    showConnectedRides = true
-                    viewModel.getRideInvites(rideId: ride.rideId, userId: ride.userId, inviteStatus: 3)
-                })
-                .frame(maxWidth: .infinity)
-                .padding(.bottom,20)
+                
+                if #available(iOS 17.0, *) {
+                    ButtonView(title: ride.rideJoined ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
+                        gradient: Gradient(colors: [
+                            AppColor.vividGreen,
+                            AppColor.vividGreen,
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ) :  LinearGradient(
+                        gradient: Gradient(colors: [
+                            AppColor.royalBlue,
+                            AppColor.pursianBlue,
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),onTap: {
+                        selectedRide = ride
+                        if ride.userId != MBUserDefaults.userIdStatic {
+                            viewModel.changeRideInviteStatus(rideId: ride.rideId, userId: ride.userId, inviteStatus: 3)
+                        }
+                    })
+                    .navigationDestination(item: $selectedRide, destination: { ride in
+                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride)
+                    })
+                    .frame(maxWidth: .infinity)
+                    .padding(.bottom,20)
+                }
             }
         }
         .padding([.leading,.trailing,.top],16)
