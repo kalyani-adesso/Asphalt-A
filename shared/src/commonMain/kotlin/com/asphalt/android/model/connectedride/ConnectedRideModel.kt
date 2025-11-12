@@ -21,6 +21,9 @@ data class ConnectedRideRoot(
         @SerialName("speedInKph")
         val speedInKph: Double? = null,
 
+        @SerialName("status")
+        val status: String? = null,
+
         @SerialName("dateTime")
         val dateTime: Long? = null,
 
@@ -35,6 +38,7 @@ data class ConnectedRideDTO(
         val currentLat: Double,
         val currentLong: Double,
         val speedInKph: Double,
+        val status: String,
         val dateTime: Long,
         val isRejoined: Boolean
 )

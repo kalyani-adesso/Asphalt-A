@@ -12,6 +12,7 @@ import Combine
 @available(iOS 17.0, *)
 struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
+    @StateObject private var joinRideVM = JoinRideViewModel()
     @StateObject var locationManager = LocationManager()
     @State private var rideComplted: Bool = false
     @State private var startTrack: Bool = false
@@ -60,11 +61,14 @@ struct ConnectedRideMapView: View {
             Section {
                 VStack(spacing: 18) {
                     ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-                    
-                    ActiveRiderView( title: MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", startTrack: $startTrack)
+
+                    ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
                     
                     Button(action: {
                         self.rideComplted = true
+                        if rideModel.userId != MBUserDefaults.userIdStatic {
+                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId: rideModel.userId, inviteStatus: 4)
+                        }
                         viewModel.endRide(rideId:rideModel.rideId)
                     }, label: {
                         Text(AppStrings.ConnectedRide.endRideButton)
@@ -161,22 +165,7 @@ struct ConnectedRideMapView: View {
             .listRowSeparator(.hidden)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $rideComplted, destination: {
-                ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: JoinRideModel(
-                    userId: "", rideId: "",
-                    title: "Weekend Coast Ride",
-                    organizer: "Sooraj",
-                    description: "Join us for a beautiful sunrise ride along the coastal highway",
-                    route: "Kochi - Kanyakumari",
-                    distance: "280km",
-                    date: "Sun, Oct 21",
-                    ridersCount: "3",
-                    maxRiders: "8",
-                    riderImage: "rider_avatar", contactNumber: "",
-                    startLat: 0.0,
-                    startLong: 0.0,
-                    endLat: 0.0,
-                    endLong: 0.0, rideJoined: false
-                ))
+                ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel)
             })
             .onAppear() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -201,7 +190,6 @@ struct ConnectedRideMapView: View {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     HStack() {
                         Button {
-                            print("Menu tapped")
                         } label: {
                             HStack(alignment:.center, spacing: 6) {
                                 Rectangle()
@@ -455,7 +443,10 @@ struct ConnectedRideOfflineView: View {
 struct ActiveRiderView: View {
     let title: String
     let speed: String
+    var rideModel:JoinRideModel
     @Binding var startTrack:Bool
+    @ObservedObject var locationManager:LocationManager
+    @ObservedObject var viewModel:ConnectedRideViewModel
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -481,6 +472,9 @@ struct ActiveRiderView: View {
             Spacer()
             Button(action: {
                 startTrack.toggle()
+                Task {
+                    await viewModel.getOnGoingRides(rideId: rideModel.rideId, userId: rideModel.userId)
+                }
             }) {
                 Text(startTrack ? AppStrings.ConnectedRide.stopTrackingButton.uppercased() : AppStrings.ConnectedRide.startTrackingButton.uppercased())
                     .font(KlavikaFont.bold.font(size: 12))
