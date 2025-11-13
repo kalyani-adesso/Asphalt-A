@@ -22,4 +22,5 @@ object APIConstants {
     const val RIDE_DECLINED = 2
     const val RIDE_JOINED = 3
     const val JOIN_RIDES_URL = "/joinride"
+    const val END_RIDE = 4
 }
