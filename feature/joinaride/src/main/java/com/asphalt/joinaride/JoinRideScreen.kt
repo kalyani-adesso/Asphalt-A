@@ -275,12 +275,14 @@ fun RiderCard(
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
-                        val timeStamp = ridersList.startDate
-                        val date = Date(timeStamp?.toLong() ?: 0L)
+
+                        val timeStampString = ridersList.startDate
+                        val date = Date(timeStampString ?: 0L)
+                        val formatted = SimpleDateFormat("EEE, MMM dd - hh:mm a", Locale.getDefault()).format(date)
 
                         Text(
                             text = Utils.formatDateTime(
-                                input =timeStamp.toString() ?: "",
+                                input =formatted,
                                 inputFormat = "dd/MM/yyyy HH:mm",
                                 outputFormat = "EEE, dd MMM yyyy - hh:mm a"
                             ),
