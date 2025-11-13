@@ -37,11 +37,12 @@ class JoinRideViewModel(private val repository: JoinRideRepository) : ViewModel(
             val apiResult = APIHelperUI.runWithLoader {
                 repository.getAllRidesList()
             }
-            APIHelperUI.handleApiResult(apiResult, viewModelScope) { rides ->
-                _rides.value = rides
+
+            APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
+                _rides.value = ride
             }
 
-          //  var acceptedRides = RidesFilter.getInvites(user?.uid ?: "",)
+            //  var acceptedRides = RidesFilter.getInvites(user?.uid ?: "",)
         }
     }
     var searchQuery by mutableStateOf("")

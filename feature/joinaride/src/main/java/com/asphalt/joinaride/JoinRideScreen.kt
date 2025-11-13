@@ -61,6 +61,7 @@ import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 
@@ -72,7 +73,6 @@ fun JoinRideScreen(
     navigateToEndRide : () -> Unit
 )
 {
-    var isLoading by remember { mutableStateOf(false) }
     var toolbarTitle by remember { mutableStateOf("") }
 
     toolbarTitle = stringResource(R.string.join_ride)
@@ -233,7 +233,7 @@ fun RiderCard(
                             painter = painterResource(
                                 id = R.drawable.ic_location_purple
                             ),
-                            contentDescription = "Email Icon",
+                            contentDescription = "location Icon",
                             tint = PrimaryDarkerLightB75,
                         )
                         Spacer(Modifier.width(width = Dimensions.size5))
@@ -276,6 +276,8 @@ fun RiderCard(
                         )
                         Spacer(Modifier.width(Dimensions.size5))
                         val timeStamp = ridersList.startDate
+                        val date = Date(timeStamp?.toLong() ?: 0L)
+
                         Text(
                             text = Utils.formatDateTime(
                                 input =timeStamp.toString() ?: "",
