@@ -10,6 +10,7 @@ object RideStatConstants {
     const val INVITES_RIDES = 3
     const val QUEUE ="QUEUE"
     const val UPCOMING ="UPCOMING"
+    const val HISTORY ="HISTORY"
 
 
 }

@@ -5,6 +5,7 @@ import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.utils.Utils
+import com.asphalt.dashboard.constants.RideStatConstants.HISTORY
 import com.asphalt.dashboard.constants.RideStatConstants.QUEUE
 import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
@@ -90,6 +91,28 @@ object RidesFilter {
                 null // Skip if participant not found
             }
 
+        }
+    }
+
+
+    fun getHistoryRide(
+        rides: List<RidesData>,
+        userId: String
+    ): List<YourRideDataModel> {
+        return rides.filter { ride ->
+            (ride.createdBy == userId && ride.rideStatus == APIConstants.END_RIDE) ||
+                    (ride.participants.any { it.userId == userId && ride.rideStatus == APIConstants.END_RIDE })
+        }.map { ride ->
+            YourRideDataModel(
+                ridesId = ride.ridesID,
+                title = ride.rideTitle,
+                place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
+                rideStatus = HISTORY,
+                date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
+                riders = ride.participants.size,
+                createdBy = ride.createdBy,
+                startDate = ride.startDate
+            )
         }
     }
 }
