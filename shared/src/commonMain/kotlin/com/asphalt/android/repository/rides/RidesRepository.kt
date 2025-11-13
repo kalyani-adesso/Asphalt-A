@@ -151,7 +151,8 @@ class RidesRepository(val apiService: RidesApIService) {
             startLongitude = this.startLongitude,
             endLatitude = this.endLatitude,
             endLongitude = this.endLongitude,
-            rideDistance = this.distance
+            rideDistance = this.distance,
+            rideStatus=this.rideStatus
         )
     }
 }
