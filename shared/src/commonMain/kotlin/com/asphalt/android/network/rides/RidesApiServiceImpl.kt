@@ -59,7 +59,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun getJoinedRides(rideId: String): APIResult<ConnectedRideDTO> {
+    override suspend fun getJoinedRides(rideId: String): APIResult<Map<String, ConnectedRideRoot>> {
         return safeApiCall {
             get(url = "$ONGOING_RIDE_URL/$rideId").body()
         }

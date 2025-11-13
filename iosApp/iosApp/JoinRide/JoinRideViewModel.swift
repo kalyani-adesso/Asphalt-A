@@ -156,7 +156,7 @@ extension JoinRideViewModel {
         }
     }
 
-    func getRideInvites(rideId:String, userId:String, inviteStatus:Int32) {
+    func changeRideInviteStatus(rideId:String, userId:String, inviteStatus:Int32) {
         rideRepository.changeRideInviteStatus(
             rideID: rideId,
             currentUid: userId,

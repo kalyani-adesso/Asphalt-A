@@ -85,6 +85,7 @@ class RidesRepository(val apiService: RidesApIService) {
                 currentLat = joinRide.currentLat ?: 0.0,
                 currentLong = joinRide.currentLong ?: 0.0,
                 speedInKph = joinRide.speedInKph ?: 0.0,
+                status = joinRide.status ?: "",
                 dateTime = joinRide.dateTime ?: 0L,
                 isRejoined = joinRide.isRejoined ?: false
             )
@@ -100,6 +101,7 @@ class RidesRepository(val apiService: RidesApIService) {
                     currentLat = rejoinRide.currentLat ?: 0.0,
                     currentLong = rejoinRide.currentLong ?: 0.0,
                     speedInKph = rejoinRide.speedInKph ?: 0.0,
+                    status = rejoinRide.status ?: "",
                     dateTime = rejoinRide.dateTime ?: 0L,
                     isRejoined = rejoinRide.isRejoined ?: false
                 )
@@ -108,6 +110,24 @@ class RidesRepository(val apiService: RidesApIService) {
 
     suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit> {
         return apiService.endRide(rideId, rideJoinedId)
+    }
+
+    suspend fun getOngoingRides(rideId: String): APIResult<List<ConnectedRideDTO>> {
+        return apiService.getJoinedRides(rideId).mapApiResult { response ->
+            response.map { (joinedRideId, data) ->
+                ConnectedRideDTO(
+                    rideJoinedID = joinedRideId,
+                    rideID = data.rideID ?: "",
+                    userID = data.userID ?: "",
+                    currentLat = data.currentLat ?: 0.0,
+                    currentLong = data.currentLong ?: 0.0,
+                    speedInKph = data.speedInKph ?: 0.0,
+                    status = data.status ?: "",
+                    dateTime = data.dateTime ?: 0L,
+                    isRejoined = data.isRejoined ?: false
+                )
+            }
+        }
     }
 
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
@@ -133,8 +153,5 @@ class RidesRepository(val apiService: RidesApIService) {
             endLongitude = this.endLongitude,
             rideDistance = this.distance
         )
-
-
     }
-
 }
