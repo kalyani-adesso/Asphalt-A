@@ -11,6 +11,7 @@ struct UpcomingRidesView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
+  
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
@@ -22,13 +23,18 @@ struct UpcomingRidesView: View {
                 }
                 .font(KlavikaFont.bold.font(size: 13))
             }
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 25) {
-                    ForEach($viewModel.rides.filter { $ride in
-                        $ride.rideAction.wrappedValue == .invities
-                    }, id: \.id) { $ride in
-                        UpcomingRideCard(viewModel: viewModel, ride: $ride)
+            let invites = viewModel.rides.filter { $0.rideAction == .invities }
+            if invites.isEmpty {
+                emptyStateView
+            }
+            else{
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 25) {
+                        ForEach($viewModel.rides.filter { $ride in
+                            $ride.rideAction.wrappedValue == .invities
+                        }, id: \.id) { $ride in
+                            UpcomingRideCard(viewModel: viewModel, ride: $ride)
+                        }
                     }
                 }
             }
@@ -149,7 +155,26 @@ struct UpcomingRideCard: View {
         name.split(separator: " ").compactMap { $0.first }.map { String($0) }.joined()
     }
 }
+@ViewBuilder
+var emptyStateView: some View {
+    VStack(spacing: 12) {
+        HStack{
+            AppIcon.UpcomingRide.message
+                .resizable()
+                .frame(width: 25, height: 25)
 
+            Text("No Upcoming Rides !!!")
+                .font(KlavikaFont.bold.font(size: 16))
+                .foregroundColor(AppColor.richBlack)
+
+        }
+        Text("You’ll see your ride invites here once someone adds you.")
+            .font(KlavikaFont.regular.font(size: 12))
+            .foregroundColor(AppColor.stoneGray)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 30)
+}
 
 #Preview {
     UpcomingRidesView()
