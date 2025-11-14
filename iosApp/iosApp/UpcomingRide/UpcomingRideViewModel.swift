@@ -86,6 +86,7 @@ class UpcomingRideViewModel: ObservableObject {
             }
             
             let currentUserID = MBUserDefaults.userIdStatic ?? ""
+            let now = Date()
             
             var upcoming: [RideModel] = []
             var history: [RideModel] = []
@@ -95,64 +96,62 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
-                let now = Date()
+                if startDate.addingTimeInterval(60) < now { continue }
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-            
+                
                 
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
                 
-                if startDate <= now {
-                    // If user was invited but never accepted, skip adding to history
-                    if isParticipant, let inviteStatus = myInviteStatus, inviteStatus != 1 {
-                        continue
-                    }
-                    
-                    rideAction = .history
-                    rideStatus = .complete
-                    rideViewAction = .shareExperience
-                }
-                
-                else {
-                    if ride.createdBy == currentUserID {
-                        //upcoming Ride that I have created
-                        if startDate >= now {
-                            rideStatus = participantCount > 0 ? .queue : .upcoming
-                            rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
-                            rideAction = .upcoming
-                        } else {
-                            rideStatus = .complete
-                            rideAction = .history
-                            rideViewAction = .shareExperience
-                        }
-                        //Invites
-                    } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 0 {
-                        if startDate >= now {
-                            rideAction = .invities
-                            rideStatus = .invite
-                            rideViewAction = .decline
-                        } else {
-                            continue 
-                        }
-                        
-                        //accepted invites
-                    } else if isParticipant, let inviteStatus = myInviteStatus, inviteStatus == 1 {
+                // MARK: - Rides created by current user
+                if ride.createdBy == currentUserID {
+//                    if myInviteStatus == 4 {
+//                            rideAction = .history
+//                            rideStatus = .complete
+//                            rideViewAction = .shareExperience
+//                    } else {
                         rideAction = .upcoming
-                        rideStatus = .upcoming
-                        rideViewAction = .viewDetails
-                        //history
-                    } else if isParticipant {
+                        rideStatus = participantCount > 0 ? .queue : .upcoming
+                        rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
+//                    }
+                }
+                // MARK: - Rides where current user is a participant
+                else if isParticipant {
+                    switch myInviteStatus {
+                    case 0:
+                        // Pending invite
+                        rideAction = .invities
+                        rideStatus = .invite
+                        rideViewAction = .decline
+                        
+                    case 1 :
+                        // Accepted ride
+                        rideAction = .upcoming
+                        rideStatus = participantCount > 0 ? .queue : .upcoming
+                        rideViewAction = participantCount > 0 ? .checkResponse : .viewDetails
+                        
+                    case 2:
+                        continue
+                        
+                    case 4:
+                        // Completed ride
                         rideAction = .history
                         rideStatus = .complete
                         rideViewAction = .shareExperience
-                    } else {
+                        
+                    default:
                         continue
                     }
+                }
+                
+                // MARK: - Ignore everything else
+                else {
+                    continue
                 }
                 let mapped = RideModel(
                     id: ride.ridesID ?? UUID().uuidString,

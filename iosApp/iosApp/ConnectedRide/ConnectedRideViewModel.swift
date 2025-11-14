@@ -61,6 +61,7 @@ final class ConnectedRideViewModel: ObservableObject {
     private var rideRepository: RidesRepository
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
+    private var ongoingRideTimer: Timer?
     init () {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -68,6 +69,10 @@ final class ConnectedRideViewModel: ObservableObject {
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
         loadData()
+         startOngoingRideTimer()
+    }
+    deinit {
+         stopOngoingRideTimer()
     }
     
     @Published var selectedType: MapType = .standard
@@ -174,24 +179,89 @@ extension ConnectedRideViewModel {
         }
     }
     
-    func getOnGoingRides(rideId:String,userId:String) async {
-        await rideRepository.getOngoingRides(rideId: rideId, completionHandler: { result, error in
-            if let result = result as? APIResultSuccess<AnyObject>,
-               let ongoingRides = result.data as? [ConnectedRideDTO] {
-                Task {
-                    let userName = await self.getAllUsers(createdBy: ongoingRides.first(where: {$0.userID == userId })?.userID ?? "")
-                    self.groupRiders = ongoingRides.filter{$0.userID != MBUserDefaults.userIdStatic}.map { ride in
-                        Rider(
-                            name: ride.userID,
-                            speed: Int(ride.speedInKph),
-                            status: self.getStatus(from: ride),
-                            timeSinceUpdate: self.formatTime(from: ride.dateTime)
-                        )
+    @MainActor
+    func getOnGoingRides(rideId: String, userId: String) async {
+        do {
+            // 1. Fetch all rides to get participants
+            let rideResult = try await rideRepository.getAllRide()
+            guard let rideSuccess = rideResult as? APIResultSuccess<AnyObject>,
+                  let allRides = rideSuccess.data as? [RidesData],
+                  let selectedRide = allRides.first(where: { $0.ridesID == rideId }) else {
+                print("Ride not found")
+                return
+            }
+
+            // 2. Get accepted participants (inviteStatus == 3), excluding current user
+            let acceptedParticipants = selectedRide.participants.filter {
+                $0.inviteStatus == 3 && $0.userId != MBUserDefaults.userIdStatic
+            }
+
+            // 3. Fetch live ongoing rides data
+            let ongoingResult = try await rideRepository.getOngoingRides(rideId: rideId)
+            guard let ongoingSuccess = ongoingResult as? APIResultSuccess<AnyObject>,
+                  let ongoingRides = ongoingSuccess.data as? [ConnectedRideDTO] else {
+                
+                // Fallback to static riders if no ongoing data available
+                let allUsers = await getAllUsersName()
+                self.groupRiders = acceptedParticipants.map { participant in
+                    let userData = allUsers[participant.userId] ?? ("Unknown", "")
+                    return Rider(
+                        name: userData.name.isEmpty ? participant.userId : userData.name,
+                        speed: 0,
+                        status: .stopped,
+                        timeSinceUpdate: "Just now"
+                    )
+                }
+                return
+            }
+
+            // 4. Fetch all users for name lookup
+            let allUsers = await getAllUsersName()
+
+            // 5. Merge both datasets (participants + live ride data)
+            self.groupRiders = acceptedParticipants.map { participant in
+                let liveRide = ongoingRides.first(where: { $0.userID == participant.userId })
+                let userData = allUsers[participant.userId] ?? ("Unknown", "")
+
+                // Use live values if available, otherwise fallback
+                let speed = liveRide?.speedInKph ?? 0
+                let status = liveRide != nil ? self.getStatus(from: liveRide!) : .stopped
+                let time = liveRide != nil ? self.formatTime(from: liveRide!.dateTime) : "Just now"
+
+                return Rider(
+                    name: userData.name.isEmpty ? participant.userId : userData.name,
+                    speed: Int(speed),
+                    
+                    status: status,
+                    timeSinceUpdate: time
+                )
+            }
+
+        } catch {
+            print("Error fetching ongoing rides:", error)
+        }
+    }
+
+
+    
+    func getAllUsersName() async -> [String: (name: String, contact: String)] {
+        await withCheckedContinuation { continuation in
+            userRepository.getAllUsers { result, error in
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let domainList = success.data as? [UserDomain] {
+                    
+                    var usersDict: [String: (String, String)] = [:]
+                    for user in domainList {
+                        usersDict[user.uid] = (user.name, user.contactNumber)
                     }
+                    continuation.resume(returning: usersDict)
+                } else {
+                    continuation.resume(returning: [:])
                 }
             }
-        })
+        }
     }
+    
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {
         await withCheckedContinuation { continuation in
@@ -242,5 +312,25 @@ extension ConnectedRideViewModel {
         } else {
             return "\(diff / 3600)h ago"
         }
+    }
+    func startOngoingRideTimer() {
+        // Invalidate any existing timer
+        ongoingRideTimer?.invalidate()
+        // Schedule the timer to trigger every 30 minutes (1800 seconds)
+        ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1800, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            Task {
+                await self.getOnGoingRides(
+                    rideId: self.ongoingRideId,
+                    userId: MBUserDefaults.userIdStatic ?? ""
+                )
+            }
+        }
+    }
+    
+    func stopOngoingRideTimer() {
+        ongoingRideTimer?.invalidate()
+        ongoingRideTimer = nil
     }
 }
