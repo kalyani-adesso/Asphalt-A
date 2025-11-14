@@ -177,6 +177,7 @@ struct ConnectedRideMapView: View {
                 } else {
                     viewModel.reJoinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 }
+                viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
             }
             .onChange(of: startTrack) { isTracking in
                 if !isTracking{

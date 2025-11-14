@@ -62,6 +62,13 @@ final class ConnectedRideViewModel: ObservableObject {
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
     private var ongoingRideTimer: Timer?
+    
+    var lastLat: Double?
+    var lastLong: Double?
+    var lastSpeed: Double = 0.0
+    var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
+    var lastMovementTime: TimeInterval = Date().timeIntervalSince1970
+    
     init () {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -69,7 +76,7 @@ final class ConnectedRideViewModel: ObservableObject {
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
         loadData()
-         startOngoingRideTimer()
+        startOngoingRideTimer()
     }
     deinit {
          stopOngoingRideTimer()
@@ -93,6 +100,7 @@ final class ConnectedRideViewModel: ObservableObject {
             RideCompleteModel(iconName: AppIcon.ConnectedRide.riders, value: "3", label: "Riders")
         ]
     }
+    
     func endRide() {
         print("Ride ended.")
         // Example of a state change that updates the view:
@@ -100,6 +108,7 @@ final class ConnectedRideViewModel: ObservableObject {
         self.isGroupNavigationActive = false
         self.activeRider = []
     }
+    
     
     /// Toggles the tracking status for the active rider.
     func toggleTracking() {
@@ -242,8 +251,6 @@ extension ConnectedRideViewModel {
         }
     }
 
-
-    
     func getAllUsersName() async -> [String: (name: String, contact: String)] {
         await withCheckedContinuation { continuation in
             userRepository.getAllUsers { result, error in
@@ -299,6 +306,43 @@ extension ConnectedRideViewModel {
         } else {
             return .stopped
         }
+    }
+    
+    func onLocationUpdate(lat: Double?, long: Double?, speed: Double?) {
+        let now = Date().timeIntervalSince1970
+        
+        guard let lat = lat, let long = long else { return }
+        
+        // Save update time (we ARE getting updates)
+        lastUpdateTime = now
+        
+        // Detect movement (lat/long changed)
+        if lastLat != lat || lastLong != long {
+            lastMovementTime = now    // movement detected
+        }
+        
+        lastLat = lat
+        lastLong = long
+        lastSpeed = speed ?? 0.0
+    }
+    
+    func getRideStatus() -> RiderStatus {
+        let now = Date().timeIntervalSince1970
+        let timeSinceUpdate = now - lastUpdateTime
+        let timeSinceMovement = now - lastMovementTime
+        
+        
+        if timeSinceUpdate > 120 && timeSinceMovement > 120 && lastSpeed == 0 {
+            return .stopped
+        }
+        
+        // CONNECTED (movement + continuous updates)
+        if timeSinceUpdate < 120 && lastSpeed > 0 {
+            return .connected
+        }
+        
+        // DELAYED (break in update < 2 min OR speed = 0)
+        return .delayed
     }
 
     func formatTime(from timestamp: Int64) -> String {
