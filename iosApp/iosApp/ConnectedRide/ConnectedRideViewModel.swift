@@ -234,7 +234,7 @@ extension ConnectedRideViewModel {
 
                 // Use live values if available, otherwise fallback
                 let speed = liveRide?.speedInKph ?? 0
-                let status = liveRide != nil ? self.getStatus(from: liveRide!) : .stopped
+                let status = liveRide != nil ? self.getRideStatus() : .stopped
                 let time = liveRide != nil ? self.formatTime(from: liveRide!.dateTime) : "Just now"
 
                 return Rider(
@@ -297,17 +297,7 @@ extension ConnectedRideViewModel {
             }
         }
     }
-    
-    func getStatus(from ride: ConnectedRideDTO) -> RiderStatus {
-        if ride.isRejoined {
-            return.delayed
-        } else if ride.speedInKph > 0 {
-            return .connected
-        } else {
-            return .stopped
-        }
-    }
-    
+        
     func onLocationUpdate(lat: Double?, long: Double?, speed: Double?) {
         let now = Date().timeIntervalSince1970
         
