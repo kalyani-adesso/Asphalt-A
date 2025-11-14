@@ -72,9 +72,10 @@ extension JoinRideViewModel {
             self.isRideLoading = true
             let rideArray = try await getAllRidesAsync()
 
-            let filteredRideArray = rideArray.filter {
-                $0.createdBy == MBUserDefaults.userIdStatic ||
-                ($0.participants.first(where: { $0.userId == MBUserDefaults.userIdStatic })?.inviteStatus == 1)
+            let filteredRideArray = rideArray.filter { ride in
+                guard let startEpoch = ride.startDate else { return false }
+                let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
+                return startDate >= Calendar.current.startOfDay(for: Date())
             }
             
             var joinRideModels: [JoinRideModel] = []
@@ -190,4 +191,29 @@ extension JoinRideViewModel {
             ride.route.lowercased().contains(query)
         }
     }
+    func hasOngoingRide(for userId: String) async -> Bool {
+        do {
+            let result = try await rideRepository.getAllRide()
+            
+            guard let success = result as? APIResultSuccess<AnyObject>,
+                  let allRides = success.data as? [RidesData] else {
+                print("Failed to fetch rides or invalid format")
+                return false
+            }
+            
+            // Check if the user has any ride where inviteStatus == 3
+            for ride in allRides {
+                if ride.participants.contains(where: { $0.userId == userId && $0.inviteStatus == 3 }) {
+                    print("already exists")
+                    return true
+                }
+            }
+            
+            return false
+        } catch {
+            print("Error checking ongoing ride:", error)
+            return false
+        }
+    }
+
 }
