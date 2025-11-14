@@ -493,7 +493,7 @@ struct ActiveRiderView: View {
         )
         .padding([.leading,.trailing],16)
         .task {
-            await viewModel.getOnGoingRides(rideId: rideModel.rideId, userId: rideModel.userId)
+            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
         }
     }
 }

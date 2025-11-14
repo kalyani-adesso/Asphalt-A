@@ -174,7 +174,7 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title: ride.rideJoined ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
+                        ButtonView(title:(MBUserDefaults.isRideJoinedID?.isEmpty ?? true) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
                             gradient: Gradient(colors: [
                                 AppColor.vividGreen,
                                 AppColor.vividGreen,
@@ -189,7 +189,7 @@ struct JoinRideRow: View {
                             startPoint: .leading,
                             endPoint: .trailing
                         ),onTap: {
-                       //    selectedRide = ride
+                           selectedRide = ride
                             Task {
                                 let userId = MBUserDefaults.userIdStatic ?? ""
                                 let alreadyInRide = await viewModel.hasOngoingRide(for: userId)
@@ -199,7 +199,7 @@ struct JoinRideRow: View {
                                         showRideAlreadyActivePopup = true
                                     }
                                 } else {
-                                    selectedRide = ride
+//                                    selectedRide = ride
                                     viewModel.changeRideInviteStatus(
                                         rideId: ride.rideId,
                                         userId: userId,
