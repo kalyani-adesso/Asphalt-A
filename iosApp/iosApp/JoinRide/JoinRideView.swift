@@ -81,7 +81,6 @@ struct JoinRideRow: View {
     var ride:JoinRideModel
     @ObservedObject var viewModel:JoinRideViewModel
     @State private var selectedRide: JoinRideModel? = nil
-    @State private var showRideAlreadyActivePopup = false
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 22) {
@@ -189,24 +188,11 @@ struct JoinRideRow: View {
                             startPoint: .leading,
                             endPoint: .trailing
                         ),onTap: {
-                       //    selectedRide = ride
                             Task {
-                                let userId = MBUserDefaults.userIdStatic ?? ""
-                                let alreadyInRide = await viewModel.hasOngoingRide(for: userId)
-                                
-                                if alreadyInRide {
-                                    await MainActor.run {
-                                        showRideAlreadyActivePopup = true
-                                    }
-                                } else {
-                                    selectedRide = ride
-                                    viewModel.changeRideInviteStatus(
-                                        rideId: ride.rideId,
-                                        userId: userId,
-                                        inviteStatus: 3
-                                    )
-                                }
-                            }
+                                       if let selected = await viewModel.handleJoin(for: ride) {
+                                           selectedRide = selected
+                                       }
+                                   }
                             
                         })
                         .navigationDestination(item: $selectedRide, destination: { ride in
@@ -223,10 +209,18 @@ struct JoinRideRow: View {
                     .fill(AppColor.listGray)
             )
             .contentShape(Rectangle())
-            .alert("Ride already active", isPresented: $showRideAlreadyActivePopup) {
-                Button("OK", role: .cancel) { }
+            .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
+                Button("No", role: .cancel) { }
+
+                Button("Yes") {
+                    Task {
+                        await viewModel.endActiveRide()
+                        await viewModel.joinRide(ride)
+                        selectedRide = ride
+                    }
+                }
             } message: {
-                Text("Please end your ongoing ride before joining a new one.")
+                Text("Do you want to end your current ride and join this one?")
             }
         }
     }

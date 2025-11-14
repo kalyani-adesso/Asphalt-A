@@ -350,8 +350,8 @@ extension ConnectedRideViewModel {
     func startOngoingRideTimer() {
         // Invalidate any existing timer
         ongoingRideTimer?.invalidate()
-        // Schedule the timer to trigger every 30 minutes (1800 seconds)
-        ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1800, repeats: true) { [weak self] _ in
+        // Schedule the timer to trigger every 15 minutes (900 seconds)
+        ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             
             Task {
