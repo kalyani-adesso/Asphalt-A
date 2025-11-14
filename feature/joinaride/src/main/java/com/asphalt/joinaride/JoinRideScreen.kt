@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -63,8 +62,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-
 @Composable
 fun JoinRideScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
@@ -74,12 +71,10 @@ fun JoinRideScreen(
 )
 {
     var toolbarTitle by remember { mutableStateOf("") }
-
     toolbarTitle = stringResource(R.string.join_ride)
 
     setTopAppBarState(
-        AppBarState(title = toolbarTitle)
-    )
+        AppBarState(title = toolbarTitle))
         Column(modifier = Modifier
             .fillMaxSize()
             .background(
@@ -89,38 +84,28 @@ fun JoinRideScreen(
                 navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                 navigateToEndRide = { navigateToEndRide.invoke()})
         }
-    viewModel.getAllRiders()
-
 }
-
 @Composable
 fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: () -> Unit,
     navigateToEndRide: () -> Unit
 ) {
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val rides by viewModel.acceptedRides.collectAsState()
 
-    val rides by viewModel.rides.collectAsState()
-    var query = viewModel.searchQuery
-
-    // filter list
-    val filteredRides = remember(rides, query) {
-        if (query.isBlank()) rides
-        else rides.filter { ride ->
-            ride.rideTitle!!.contains(query, ignoreCase = true) ||
-                    ride.startLocation!!.contains(query, ignoreCase = true)
-        }
-    }
     Column {
-
         SearchView(
-            query = query,
+            query = searchQuery,
             modifier = Modifier.fillMaxWidth()
                 .padding(top = Dimensions.padding20, start = Dimensions.padding16, end = Dimensions.padding16)
                 .background(color = NeutralLightPaper,
                     shape = RoundedCornerShape(size = Dimensions.size10)),
-            onQueryChange = { viewModel.onQueryChange(it) },
-            onClearClick = { viewModel.onQueryChange("") },
+            onQueryChange = {
+                viewModel.setSearchQuery(it) },
+            onClearClick = {
+                viewModel.setSearchQuery("") // Clear search filter
+            },
             placeholder = "Search rides by location.."
         )
         Spacer(modifier = Modifier.height(Dimensions.padding20))
@@ -135,7 +120,7 @@ fun JoinRide(
         }
         else {
             LazyColumn {
-                items(filteredRides) { rider ->
+                items(items = rides) { rider ->
                     RiderCard( navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                         navigateToEndRide = { navigateToEndRide.invoke() },
                         ridersList = rider)
@@ -151,8 +136,6 @@ fun RiderCard(
     navigateToEndRide: () -> Unit,
     ridersList : RidesData
 ) {
-
-
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
@@ -162,7 +145,6 @@ fun RiderCard(
             .padding(start = Dimensions.padding16, end = Dimensions.padding16, bottom = Dimensions.padding16),
 
         ) {
-
         Column(
             modifier = Modifier
                 .padding(vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16)
@@ -175,7 +157,7 @@ fun RiderCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(weight = 1f)
                 ) {
                     CircularNetworkImage(
                         modifier = Modifier.border(
@@ -185,7 +167,7 @@ fun RiderCard(
                         ),
                         size = Dimensions.size32,
                         imageUrl = "dashboardRideInvite.inviterProfilePicUrl",
-                        placeholderPainter = painterResource(R.drawable.profile_placeholder)
+                        placeholderPainter = painterResource(id=R.drawable.profile_placeholder)
                     )
                     Spacer(Modifier.width(width = Dimensions.size10))
                     Column {
@@ -208,7 +190,6 @@ fun RiderCard(
                             modifier = Modifier.padding(end = Dimensions.size10)
                         )
                     }
-
                     Spacer(Modifier.height(height = Dimensions.size17))
                 }
             }
@@ -223,26 +204,27 @@ fun RiderCard(
                     modifier = Modifier.padding(end = Dimensions.size10)
                 )
                 Spacer(Modifier.height(height = Dimensions.padding10))
-
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween
                     , modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)) {
                         Icon(
                             painter = painterResource(
-                                id = R.drawable.ic_location_purple
-                            ),
+                                id = R.drawable.ic_location_purple),
                             contentDescription = "location Icon",
-                            tint = PrimaryDarkerLightB75,
-                        )
+                            tint = PrimaryDarkerLightB75)
+
                         Spacer(Modifier.width(width = Dimensions.size5))
+
                         val startLocation = ridersList.startLocation
                         val endLocation = ridersList.endLocation
                         Text(
                             text = startLocation + "-" + endLocation ?: "",
                             style = Typography.titleMedium,
-                            fontSize = Dimensions.textSize12
+                            fontSize = Dimensions.textSize12,
+                            maxLines = 2
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -252,19 +234,19 @@ fun RiderCard(
                             tint = SafetyOrange)
                         Spacer(Modifier.width(Dimensions.size5))
                         val distance = ridersList.rideDistance
+                        val smallDistance = String.format("%.2f", distance)
                         Text(
-                            text = distance.toString() ?: "",
+                            text = smallDistance ?: "",
                             style = Typography.titleMedium,
-                            fontSize = Dimensions.textSize12
+                            fontSize = Dimensions.textSize12,
+                            maxLines = 2
                         )
                     }
                 }
-
                 Spacer(Modifier.height(Dimensions.padding10))
-
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                    , modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ){
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -312,11 +294,9 @@ fun RiderCard(
                         Dimensions.size8, Alignment.CenterHorizontally
                     ), modifier = Modifier.fillMaxWidth()
                 ) {
-
                     ElevatedButton(
                         onClick = {
                             navigateToEndRide.invoke()
-
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                         modifier = Modifier
@@ -325,25 +305,21 @@ fun RiderCard(
                             .height(Dimensions.size50),
                         shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS)
                     ) {
-
                         Icon(imageVector = Icons.Default.Call,
                             contentDescription = "Call",
                             tint = PrimaryDarkerLightB75)
-
                         Text(
                             stringResource(R.string.call_ride).uppercase(),
                             color = NeutralBlack,
                             style = TypographyBold.titleMedium,
                             fontSize = Dimensions.textSize14,
-                            modifier = Modifier.padding(start = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
-
                     GradientButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
                             navigateToConnectedRide.invoke()
-
                         },
                         buttonHeight = Dimensions.size50,
                         contentPadding = PaddingValues(Dimensions.size0)
@@ -355,17 +331,15 @@ fun RiderCard(
                         ) {
                             Icon(
                                 painter = painterResource(
-                                    id = R.drawable.moved_location,
-                                ),
+                                    id = R.drawable.moved_location),
                                 contentDescription = "Riders icon",
-                                tint = NeutralWhite,
-                            )
+                                tint = NeutralWhite)
                             Text(
                                 stringResource(R.string.join_ride).uppercase(),
                                 color = NeutralWhite,
                                 style = TypographyBold.titleMedium,
                                 fontSize = Dimensions.textSize14,
-                                modifier = Modifier.padding(start = 8.dp),
+                                modifier = Modifier.padding(start = 8.dp)
                             )
                         }
                     }
@@ -375,13 +349,8 @@ fun RiderCard(
     }
 }
 
-
 @Composable
 @Preview
 fun JoinRideScrenPreview() {
 
-//    JoinRideScreen(setTopAppBarState = {},
-//        viewModel = viewModel(),
-//        navigateToConnectedRide = {},
-//        navigateToEndRide = {})
 }

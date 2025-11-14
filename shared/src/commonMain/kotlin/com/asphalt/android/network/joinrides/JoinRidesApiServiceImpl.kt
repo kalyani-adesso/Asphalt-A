@@ -10,10 +10,10 @@ import io.ktor.client.call.body
 
 class JoinRidesApiServiceImpl(client: KtorClient) : BaseAPIService(client) ,JoinRidesApiService {
 
-    override suspend fun getAllRide(): List<RidesData> {
-        val response : Map<String, RidesData> = get(url = RIDES_URL).body()
-        return response.values.toList()
-    }
+//    override suspend fun getAllRide(): List<RidesData> {
+//        val response : Map<String, RidesData> = get(url = RIDES_URL).body()
+//        return response.values.toList()
+//    }
 
     override suspend fun getAllRiders(): APIResult<Map<String, CreateRideRoot>> {
         return safeApiCall {

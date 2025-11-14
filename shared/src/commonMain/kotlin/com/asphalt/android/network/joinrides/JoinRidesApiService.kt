@@ -7,7 +7,7 @@ import com.asphalt.android.model.rides.RidesData
 
 interface JoinRidesApiService  {
 
-    suspend fun getAllRide() :  List<RidesData>
+   // suspend fun getAllRide() :  List<RidesData>
 
     suspend fun getAllRiders() : APIResult<Map<String, CreateRideRoot>>
 
