@@ -42,7 +42,7 @@ actual class ConnectedRideImpl {
                 val childrenArray = snapshot.children.allObjects as? List<FIRDataSnapshot> ?: emptyList()
 
                 for (child in childrenArray) {
-                    val joinedId = child.key ?: continue
+                    val joinedId = child.key
                     val dict = child.value as? NSDictionary ?: continue
                     val root = dict.toConnectedRideRoot()
 

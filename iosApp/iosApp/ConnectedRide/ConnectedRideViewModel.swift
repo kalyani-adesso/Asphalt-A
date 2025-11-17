@@ -189,6 +189,16 @@ extension ConnectedRideViewModel {
         }
     }
     
+    func updateOrganizerStatus(rideId:String) {
+        rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { status, error in
+            if let error = error {
+                print("Failed to update ride status: \(error.localizedDescription)")
+            } else {
+                print("Successfully updated ride status")
+            }
+        })
+    }
+    
     @MainActor
     func getOnGoingRides(rideId: String) async {
         do {

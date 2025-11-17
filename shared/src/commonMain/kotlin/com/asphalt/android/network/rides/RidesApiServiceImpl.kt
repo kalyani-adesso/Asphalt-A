@@ -70,4 +70,13 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             delete("$ONGOING_RIDE_URL/$rideId/$rideJoinedId").body()
         }
     }
+
+    override suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit> {
+        val rideStatus = mapOf<Any?, Any?>(
+            "rideStatus" to rideStatus
+        )
+       return safeApiCall {
+          patch(rideStatus, "$RIDES_URL/$rideId")
+       }
+    }
 }

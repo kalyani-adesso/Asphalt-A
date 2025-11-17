@@ -67,9 +67,11 @@ struct ConnectedRideMapView: View {
                     
                     Button(action: {
                         self.rideComplted = true
-                      
+                        if rideModel.userId == MBUserDefaults.userIdStatic {
+                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId)
+                        } else {
                             joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId: rideModel.userId, inviteStatus: 4)
-                        
+                        }
                         viewModel.endRide(rideId:rideModel.rideId)
                     }, label: {
                         Text(AppStrings.ConnectedRide.endRideButton)

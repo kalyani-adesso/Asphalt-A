@@ -130,6 +130,10 @@ class RidesRepository(val apiService: RidesApIService) {
         }
     }
 
+    suspend fun updateOrganizerStatus(rideId:String,rideStatus:Int): APIResult<Unit> {
+         return apiService.updateOrganizerStatus(rideId,rideStatus)
+    }
+
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
         return RidesData(
             ridesID = rideId,
