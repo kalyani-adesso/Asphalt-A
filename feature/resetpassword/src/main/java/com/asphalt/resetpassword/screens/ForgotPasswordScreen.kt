@@ -1,5 +1,6 @@
 package com.asphalt.resetpassword.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,17 +20,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
+import com.asphalt.android.repository.AuthenticatorImpl
+import com.asphalt.android.repository.user.UserRepository
+import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -41,6 +51,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.ui.BouncingCirclesLoader
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.resetpassword.viewmodel.ForgotPasswordViewModel
@@ -51,8 +62,42 @@ fun ForgotPasswordScreen(
     onSendClick: (String) -> Unit,
     viewModel: ForgotPasswordViewModel = koinViewModel()
 ) {
-
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     AsphaltTheme {
+
+        if (viewModel.showSuccess.value) {
+            val successMessage = stringResource(R.string.reset_success_msg)
+            LaunchedEffect(Unit) {
+                UIStateHandler.sendEvent(UIState.SUCCESS(successMessage))
+                onSendClick.invoke("")
+            }
+
+        }
+        if (viewModel.showFailure.value) {
+            val successMessage = stringResource(R.string.user_not_found)
+            LaunchedEffect(Unit) {
+                UIStateHandler.sendEvent(UIState.Error(successMessage))
+            }
+
+            /*Popup {
+                StatusBanner(
+                    message = stringResource(R.string.reset_success_msg),
+                    type = BannerType.SUCCESS,
+                    showBanner = viewModel.showSuccess.value
+                ) {
+                    viewModel.showSuccess.value = false
+
+                }
+            }*/
+
+        }
+
+        if (viewModel.showLoader.value) {
+            BouncingCirclesLoader()
+        }
+
+
         Scaffold { paddingValues ->
             Column(
                 modifier = Modifier
@@ -192,7 +237,8 @@ fun ForgotPasswordScreen(
                         startColor = PrimaryDarkerLightB75,
                         endColor = PrimaryDarkerLightB50, onClick = {
                             if (viewModel.sendCode())
-                                onSendClick.invoke(viewModel.emailState.value)
+                                viewModel.callRestPassword()
+                            //onSendClick.invoke(viewModel.emailState.value)
                         }
                     ) {
                         ComposeUtils.DefaultButtonContent(
@@ -212,9 +258,14 @@ fun ForgotPasswordScreen(
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun ForgotPasswordPreview() {
-    val viewModel: ForgotPasswordViewModel = viewModel()
+    var modelauth: AuthViewModel = AuthViewModel(AuthenticatorImpl())
+    val viewModel: ForgotPasswordViewModel = ForgotPasswordViewModel(
+        modelauth,
+        UserRepository(UserAPIServiceImpl(KtorClient()))
+    )
     ForgotPasswordScreen({}, viewModel)
 }
