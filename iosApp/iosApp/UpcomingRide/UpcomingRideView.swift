@@ -63,17 +63,27 @@ struct UpcomingRideView: View {
                     .contentShape(Rectangle())
                     VStack {
                         List {
+                            let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                            
+                            if filtered.isEmpty {
+                                Text("No rides found")
+                                    .font(KlavikaFont.bold.font(size: 16))
+                                    .foregroundColor(AppColor.stoneGray)
+                            }
+                            else{
+                                
                             ForEach($viewModel.rides.indices.filter { index in
                                 viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
                             }, id: \.self) { index in
                                 UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
-                                    selectedRideId = rideId  // open upload flow for this ride
-                                    selectedImages = []  // clear previously selected images
-                                    withAnimation(.easeInOut) { activePopup = .uploadOptions } 
+                                    selectedRideId = rideId
+                                    selectedImages = []
+                                    withAnimation(.easeInOut) { activePopup = .uploadOptions }
                                 }
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                             }
+                        }
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
@@ -147,8 +157,6 @@ struct UpcomingRideView: View {
                 withAnimation { activePopup = .previewSelected }
             }
         }) {
-            //TODO: Check photo picker file is missing.
-//            PhotoPicker(images: $selectedImages)
         }
         .zIndex(showpopup ? 2 : 0)
         .task{

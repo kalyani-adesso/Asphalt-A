@@ -59,57 +59,57 @@ struct ConnectedRideMapView: View {
                 }
             }
             .listRowSeparator(.hidden)
-            Section {
-                VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
+                Section {
+                    VStack(spacing: 18) {
+                        ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
 
-                    ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
-                    
-                    Button(action: {
-                        self.rideComplted = true
-                        if rideModel.userId == MBUserDefaults.userIdStatic {
-                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId)
-                        } else {
-                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId: rideModel.userId, inviteStatus: 4)
-                        }
-                        viewModel.endRide(rideId:rideModel.rideId)
-                    }, label: {
-                        Text(AppStrings.ConnectedRide.endRideButton)
-                            .frame(maxWidth: .infinity,minHeight: 60)
-                            .font(KlavikaFont.bold.font(size: 18))
-                            .foregroundColor(AppColor.white)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.red)
-                            )
-                    })
-                    .padding([.leading,.trailing,.bottom],16)
-                    .buttonStyle(.plain)
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-            }
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-            
-            Section {
-                VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
-                    ForEach(viewModel.groupRiders, id: \.id) { rider in
-                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate)
+                        ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+
+                        Button(action: {
+                            self.rideComplted = true
+                            if rideModel.userId != MBUserDefaults.userIdStatic {
+                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+                            }
+
+                            viewModel.endRide(rideId:rideModel.rideId)
+                        }, label: {
+                            Text(AppStrings.ConnectedRide.endRideButton)
+                                .frame(maxWidth: .infinity,minHeight: 60)
+                                .font(KlavikaFont.bold.font(size: 18))
+                                .foregroundColor(AppColor.white)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppColor.red)
+                                )
+                        })
+                        .padding([.leading,.trailing,.bottom],16)
+                        .buttonStyle(.plain)
                     }
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppColor.listGray)
+                    )
                 }
-                .padding(.bottom,16)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-            }
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             
+            if viewModel.groupRiders.count >= 1 {
+                Section {
+                    VStack(spacing: 18) {
+                        ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
+                        ForEach(viewModel.groupRiders, id: \.id) { rider in
+                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate)
+                        }
+                    }
+                    .padding(.bottom,16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppColor.listGray)
+                    )
+                }
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            }
             Section {
                 VStack(spacing: 18) {
                     ConnectedRideHeaderView(title: AppStrings.ConnectedRide.emergencyActionsTitle, subtitle: "", image: AppIcon.ConnectedRide.emergency)
@@ -495,7 +495,7 @@ struct ActiveRiderView: View {
         )
         .padding([.leading,.trailing],16)
         .task {
-            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
+            await viewModel.getOnGoingRides(rideId: rideModel.rideId, userId: rideModel.userId)
         }
     }
 }
