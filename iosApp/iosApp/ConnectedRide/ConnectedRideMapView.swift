@@ -68,12 +68,11 @@ struct ConnectedRideMapView: View {
                         Button(action: {
                             self.rideComplted = true
                             if rideModel.userId != MBUserDefaults.userIdStatic {
-//                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
-                              
+                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
                             } else {
-                               
+                                joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
                             }
-                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId)
+                           
                             viewModel.endRide(rideId:rideModel.rideId)
                         }, label: {
                             Text(AppStrings.ConnectedRide.endRideButton)
@@ -178,9 +177,9 @@ struct ConnectedRideMapView: View {
                     showToast = false
                 }
                 if !rideModel.rideJoined {
-                    viewModel.joinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 } else {
-                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 }
                 viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
             }

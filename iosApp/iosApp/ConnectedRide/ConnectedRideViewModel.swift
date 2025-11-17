@@ -38,6 +38,7 @@ struct Rider: Identifiable {
     let speed: Int // Kph
     let status: RiderStatus
     let timeSinceUpdate: String
+    let contactNumber: String
 }
 
 struct RideStop: Identifiable {
@@ -54,7 +55,7 @@ enum MapType: String, CaseIterable, Hashable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     private var ongoingRideId = ""
@@ -156,7 +157,6 @@ extension ConnectedRideViewModel {
         rideRepository.joinRide(joinRide: connectedRideRoot) { result, error in
             if let result = result as? APIResultSuccess<ConnectedRideDTO> {
                 let ride = result.data
-                //TODO: Check here -
                 MBUserDefaults.isRideJoinedID = ride?.rideJoinedID ?? ""
                 self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
             } else if let error = error {
@@ -203,84 +203,50 @@ extension ConnectedRideViewModel {
     func getOnGoingRides(rideId: String) async {
         do {
             let flow = try await ConnectedRideImpl().getOngoingRides(rideId: rideId)
-            flow.collect(collector: ConnectedRideCollector(
-                onValue: { rides in
-                    for ride in rides {
-                        print("Ride status: \(ride.status)")
-                        print("Ride status: \(ride.currentLat)")
+
+            try await flow.collect(
+                collector: ConnectedRideCollector(
+                    onValue: { ongoingRides in
+                        
+                        Task { 
+                            var updatedRiders: [Rider] = []
+                            let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
+                            
+                            for ongoingRide in filteredRides {
+                                let status = self.getRideStatus()
+                                let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
+                                let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
+                                let rider = Rider(
+                                    name: userDetails?.0 ?? "",
+                                    speed: Int(ongoingRide.speedInKph),
+                                    status: status,
+                                    timeSinceUpdate: timeSinceUpdate,
+                                    contactNumber: userDetails?.1 ?? ""
+                                )
+                                updatedRiders.append(rider)
+                            }
+                            
+                            DispatchQueue.main.async {
+                                self.groupRiders = updatedRiders
+                            }
+                        }
+                    },
+                    onError: { error in
+                        print("Error: \(error.localizedDescription)")
                     }
-                },
-                onError: { error in
-                    print("Error: \(error.localizedDescription)")
+                ),
+                completionHandler: { error in
+                    if let error = error {
+                        print("Collection failed: \(error.localizedDescription)")
+                    } else {
+                        print("Collection finished")
+                    }
                 }
-            )) { error in
-                if let error = error {
-                    print("Collection failed: \(error.localizedDescription)")
-                } else {
-                    print("Collection finished")
-                }
-            }
-        } catch {}
-        
-//        do {
-//            // 1. Fetch all rides to get participants
-//            let rideResult = try await rideRepository.getAllRide()
-//            guard let rideSuccess = rideResult as? APIResultSuccess<AnyObject>,
-//                  let allRides = rideSuccess.data as? [RidesData],
-//                  let selectedRide = allRides.first(where: { $0.ridesID == rideId }) else {
-//                print("Ride not found")
-//                return
-//            }
-//
-//            // 2. Get accepted participants (inviteStatus == 3), excluding current user
-//            let acceptedParticipants = selectedRide.participants.filter {
-//                $0.inviteStatus == 3 && $0.userId != MBUserDefaults.userIdStatic
-//            }
-//
-//            // 3. Fetch live ongoing rides data
-//            let ongoingResult = try await rideRepository.getOngoingRides(rideId: rideId)
-//            guard let ongoingSuccess = ongoingResult as? APIResultSuccess<AnyObject>,
-//                  let ongoingRides = ongoingSuccess.data as? [ConnectedRideDTO] else {
-//                
-//                // Fallback to static riders if no ongoing data available
-//                let allUsers = await getAllUsersName()
-//                self.groupRiders = acceptedParticipants.map { participant in
-//                    let userData = allUsers[participant.userId] ?? ("Unknown", "")
-//                    return Rider(
-//                        name: userData.name.isEmpty ? participant.userId : userData.name,
-//                        speed: 0,
-//                        status: .stopped,
-//                        timeSinceUpdate: "Just now"
-//                    )
-//                }
-//                return
-//            }
-//
-//            // 4. Fetch all users for name lookup
-//            let allUsers = await getAllUsersName()
-//
-//            // 5. Merge both datasets (participants + live ride data)
-//            self.groupRiders = acceptedParticipants.map { participant in
-//                let liveRide = ongoingRides.first(where: { $0.userID == participant.userId })
-//                let userData = allUsers[participant.userId] ?? ("Unknown", "")
-//
-//                // Use live values if available, otherwise fallback
-//                let speed = liveRide?.speedInKph ?? 0
-//                let status = liveRide != nil ? self.getRideStatus() : .stopped
-//                let time = liveRide != nil ? self.formatTime(from: liveRide!.dateTime) : "Just now"
-//
-//                return Rider(
-//                    name: userData.name.isEmpty ? participant.userId : userData.name,
-//                    speed: Int(speed),
-//                    
-//                    status: status,
-//                    timeSinceUpdate: time
-//                )
-//            }
-//
-//        } catch {
-//            print("Error fetching ongoing rides:", error)
-//        }
+            )
+
+        } catch {
+            print("Outer error: \(error.localizedDescription)")
+        }
     }
 
     func getAllUsersName() async -> [String: (name: String, contact: String)] {
@@ -300,7 +266,6 @@ extension ConnectedRideViewModel {
             }
         }
     }
-    
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {
         await withCheckedContinuation { continuation in

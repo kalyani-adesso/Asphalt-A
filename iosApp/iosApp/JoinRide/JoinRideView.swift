@@ -173,7 +173,7 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title:(MBUserDefaults.isRideJoinedID?.isEmpty ?? true) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
+                        ButtonView(title: ride.rideJoined ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
                             gradient: Gradient(colors: [
                                 AppColor.vividGreen,
                                 AppColor.vividGreen,

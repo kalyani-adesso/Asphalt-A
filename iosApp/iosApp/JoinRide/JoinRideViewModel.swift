@@ -100,7 +100,8 @@ extension JoinRideViewModel {
                 // Fetch user name asynchronously
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
-                let rideJoinedStatus = ride.participants.first(where: {$0.userId == (MBUserDefaults.userIdStatic ?? "") })?.inviteStatus == 3
+                
+                let rideJoinedStatus = (ride.participants.contains(where: { $0.inviteStatus == 3 })) || ride.rideStatus == 3
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
@@ -218,16 +219,15 @@ extension JoinRideViewModel {
             return ride
         }
 
-        func joinRide(_ ride: JoinRideModel) async {
-            let uid = currentUserId
-
-            if ride.userId == uid {
-                print("\(ride.rideId) -> rideStatus = 3")
-                // rideRepository.changeRideStatus(...)
-            } else {
-                changeRideInviteStatus(rideId: ride.rideId, userId: uid, inviteStatus: 3)
-            }
+    func joinRide(_ ride: JoinRideModel) async {
+        let uid = currentUserId
+        
+        if ride.userId == uid {
+            updateOrganizerStatus(rideId: ride.rideId, rideStatus: 3)
+        } else {
+            changeRideInviteStatus(rideId: ride.rideId, userId: uid, inviteStatus: 3)
         }
+    }
 
         func endActiveRide() async {
             guard let active = await getUserActiveRide() else { return }
@@ -276,8 +276,8 @@ extension JoinRideViewModel {
             return nil
         }
     
-    func updateOrganizerStatus(rideId:String) {
-        rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { status, error in
+    func updateOrganizerStatus(rideId:String,rideStatus:Int) {
+        rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus:Int32(rideStatus) , completionHandler: { status, error in
             if let error = error {
                 print("Failed to update ride status: \(error.localizedDescription)")
             } else {
