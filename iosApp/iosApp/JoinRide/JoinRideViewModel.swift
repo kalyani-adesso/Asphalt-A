@@ -41,6 +41,7 @@ final class JoinRideViewModel: ObservableObject {
     private var userRepository: UserRepository
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     @Published var isRideLoading = false
+    @Published var showRideAlreadyActivePopup = false
     @Published var searchQuery: String = "" {
         didSet {
             searchRides()
@@ -72,10 +73,22 @@ extension JoinRideViewModel {
             self.isRideLoading = true
             let rideArray = try await getAllRidesAsync()
 
-            let filteredRideArray = rideArray.filter {
-                $0.createdBy == MBUserDefaults.userIdStatic ||
-                ($0.participants.first(where: { $0.userId == MBUserDefaults.userIdStatic })?.inviteStatus == 1)
+            let filteredRideArray = rideArray.filter { ride in
+                guard let startEpoch = ride.startDate else { return false }
+                let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
+                // 1. Ignore past rides
+                guard startDate >= Calendar.current.startOfDay(for: Date()) else { return false }
+                // 2. Determine current user role
+                let isCreator = ride.createdBy == currentUserId
+                let participantRecord = ride.participants.first { $0.userId == currentUserId }
+                let isParticipant = participantRecord != nil
+                // 3. Hide ended rides
+                if isCreator, ride.rideStatus == 4 { return false }
+                if isParticipant, participantRecord?.inviteStatus == 4 { return false }
+                // 4. Show only creator or participant rides
+                return isCreator || isParticipant
             }
+            
             
             var joinRideModels: [JoinRideModel] = []
             
@@ -190,4 +203,77 @@ extension JoinRideViewModel {
             ride.route.lowercased().contains(query)
         }
     }
+    // MARK: - Join Flow
+        func handleJoin(for ride: JoinRideModel) async -> JoinRideModel? {
+            if ride.rideJoined { return ride }
+
+            if let active = await getUserActiveRide() {
+                if active.ridesID != ride.rideId {
+                    showRideAlreadyActivePopup = true
+                    return nil
+                }
+            }
+
+            await joinRide(ride)
+            return ride
+        }
+
+        func joinRide(_ ride: JoinRideModel) async {
+            let uid = currentUserId
+
+            if ride.userId == uid {
+                print("\(ride.rideId) -> rideStatus = 3")
+                // rideRepository.changeRideStatus(...)
+            } else {
+                changeRideInviteStatus(rideId: ride.rideId, userId: uid, inviteStatus: 3)
+            }
+        }
+
+        func endActiveRide() async {
+            guard let active = await getUserActiveRide() else { return }
+            let uid = currentUserId
+
+            if active.createdBy == uid {
+                print("\(active.ridesID ?? "") -> rideStatus = 4")
+            } else {
+                changeRideInviteStatus(
+                    rideId: active.ridesID ?? "",
+                    userId: uid,
+                    inviteStatus: 4
+                )
+            }
+
+            showRideAlreadyActivePopup = false
+        }
+
+        func getUserActiveRide() async -> RidesData? {
+            do {
+                let result = try await rideRepository.getAllRide()
+                guard
+                    let success = result as? APIResultSuccess<AnyObject>,
+                    let rides = success.data as? [RidesData]
+                else { return nil }
+
+                let uid = currentUserId
+                let today = Calendar.current.startOfDay(for: Date())
+
+                return rides.first { ride in
+                    guard let epoch = ride.startDate else { return false }
+                    let date = Date(timeIntervalSince1970: Double(truncating: epoch) / 1000)
+                    if date < today { return false }
+
+                    let isCreator = ride.createdBy == uid && ride.rideStatus == 3
+                    let isParticipant = ride.participants.contains {
+                        $0.userId == uid && $0.inviteStatus == 3
+                    }
+
+                    return isCreator || isParticipant
+                }
+
+            } catch {
+                return nil
+            }
+        }
+
+
 }
