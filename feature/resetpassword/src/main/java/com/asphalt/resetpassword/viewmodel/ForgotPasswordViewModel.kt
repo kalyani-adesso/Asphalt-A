@@ -24,7 +24,6 @@ class ForgotPasswordViewModel(
 
     val showSuccess = mutableStateOf(false)
     val showFailure = mutableStateOf(false)
-    val showLoader = mutableStateOf(false)
 
     fun updateEmail(email: String) {
         isShowError.value = false

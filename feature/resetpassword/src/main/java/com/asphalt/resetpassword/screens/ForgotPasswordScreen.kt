@@ -80,21 +80,6 @@ fun ForgotPasswordScreen(
                 UIStateHandler.sendEvent(UIState.Error(successMessage))
             }
 
-            /*Popup {
-                StatusBanner(
-                    message = stringResource(R.string.reset_success_msg),
-                    type = BannerType.SUCCESS,
-                    showBanner = viewModel.showSuccess.value
-                ) {
-                    viewModel.showSuccess.value = false
-
-                }
-            }*/
-
-        }
-
-        if (viewModel.showLoader.value) {
-            BouncingCirclesLoader()
         }
 
 
@@ -157,7 +142,7 @@ fun ForgotPasswordScreen(
 
                 ) {
                     Text(
-                        text = stringResource(string.email_phone),
+                        text = stringResource(string.email),
                         modifier = Modifier.padding(top = Dimensions.spacing20),
                         style = TypographyBold.titleMedium,
                         color = NeutralBlack
