@@ -68,9 +68,12 @@ struct ConnectedRideMapView: View {
                         Button(action: {
                             self.rideComplted = true
                             if rideModel.userId != MBUserDefaults.userIdStatic {
-                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+//                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+                              
+                            } else {
+                               
                             }
-
+                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId)
                             viewModel.endRide(rideId:rideModel.rideId)
                         }, label: {
                             Text(AppStrings.ConnectedRide.endRideButton)
@@ -495,7 +498,7 @@ struct ActiveRiderView: View {
         )
         .padding([.leading,.trailing],16)
         .task {
-            await viewModel.getOnGoingRides(rideId: rideModel.rideId, userId: rideModel.userId)
+            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
         }
     }
 }

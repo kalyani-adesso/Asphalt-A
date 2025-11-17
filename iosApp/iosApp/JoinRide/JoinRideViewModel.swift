@@ -270,14 +270,12 @@ extension JoinRideViewModel {
                     return isCreator || isParticipant
                 }
             }
-            
-            return false
-        } catch {
-            print("Error checking ongoing ride:", error)
-            return false
+            catch {
+                print("Error checking ongoing ride:", error)
+            }
+            return nil
         }
-    }
-
+    
     func updateOrganizerStatus(rideId:String) {
         rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { status, error in
             if let error = error {
