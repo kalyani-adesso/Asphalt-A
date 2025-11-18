@@ -4,9 +4,11 @@ import com.asphalt.android.constants.APIConstants.PARTICIPANTS_URL
 import com.asphalt.android.constants.APIConstants.QUERIES_URL
 import com.asphalt.android.constants.APIConstants.RIDES_URL
 import com.asphalt.android.constants.APIConstants.ONGOING_RIDE_URL
+import com.asphalt.android.constants.APIConstants.RATINGS
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
 import com.asphalt.android.model.rides.CreateRideRoot
@@ -68,6 +70,34 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
     override suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit> {
         return safeApiCall {
             delete("$ONGOING_RIDE_URL/$rideId/$rideJoinedId").body()
+        }
+    }
+
+    override suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit> {
+        val rideStatus = mapOf<Any?, Any?>(
+            "rideStatus" to rideStatus
+        )
+       return safeApiCall {
+          patch(rideStatus, "$RIDES_URL/$rideId").body()
+       }
+    }
+
+    override suspend fun rateYourRide(
+        rideId: String,
+        userId: String,
+        stars: Int,
+        comments: String
+    ): APIResult<Unit> {
+
+        val rating = RatingRequest(
+            userId = userId,
+            rideId = rideId,
+            stars = stars,
+            comments = comments
+        )
+
+        return safeApiCall {
+            post(rating, RATINGS).body()
         }
     }
 }

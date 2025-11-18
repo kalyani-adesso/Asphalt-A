@@ -1,5 +1,6 @@
 package com.asphalt.android.network.rides
 
+import androidx.compose.ui.platform.TextToolbarStatus
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
@@ -23,6 +24,11 @@ interface RidesApIService {
     suspend fun getJoinedRides(rideId: String): APIResult<Map<String, ConnectedRideRoot>>
 
     suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit>
+
+    suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit>
+
+
+    suspend fun rateYourRide(rideId:String, userId:String, stars:Int, comments:String): APIResult<Unit>
 
     suspend fun getSingleRide(rideID:String) : APIResult<CreateRideRoot>
 }
