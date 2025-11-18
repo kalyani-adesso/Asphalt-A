@@ -27,5 +27,8 @@ interface RidesApIService {
 
     suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit>
 
+
+    suspend fun rateYourRide(rideId:String, userId:String, stars:Int, comments:String): APIResult<Unit>
+
     suspend fun getSingleRide(rideID:String) : APIResult<CreateRideRoot>
 }

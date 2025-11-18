@@ -134,6 +134,15 @@ class RidesRepository(val apiService: RidesApIService) {
          return apiService.updateOrganizerStatus(rideId,rideStatus)
     }
 
+    suspend fun rateYourRide(
+        rideId: String,
+        userId: String,
+        stars: Int,
+        comments: String
+    ) : APIResult<Unit> {
+        return apiService.rateYourRide(rideId,userId,stars,comments)
+    }
+
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
         return RidesData(
             ridesID = rideId,

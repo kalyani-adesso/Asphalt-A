@@ -267,6 +267,16 @@ extension ConnectedRideViewModel {
         }
     }
     
+    func rateYourRide(ratings:Int,comments:String) {
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
+            if let error = error {
+                print("Error while rating your ride \(error)")
+            } else {
+                print("Sucesss!")
+            }
+        }
+    }
+    
     func getAllUsers(createdBy: String) async  -> (String, String)? {
         await withCheckedContinuation { continuation in
             userRepository.getAllUsers { result, error in
