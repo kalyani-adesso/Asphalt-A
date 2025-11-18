@@ -10,7 +10,7 @@ import Charts
 
 struct JourneyCardView: View {
     @EnvironmentObject var home: HomeViewModel 
-    @State private var selectedOption = "Last 4 months"
+    @State private var selectedOption = "This month"
     @State private var currentSlices: [JourneySlice] = []
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -71,6 +71,7 @@ struct JourneyCardView: View {
         )
         .padding(.top,20)
         .onAppear {
+            home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
             currentSlices = home.getJourneySlices(for: selectedOption)
         }
         .onChange(of: selectedOption) { newValue in
@@ -121,7 +122,7 @@ extension Array {
 // MARK: - Donut Chart
 struct DonutChartView: View {
     let slices: [JourneySlice]
-    
+    @EnvironmentObject var home: HomeViewModel 
     var body: some View {
         Chart {
             ForEach(slices) { s in
@@ -142,7 +143,7 @@ struct DonutChartView: View {
             VStack {
                 AppIcon.Home.chart
                     .frame(width: 38, height: 38)
-                Text("Total \(Int(slices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
+                Text("Total \(Int(home.journeySlices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

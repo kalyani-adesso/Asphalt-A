@@ -23,16 +23,14 @@ struct UpcomingRidesView: View {
                 }
                 .font(KlavikaFont.bold.font(size: 13))
             }
-            let invites = viewModel.rides.filter { $0.rideAction == .invities }
+            let invites = viewModel.upcomingInvitesRide
             if invites.isEmpty {
                 emptyStateView
             }
             else{
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 25) {
-                        ForEach($viewModel.rides.filter { $ride in
-                            $ride.rideAction.wrappedValue == .invities
-                        }, id: \.id) { $ride in
+                        ForEach($viewModel.upcomingInvitesRide, id: \.id) { $ride in
                             UpcomingRideCard(viewModel: viewModel, ride: $ride)
                         }
                     }
@@ -48,6 +46,7 @@ struct UpcomingRidesView: View {
         .task{
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
+            await viewModel.getInvites()
         }
     }
 }

@@ -2,12 +2,12 @@ package com.asphalt.android.network.rides
 
 import androidx.compose.ui.platform.TextToolbarStatus
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.Dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.UserInvites
-import  com.asphalt.android.model.connectedride.ConnectedRideDTO
 
 interface RidesApIService {
     suspend fun createRide(
@@ -31,4 +31,8 @@ interface RidesApIService {
     suspend fun rateYourRide(rideId:String, userId:String, stars:Int, comments:String): APIResult<Unit>
 
     suspend fun getSingleRide(rideID:String) : APIResult<CreateRideRoot>
+
+    suspend fun endRideSummary(userID: String, endRide: DashboardDTO) :  APIResult<FirebasePushResponse>
+
+    suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>
 }
