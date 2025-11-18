@@ -15,6 +15,7 @@ struct RatingSheetView: View {
     @State var showHome: Bool = false
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @ObservedObject var coneectedRideVM  = ConnectedRideViewModel()
     
     var ratingText: String {
         switch rating {
@@ -119,6 +120,7 @@ struct RatingSheetView: View {
             .buttonStyle(.plain)
             ButtonView(title: AppStrings.ConnectedRide.submitRating.uppercased(),onTap: {
                 isPresented = false
+                coneectedRideVM.rateYourRide(ratings: rating, comments: feedback)
             })
             .disabled(rating == 0)
             .opacity(rating == 0 ? 0.9 : 1.0)
@@ -126,8 +128,6 @@ struct RatingSheetView: View {
         }
     }
 }
-
-
 
 #Preview {
     RatingSheetView(isPresented: .constant(true))
