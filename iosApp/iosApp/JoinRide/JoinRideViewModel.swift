@@ -29,6 +29,7 @@ struct JoinRideModel: Identifiable,Hashable {
     let endLat:Double
     let endLong:Double
     let rideJoined:Bool
+    let participants: [ParticipantData]? 
 }
 
 @MainActor
@@ -96,6 +97,7 @@ extension JoinRideViewModel {
                 guard let startEpoch = ride.startDate else { continue }
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 let dateString = self.formatDate(startDate)
+                let participants = ride.participants
                 
                 // Fetch user name asynchronously
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
@@ -118,7 +120,9 @@ extension JoinRideViewModel {
                         startLat: ride.startLatitude,
                         startLong: ride.startLongitude,
                         endLat: ride.endLatitude,
-                        endLong: ride.endLongitude, rideJoined: rideJoinedStatus
+                        endLong: ride.endLongitude,
+                        rideJoined: rideJoinedStatus,
+                        participants: participants
                         
                     )
                     joinRideModels.append(model)

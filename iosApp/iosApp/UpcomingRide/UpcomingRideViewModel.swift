@@ -59,6 +59,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var userName: String = ""
     @Published var selectedTab: RideAction = .upcoming
     @Published var hasPhotos: Bool = false
+    @Published var upcomingInvitesRide: [RideModel] = []
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private let userRepo: UserRepository
@@ -284,5 +285,48 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Get Upcoming Invites
+    @MainActor
+    func getInvites() async {
+        do {
+            let result = try await rideRepository.getRideInvites(userID: MBUserDefaults.userIdStatic ?? "")
+            if let success = result as? APIResultSuccess<AnyObject>,
+             let invites = success.data as? [RideInvitesDomain] {
+                let mapped: [RideModel] = invites.compactMap { domain in
+                           
+                    let millis = domain.startDateTime ?? 0
+                    let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
+                    
+                    if startDate < Date().startOfDay {
+                        return nil
+                    }
+                           
+                           return RideModel(
+                               id: domain.rideID,
+                               title: "Ride Invite",
+                               routeStart: domain.startLocation,
+                               routeEnd: domain.destination,
+                               status: .invite,
+                               rideViewAction: .decline,
+                               rideAction: .invities,
+                               date: formatDate(startDate),
+                               riderCount: domain.acceptedParticipants.count,
+                               createdBy: domain.inviter,
+                               startDate: startDate,
+                               participantAcceptedCount: domain.acceptedParticipants.count
+                           )
+                       }
+                       
+                       self.upcomingInvitesRide = mapped
+            }
+        } catch {
+            print("Error fetching users:", error)
+        }
+    }
     
+}
+extension Date {
+    var startOfDay: Date {
+        Calendar.current.startOfDay(for: self)
+    }
 }

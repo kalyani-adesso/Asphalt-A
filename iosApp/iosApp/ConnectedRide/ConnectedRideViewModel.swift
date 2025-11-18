@@ -367,4 +367,33 @@ extension ConnectedRideViewModel {
         ongoingRideTimer?.invalidate()
         ongoingRideTimer = nil
     }
+    
+    func endRideSummary(ride: JoinRideModel, userID: String) {
+        
+        let isParticipant = ride.participants?.contains { $0.userId == userID } ?? false
+        
+        let dto = DashboardDTO(
+              rideID: ride.rideId,
+              rideDistance: KotlinDouble(value: Double(ride.distance.replacingOccurrences(of: " km", with: "")) ?? 0),
+              isGroupRide: KotlinBoolean(bool: (Int(ride.maxRiders) ?? 0) > 0),
+              startLocation: ride.route.split(separator: "-").first?.trimmingCharacters(in: .whitespaces) ?? "",
+              endLocation: ride.route.split(separator: "-").last?.trimmingCharacters(in: .whitespaces) ?? "",
+              isOrganiserGroupRide: KotlinBoolean(bool: userID == ride.userId),
+              isParticipantGroupRide: KotlinBoolean(bool: isParticipant),
+              endRideDate: "\(Date().timeIntervalSince1970 * 1000)"
+        )
+        
+        rideRepository.endRideSummary(userID: userID, endRide: dto){ result, error in
+            if let result = result as? APIResultSuccess<ConnectedRideDTO> {
+                _ = result.data
+               
+            } else if let error = error {
+                print("Error joining ride:", error.localizedDescription)
+            } else {
+                print("Result is nil")
+            }
+        }
+    }
+    
+   
 }
