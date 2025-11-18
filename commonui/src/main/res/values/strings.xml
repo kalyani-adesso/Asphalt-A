@@ -249,5 +249,9 @@
     <string name="ride_creator">Ride Creator</string>
     <string name="organizer">Organizer</string>
 
+    <string name="reset_success_msg">A password reset email has been sent to your registered email address.</string>
+
+
+
 
 </resources>

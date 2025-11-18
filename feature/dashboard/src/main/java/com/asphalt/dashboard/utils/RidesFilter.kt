@@ -55,7 +55,7 @@ object RidesFilter {
                 place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                 rideStatus = rideStatus,
                 date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
-                riders = ride.participants.size,
+                riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
                 startDate = ride.startDate
             )
@@ -82,7 +82,7 @@ object RidesFilter {
                     title = "",
                     place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                     date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
-                    riders = ride.participants.size,
+                    riders = ride.participants.size + 1,// need to count the organizer
                     createdBy = ride.createdBy,
                     createdUSerName = userDomain?.name ?: "",
                     profileImageUrl = userDomain?.profilePic
@@ -109,7 +109,7 @@ object RidesFilter {
                 place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                 rideStatus = HISTORY,
                 date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
-                riders = ride.participants.size,
+                riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
                 startDate = ride.startDate
             )
