@@ -8,7 +8,6 @@ import com.asphalt.android.constants.APIConstants.RATINGS
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.Dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
-import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
@@ -25,8 +24,8 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun getAllRide() : APIResult<Map<String, CreateRideRoot>> {
-       return safeApiCall {
+    override suspend fun getAllRide(): APIResult<Map<String, CreateRideRoot>> {
+        return safeApiCall {
             get(url = RIDES_URL).body()
         }
     }
@@ -43,14 +42,14 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
 
     override suspend fun getSingleRide(rideID: String): APIResult<CreateRideRoot> {
         return safeApiCall {
-            get(url = RIDES_URL+"/${rideID}").body()
+            get(url = RIDES_URL + "/${rideID}").body()
         }
     }
 
     override suspend fun joinRide(joinRide: ConnectedRideRoot): APIResult<FirebasePushResponse> {
-      return safeApiCall {
-          post(joinRide, "$ONGOING_RIDE_URL/${joinRide.rideID}").body()
-      }
+        return safeApiCall {
+            post(joinRide, "$ONGOING_RIDE_URL/${joinRide.rideID}").body()
+        }
     }
 
     override suspend fun rejoinRide(
@@ -74,7 +73,10 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun endRideSummary(userID: String,endRide: DashboardDTO): APIResult<FirebasePushResponse> {
+    override suspend fun endRideSummary(
+        userID: String,
+        endRide: DashboardDTO
+    ): APIResult<FirebasePushResponse> {
         return safeApiCall {
             post(endRide, "$END_RIDE_SUMMARY_URL/$userID").body()
         }
@@ -83,13 +85,17 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
     override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>> {
         return safeApiCall {
             get(url = "$END_RIDE_SUMMARY_URL/$userID").body()
-    override suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit> {
+
+        }
+    }
+
+    override suspend fun updateOrganizerStatus(rideId: String, rideStatus: Int): APIResult<Unit> {
         val rideStatus = mapOf<Any?, Any?>(
             "rideStatus" to rideStatus
         )
-       return safeApiCall {
-          patch(rideStatus, "$RIDES_URL/$rideId").body()
-       }
+        return safeApiCall {
+            patch(rideStatus, "$RIDES_URL/$rideId").body()
+        }
     }
 
     override suspend fun rateYourRide(
