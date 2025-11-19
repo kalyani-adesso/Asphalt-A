@@ -29,7 +29,7 @@ struct ConnectedRideMapView: View {
             Section {
                 VStack {
                     ZStack(alignment: .topLeading) {
-                        BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel)
+                        BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack)
                             .cornerRadius(12)
                             .ignoresSafeArea(edges: .top)
                         VStack {
@@ -45,7 +45,7 @@ struct ConnectedRideMapView: View {
                                         .padding(.horizontal, 16)
                                 }
                             }
-
+                            
                             Spacer()
                             HStack {
                                 distanceAndETA()
@@ -59,42 +59,44 @@ struct ConnectedRideMapView: View {
                 }
             }
             .listRowSeparator(.hidden)
-                Section {
-                    VStack(spacing: 18) {
-                        ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-
-                        ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
-
-                        Button(action: {
-                            self.rideComplted = true
-                            if rideModel.userId != MBUserDefaults.userIdStatic {
-                                joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
-                            } else {
-                                joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
-                            }
-                           
-                            viewModel.endRide(rideId:rideModel.rideId)
-                            viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
-                        }, label: {
-                            Text(AppStrings.ConnectedRide.endRideButton)
-                                .frame(maxWidth: .infinity,minHeight: 60)
-                                .font(KlavikaFont.bold.font(size: 18))
-                                .foregroundColor(AppColor.white)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(AppColor.red)
-                                )
-                        })
-                        .padding([.leading,.trailing,.bottom],16)
-                        .buttonStyle(.plain)
-                    }
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
+            Section {
+                VStack(spacing: 18) {
+                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
+                    
+                    ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+                    
+                    Button(action: {
+                        self.rideComplted = true
+                        if rideModel.userId != MBUserDefaults.userIdStatic {
+                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+                        } else {
+                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
+                        }
+                        
+                        viewModel.endRide(rideId:rideModel.rideId)
+                        viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
+                        viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
+                        stopTimer()
+                    }, label: {
+                        Text(AppStrings.ConnectedRide.endRideButton)
+                            .frame(maxWidth: .infinity,minHeight: 60)
+                            .font(KlavikaFont.bold.font(size: 18))
+                            .foregroundColor(AppColor.white)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.red)
+                            )
+                    })
+                    .padding([.leading,.trailing,.bottom],16)
+                    .buttonStyle(.plain)
                 }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(AppColor.listGray)
+                )
+            }
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
             
             if viewModel.groupRiders.count >= 1 {
                 Section {
@@ -171,7 +173,7 @@ struct ConnectedRideMapView: View {
             .listRowSeparator(.hidden)
             .navigationBarBackButtonHidden()
             .navigationDestination(isPresented: $rideComplted, destination: {
-                ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel)
+                ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel, rideCompleteModel: viewModel.rideCompleteModel)
             })
             .onAppear() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -183,14 +185,8 @@ struct ConnectedRideMapView: View {
                     viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 }
                 viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-            }
-            .onChange(of: startTrack) { isTracking in
-                if !isTracking{
-                    stopTimer()
-                } else {
-                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                        self.elapsedSeconds += 1
-                    }
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    self.elapsedSeconds += 1
                 }
             }
             .toolbar {

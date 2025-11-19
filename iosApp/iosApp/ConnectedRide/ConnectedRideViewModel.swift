@@ -39,6 +39,8 @@ struct Rider: Identifiable {
     let status: RiderStatus
     let timeSinceUpdate: String
     let contactNumber: String
+    let currentLat:Double
+    let currentLong:Double
 }
 
 struct RideStop: Identifiable {
@@ -55,7 +57,7 @@ enum MapType: String, CaseIterable, Hashable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0)]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     private var ongoingRideId = ""
@@ -77,7 +79,6 @@ final class ConnectedRideViewModel: ObservableObject {
         self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
-        loadData()
         startOngoingRideTimer()
     }
     deinit {
@@ -95,11 +96,11 @@ final class ConnectedRideViewModel: ObservableObject {
         }
     }
     
-    func loadData() {
+    func  getRideCompleteDetails(duration:String,distance:String,riders:String) {
         rideCompleteModel =   [
-            RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDuration, value: "09:30:23", label: "Duration"),
-            RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDistance, value: "78.5", label: "KM"),
-            RideCompleteModel(iconName: AppIcon.ConnectedRide.riders, value: "3", label: "Riders")
+            RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDuration, value: duration, label: "Duration"),
+            RideCompleteModel(iconName: AppIcon.ConnectedRide.rideDistance, value: distance, label: "KM"),
+            RideCompleteModel(iconName: AppIcon.ConnectedRide.riders, value: riders, label: "Riders")
         ]
     }
     
@@ -208,8 +209,8 @@ extension ConnectedRideViewModel {
                 collector: ConnectedRideCollector(
                     onValue: { ongoingRides in
                         
-                        Task { 
-                            var updatedRiders: [Rider] = []
+                        Task {
+                            var ridersDict: [String: Rider] = [:]  // Dictionary to track unique riders by userID
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
@@ -221,12 +222,22 @@ extension ConnectedRideViewModel {
                                     speed: Int(ongoingRide.speedInKph),
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,
-                                    contactNumber: userDetails?.1 ?? ""
+                                    contactNumber: userDetails?.1 ?? "",
+                                    currentLat: ongoingRide.currentLat,
+                                    currentLong: ongoingRide.currentLong
                                 )
-                                updatedRiders.append(rider)
+                                
+                                // Update or add to dictionary (ensures uniqueness by userID)
+                                ridersDict[ongoingRide.userID] = rider
                             }
                             
+                            // Convert dictionary values to array
+                            let updatedRiders = Array(ridersDict.values)
+                            
                             DispatchQueue.main.async {
+                                if self.groupRiders.count > 0 {
+                                    self.groupRiders.removeAll()
+                                }
                                 self.groupRiders = updatedRiders
                             }
                         }
@@ -248,6 +259,7 @@ extension ConnectedRideViewModel {
             print("Outer error: \(error.localizedDescription)")
         }
     }
+
 
     func getAllUsersName() async -> [String: (name: String, contact: String)] {
         await withCheckedContinuation { continuation in

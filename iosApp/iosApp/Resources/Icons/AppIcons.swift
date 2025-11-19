@@ -132,6 +132,9 @@ struct AppIcon {
         static let nearMe = Image("near-me")
         static let ridePending = Image("icon-ridePending")
         static let rideConfirmed = Image("icon-rideConfirmed")
+        static let orangePin = Image("orangePin")
+        static let greenPin = Image("greenPin")
+        static let yellowPin = Image("yellowPin")
     }
     
     struct ConnectedRide {

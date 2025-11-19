@@ -16,6 +16,7 @@ struct ConnectedRideCompleteView: View {
     @State var showHome: Bool = false
     @State var showPopup: Bool = false
     @State var showMapView:Bool = false
+    let rideCompleteModel:[RideCompleteModel]
     var body: some View {
         ZStack{
             VStack(spacing: 16) {
@@ -74,7 +75,7 @@ struct ConnectedRideCompleteView: View {
                 .padding(.leading,16)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 18) {
-                    ForEach(connectedRideViewModel.rideCompleteModel, id: \.id) { rideComplete in
+                    ForEach(rideCompleteModel, id: \.id) { rideComplete in
                         RideDetails(
                             image: rideComplete.iconName,
                             title: rideComplete.value,

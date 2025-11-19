@@ -105,7 +105,7 @@ struct RideDetailsView: View {
                     UpcomingRideView()
                 })
                 .navigationDestination(isPresented:$startRide,  destination: {
-                    ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel)
+                    ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])
                 })
                 .onAppear {
                     Task {

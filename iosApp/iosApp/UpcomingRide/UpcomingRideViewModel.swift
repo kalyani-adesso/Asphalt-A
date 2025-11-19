@@ -74,7 +74,7 @@ class UpcomingRideViewModel: ObservableObject {
     private let userRepo: UserRepository
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
-    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false)
+    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -347,10 +347,8 @@ class UpcomingRideViewModel: ObservableObject {
                         startLong: ride.startLongitude,
                         endLat: ride.endLatitude,
                         endLong: ride.endLongitude,
-                        rideJoined: rideJoinedStatus
+                        rideJoined: rideJoinedStatus, participants: ride.participants
                     )
-
-
 
                     // Now handle rideDetails
                     let rideDetails = await ride.participants.asyncMap { participant in

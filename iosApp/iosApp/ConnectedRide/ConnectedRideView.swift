@@ -12,6 +12,7 @@ struct ConnectedRideView: View {
     let title:String
     let subTitle:String
     let model:JoinRideModel
+    let rideCompleteModel:[RideCompleteModel]
     @State var showView = false
     var body: some View {
         VStack {
@@ -45,7 +46,7 @@ struct ConnectedRideView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showView, destination: {
             if title == AppStrings.ConnectedRide.rideMessage {
-                ConnectedRideCompleteView(viewModel:model )
+                ConnectedRideCompleteView(viewModel:model, rideCompleteModel: rideCompleteModel)
             } else {
                 if #available(iOS 17.0, *) {
                     ConnectedRideMapView(rideModel: model)
