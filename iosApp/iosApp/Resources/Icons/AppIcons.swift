@@ -129,6 +129,9 @@ struct AppIcon {
         static let movedLocation = Image("icon-movedLocation")
         static let location = Image("icon-location")
         static let route = Image("icon-route")
+        static let nearMe = Image("near-me")
+        static let ridePending = Image("icon-ridePending")
+        static let rideConfirmed = Image("icon-rideConfirmed")
     }
     
     struct ConnectedRide {
