@@ -15,8 +15,8 @@ class HomeViewModel: ObservableObject {
     @Published var location: String = "Kochi, Infopark"
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
-    
     private let userRepo = UserRepoImpl()
+    @Published var dashboardData: [DashboardDomain] = []
     
     // MARK: - Dashboard
     @Published var stats: [RideStat] = []
@@ -100,7 +100,7 @@ class HomeViewModel: ObservableObject {
         rideRepository = RidesRepository(apiService: rideAPIService)
         loadUserName()
         locationManager.requestLocation()
-
+        
         // Observe location updates
         Task {
             for await address in locationManager.$currentAddress.values {
@@ -123,13 +123,13 @@ class HomeViewModel: ObservableObject {
         }
     }
     func getRideSummary(userID: String, range: String) {
-        rideRepository.getRideSummary(userID: userID, range: range) { result, error in
+        rideRepository.getRideSummary(userID: userID) { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
-               let rideArray = success.data as? [Dashboard] {
-                print("----Rides---\(rideArray)")
+               let rideArray = success.data as? [DashboardDomain] {
                 Task { @MainActor in
-                    self.populateData(from: rideArray)
+                    self.dashboardData = rideArray
                 }
+                print("----Rides---\(rideArray)")
             }  else {
                 print("error")
             }
@@ -137,11 +137,28 @@ class HomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func populateData(from dashboards: [Dashboard]) {
+    func updateStatsFor(month: Int, year: Int) {
         
-        let totalRides = dashboards.count
-        let totalDistance = dashboards.reduce(0) { $0 + Int($1.rideDistance ?? 0) }
-        let locations = Set(dashboards.map { $0.endLocation }).count
+        guard let selectedDash = dashboardData.first(where: {
+            $0.monthYear.month == month && $0.monthYear.year == year
+        }) else {
+            
+            self.stats = [
+                RideStat(title: "Total Rides", value: 0, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
+                RideStat(title: "Locations", value: 0, color: AppColor.skyBlue, icon: AppIcon.Home.location),
+                RideStat(title: "Total KMs", value: 0, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
+            ]
+            return
+        }
+        
+        let rides = selectedDash.perMonthData
+        
+        let totalRides = rides.count
+        let totalDistance = Int(rides.reduce(0) { $0 + Int($1.rideDistance ?? 0) })
+        let locations = Set(rides.map { $0.endLocation ?? "" }).count
+        let organiser = rides.filter { $0.isOrganiserGroupRide == true }.count
+        let participant = rides.filter { $0.isParticipantGroupRide == true }.count
+        
         
         self.stats = [
             RideStat(title: "Total Rides", value: totalRides, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
@@ -149,33 +166,13 @@ class HomeViewModel: ObservableObject {
             RideStat(title: "Total KMs", value: totalDistance, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
         ]
         
-        let organiser = dashboards.filter { $0.isOrganiserGroupRide as! Bool }.count
-        let participant = dashboards.filter { $0.isParticipantGroupRide as! Bool }.count
-    
-                self.journeySlices = [
-                    JourneySlice(category: "Total Rides", value: Double(totalRides), color: AppColor.strongCyan),
-                    JourneySlice(category: "Places Explored", value: Double(locations), color: AppColor.purple),
-                    JourneySlice(category: "Ride Groups", value: Double(participant), color: AppColor.lightCyan),
-                    JourneySlice(category: "Ride Invites", value: Double(organiser), color: AppColor.vividBlue)
-                ]
-        //
-        //
-        //        // MARK: Places by month
-        //        let calendar = Calendar.current
-        //
-        //        let mapped = dashboards.map { dash -> (String, Int) in
-        //            let date = Date(timeIntervalSince1970: dash.endRideDate / 1000)
-        //            let monthName = calendar.shortMonthSymbols[calendar.component(.month, from: date) - 1]
-        //            return (monthName, 1)
-        //        }
-        //
-        //        let grouped = Dictionary(grouping: mapped, by: { $0.0 })
-        //            .map { month, items in
-        //                PlacesMonth(month: month, placesCount: items.count)
-        //            }
-        //            .sorted { $0.month < $1.month }
-        //
-        //        self.placesByMonth = grouped
+        self.journeySlices = [
+            JourneySlice(category: "Total Rides", value: Double(totalRides), color: AppColor.strongCyan),
+            JourneySlice(category: "Places Explored", value: Double(locations), color: AppColor.purple),
+            JourneySlice(category: "Ride Groups", value: Double(participant), color: AppColor.lightCyan),
+            JourneySlice(category: "Ride Invites", value: Double(organiser), color: AppColor.vividBlue)
+        ]
     }
+    
     
 }

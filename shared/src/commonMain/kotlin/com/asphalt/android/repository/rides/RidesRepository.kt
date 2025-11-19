@@ -153,40 +153,14 @@ class RidesRepository(val apiService: RidesApIService) {
         }
     }
 
-    suspend fun getRideSummary(userID: String, range: String): APIResult<List<DashboardDomain>>? {
+    suspend fun getRideSummary(userID: String): APIResult<List<DashboardDomain>>? {
         return apiService.getRideSummary(userID)?.mapApiResult { response ->
             response.toDashboardDomain()
-//            response.toRidesSummary()
-//                ?.filterByRange(range)
-//                .orEmpty()
-
         }
     }
 
     fun Map<String, DashboardDTO>?.toDashboardDomain(): List<DashboardDomain> {
         return this.toPerMonthRideDataDomain().mapAndGroupMonthData(TimeZone.currentSystemDefault())
-    }
-
-
-    private fun daysAgo(days: Int): Long {
-        return getTimeMillis() - days * 86_400_000L
-    }
-
-    fun List<PerMonthRideDataDomain>.filterByRange(range: String): List<PerMonthRideDataDomain> {
-
-        val startMillis = when (range) {
-            "This month" -> daysAgo(30)
-            "Last month" -> daysAgo(60)
-            "Last 4 months" -> daysAgo(120)
-            "Last 6 months" -> daysAgo(180)
-            "Last year" -> daysAgo(365)
-            else -> 0L
-        }
-
-        return this.filter { ride ->
-            val end = ride.endRideDate ?: return@filter false
-            end >= startMillis
-        }
     }
 
 

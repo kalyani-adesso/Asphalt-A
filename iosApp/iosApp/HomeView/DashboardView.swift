@@ -57,7 +57,18 @@ struct DashboardView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(AppColor.darkGray, lineWidth: 2)
             )
-       
+            .onChange(of: currentDate) { newValue in
+                        let month = Calendar.current.component(.month, from: newValue)
+                        let year = Calendar.current.component(.year, from: newValue)
+                        home.updateStatsFor(month: month, year: year)
+                    }
+                    .onAppear {
+                        DispatchQueue.main.async {
+                            let month = Calendar.current.component(.month, from: currentDate)
+                            let year = Calendar.current.component(.year, from: currentDate)
+                            home.updateStatsFor(month: month, year: year)
+                        }
+                    }
     }
     
 }
