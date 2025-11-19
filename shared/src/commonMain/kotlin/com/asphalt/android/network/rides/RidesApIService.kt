@@ -33,5 +33,5 @@ interface RidesApIService {
 
     suspend fun endRideSummary(userID: String, endRide: DashboardDTO) :  APIResult<FirebasePushResponse>
 
-    suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>
+    suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>?
 }

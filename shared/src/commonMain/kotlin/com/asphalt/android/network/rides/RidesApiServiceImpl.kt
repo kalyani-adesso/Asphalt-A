@@ -82,7 +82,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>> {
+    override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>>? {
         return safeApiCall {
             get(url = "$END_RIDE_SUMMARY_URL/$userID").body()
 

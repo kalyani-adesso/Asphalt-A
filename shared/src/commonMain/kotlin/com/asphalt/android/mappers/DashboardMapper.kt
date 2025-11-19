@@ -40,7 +40,9 @@ fun List<PerMonthRideDataDomain>.mapAndGroupMonthData(
         }
 
         val instant = try {
-            Instant.parse(dateString)
+            val timeInMillis = dateString.toLong()
+
+            Instant.fromEpochMilliseconds(timeInMillis)
         } catch (e: Exception) {
             println("Error parsing date: $dateString for ride ID ${ride.ridesID}. Skipping. ${e.message}")
             return@mapNotNull null

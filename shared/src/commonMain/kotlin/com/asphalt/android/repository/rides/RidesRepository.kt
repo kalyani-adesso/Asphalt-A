@@ -150,8 +150,8 @@ class RidesRepository(val apiService: RidesApIService) {
         }
     }
 
-    suspend fun getRideSummary(userID: String,range: String): APIResult<List<DashboardDomain>> {
-        return apiService.getRideSummary(userID).mapApiResult { response ->
+    suspend fun getRideSummary(userID: String,range: String): APIResult<List<DashboardDomain>>? {
+        return apiService.getRideSummary(userID)?.mapApiResult { response ->
             response.toDashboardDomain()
 //            response.toRidesSummary()
 //                ?.filterByRange(range)
@@ -159,7 +159,7 @@ class RidesRepository(val apiService: RidesApIService) {
        }
     }
 
-    fun Map<String, DashboardDTO>.toDashboardDomain():List<DashboardDomain>{
+    fun Map<String, DashboardDTO>?.toDashboardDomain():List<DashboardDomain>{
         return this.toPerMonthRideDataDomain().mapAndGroupMonthData(TimeZone.currentSystemDefault())
     }
 
