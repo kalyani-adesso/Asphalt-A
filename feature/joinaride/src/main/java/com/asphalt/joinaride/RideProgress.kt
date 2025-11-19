@@ -1,6 +1,5 @@
 package com.asphalt.joinaride
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -9,33 +8,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -45,16 +41,20 @@ import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RideProgress(
+    androidUserVM: AndroidUserVM = koinViewModel(),
     onClickEndRide :() -> Unit
 ) {
+
+    val currentUser = androidUserVM.userState.collectAsState(null)
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -159,7 +159,7 @@ fun RideProgress(
 
                     ) {
                         Text(
-                            text = "Sooraj ",
+                            text = currentUser.value?.name.toString(),
                             style = TypographyBold.bodySmall,
                             color = NeutralBlack,
                             maxLines = 1,

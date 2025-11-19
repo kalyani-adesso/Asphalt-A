@@ -92,6 +92,21 @@ class RidesRepository(val apiService: RidesApIService) {
         }
     }
 
+    suspend fun joinRideClick(joinRide: ConnectedRideRoot): APIResult<ConnectedRideRoot> {
+        return apiService.joinRide(joinRide).mapApiResult { response ->
+            ConnectedRideRoot(
+                rideID = joinRide.rideID ?: "",
+                userID = joinRide.userID ?: "",
+                currentLat = joinRide.currentLat ?: 0.0,
+                currentLong = joinRide.currentLong ?: 0.0,
+                speedInKph = joinRide.speedInKph ?: 0.0,
+                status = joinRide.status ?: "",
+                dateTime = joinRide.dateTime ?: 0L,
+                isRejoined = joinRide.isRejoined ?: false
+            )
+        }
+    }
+
     suspend fun reJoinRide(rejoinRide: ConnectedRideRoot,ongoingRideId: String): APIResult<ConnectedRideDTO> {
             return apiService.rejoinRide(rejoinRide,ongoingRideId).mapApiResult { response ->
                 ConnectedRideDTO(

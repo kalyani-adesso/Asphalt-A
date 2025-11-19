@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -58,6 +62,10 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
+import com.asphalt.joinaride.di.joinRideModule
+import com.asphalt.joinaride.viewmodel.RideUiState
+import io.ktor.util.collections.getValue
+import kotlinx.coroutines.coroutineScope
 import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -97,10 +105,17 @@ fun JoinRide(
     Column {
         SearchView(
             query = searchQuery,
-            modifier = Modifier.fillMaxWidth()
-                .padding(top = Dimensions.padding20, start = Dimensions.padding16, end = Dimensions.padding16)
-                .background(color = NeutralLightPaper,
-                    shape = RoundedCornerShape(size = Dimensions.size10)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = Dimensions.padding20,
+                    start = Dimensions.padding16,
+                    end = Dimensions.padding16
+                )
+                .background(
+                    color = NeutralLightPaper,
+                    shape = RoundedCornerShape(size = Dimensions.size10)
+                ),
             onQueryChange = {
                 viewModel.setSearchQuery(it) },
             onClearClick = {
@@ -123,7 +138,8 @@ fun JoinRide(
                 items(items = rides) { rider ->
                     RiderCard( navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                         navigateToEndRide = { navigateToEndRide.invoke() },
-                        ridersList = rider)
+                        ridersList = rider, viewModel = viewModel
+                    )
                 }
             }
         }
@@ -134,15 +150,23 @@ fun JoinRide(
 fun RiderCard(
     navigateToConnectedRide: () -> Unit,
     navigateToEndRide: () -> Unit,
-    ridersList : RidesData
+    ridersList : RidesData,
+    viewModel: JoinRideViewModel
 ) {
+    viewModel.setCreatedBy(ride = ridersList)
+    val createdBy by viewModel.createdBy.collectAsState()
+
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(start = Dimensions.padding16, end = Dimensions.padding16, bottom = Dimensions.padding16),
+            .padding(
+                start = Dimensions.padding16,
+                end = Dimensions.padding16,
+                bottom = Dimensions.padding16
+            ),
 
         ) {
         Column(
@@ -181,7 +205,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.height(height = Dimensions.size3))
                         Text(
-                            text = ("By" + " " + ridersList.createdBy ?: ""),
+                            text = ("By" + " " + createdBy),
                             style = Typography.titleMedium,
                             color = NeutralDarkGrey,
                             fontSize = Dimensions.textSize12,
@@ -282,7 +306,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.width(Dimensions.size5))
                         Text(
-                            text =  "3/8 Riders",
+                            text =  "0/8 Riders",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
@@ -319,13 +343,24 @@ fun RiderCard(
                     GradientButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
+                            val request = ConnectedRideRoot(
+                                rideID = ridersList.ridesID,
+                                userID = ridersList.participants[0].userId,
+                                currentLat = ridersList.startLatitude,
+                                currentLong = ridersList.startLongitude,
+                                dateTime = ridersList.startDate,
+                                isRejoined = false,
+                                status = "ACTIVE"
+                            )
+                            viewModel.JoinRideClick(joinRide = request)
                             navigateToConnectedRide.invoke()
                         },
                         buttonHeight = Dimensions.size50,
                         contentPadding = PaddingValues(Dimensions.size0)
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(start = Dimensions.padding10),
                             horizontalArrangement = Arrangement.Center
                         ) {

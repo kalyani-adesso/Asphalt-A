@@ -2,11 +2,13 @@ package com.asphalt.android.repository.joinride
 
 import com.asphalt.android.mapApiResult
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.joinride.JoinRideModel
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.network.joinrides.JoinRidesApiService
+import com.asphalt.android.repository.rides.RidesRepository
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.orEmpty

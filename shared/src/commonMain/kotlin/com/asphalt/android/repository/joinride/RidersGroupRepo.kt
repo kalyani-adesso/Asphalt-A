@@ -23,27 +23,6 @@ class RidersGroupRepo {
             distance = "65Kph",
             riderProfile = ""
         ),
-
-        RidersGroupModel(
-            riderName = "Abhishek",
-            status = "Stopped",
-            distance = "65Kph",
-            riderProfile = ""
-        ),
-
-        RidersGroupModel(
-            riderName = "Abhishek",
-            status = "Stopped",
-            distance = "65Kph",
-            riderProfile = ""
-        ),
-
-        RidersGroupModel(
-            riderName = "Abhishek",
-            status = "Stopped",
-            distance = "65Kph",
-            riderProfile = ""
-        ),
     )
     fun getAllRiders() : List<RidersGroupModel> = groupRidersList
 }
