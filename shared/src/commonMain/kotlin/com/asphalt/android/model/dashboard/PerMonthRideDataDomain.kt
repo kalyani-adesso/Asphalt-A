@@ -28,7 +28,7 @@ data class DashboardDTO(
     val isParticipantGroupRide: Boolean? = false,
 
     @SerialName("endRide_Date")
-    val endRideDate: String? = null,
+    val endRideDate: Long? = null,
 )
 data class DashboardDomain(val monthYear: RideDate,val perMonthData: List<PerMonthRideDataDomain>)
 data class PerMonthRideDataDomain (
@@ -39,7 +39,7 @@ data class PerMonthRideDataDomain (
     var endLocation: String? = null,
     var isOrganiserGroupRide: Boolean? = false,
     var isParticipantGroupRide: Boolean? = false,
-    var endRideDate: String? = null
+    var endRideDate: Long? = null
 )
 
 data class RideDate(val month: Int, val year: Int)

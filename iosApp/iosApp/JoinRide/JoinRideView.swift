@@ -195,7 +195,7 @@ struct JoinRideRow: View {
                             }
                         })
                         .navigationDestination(item: $selectedRide, destination: { ride in
-                            ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride)
+                            ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
                         })
                         .frame(maxWidth: .infinity)
                         .padding(.bottom,20)

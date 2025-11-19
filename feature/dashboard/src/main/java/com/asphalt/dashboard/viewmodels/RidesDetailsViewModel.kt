@@ -48,6 +48,8 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             val userList = ridesDetails.value?.participants ?: emptyList()
             val list = ArrayList(userList.mapNotNull { participant ->
+                if (participant.inviteStatus == APIConstants.END_RIDE || participant.inviteStatus == APIConstants.RIDE_JOINED) return@mapNotNull null
+
                 users.find { it.uid == participant.userId }?.let { user ->
                     RidersList(
                         uid = user.uid,
