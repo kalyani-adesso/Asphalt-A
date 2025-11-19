@@ -1,13 +1,16 @@
 package com.asphalt.android.repository.rides
 
 import com.asphalt.android.mapApiResult
+import com.asphalt.android.mappers.mapAndGroupMonthData
+import com.asphalt.android.mappers.toPerMonthRideDataDomain
 import com.asphalt.android.mappers.toRideInviteListDomain
 import com.asphalt.android.model.APIResult
-import com.asphalt.android.model.Dashboard.Dashboard
-import com.asphalt.android.model.Dashboard.DashboardDTO
+import com.asphalt.android.model.dashboard.PerMonthRideDataDomain
+import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.RideInvitesDomain
@@ -15,6 +18,7 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.rides.RidesApIService
 import io.ktor.util.date.getTimeMillis
+import kotlinx.datetime.TimeZone
 
 class RidesRepository(val apiService: RidesApIService) {
     suspend fun createRide(createRideRoot: CreateRideRoot): APIResult<GenericResponse> {
@@ -146,33 +150,25 @@ class RidesRepository(val apiService: RidesApIService) {
         }
     }
 
-    suspend fun getRideSummary(userID: String,range: String): APIResult<List<Dashboard>> {
+    suspend fun getRideSummary(userID: String,range: String): APIResult<List<DashboardDomain>> {
         return apiService.getRideSummary(userID).mapApiResult { response ->
-            response.toRidesSummary()
-                ?.filterByRange(range)
-                .orEmpty()
+            response.toDashboardDomain()
+//            response.toRidesSummary()
+//                ?.filterByRange(range)
+//                .orEmpty()
        }
     }
 
-    fun Map<String, DashboardDTO>?.toRidesSummary(): List<Dashboard> {
-        return this?.map { (id, rowData) ->
-            Dashboard(
-                    ridesID = id,
-                    rideDistance = rowData.rideDistance,
-                    isGroupRide = rowData.isGroupRide,
-                    startLocation = rowData.startLocation,
-                    endLocation = rowData.endLocation,
-                    isOrganiserGroupRide = rowData.isOrganiserGroupRide,
-                    isParticipantGroupRide = rowData.isParticipantGroupRide,
-                    endRideDate = rowData.endRideDate
-            )
-        } ?: emptyList()
+    fun Map<String, DashboardDTO>.toDashboardDomain():List<DashboardDomain>{
+        return this.toPerMonthRideDataDomain().mapAndGroupMonthData(TimeZone.currentSystemDefault())
     }
+
+
     private fun daysAgo(days: Int): Long {
         return getTimeMillis() - days * 86_400_000L
     }
 
-    fun List<Dashboard>.filterByRange(range: String): List<Dashboard> {
+    fun List<PerMonthRideDataDomain>.filterByRange(range: String): List<PerMonthRideDataDomain> {
 
         val startMillis = when (range) {
             "This month"    -> daysAgo(30)

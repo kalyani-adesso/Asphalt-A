@@ -1,4 +1,4 @@
-package com.asphalt.android.model.Dashboard
+package com.asphalt.android.model.dashboard
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,7 +30,8 @@ data class DashboardDTO(
     @SerialName("endRide_Date")
     val endRideDate: String? = null,
 )
-data class Dashboard (
+data class DashboardDomain(val monthYear: RideDate,val perMonthData: List<PerMonthRideDataDomain>)
+data class PerMonthRideDataDomain (
     var ridesID: String? = null,
     var rideDistance: Double? = 0.0,
     var isGroupRide: Boolean? = false,
@@ -40,3 +41,6 @@ data class Dashboard (
     var isParticipantGroupRide: Boolean? = false,
     var endRideDate: String? = null
 )
+
+data class RideDate(val month: Int, val year: Int)
+
