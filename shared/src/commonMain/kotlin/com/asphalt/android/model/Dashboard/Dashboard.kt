@@ -28,7 +28,7 @@ data class DashboardDTO(
     val isParticipantGroupRide: Boolean? = false,
 
     @SerialName("endRide_Date")
-    val endRideDate: String? = null,
+    val endRideDate: Long? = null,
 )
 data class Dashboard (
     var ridesID: String? = null,
@@ -38,5 +38,5 @@ data class Dashboard (
     var endLocation: String? = null,
     var isOrganiserGroupRide: Boolean? = false,
     var isParticipantGroupRide: Boolean? = false,
-    var endRideDate: String? = null
+    var endRideDate: Long? = null
 )

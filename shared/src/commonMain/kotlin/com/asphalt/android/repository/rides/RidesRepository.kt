@@ -141,7 +141,7 @@ class RidesRepository(val apiService: RidesApIService) {
                 endLocation = endRide.endLocation  ?: "",
                 isOrganiserGroupRide = endRide.isOrganiserGroupRide  ?: false,
                 isParticipantGroupRide = endRide.isParticipantGroupRide  ?: false,
-                endRideDate = endRide.endRideDate  ?: ""
+                endRideDate = endRide.endRideDate  ?: 0
             )
         }
     }
@@ -149,7 +149,7 @@ class RidesRepository(val apiService: RidesApIService) {
     suspend fun getRideSummary(userID: String,range: String): APIResult<List<Dashboard>> {
         return apiService.getRideSummary(userID).mapApiResult { response ->
             response.toRidesSummary()
-                ?.filterByRange(range)
+                .filterByRange(range)
                 .orEmpty()
        }
     }
@@ -184,7 +184,7 @@ class RidesRepository(val apiService: RidesApIService) {
         }
 
         return this.filter { ride ->
-            val end = ride.endRideDate?.toLongOrNull() ?: return@filter false
+            val end = ride.endRideDate?: return@filter false
             end >= startMillis
         }
     }
