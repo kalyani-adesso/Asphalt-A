@@ -34,15 +34,12 @@ fun List<PerMonthRideDataDomain>.mapAndGroupMonthData(
 
     val processedRides = this.mapNotNull { ride ->
 
-        val dateString = ride.endRideDate
-        if (dateString.isNullOrBlank()) {
-            return@mapNotNull null
-        }
+        val dateString: Long = ride.endRideDate ?: 0
+
 
         val instant = try {
-            val timeInMillis = dateString.toLong()
 
-            Instant.fromEpochMilliseconds(timeInMillis)
+            Instant.fromEpochMilliseconds(dateString)
         } catch (e: Exception) {
             println("Error parsing date: $dateString for ride ID ${ride.ridesID}. Skipping. ${e.message}")
             return@mapNotNull null
