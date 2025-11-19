@@ -122,8 +122,17 @@ struct UpcomingRideView: View {
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
-                        subMessage: "Your ride has been created and is now live for other riders to join."
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.lightGreen,
+                                AppColor.lightGreen,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ), foregroundColor: .spanishGreen
+                    
                     )
+                    
                     
                     Spacer()
                 }

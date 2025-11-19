@@ -45,7 +45,7 @@ struct ConnectedRideCompleteView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
-                    showMapView = true
+                    showHome = true
                 }, label:{
                     AppIcon.CreateRide.backButton
                 })
