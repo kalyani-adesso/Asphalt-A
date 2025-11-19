@@ -32,8 +32,3 @@ struct JourneySlice: Identifiable {
     let color: Color
 }
 
-struct PlacesMonth: Identifiable {
-    let id = UUID()
-    let month: String
-    let placesCount: Int
-}

@@ -63,11 +63,11 @@ struct DashboardView: View {
                         home.updateStatsFor(month: month, year: year)
                     }
                     .onAppear {
-                        DispatchQueue.main.async {
+                       
                             let month = Calendar.current.component(.month, from: currentDate)
                             let year = Calendar.current.component(.year, from: currentDate)
                             home.updateStatsFor(month: month, year: year)
-                        }
+                        
                     }
     }
     
