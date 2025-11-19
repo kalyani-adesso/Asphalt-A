@@ -62,16 +62,19 @@ struct ConnectedRideMapView: View {
                 Section {
                     VStack(spacing: 18) {
                         ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-                        
+
                         ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
-                        
+
                         Button(action: {
                             self.rideComplted = true
                             if rideModel.userId != MBUserDefaults.userIdStatic {
                                 joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+                            } else {
+                                joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
                             }
-                            
+                           
                             viewModel.endRide(rideId:rideModel.rideId)
+                            viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
                         }, label: {
                             Text(AppStrings.ConnectedRide.endRideButton)
                                 .frame(maxWidth: .infinity,minHeight: 60)
@@ -175,9 +178,9 @@ struct ConnectedRideMapView: View {
                     showToast = false
                 }
                 if !rideModel.rideJoined {
-                    viewModel.joinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 } else {
-                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: rideModel.userId, currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 }
                 viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
             }
@@ -495,7 +498,7 @@ struct ActiveRiderView: View {
         )
         .padding([.leading,.trailing],16)
         .task {
-            await viewModel.getOnGoingRides(rideId: rideModel.rideId, userId: rideModel.userId)
+            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
         }
     }
 }

@@ -8,7 +8,7 @@ import com.asphalt.android.repository.AuthenticatorImpl
 
 class AuthViewModel(private val authenticator: AuthenticatorImpl) : ViewModel() {
 
-    suspend fun SignUp(user: User) : Result<String> {
+    suspend fun SignUp(user: User): Result<String> {
 
         return try {
             authenticator.signUp(user)
@@ -17,11 +17,20 @@ class AuthViewModel(private val authenticator: AuthenticatorImpl) : ViewModel() 
         }
     }
 
-    suspend fun signIn(email:String,password:String) : LoginResult {
+    suspend fun signIn(email: String, password: String): LoginResult {
         return try {
-            authenticator.signIn(email,password)
+            authenticator.signIn(email, password)
         } catch (e: Exception) {
-            return AuthResultimpl(false,"Something went wrong")
+            return AuthResultimpl(false, "Something went wrong")
+        }
+    }
+
+    suspend fun resetPassword(email: String): Result<String> {
+
+        return try {
+            authenticator.resetPassword(email)
+        } catch (e: Exception) {
+            Result.failure(exception = e)
         }
     }
 }

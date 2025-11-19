@@ -170,7 +170,7 @@ fun LoginScreen(
                     .padding(start = Dimensions.padding, end = Dimensions.padding),
             ) {
                 Text(
-                    text = stringResource(string.email_phone),
+                    text = stringResource(string.email),
                     modifier = Modifier.padding(top = Dimensions.spacing20),
                     style = TypographyBold.titleMedium,
                     color = NeutralBlack

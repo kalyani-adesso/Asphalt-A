@@ -189,11 +189,10 @@ struct JoinRideRow: View {
                             endPoint: .trailing
                         ),onTap: {
                             Task {
-                                       if let selected = await viewModel.handleJoin(for: ride) {
-                                           selectedRide = selected
-                                       }
-                                   }
-                            
+                                if let selected = await viewModel.handleJoin(for: ride) {
+                                    selectedRide = selected
+                                }
+                            }
                         })
                         .navigationDestination(item: $selectedRide, destination: { ride in
                             ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride)

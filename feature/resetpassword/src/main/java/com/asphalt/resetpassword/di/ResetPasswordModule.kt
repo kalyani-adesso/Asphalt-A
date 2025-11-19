@@ -8,7 +8,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val resetModule = module {
-    viewModel { ForgotPasswordViewModel() }
+    viewModel { ForgotPasswordViewModel(get(),get()) }
     viewModel { VerifyCodeViewModel() }
     viewModel { CreatePasswordViewModel() }
 }
