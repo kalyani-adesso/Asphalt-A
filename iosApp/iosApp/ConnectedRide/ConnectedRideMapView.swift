@@ -74,6 +74,7 @@ struct ConnectedRideMapView: View {
                             }
                            
                             viewModel.endRide(rideId:rideModel.rideId)
+                            viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
                         }, label: {
                             Text(AppStrings.ConnectedRide.endRideButton)
                                 .frame(maxWidth: .infinity,minHeight: 60)

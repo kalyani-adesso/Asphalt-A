@@ -13,50 +13,51 @@ struct DashboardView: View {
     
     
     var body: some View {
-        
-        HStack(alignment: .top, spacing: 15) {
-            VStack(spacing: 10) {
-                Button {
-                    currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
-                } label: {
-                    AppIcon.Home.arrow
-                }
-                .buttonStyle(.plain)
-                Text(CalendarFormat().dateFormatter.string(from: currentDate))
-                    .font(KlavikaFont.medium.font(size: 18))
-                Text(CalendarFormat().dayFormatter.string(from: currentDate))
-                    .font(KlavikaFont.bold.font(size: 30))
-                let isToday = Calendar.current.isDateInToday(currentDate)
-                Button {
-                    let nextDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
-                    if nextDate <= Date()
-                    {
-                        currentDate = nextDate
+            HStack(alignment: .top, spacing: 15) {
+                VStack(spacing: 10) {
+                    Button {
+                        currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                    } label: {
+                        AppIcon.Home.arrow
                     }
-                } label: {
-                    AppIcon.Home.arrow
-                        .rotationEffect(.degrees(180))
+                    .buttonStyle(.plain)
+                    let yearString = Calendar.current.component(.year, from: currentDate)  % 100
+                    Text(CalendarFormat().dateFormatter.string(from: currentDate))
+                        .font(KlavikaFont.medium.font(size: 18))
+                    Text(String(yearString))
+                        .font(KlavikaFont.bold.font(size: 30))
+                    let isToday = Calendar.current.isDateInToday(currentDate)
+                    Button {
+                        let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+                        if nextDate <= Date()
+                        {
+                            currentDate = nextDate
+                        }
+                    } label: {
+                        AppIcon.Home.arrow
+                            .rotationEffect(.degrees(180))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isToday)
                 }
-                .buttonStyle(.plain)
-                .disabled(isToday)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 8)
-            .cornerRadius(12)
-            HStack(spacing: 15) {
-                ForEach(home.stats) { stat in
-                    StatCardView(stat: stat)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 8)
+                .cornerRadius(12)
+                HStack(spacing: 15) {
+                    ForEach(home.stats) { stat in
+                        StatCardView(stat: stat)
+                    }
                 }
             }
-        }
-        .frame(width: 345)
-        .padding()
-        .background(AppColor.backgroundLight)
-        .cornerRadius(15)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(AppColor.darkGray, lineWidth: 2)
-        )
+            .frame(width: 345)
+            .padding()
+            .background(AppColor.backgroundLight)
+            .cornerRadius(15)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppColor.darkGray, lineWidth: 2)
+            )
+       
     }
     
 }

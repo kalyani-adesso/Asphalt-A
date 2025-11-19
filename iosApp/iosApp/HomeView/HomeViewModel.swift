@@ -13,15 +13,13 @@ import shared
 class HomeViewModel: ObservableObject {
     @Published var locationManager = LocationManager()
     @Published var location: String = "Kochi, Infopark"
+    private var rideAPIService: RidesApIService
+    private var rideRepository: RidesRepository
     
     private let userRepo = UserRepoImpl()
     
     // MARK: - Dashboard
-    @Published var stats: [RideStat] = [
-        RideStat(title: "Total Rides", value: 25, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
-        RideStat(title: "Locations", value: 12, color: AppColor.skyBlue, icon: AppIcon.Home.location),
-        RideStat(title: "Total KMs", value: 1850, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
-    ]
+    @Published var stats: [RideStat] = []
     
     // MARK: - Upcoming Rides
     @Published var upcomingRides: [UpcomingRide] = [
@@ -31,22 +29,12 @@ class HomeViewModel: ObservableObject {
     ]
     
     // MARK: - Donut chart
-    @Published var journeySlices: [JourneySlice] = [
-        JourneySlice(category: "Total Rides", value: 50, color: AppColor.strongCyan),
-        JourneySlice(category: "Places Explored", value: 10, color: AppColor.purple),
-        JourneySlice(category: "Ride Groups", value: 15, color: AppColor.lightCyan),
-        JourneySlice(category: "Ride Invites", value: 25, color: AppColor.vividBlue)
-    ]
+    @Published var journeySlices: [JourneySlice] = []
     
     func getJourneySlices(for range: String) -> [JourneySlice] {
         switch range {
         case "This month":
-            return [
-                JourneySlice(category: "Total Rides", value: 8, color: AppColor.strongCyan),
-                JourneySlice(category: "Places Explored", value: 2, color: AppColor.purple),
-                JourneySlice(category: "Ride Groups", value: 1, color: AppColor.lightCyan),
-                JourneySlice(category: "Ride Invites", value: 4, color: AppColor.vividBlue)
-            ]
+            return journeySlices
             
         case "Last month":
             return [
@@ -108,9 +96,11 @@ class HomeViewModel: ObservableObject {
     
     
     init() {
+        rideAPIService = RidesApiServiceImpl(client: KtorClient())
+        rideRepository = RidesRepository(apiService: rideAPIService)
         loadUserName()
         locationManager.requestLocation()
-        
+
         // Observe location updates
         Task {
             for await address in locationManager.$currentAddress.values {
@@ -132,6 +122,60 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
+    func getRideSummary(userID: String, range: String) {
+        rideRepository.getRideSummary(userID: userID, range: range) { result, error in
+            if let success = result as? APIResultSuccess<AnyObject>,
+               let rideArray = success.data as? [Dashboard] {
+                print("----Rides---\(rideArray)")
+                Task { @MainActor in
+                    self.populateData(from: rideArray)
+                }
+            }  else {
+                print("error")
+            }
+        }
+    }
     
+    @MainActor
+    private func populateData(from dashboards: [Dashboard]) {
+        
+        let totalRides = dashboards.count
+        let totalDistance = dashboards.reduce(0) { $0 + Int($1.rideDistance ?? 0) }
+        let locations = Set(dashboards.map { $0.endLocation }).count
+        
+        self.stats = [
+            RideStat(title: "Total Rides", value: totalRides, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
+            RideStat(title: "Locations", value: locations, color: AppColor.skyBlue, icon: AppIcon.Home.location),
+            RideStat(title: "Total KMs", value: totalDistance, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
+        ]
+        
+        let organiser = dashboards.filter { $0.isOrganiserGroupRide as! Bool }.count
+        let participant = dashboards.filter { $0.isParticipantGroupRide as! Bool }.count
+    
+                self.journeySlices = [
+                    JourneySlice(category: "Total Rides", value: Double(totalRides), color: AppColor.strongCyan),
+                    JourneySlice(category: "Places Explored", value: Double(locations), color: AppColor.purple),
+                    JourneySlice(category: "Ride Groups", value: Double(participant), color: AppColor.lightCyan),
+                    JourneySlice(category: "Ride Invites", value: Double(organiser), color: AppColor.vividBlue)
+                ]
+        //
+        //
+        //        // MARK: Places by month
+        //        let calendar = Calendar.current
+        //
+        //        let mapped = dashboards.map { dash -> (String, Int) in
+        //            let date = Date(timeIntervalSince1970: dash.endRideDate / 1000)
+        //            let monthName = calendar.shortMonthSymbols[calendar.component(.month, from: date) - 1]
+        //            return (monthName, 1)
+        //        }
+        //
+        //        let grouped = Dictionary(grouping: mapped, by: { $0.0 })
+        //            .map { month, items in
+        //                PlacesMonth(month: month, placesCount: items.count)
+        //            }
+        //            .sorted { $0.month < $1.month }
+        //
+        //        self.placesByMonth = grouped
+    }
     
 }

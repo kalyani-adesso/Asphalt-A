@@ -3,17 +3,18 @@ package com.asphalt.android.repository.rides
 import com.asphalt.android.mapApiResult
 import com.asphalt.android.mappers.toRideInviteListDomain
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.model.Dashboard.Dashboard
+import com.asphalt.android.model.Dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
-import com.asphalt.android.model.profile.BikeDTO
-import com.asphalt.android.model.profile.BikeDomain
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.rides.RidesApIService
+import io.ktor.util.date.getTimeMillis
 
 class RidesRepository(val apiService: RidesApIService) {
     suspend fun createRide(createRideRoot: CreateRideRoot): APIResult<GenericResponse> {
@@ -24,7 +25,7 @@ class RidesRepository(val apiService: RidesApIService) {
 
     suspend fun getAllRide(): APIResult<List<RidesData>> {
         return apiService.getAllRide().mapApiResult { response ->
-            response?.toRides().orEmpty()
+            response.toRides().orEmpty()
         }
     }
 
@@ -129,6 +130,65 @@ class RidesRepository(val apiService: RidesApIService) {
             }
         }
     }
+
+    suspend fun endRideSummary(userID: String, endRide: DashboardDTO): APIResult<DashboardDTO> {
+        return apiService.endRideSummary(userID, endRide).mapApiResult { response ->
+            DashboardDTO(
+                rideID = endRide.rideID,
+                rideDistance = endRide.rideDistance  ?: 0.0,
+                isGroupRide = endRide.isGroupRide  ?: false,
+                startLocation = endRide.startLocation  ?: "",
+                endLocation = endRide.endLocation  ?: "",
+                isOrganiserGroupRide = endRide.isOrganiserGroupRide  ?: false,
+                isParticipantGroupRide = endRide.isParticipantGroupRide  ?: false,
+                endRideDate = endRide.endRideDate  ?: ""
+            )
+        }
+    }
+
+    suspend fun getRideSummary(userID: String,range: String): APIResult<List<Dashboard>> {
+        return apiService.getRideSummary(userID).mapApiResult { response ->
+            response.toRidesSummary()
+                ?.filterByRange(range)
+                .orEmpty()
+       }
+    }
+
+    fun Map<String, DashboardDTO>?.toRidesSummary(): List<Dashboard> {
+        return this?.map { (id, rowData) ->
+            Dashboard(
+                    ridesID = id,
+                    rideDistance = rowData.rideDistance,
+                    isGroupRide = rowData.isGroupRide,
+                    startLocation = rowData.startLocation,
+                    endLocation = rowData.endLocation,
+                    isOrganiserGroupRide = rowData.isOrganiserGroupRide,
+                    isParticipantGroupRide = rowData.isParticipantGroupRide,
+                    endRideDate = rowData.endRideDate
+            )
+        } ?: emptyList()
+    }
+    private fun daysAgo(days: Int): Long {
+        return getTimeMillis() - days * 86_400_000L
+    }
+
+    fun List<Dashboard>.filterByRange(range: String): List<Dashboard> {
+
+        val startMillis = when (range) {
+            "This month"    -> daysAgo(30)
+            "Last month"    -> daysAgo(60)
+            "Last 4 months" -> daysAgo(120)
+            "Last 6 months" -> daysAgo(180)
+            "Last year"     -> daysAgo(365)
+            else -> 0L
+        }
+
+        return this.filter { ride ->
+            val end = ride.endRideDate?.toLongOrNull() ?: return@filter false
+            end >= startMillis
+        }
+    }
+
 
     suspend fun updateOrganizerStatus(rideId:String,rideStatus:Int): APIResult<Unit> {
          return apiService.updateOrganizerStatus(rideId,rideStatus)

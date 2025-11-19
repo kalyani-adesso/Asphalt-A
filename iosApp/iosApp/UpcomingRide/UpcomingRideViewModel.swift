@@ -68,6 +68,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var userName: String = ""
     @Published var selectedTab: RideAction = .upcoming
     @Published var hasPhotos: Bool = false
+    @Published var upcomingInvitesRide: [RideModel] = []
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private let userRepo: UserRepository
@@ -110,31 +111,33 @@ class UpcomingRideViewModel: ObservableObject {
                 if startDate.addingTimeInterval(60) < now { continue }
                 let dateString = formatDate(startDate)
                 let participantCount = ride.participants.count
+                let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-                
+
+
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
-                
-                
+
+
                 // MARK: - Creator Logic
                 if ride.createdBy == currentUserID {
-                    
+
                     // Creator ride status 3 = joined = upcoming
                     if ride.rideStatus == 3 {
                         rideAction = .upcoming
                         rideStatus = .queue
                         rideViewAction = .checkResponse
                     }
-                    
+
                     // Creator ride status 4 = ended = history
                     else if ride.rideStatus == 4 {
                         rideAction = .history
                         rideStatus = .complete
                         rideViewAction = .shareExperience
                     }
-                    
+
                     // Default creator: future ride
                     else {
                         rideAction = .upcoming
@@ -142,39 +145,39 @@ class UpcomingRideViewModel: ObservableObject {
                         rideViewAction = ride.participants.isEmpty ? .viewDetails : .checkResponse
                     }
                 }
-                
+
                 // MARK: - Participant Logic
                 else if let myStatus = myInviteStatus {
-                    
+
                     switch myStatus {
                     case 0:
                         rideAction = .invities
                         rideStatus = .invite
                         rideViewAction = .decline
-                        
+
                     case 1:
                         rideAction = .upcoming
                         rideStatus = ride.participants.isEmpty ? .upcoming : .queue
                         rideViewAction = ride.participants.isEmpty ? .viewDetails : .checkResponse
-                        
+
                     case 2:
                         continue  // hide
-                        
+
                     case 3:
                         rideAction = .upcoming
                         rideStatus = .queue
                         rideViewAction = .checkResponse
-                        
+
                     case 4:
                         rideAction = .history
                         rideStatus = .complete
                         rideViewAction = .shareExperience
-                        
+
                     default:
                         continue
                     }
                 }
-                
+
                 // Not creator and not participant
                 else {
                     continue
@@ -269,7 +272,7 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-    
+
     // MARK: - Fetch Users
     @MainActor
     func fetchAllUsers() async {
@@ -297,7 +300,7 @@ class UpcomingRideViewModel: ObservableObject {
                 if let success = result as? APIResultSuccess<AnyObject>,
                    let domainList = success.data as? [UserDomain],
                    let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
-                    
+
                     let userName = matchedUser.name
                     let contactNumber = matchedUser.contactNumber
                     continuation.resume(returning:( userName,contactNumber))
@@ -313,19 +316,19 @@ class UpcomingRideViewModel: ObservableObject {
             if let success = result as? APIResultSuccess<AnyObject>,
                let ride = success.data as? RidesData {
                 let currentUserId = MBUserDefaults.userIdStatic
-                
+
                 let startEpoch = ride.startDate
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch!) / 1000)
                 let dateString = self.formatDate(startDate)
-                
+
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 let rideJoinedStatus = (ride.participants.contains(where: { $0.inviteStatus == 3 })) || ride.rideStatus == 3
-                
+
                 // Move all async operations into a single Task block
                 Task {
                     // Fetch user name asynchronously
                     let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
-                    
+
                     // Create the model now that we have the async data
                     let model = JoinRideModel(
                         userId: ride.createdBy ?? "",
@@ -346,14 +349,14 @@ class UpcomingRideViewModel: ObservableObject {
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus
                     )
-                    
-                    
-                    
+
+
+
                     // Now handle rideDetails
                     let rideDetails = await ride.participants.asyncMap { participant in
                         // Fetch the participant's name asynchronously
                         let userName = await self.getAllUsers(createdBy: participant.userId)
-                        
+
                         // Determine status based on inviteStatus
                         let status: String
                         switch participant.inviteStatus {
@@ -370,7 +373,7 @@ class UpcomingRideViewModel: ObservableObject {
                         }
                         return RideDetailsModel(userId: participant.userId, userName: userName?.0 ?? "", status: status)
                     }
-                    
+
                     // Sort the rideDetails so that the current user's entry appears at the top
                     let sortedRideDetails = rideDetails.sorted { (a, b) in
                         if a.userId == currentUserId {
@@ -381,7 +384,7 @@ class UpcomingRideViewModel: ObservableObject {
                             return false
                         }
                     }
-                    
+
                     DispatchQueue.main.async {
                         // Assuming you have a property for the main model, e.g., self.joinRideModel = model
                         // Update it here if needed
@@ -398,6 +401,44 @@ class UpcomingRideViewModel: ObservableObject {
             }
         })
     }
+
+    @MainActor
+    func getInvites() async {
+        do {
+            let result = try await rideRepository.getRideInvites(userID: MBUserDefaults.userIdStatic ?? "")
+            if let success = result as? APIResultSuccess<AnyObject>,
+               let invites = success.data as? [RideInvitesDomain] {
+                let mapped: [RideModel] = invites.compactMap { domain in
+
+                    let millis = domain.startDateTime ?? 0
+                    let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
+
+                    if startDate < Date().startOfDay {
+                        return nil
+                    }
+
+                    return RideModel(
+                        id: domain.rideID,
+                        title: "Ride Invite",
+                        routeStart: domain.startLocation,
+                        routeEnd: domain.destination,
+                        status: .invite,
+                        rideViewAction: .decline,
+                        rideAction: .invities,
+                        date: formatDate(startDate),
+                        riderCount: domain.acceptedParticipants.count,
+                        createdBy: domain.inviter,
+                        startDate: startDate,
+                        participantAcceptedCount: domain.acceptedParticipants.count
+                    )
+                }
+
+                self.upcomingInvitesRide = mapped
+            }
+        } catch {
+            print("Error fetching users:", error)
+        }
+    }
 }
 
 // Extension to help with async mapping (if not already available)
@@ -408,5 +449,10 @@ extension Sequence {
             try await values.append(transform(element))
         }
         return values
+    }
+}
+extension Date {
+    var startOfDay: Date {
+        Calendar.current.startOfDay(for: self)
     }
 }

@@ -18,6 +18,8 @@ object APIConstants {
 
     const val ONGOING_RIDE_URL = "/ongoing_ride"
 
+    const val END_RIDE_SUMMARY_URL = "/endRide_summary"
+
     //Ride Invite Status
     const val RIDE_INVITED = 0
     const val RIDE_ACCEPTED = 1

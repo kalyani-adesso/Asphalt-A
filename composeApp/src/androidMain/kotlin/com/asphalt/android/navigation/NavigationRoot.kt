@@ -393,8 +393,9 @@ fun NavigationRoot(
                     }
                     entry<AppNavKey.ForgotPasswordNav> { key ->
                         ForgotPasswordScreen(onSendClick = { emailId ->
-                            backStack.remove(AppNavKey.ForgotPasswordNav)
-                            backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
+                            //backStack.remove(AppNavKey.ForgotPasswordNav)
+                            onBackPressed()
+                            //backStack.add(AppNavKey.VerifyPassCodeNav(emailId))
                         })
                     }
                     entry<AppNavKey.VerifyPassCodeNav> { key ->

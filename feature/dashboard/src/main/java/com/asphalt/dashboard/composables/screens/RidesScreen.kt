@@ -318,7 +318,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             )
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(modifier = Modifier) {
+            Row(modifier = Modifier.weight(1.5f)) {
 
                 ColorIconRounded(backColor = GreenDark, resId = R.drawable.ic_location)
                 Spacer(modifier = Modifier.width(Dimensions.size5))
@@ -333,7 +333,9 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     Text(
                         text = history.place ?: "",
                         style = Typography.bodySmall,
-                        color = NeutralDarkGrey
+                        color = NeutralDarkGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
