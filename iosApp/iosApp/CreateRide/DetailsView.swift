@@ -19,7 +19,6 @@ struct DetailsView: View {
             stepIndicator
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    
                     VStack(alignment: .leading, spacing: 10) {
                         Text(AppStrings.CreateRide.rideType)
                             .font(KlavikaFont.medium.font(size: 16))
@@ -51,7 +50,6 @@ struct DetailsView: View {
                             .cornerRadius(10)
                         }
                     }
-                    
                     
                     Text(AppStrings.CreateRide.rideTitle).font(KlavikaFont.medium.font(size: 16))
                         .foregroundColor(AppColor.black)
@@ -132,7 +130,6 @@ struct DetailsView: View {
             .disabled(!viewModel.isDetailsValid)
             .padding()
         }
-        
         .sheet(isPresented: $showDatePicker) {
             CustomDatePicker(selectedDate: Binding(
                 get: { viewModel.selectedDate ?? Date() },
