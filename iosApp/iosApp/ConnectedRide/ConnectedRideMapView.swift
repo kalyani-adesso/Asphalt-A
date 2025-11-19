@@ -306,6 +306,7 @@ struct ConnectedRideMapView: View {
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
         .padding(.trailing)
+        .contentShape(Rectangle())
     }
     
     @ViewBuilder func showToast(title:String) -> some View {

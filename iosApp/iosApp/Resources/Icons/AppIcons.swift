@@ -18,6 +18,7 @@ struct AppIcon {
         static let rememberLogin = Image("remember-login")
         static let validEmail = Image("vaild-Email")
         static let invalidPassword = Image("invalid-Password")
+        static let resetSent = Image("icon-resetSent")
     }
     
     struct SignUp {
