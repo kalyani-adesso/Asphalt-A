@@ -73,6 +73,7 @@ class HomeViewModel: ObservableObject {
                     self.journeySlices = self.aggregateSlices(from: self.dashboardData)
                     self.currentSlices = self.getJourneySlices(for: range)
                     self.generatePlacesByMonth()
+                    NotificationCenter.default.post(name: .placesDataUpdated, object: nil)
                     
                 }
                 print("----Rides---\(rideArray)")
@@ -80,7 +81,9 @@ class HomeViewModel: ObservableObject {
                 print("error")
             }
         }
+        
     }
+    
     
     @MainActor
     func updateStatsFor(month: Int, year: Int) {
@@ -224,4 +227,7 @@ class HomeViewModel: ObservableObject {
     }
 
     
+}
+extension Notification.Name {
+    static let placesDataUpdated = Notification.Name("placesDataUpdated")
 }
