@@ -385,7 +385,7 @@ extension ConnectedRideViewModel {
               endLocation: ride.route.split(separator: "-").last?.trimmingCharacters(in: .whitespaces) ?? "",
               isOrganiserGroupRide: KotlinBoolean(bool: userID == ride.userId),
               isParticipantGroupRide: KotlinBoolean(bool: isParticipant),
-              endRideDate: "\(Date().timeIntervalSince1970 * 1000)"
+              endRideDate: KotlinLong(value: Int64(Date().timeIntervalSince1970 * 1000))
         )
         
         rideRepository.endRideSummary(userID: userID, endRide: dto){ result, error in
