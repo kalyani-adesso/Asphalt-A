@@ -6,7 +6,7 @@ import com.asphalt.android.constants.APIConstants.RIDES_URL
 import com.asphalt.android.constants.APIConstants.ONGOING_RIDE_URL
 import com.asphalt.android.constants.APIConstants.RATINGS
 import com.asphalt.android.model.APIResult
-import com.asphalt.android.model.Dashboard.DashboardDTO
+import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
@@ -82,7 +82,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>> {
+    override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>>? {
         return safeApiCall {
             get(url = "$END_RIDE_SUMMARY_URL/$userID").body()
 
