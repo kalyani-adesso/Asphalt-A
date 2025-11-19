@@ -25,18 +25,15 @@ import kotlin.getValue
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
-class JoinRideViewModel(private val repository: JoinRideRepository
-    ) : ViewModel(), KoinComponent {
-
+class JoinRideViewModel(
+    private val repository: JoinRideRepository) : ViewModel(), KoinComponent {
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
     val ridesRepo: RidesRepository by inject()
-
     val androidUserVM: AndroidUserVM by inject()
    val rides = _rides.asStateFlow()
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
     val userRepoImpl: UserRepoImpl by inject()
-
 
     // join ride
     private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideRoot>?>(null)
@@ -67,8 +64,6 @@ class JoinRideViewModel(private val repository: JoinRideRepository
                         val titleMatch =
                             ride.rideTitle?.lowercase()?.contains(q) == true
                         titleMatch
-
-
                     }
                 }
             println("Accepted Count after search = ${finalList.size}")
@@ -107,21 +102,18 @@ class JoinRideViewModel(private val repository: JoinRideRepository
             _createdBy.value = userDomain!!.name
         }
     }
-
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
 
-    fun JoinRideClick(joinRide:ConnectedRideRoot) {
+    fun joinRideClick(joinRide:ConnectedRideRoot) {
         viewModelScope.launch {
             val result = ridesRepo.joinRideClick(joinRide = joinRide)
             _joinRideResult.value = result
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
-
-
 }
 
 sealed class RideUiState {

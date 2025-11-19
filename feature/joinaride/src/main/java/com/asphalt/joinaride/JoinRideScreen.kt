@@ -1,6 +1,5 @@
 package com.asphalt.joinaride
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
@@ -62,10 +59,6 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.joinaride.di.joinRideModule
-import com.asphalt.joinaride.viewmodel.RideUiState
-import io.ktor.util.collections.getValue
-import kotlinx.coroutines.coroutineScope
 import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -352,7 +345,7 @@ fun RiderCard(
                                 isRejoined = false,
                                 status = "ACTIVE"
                             )
-                            viewModel.JoinRideClick(joinRide = request)
+                            viewModel.joinRideClick(joinRide = request)
                             navigateToConnectedRide.invoke()
                         },
                         buttonHeight = Dimensions.size50,
