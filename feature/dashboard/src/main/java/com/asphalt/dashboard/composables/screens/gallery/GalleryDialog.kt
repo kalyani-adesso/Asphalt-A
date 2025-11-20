@@ -61,6 +61,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
+import com.asphalt.commonui.utils.rememberImagePicker
 
 @Composable
 fun GalleryDialog(onDismiss: () -> Unit) {
@@ -69,34 +70,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
     var showGallery by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
-
-    // Use PickMultipleVisualMedia for the best compatibility (Min 24, Target 36)
-    val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10),
-        onResult = { uris ->
-            // 1. Clear previous persistent URI permissions
-            selectedImageUris.forEach { oldUri ->
-                context.contentResolver.releasePersistableUriPermission(
-                    oldUri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            }
-
-            selectedImageUris = uris
-
-            // 2. IMPORTANT: Request persistent read access for the new URIs
-            uris.forEach { uri ->
-                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                try {
-                    showGallery = false
-                    context.contentResolver.takePersistableUriPermission(uri, takeFlags)
-                } catch (e: SecurityException) {
-                    showGallery = false
-                    Log.e("PhotoPicker", "Failed to take persistable URI permission for $uri", e)
-                }
-            }
-        })
-
+    val (selectedImageUris, openGallery) = rememberImagePicker(10)
 
 
     Dialog(
@@ -239,10 +213,10 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                                 shape = RoundedCornerShape(12.dp)
                             )
                             .clickable {
-                                // FIX: LAUNCH DIRECTLY FROM THE CLICK HANDLER
-                                multiplePhotoPickerLauncher.launch(
+                               openGallery()
+                                /*multiplePhotoPickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
+                                )*/
                             },
                         contentAlignment = Alignment.Center
                     ) {
