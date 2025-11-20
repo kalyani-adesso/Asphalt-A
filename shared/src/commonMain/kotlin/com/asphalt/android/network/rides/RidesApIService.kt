@@ -1,8 +1,7 @@
 package com.asphalt.android.network.rides
 
-import androidx.compose.ui.platform.TextToolbarStatus
 import com.asphalt.android.model.APIResult
-import com.asphalt.android.model.Dashboard.DashboardDTO
+import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
@@ -34,5 +33,5 @@ interface RidesApIService {
 
     suspend fun endRideSummary(userID: String, endRide: DashboardDTO) :  APIResult<FirebasePushResponse>
 
-    suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>
+    suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>?
 }
