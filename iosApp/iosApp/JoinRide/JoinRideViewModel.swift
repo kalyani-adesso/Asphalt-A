@@ -248,8 +248,21 @@ extension JoinRideViewModel {
                 inviteStatus: 4
             )
         }
-        
         showRideAlreadyActivePopup = false
+        
+        endRide(rideId: active.ridesID ?? "")
+        
+    }
+    
+    func endRide(rideId: String) {
+        let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
+        rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
+            if let error = error {
+                print("Failed to end ride: \(error.localizedDescription)")
+            } else {
+                print("Successfully ended ride")
+            }
+        }
     }
     
     func getUserActiveRide() async -> RidesData? {
