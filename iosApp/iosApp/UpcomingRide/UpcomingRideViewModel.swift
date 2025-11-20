@@ -28,6 +28,9 @@ enum RideStatus: String {
     case queue = "Queue"
     case complete = "Completed"
     case invite = "Invite"
+    case pending = "Pending"
+    case declined = "Declined"
+    case confirmed = "Confirmed"
 }
 
 struct RideModel: Identifiable,Hashable {
@@ -46,6 +49,12 @@ struct RideModel: Identifiable,Hashable {
     let participantAcceptedCount: Int
 }
 
+struct RideDetailsModel: Identifiable,Hashable {
+    var id = UUID()
+    let userId:String
+    let userName:String
+    let status:String
+}
 
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
@@ -63,7 +72,9 @@ class UpcomingRideViewModel: ObservableObject {
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private let userRepo: UserRepository
-    
+    @Published  var participants: [Participant] = []
+    @Published var rideDetails: [RideDetailsModel] = []
+    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -103,12 +114,12 @@ class UpcomingRideViewModel: ObservableObject {
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-                
-                
+
+
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
-               
+
 
                 // MARK: - Creator Logic
                 if ride.createdBy == currentUserID {
@@ -261,9 +272,7 @@ class UpcomingRideViewModel: ObservableObject {
             isRideLoading = false
         }
     }
-    
-    
-    
+
     // MARK: - Fetch Users
     @MainActor
     func fetchAllUsers() async {
@@ -285,45 +294,158 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Get Upcoming Invites
+    func getAllUsers(createdBy: String) async -> (String,String)? {
+        await withCheckedContinuation { continuation in
+            userRepo.getAllUsers { result, error in
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let domainList = success.data as? [UserDomain],
+                   let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
+
+                    let userName = matchedUser.name
+                    let contactNumber = matchedUser.contactNumber
+                    continuation.resume(returning:( userName,contactNumber))
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    func getSingleRide(rideId: String) async {
+        rideRepository.getSingeRide(rideID: rideId, completionHandler: { result, error in
+            if let success = result as? APIResultSuccess<AnyObject>,
+               let ride = success.data as? RidesData {
+                let currentUserId = MBUserDefaults.userIdStatic
+
+                let startEpoch = ride.startDate
+                let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch!) / 1000)
+                let dateString = self.formatDate(startDate)
+
+                let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
+                let rideJoinedStatus = (ride.participants.contains(where: { $0.inviteStatus == 3 })) || ride.rideStatus == 3
+
+                // Move all async operations into a single Task block
+                Task {
+                    // Fetch user name asynchronously
+                    let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
+
+                    // Create the model now that we have the async data
+                    let model = JoinRideModel(
+                        userId: ride.createdBy ?? "",
+                        rideId: ride.ridesID ?? "",
+                        title: ride.rideTitle ?? "",
+                        organizer: userName?.0 ?? "",
+                        description: ride.description_ ?? "",
+                        route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
+                        distance: "\(Int(ride.rideDistance)) km",
+                        date: dateString,
+                        ridersCount: "\(joinedCount)",
+                        maxRiders: "\(ride.participants.count)",
+                        riderImage: "rider_avatar",
+                        contactNumber: userName?.1 ?? "",
+                        startLat: ride.startLatitude,
+                        startLong: ride.startLongitude,
+                        endLat: ride.endLatitude,
+                        endLong: ride.endLongitude,
+                        rideJoined: rideJoinedStatus, participants: ride.participants
+                    )
+
+                    // Now handle rideDetails
+                    let rideDetails = await ride.participants.asyncMap { participant in
+                        // Fetch the participant's name asynchronously
+                        let userName = await self.getAllUsers(createdBy: participant.userId)
+
+                        // Determine status based on inviteStatus
+                        let status: String
+                        switch participant.inviteStatus {
+                        case 0:
+                            status = "waiting for response."
+                        case 1:
+                            status = "confirmed"
+                        default:
+                            if participant.userId == currentUserId {
+                                status = "Ride Creator"
+                            } else {
+                                status = "unknown"
+                            }
+                        }
+                        return RideDetailsModel(userId: participant.userId, userName: userName?.0 ?? "", status: status)
+                    }
+
+                    // Sort the rideDetails so that the current user's entry appears at the top
+                    let sortedRideDetails = rideDetails.sorted { (a, b) in
+                        if a.userId == currentUserId {
+                            return true
+                        } else if b.userId == currentUserId {
+                            return false
+                        } else {
+                            return false
+                        }
+                    }
+
+                    DispatchQueue.main.async {
+                        // Assuming you have a property for the main model, e.g., self.joinRideModel = model
+                        // Update it here if needed
+                        self.joinRideModel = model
+                        if self.rideDetails.count > 0 {
+                            self.rideDetails.removeAll()
+                        }
+                        self.rideDetails = sortedRideDetails
+                    }
+                }
+            } else {
+                // Handle error or no data
+                print("Error fetching ride or no data: \(error?.localizedDescription ?? "Unknown error")")
+            }
+        })
+    }
+
     @MainActor
     func getInvites() async {
         do {
             let result = try await rideRepository.getRideInvites(userID: MBUserDefaults.userIdStatic ?? "")
             if let success = result as? APIResultSuccess<AnyObject>,
-             let invites = success.data as? [RideInvitesDomain] {
+               let invites = success.data as? [RideInvitesDomain] {
                 let mapped: [RideModel] = invites.compactMap { domain in
-                           
+
                     let millis = domain.startDateTime ?? 0
                     let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
-                    
-                    if startDate < Date().startOfDay {
-                        return nil
-                    }
-                           
-                           return RideModel(
-                               id: domain.rideID,
-                               title: "Ride Invite",
-                               routeStart: domain.startLocation,
-                               routeEnd: domain.destination,
-                               status: .invite,
-                               rideViewAction: .decline,
-                               rideAction: .invities,
-                               date: formatDate(startDate),
-                               riderCount: domain.acceptedParticipants.count,
-                               createdBy: domain.inviter,
-                               startDate: startDate,
-                               participantAcceptedCount: domain.acceptedParticipants.count
-                           )
-                       }
-                       
-                       self.upcomingInvitesRide = mapped
+
+                    guard startDate >= Date() else { return nil }
+
+                    return RideModel(
+                        id: domain.rideID,
+                        title: "Ride Invite",
+                        routeStart: domain.startLocation,
+                        routeEnd: domain.destination,
+                        status: .invite,
+                        rideViewAction: .decline,
+                        rideAction: .invities,
+                        date: formatDate(startDate),
+                        riderCount: domain.acceptedParticipants.count,
+                        createdBy: domain.inviter,
+                        startDate: startDate,
+                        participantAcceptedCount: domain.acceptedParticipants.count
+                    )
+                }
+
+                self.upcomingInvitesRide = mapped
             }
         } catch {
             print("Error fetching users:", error)
         }
     }
-    
+}
+
+// Extension to help with async mapping (if not already available)
+extension Sequence {
+    func asyncMap<T>(_ transform: (Element) async throws -> T) async rethrows -> [T] {
+        var values = [T]()
+        for element in self {
+            try await values.append(transform(element))
+        }
+        return values
+    }
 }
 extension Date {
     var startOfDay: Date {

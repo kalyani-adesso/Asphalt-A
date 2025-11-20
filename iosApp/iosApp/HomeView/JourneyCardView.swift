@@ -11,7 +11,7 @@ import Charts
 struct JourneyCardView: View {
     @EnvironmentObject var home: HomeViewModel 
     @State private var selectedOption = "This month"
-    @State private var currentSlices: [JourneySlice] = []
+   
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -45,7 +45,7 @@ struct JourneyCardView: View {
                 }
             }
             VStack {
-                DonutChartView(slices: currentSlices)
+                DonutChartView(slices: home.currentSlices)
                     .frame(width: 190, height: 190)
                 
                 VStack(spacing: 8) {
@@ -72,11 +72,11 @@ struct JourneyCardView: View {
         .padding(.top,20)
         .onAppear {
             home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
-            currentSlices = home.getJourneySlices(for: selectedOption)
         }
         .onChange(of: selectedOption) { newValue in
             withAnimation {
-                currentSlices = home.getJourneySlices(for: newValue)
+                home.currentSlices = home.getJourneySlices(for: newValue)
+                home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: newValue)
             }
         }
     }
@@ -143,7 +143,7 @@ struct DonutChartView: View {
             VStack {
                 AppIcon.Home.chart
                     .frame(width: 38, height: 38)
-                Text("Total \(Int(home.journeySlices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
+                Text("Total \(Int(home.currentSlices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

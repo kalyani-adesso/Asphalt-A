@@ -44,6 +44,7 @@ firebaseDatabase = "22.0.1"
 datastore = "1.1.7"
 mp-chart = "v3.1.0"
 playServicesLocation = "21.3.0"
+kotlinDateTime = "0.7.1"
 
 [libraries]
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
@@ -104,6 +105,8 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koinCore" }
 koin-test-junit5 = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinCore" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 koin-compose-androidx = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinCore" }
+
+kotlinx-datetime= {module="org.jetbrains.kotlinx:kotlinx-datetime",version.ref="kotlinDateTime"}
 
 
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }

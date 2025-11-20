@@ -18,6 +18,9 @@ struct ForgotPassword: View {
     @State private var isPasswordEntering: Bool = false
     @StateObject private var viewModel: SignUpViewModal = .init()
     @State var hasPasswordReset: Bool = false
+    @State private var showSnackbar: Bool = false  // Added for snackbar control
+    @State private var navigationTimer: Timer? = nil  // Added for timer
+    
     var body: some View {
         ZStack {
             VStack {
@@ -38,9 +41,14 @@ struct ForgotPassword: View {
                 //TODO: Show forgot password mail send toast.
                 ButtonView(title: AppStrings.SignInLabel.updatePassword.localized.uppercased(), onTap: {
                     viewModel.getEmailorPhoneNumber(emailorPhoneNumber: emailOrPhone, password: password, confirmPassword: confirmPassword, onSucess: {
-                        hasPasswordReset = true
+                        // Show snackbar and start timer for navigation
+                        showSnackbar = true
+                        navigationTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                            hasPasswordReset = true
+                            showSnackbar = false
+                        }
                     })
-                })
+                }).disabled(!isValidEmail)
                 .padding(.bottom,20)
                 NavigationLink(destination: {
                     SignInView()
@@ -65,7 +73,26 @@ struct ForgotPassword: View {
             .navigationDestination(isPresented: $hasPasswordReset, destination: {
                 SignInView()
             })
+            .onDisappear {
+                // Clean up timer to avoid memory leaks
+                navigationTimer?.invalidate()
+                navigationTimer = nil
+            }
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
+            if showSnackbar {  // Changed from hasPasswordReset to showSnackbar
+                VStack {
+                    Snackbar(
+                        message: "Reset link sent!",
+                        subMessage: "Check your mail for password reset link", icon:  AppIcon.Login.resetSent
+                    )
+                    Spacer()
+                }
+                .background(AppColor.darkGray)
+                .frame(maxWidth: .infinity)
+                .transition(.scale)
+                .zIndex(2)
+            }
+         
         }
     }
 }
