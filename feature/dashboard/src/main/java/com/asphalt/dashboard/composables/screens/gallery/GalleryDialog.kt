@@ -1,11 +1,6 @@
 package com.asphalt.dashboard.composables.screens.gallery
 
-import android.content.Intent
 import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +26,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,10 +64,13 @@ fun GalleryDialog(onDismiss: () -> Unit) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     var showGallery by remember { mutableStateOf(false) }
+    var selectedUris by remember { mutableStateOf<List<Uri>>(arrayListOf()) }
 
     val context = LocalContext.current
     val (selectedImageUris, openGallery) = rememberImagePicker(10)
-
+    LaunchedEffect(selectedImageUris) {
+        selectedUris = (selectedUris + selectedImageUris).distinct()
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -85,7 +84,8 @@ fun GalleryDialog(onDismiss: () -> Unit) {
         Card(
             modifier = Modifier
                 .wrapContentWidth()
-                .wrapContentHeight().padding(30.dp),
+                .wrapContentHeight()
+                .padding(30.dp),
             colors = CardDefaults.cardColors(
                 containerColor = NeutralWhite  // Change background here
             )
@@ -127,7 +127,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                     //.weight(1f)
 
                 ) {
-                    if (selectedImageUris.size > 0) {
+                    if (selectedUris.size > 0) {
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
                             contentPadding = PaddingValues(16.dp),
@@ -136,7 +136,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                             modifier = Modifier
                                 .wrapContentHeight()
                         ) {
-                            items(selectedImageUris) { images ->
+                            items(selectedUris) { images ->
 
                                 AsyncImage( // Use AsyncImage for URIs
                                     model = images,
@@ -154,7 +154,10 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                             modifier = Modifier.align(Alignment.Center),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(painter = painterResource(R.drawable.ic_no_image_icon), contentDescription = "")
+                            Image(
+                                painter = painterResource(R.drawable.ic_no_image_icon),
+                                contentDescription = ""
+                            )
                             Spacer(Modifier.height(Dimensions.padding16))
                             Text(
                                 text = "Upload Photos from Gallery",
@@ -213,7 +216,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                                 shape = RoundedCornerShape(12.dp)
                             )
                             .clickable {
-                               openGallery()
+                                openGallery()
                                 /*multiplePhotoPickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )*/
