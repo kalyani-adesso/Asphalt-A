@@ -77,9 +77,10 @@ extension JoinRideViewModel {
             
             let filteredRideArray = rideArray.filter { ride in
                 guard let startEpoch = ride.startDate else { return false }
+                
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 // 1. Ignore past rides
-                guard startDate >= Calendar.current.startOfDay(for: Date()) else { return false }
+                guard startDate >= Date() else { return false }
                 // 2. Determine current user role
                 let isCreator = ride.createdBy == currentUserId
                 let participantRecord = ride.participants.first { $0.userId == currentUserId }
