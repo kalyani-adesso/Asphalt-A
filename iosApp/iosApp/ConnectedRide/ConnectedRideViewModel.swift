@@ -217,13 +217,13 @@ extension ConnectedRideViewModel {
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
-                                let status = self.getRideStatus()
+//                                let status = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                 let rider = Rider(
                                     name: userDetails?.0 ?? "",
                                     speed: Int(ongoingRide.speedInKph),
-                                    status: status,
+                                    status: RiderStatus(rawValue: ongoingRide.status) ?? .delayed,
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: ongoingRide.currentLat,
