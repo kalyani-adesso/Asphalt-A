@@ -210,6 +210,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                 ) {
                     BorderedButton(
                         onClick = {
+                            onDismiss()
                             // showGalleryDialog = true
                         },
                         modifier = Modifier
