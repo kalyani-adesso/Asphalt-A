@@ -411,9 +411,7 @@ class UpcomingRideViewModel: ObservableObject {
                     let millis = domain.startDateTime ?? 0
                     let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
 
-                    if startDate < Date().startOfDay {
-                        return nil
-                    }
+                    guard startDate >= Date() else { return nil }
 
                     return RideModel(
                         id: domain.rideID,

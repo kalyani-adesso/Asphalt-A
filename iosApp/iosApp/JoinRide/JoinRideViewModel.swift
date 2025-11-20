@@ -77,6 +77,7 @@ extension JoinRideViewModel {
             
             let filteredRideArray = rideArray.filter { ride in
                 guard let startEpoch = ride.startDate else { return false }
+                
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 // 1. Ignore past rides
                 guard startDate >= Date() else { return false }

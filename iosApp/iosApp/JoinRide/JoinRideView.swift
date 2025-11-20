@@ -37,6 +37,7 @@ struct JoinRideView: View {
                         }
                         .listStyle(.plain)
                     }
+                    
                     Spacer()
                 }
                 .navigationBarBackButtonHidden(true)
@@ -219,6 +220,7 @@ struct JoinRideRow: View {
             .contentShape(Rectangle())
             .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
                 Button("No", role: .cancel) { }
+                
                 Button("Yes") {
                     Task {
                         selectedRide = ride
