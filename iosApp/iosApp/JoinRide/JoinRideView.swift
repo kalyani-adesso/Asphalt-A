@@ -219,12 +219,12 @@ struct JoinRideRow: View {
             .contentShape(Rectangle())
             .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
                 Button("No", role: .cancel) { }
+
                 Button("Yes") {
                     Task {
-                        selectedRide = ride
                         await viewModel.endActiveRide()
                         await viewModel.joinRide(ride)
-                        
+                        selectedRide = ride
                     }
                 }
             } message: {
