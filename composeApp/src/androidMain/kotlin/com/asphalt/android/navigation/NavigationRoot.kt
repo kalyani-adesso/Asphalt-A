@@ -52,6 +52,7 @@ import com.asphalt.joinaride.ConnectedRideEnd
 import com.asphalt.joinaride.ConnectedRideMap
 import com.asphalt.joinaride.EndRidersScreenLoader
 import com.asphalt.joinaride.JoinRideScreen
+import com.asphalt.joinaride.RatingThisRide
 import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.login.ui.LoginScreen
@@ -460,6 +461,12 @@ fun NavigationRoot(
                             }
                         )
                     }
+//                    entry(AppNavKey.RatingRideNavKey) { key ->
+//                        AppNavKey.RatingRide(
+//                            key.
+//                        )
+//
+//                    }
 
                     entry<AppNavKey.RideDetails> { key ->
                         RidesDetailsScreen(

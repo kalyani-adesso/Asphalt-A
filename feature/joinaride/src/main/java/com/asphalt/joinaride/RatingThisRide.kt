@@ -80,6 +80,9 @@ fun RatingThisRide(
     val isSubmitted by viewModel.isSumitted.collectAsState()
     var feedbackText by remember { mutableStateOf("") }
 
+    val comments by viewModel.comments.collectAsState()
+    val apiState by viewModel.ratingState.collectAsState()
+
     Dialog(onDismissRequest = {onDismiss},
         properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
@@ -136,9 +139,9 @@ fun RatingThisRide(
                 Spacer(modifier = Modifier.height(Dimensions.padding2))
 
                 OutlinedTextField(
-                    value = feedbackText,
+                    value = comments,
                     onValueChange = {
-                        feedbackText = it
+                        viewModel.setComments(it)
                     },
                     modifier = Modifier.fillMaxWidth()
                         .height(120.dp),
@@ -180,6 +183,8 @@ fun RatingThisRide(
                     GradientButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
+                            viewModel.submit(rideId = "",
+                                userId = "")
                             onSubmit.invoke()
 
                         },
@@ -201,7 +206,6 @@ fun RatingThisRide(
                     }
                 }
             }
-
         }
     }
 }

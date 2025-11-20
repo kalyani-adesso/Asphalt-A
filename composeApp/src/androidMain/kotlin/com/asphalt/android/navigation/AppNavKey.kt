@@ -60,7 +60,12 @@ sealed interface AppNavKey : NavKey {
     object ConnectedRideEndNavKey : AppNavKey
 
     @Serializable
-    object RatingRideNavKEy : AppNavKey
+    object RatingRideNavKey : AppNavKey
+
+    @Serializable
+    data class RatingRide(
+        val ridesID: String? = null,
+        val userId: String? = null) : AppNavKey
 
     @Serializable
     object EndRideLoaderNavKey : AppNavKey

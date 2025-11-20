@@ -126,7 +126,7 @@ fun MapWithCurrentLocation(locationProvider: LocationProvider) {
             )
 
             Log.d("TAG", "MapWithCurrentLocation: distance $distanceKm")
-            Log.d("TAG", "MapWithCurrentLocation: ${userLocation!!.latitude},${userLocation!!.longitude}")
+          //  Log.d("TAG", "MapWithCurrentLocation: ${userLocation!!.latitude},${userLocation!!.longitude}")
 
             if (loading) {
                 Box(

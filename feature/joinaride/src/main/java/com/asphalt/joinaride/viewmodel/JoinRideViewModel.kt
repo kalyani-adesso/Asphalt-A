@@ -7,6 +7,7 @@ import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.UserRepoImpl
@@ -38,10 +39,8 @@ class JoinRideViewModel(
     // join ride
     private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideRoot>?>(null)
     val joinRideResult : StateFlow<APIResult<ConnectedRideRoot>?> = _joinRideResult
-
     private val _createdBy =  MutableStateFlow("")
     val createdBy = _createdBy.asStateFlow()
-
 
     val acceptedRides: StateFlow<List<RidesData>> =
         combine(rides, _searchQuery) { ridesData, query ->
@@ -66,8 +65,6 @@ class JoinRideViewModel(
                         titleMatch
                     }
                 }
-            println("Accepted Count after search = ${finalList.size}")
-            println("user name = ${_createdBy.value}}")
 
             finalList
 
@@ -84,17 +81,18 @@ class JoinRideViewModel(
             var user = userRepoImpl.getUserDetails()
 
             val apiResult = APIHelperUI.runWithLoader {
-                repository.getAllRidesList()
+                ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
                 _rides.value = ride
             }
         }
     }
-
     fun setCreatedBy(ride: RidesData) {
         val userDomain: UserDomain? = androidUserVM.getUser(userID = ride.createdBy.toString())
 
+        val rideStatus = ride.rideStatus
+        Log.d("TAG", "setCreatedBy: $rideStatus")
         if (androidUserVM.getCurrentUserUID() == ride.createdBy) {
             _createdBy.value = "Me"
         }

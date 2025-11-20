@@ -45,16 +45,16 @@ import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
-    onClickEndRide :() -> Unit
+    onClickEndRide :() -> Unit,
+
 ) {
-
     val currentUser = androidUserVM.userState.collectAsState(null)
-
 
     ComposeUtils.CommonContentBox(
         isBordered = true,

@@ -67,6 +67,8 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,14 +76,13 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ConnectedRideMap(
     setTopAppBarState: (AppBarState) -> Unit,
     viewModel: RidersGroupViewModel = koinViewModel(),
+    mapViewModel: JoinRideMapViewModel = koinViewModel(),
     onClick : () -> Unit,
     locationProvider: LocationProvider
     ) {
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
-
-
 
 
     setTopAppBarState(
