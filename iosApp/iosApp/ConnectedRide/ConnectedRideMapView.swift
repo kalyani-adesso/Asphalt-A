@@ -40,8 +40,8 @@ struct ConnectedRideMapView: View {
                                 if showToast {
                                     showToast(title: AppStrings.ConnectedRide.rideStarted)
                                 }
-                                if startTrack {
-                                    ConnectedRideOfflineView(title: "Abhishek has been stopped for 5 minutes.", image: AppIcon.ConnectedRide.warning)
+                                if startTrack && viewModel.showPopup {
+                                    ConnectedRideOfflineView(title: viewModel.popupTitle, image: AppIcon.ConnectedRide.warning)
                                         .padding(.horizontal, 16)
                                 }
                             }
@@ -68,7 +68,7 @@ struct ConnectedRideMapView: View {
                     Button(action: {
                         self.rideComplted = true
                         if rideModel.userId != MBUserDefaults.userIdStatic {
-                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  rideModel.userId, inviteStatus: 4)
+                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  MBUserDefaults.userIdStatic ?? "", inviteStatus: 4)
                         } else {
                             joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
                         }

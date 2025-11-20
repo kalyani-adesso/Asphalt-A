@@ -223,9 +223,10 @@ struct JoinRideRow: View {
                 
                 Button("Yes") {
                     Task {
+                        selectedRide = ride
                         await viewModel.endActiveRide()
                         await viewModel.joinRide(ride)
-                        selectedRide = ride
+                        
                     }
                 }
             } message: {
