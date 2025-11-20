@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -131,22 +132,41 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
                             contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier
                                 .wrapContentHeight()
                         ) {
                             items(selectedUris) { images ->
 
-                                AsyncImage( // Use AsyncImage for URIs
-                                    model = images,
+                                Box(
                                     modifier = Modifier
                                         .height(130.dp)
-                                        .width(131.dp)
-                                        .clip(RoundedCornerShape(5.dp)),
-                                    contentDescription = "Selected Photo",
-                                    contentScale = ContentScale.Crop
-                                )
+                                        .width(140.dp)
+
+                                ) {
+                                    AsyncImage( // Use AsyncImage for URIs
+                                        model = images,
+                                        modifier = Modifier
+                                            .height(130.dp)
+                                            .width(131.dp)
+                                            .clip(RoundedCornerShape(5.dp)),
+                                        contentDescription = "Selected Photo",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_close_red_icon),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .offset((6).dp, -5.dp)
+                                            .clickable {
+                                                selectedUris = selectedUris.toMutableList()
+                                                    .also { it.remove(images) }
+                                            }
+                                    )
+                                }
+
                             }
                         }
                     } else {
