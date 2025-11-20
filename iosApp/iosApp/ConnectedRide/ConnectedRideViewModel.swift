@@ -66,7 +66,10 @@ final class ConnectedRideViewModel: ObservableObject {
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
     private var ongoingRideTimer: Timer?
-    
+    private var previousRidersDict: [String: Rider] = [:]
+    @Published var showPopup: Bool = false
+    @Published var popupTitle: String = ""
+
     var lastLat: Double?
     var lastLong: Double?
     var lastSpeed: Double = 0.0
@@ -238,7 +241,13 @@ extension ConnectedRideViewModel {
                                 if self.groupRiders.count > 0 {
                                     self.groupRiders.removeAll()
                                 }
+                                
+                                self.detectRiderChanges(newRiders: updatedRiders)
+                                
                                 self.groupRiders = updatedRiders
+                                
+                                self.previousRidersDict = Dictionary(uniqueKeysWithValues: updatedRiders.map { ($0.contactNumber, $0) })
+
                             }
                         }
                     },
@@ -259,7 +268,36 @@ extension ConnectedRideViewModel {
             print("Outer error: \(error.localizedDescription)")
         }
     }
+    
+    func detectRiderChanges(newRiders: [Rider]) {
+        let newDict = Dictionary(uniqueKeysWithValues: newRiders.map { ($0.contactNumber, $0) })
+        let oldDict = previousRidersDict
 
+        //Detect NEW riders joining
+        for (id, newRider) in newDict where oldDict[id] == nil {
+            showPopup(title: "\(newRider.name) joined the ride")
+        }
+
+        //Detect riders who left / ended ride
+        for (id, oldRider) in oldDict where newDict[id] == nil {
+            showPopup(title: "\(oldRider.name) ended the ride")
+        }
+
+        //Detect STATUS change
+        for (id, newRider) in newDict {
+            if let old = oldDict[id], old.status != newRider.status {
+                showPopup(title: "\(newRider.name) has been \(newRider.status) for a while")
+            }
+        }
+    }
+
+    func showPopup(title: String) {
+        self.popupTitle = title
+        self.showPopup = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showPopup = false
+        }
+    }
 
     func getAllUsersName() async -> [String: (name: String, contact: String)] {
         await withCheckedContinuation { continuation in

@@ -23,11 +23,20 @@ struct JoinRideView: View {
                     searchBarView
                         .font(KlavikaFont.regular.font(size: 14))
                         .padding(.top)
-                    List(viewModel.filteredRides, id: \.id) { ride in
-                        JoinRideRow(ride: ride, viewModel: viewModel)
-                            .listRowSeparator(.hidden)
+                    if viewModel.filteredRides.isEmpty {
+                        VStack(spacing: 12) {
+                            Text("No active rides found")
+                                .font(KlavikaFont.bold.font(size: 18))
+                                .foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 400)
+                    } else {
+                        List(viewModel.filteredRides, id: \.id) { ride in
+                            JoinRideRow(ride: ride, viewModel: viewModel)
+                                .listRowSeparator(.hidden)
+                        }
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                     Spacer()
                 }
                 .navigationBarBackButtonHidden(true)
@@ -210,12 +219,12 @@ struct JoinRideRow: View {
             .contentShape(Rectangle())
             .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
                 Button("No", role: .cancel) { }
-
                 Button("Yes") {
                     Task {
+                        selectedRide = ride
                         await viewModel.endActiveRide()
                         await viewModel.joinRide(ride)
-                        selectedRide = ride
+                        
                     }
                 }
             } message: {

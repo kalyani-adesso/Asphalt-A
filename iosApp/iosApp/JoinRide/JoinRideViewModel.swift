@@ -79,7 +79,7 @@ extension JoinRideViewModel {
                 guard let startEpoch = ride.startDate else { return false }
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 // 1. Ignore past rides
-                guard startDate >= Calendar.current.startOfDay(for: Date()) else { return false }
+                guard startDate >= Date() else { return false }
                 // 2. Determine current user role
                 let isCreator = ride.createdBy == currentUserId
                 let participantRecord = ride.participants.first { $0.userId == currentUserId }
@@ -247,8 +247,21 @@ extension JoinRideViewModel {
                 inviteStatus: 4
             )
         }
-        
         showRideAlreadyActivePopup = false
+        
+        endRide(rideId: active.ridesID ?? "")
+        
+    }
+    
+    func endRide(rideId: String) {
+        let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
+        rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
+            if let error = error {
+                print("Failed to end ride: \(error.localizedDescription)")
+            } else {
+                print("Successfully ended ride")
+            }
+        }
     }
     
     func getUserActiveRide() async -> RidesData? {
