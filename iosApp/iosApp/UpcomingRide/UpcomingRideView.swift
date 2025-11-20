@@ -132,8 +132,6 @@ struct UpcomingRideView: View {
                         ), foregroundColor: .spanishGreen
                     
                     )
-                    
-                    
                     Spacer()
                 }
                 .frame(width: 390, height: 620)

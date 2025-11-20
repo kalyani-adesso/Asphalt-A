@@ -285,28 +285,29 @@ struct ConnectedRideMapView: View {
         }
         .buttonStyle(.plain)
         Spacer()
-        Picker("", selection: $viewModel.selectedType) {
-            ForEach(MapType.allCases, id: \.self) { type in
-                HStack(alignment: .center) {
+        Menu {
+            Picker("", selection: $viewModel.selectedType) {
+                ForEach(MapType.allCases, id: \.self) { type in
                     Text(type.rawValue)
-                        .font(KlavikaFont.regular.font(size: 12))
-                        .foregroundStyle(AppColor.stoneGray)
                 }
             }
+        } label: {
+            HStack(alignment: .center) {
+                Text(viewModel.selectedType.rawValue)
+                    .font(KlavikaFont.regular.font(size: 12))
+                    .foregroundColor(AppColor.stoneGray)
+            }
+            .frame(width: 69, height: 24)
+            .background(
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(AppColor.white)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(AppColor.darkGray, lineWidth: 1)
+            )
         }
-        .pickerStyle(.automatic)
-        .frame(width: 96, height: 24)
-        .padding([.trailing,.bottom])
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(AppColor.white)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(AppColor.darkGray, lineWidth: 2)
-        )
-        .padding(.trailing)
-        .contentShape(Rectangle())
+        .padding(.trailing,16)
     }
     
     @ViewBuilder func showToast(title:String) -> some View {
