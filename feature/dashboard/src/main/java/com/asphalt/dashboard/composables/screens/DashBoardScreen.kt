@@ -57,7 +57,7 @@ fun DashBoardScreen(
     notificationViewModel: NotificationViewModel = koinActivityViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     notificationsClick: () -> Unit, creatRideClick: () -> Unit,
-    joinRideClick : () -> Unit,
+    joinRideClick: () -> Unit,
     dashboardRideSummaryVM: DashboardRideSummaryVM = koinViewModel()
 ) {
 
@@ -98,7 +98,7 @@ fun DashBoardScreen(
         }
     }
     val helloUser = stringResource(R.string.hello_user)
-    LaunchedEffect(Unit,locationStatus) {
+    LaunchedEffect(Unit, locationStatus) {
 
         setTopAppBarState(
             AppBarState(
@@ -125,7 +125,10 @@ fun DashBoardScreen(
                 })
         )
     }
-    dashboardRideSummaryVM.getRidesData()
+    LaunchedEffect(Unit) {
+        dashboardRideSummaryVM.getRidesData()
+    }
+    val dashboardSummary = dashboardRideSummaryVM.dashboardSummary.collectAsStateWithLifecycle()
 
 
     ComposeUtils.DefaultColumnRoot(
@@ -139,9 +142,9 @@ fun DashBoardScreen(
         }, {
             joinRideClick.invoke()
         })
-        RideStatsPerMonth()
+        RideStatsPerMonth(dashboardSummary.value)
         DashboardUpcomingRide(upcomingRideClick)
-        AdventureJourney()
+        AdventureJourney(dashboardSummary.value)
         PlacesVisitedGraph()
     }
 }

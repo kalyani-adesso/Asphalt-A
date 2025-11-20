@@ -2,7 +2,7 @@ package com.asphalt.dashboard.data
 
 import com.asphalt.dashboard.sealedclasses.RideStatType
 
-data class RideStatData(val type: RideStatType, val value: Int = 0)
+data class RideStatDataUIModel(val type: RideStatType, val value: Int = 0)
 data class RideDateDto(val month: Int, val year: Int)
 data class RidePerMonthDto(
     val rideDate: RideDateDto,

@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.ui.RoundedBox
@@ -19,14 +21,19 @@ import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.dashboard.composables.components.RideMonthYear
 import com.asphalt.dashboard.composables.components.RideStatBox
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.data.DashboardSummaryUI
 import com.asphalt.dashboard.viewmodels.PerMonthRideStatsViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun RideStatsPerMonth(
+    dashboardSummary: List<DashboardDomain>,
     perMonthRideStatsViewModel: PerMonthRideStatsViewModel = koinViewModel()
 ) {
+    LaunchedEffect(dashboardSummary) {
+        perMonthRideStatsViewModel.setSummaryData(dashboardSummary)
+    }
     val perMonthStats = perMonthRideStatsViewModel.perMonthStats.collectAsStateWithLifecycle()
 
 
