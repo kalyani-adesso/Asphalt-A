@@ -99,7 +99,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.select_photos).uppercase(),
+                    text = stringResource(R.string.ride_photos).uppercase(),
                     style = TypographyBold.bodyMedium,
                     color = NeutralBlackGrey,
                     fontSize = Dimensions.textSize18,
