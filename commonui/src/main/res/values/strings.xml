@@ -251,6 +251,8 @@
 
     <string name="reset_success_msg">A password reset email has been sent to your registered email address.</string>
     <string name="select_photos">Select photos</string>
+    <string name="upload_photos_gallery">Upload Photos from Gallery</string>
+    <string name="share_memory_with_group">Share your ride memories with the group</string>
 
 
 

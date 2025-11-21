@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import coil.size.Dimension
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.LightGray40
@@ -108,13 +109,13 @@ fun GalleryDialog(onDismiss: () -> Unit) {
 
             Column(
                 modifier = Modifier
-                    .padding(vertical = 16.dp, horizontal = 16.dp)
+                    .padding(vertical = Dimensions.padding16, horizontal = Dimensions.padding16)
                     .border(
-                        width = 2.dp,
+                        width = Dimensions.size2,
                         color = LightGray40,
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(Dimensions.padding16)
                     )
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(Dimensions.padding16))
             ) {
 
                 Box(
@@ -131,9 +132,9 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                     if (selectedUris.size > 0) {
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(Dimensions.padding16),
+                            verticalArrangement = Arrangement.spacedBy(Dimensions.padding16),
+                            horizontalArrangement = Arrangement.spacedBy(Dimensions.padding16),
                             modifier = Modifier
                                 .wrapContentHeight()
                         ) {
@@ -141,16 +142,16 @@ fun GalleryDialog(onDismiss: () -> Unit) {
 
                                 Box(
                                     modifier = Modifier
-                                        .height(130.dp)
-                                        .width(140.dp)
+                                        .height(Dimensions.size132)
+                                        .width(Dimensions.size140)
 
                                 ) {
                                     AsyncImage( // Use AsyncImage for URIs
                                         model = images,
                                         modifier = Modifier
-                                            .height(130.dp)
-                                            .width(131.dp)
-                                            .clip(RoundedCornerShape(5.dp)),
+                                            .height(Dimensions.size132)
+                                            .width(Dimensions.size132)
+                                            .clip(RoundedCornerShape(Dimensions.size5)),
                                         contentDescription = "Selected Photo",
                                         contentScale = ContentScale.Crop
                                     )
@@ -180,14 +181,14 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                             )
                             Spacer(Modifier.height(Dimensions.padding16))
                             Text(
-                                text = "Upload Photos from Gallery",
+                                text = stringResource(R.string.upload_photos_gallery),
                                 style = TypographyBold.bodyMedium,
                                 color = NeutralBlackGrey,
                                 textAlign = TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(Dimensions.size5))
                             Text(
-                                "Share your ride memories with the group",
+                                stringResource(R.string.share_memory_with_group),
                                 style = Typography.bodySmall,
                                 color = LightGray45
                             )
@@ -203,7 +204,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                             end = Dimensions.padding16,
                             bottom = Dimensions.padding16
                         ),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.size8),
                 ) {
                     BorderedButton(
                         onClick = {
@@ -233,7 +234,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                             .weight(1f)
                             .background(
                                 color = PrimaryDarkerLightB75,
-                                shape = RoundedCornerShape(12.dp)
+                                shape = RoundedCornerShape(Dimensions.spacing12)
                             )
                             .clickable {
                                 openGallery()
