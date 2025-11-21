@@ -190,7 +190,7 @@ struct ConnectedRideMapView: View {
                 if !rideModel.rideJoined {
                     viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 } else {
-                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    startOngoingRideTimer()
                 }
                 viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
@@ -246,6 +246,7 @@ struct ConnectedRideMapView: View {
                     }
                 }
                 
+                
                 ToolbarItemGroup(placement: .topBarLeading) {
                     HStack {
                         Button(action: {
@@ -268,6 +269,18 @@ struct ConnectedRideMapView: View {
             .navigationDestination(isPresented: $showJoinRideView, destination: {
                 JoinRideView()
             })
+        }
+    }
+    
+    func startOngoingRideTimer() {
+        // Invalidate any existing timer
+        viewModel.ongoingRideTimer?.invalidate()
+        // Schedule the timer to trigger every 2 min minutes (900 seconds)
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) {  _ in
+            Task {
+                await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                
+            }
         }
     }
     

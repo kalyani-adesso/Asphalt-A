@@ -346,8 +346,7 @@ struct UpComingView: View {
 //                            if ride.status == .upcoming {
                                 self.showRideDetails = true
                                 await viewModel.getSingleRide(rideId: ride.id)
-//                            }
-//                            else {
+//                            } else {
 //                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
 //                            }
                         }
