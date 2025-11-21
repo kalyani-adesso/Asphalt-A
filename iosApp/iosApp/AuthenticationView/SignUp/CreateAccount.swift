@@ -91,7 +91,7 @@ struct CreateAccount: View {
                     .disabled(!isFormValid)
                     .opacity(isFormValid ? 1 : 0.5)
                     .navigationDestination(isPresented: $isSignupSuccess, destination: {
-                        SignInView()
+                        BottomNavBar()
                     })
                     .navigationBarBackButtonHidden(true)
                     .toolbar {

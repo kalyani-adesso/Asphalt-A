@@ -148,7 +148,7 @@ extension ConnectedRideViewModel {
         let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
         
         let status = getRideStatus()
-        
+
         let connectedRideRoot = ConnectedRideRoot(
             rideID: rideId,
             userID: userId,
@@ -404,7 +404,7 @@ extension ConnectedRideViewModel {
             return "\(diff / 3600)h ago"
         }
     }
-   
+
     
     func stopOngoingRideTimer() {
         ongoingRideTimer?.invalidate()
@@ -437,7 +437,7 @@ extension ConnectedRideViewModel {
             }
         }
     }
-    
+
 }
 
 class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {

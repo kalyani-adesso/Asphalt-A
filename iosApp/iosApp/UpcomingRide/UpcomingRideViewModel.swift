@@ -113,7 +113,8 @@ class UpcomingRideViewModel: ObservableObject {
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
                 if startDate.addingTimeInterval(60) < now { continue }
                 let dateString = formatDate(startDate)
-                let participantCount = ride.participants.count
+                let participantsExcludingCreator = ride.participants.filter { $0.userId != ride.createdBy }
+                let participantCount = participantsExcludingCreator.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
