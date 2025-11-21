@@ -14,6 +14,7 @@ struct JoinRideView: View {
     @State private var showConnectedRides: Bool = false
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
+    @State private var selectedRide: JoinRideModel? = nil
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         ZStack {
