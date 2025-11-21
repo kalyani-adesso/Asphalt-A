@@ -112,7 +112,7 @@ extension JoinRideViewModel {
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
                         title: ride.rideTitle ?? "",
-                        organizer: userName?.0 ?? "",
+                        organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",

@@ -35,7 +35,7 @@ struct JoinRideView: View {
                         } else {
                             List(viewModel.filteredRides.indices, id: \.self) { index in
                                 let ride = viewModel.filteredRides[index]
-                                
+
                                 JoinRideRow(
                                     ride: ride,
                                     index: index,
@@ -232,6 +232,7 @@ struct JoinRideRow: View {
             .contentShape(Rectangle())
             .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
                 Button("No", role: .cancel) { }
+
                 Button("Yes") {
                     Task {
                         await viewModel.endActiveRide()
