@@ -145,5 +145,5 @@ struct MessagePopupView: View {
 }
 
 #Preview {
-    MessagePopupView(isPresented: .constant(true), riderName: "Sooraj Rajan", delayText: "Delayed by 15min", )
+    MessagePopupView(isPresented: .constant(true), riderName: "Sooraj Rajan", delayText: "Delayed by 15min" )
 }
