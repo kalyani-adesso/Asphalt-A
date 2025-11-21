@@ -62,9 +62,9 @@ struct RideDetailsView: View {
                     .contentShape(Rectangle())
                     
                     HStack(spacing: 16) {
-                        StatusCard(count: ride.participantAcceptedCount, title: "Confirmed", color: AppColor.spanishGreen)
-                        StatusCard(count: ride.riderCount, title: "Pending", color: AppColor.lightOrange)
-                        StatusCard(count: declinedCount , title: "Declined", color: AppColor.darkRed)
+                        StatusCard(count: viewModel.rideDetails.first?.confirmedCount ?? 0, title: "Confirmed", color: AppColor.spanishGreen)
+                        StatusCard(count: viewModel.rideDetails.first?.pendingCount ?? 0, title: "Pending", color: AppColor.lightOrange)
+                        StatusCard(count: viewModel.rideDetails.first?.declinedCount ?? 0, title: "Declined", color: AppColor.darkRed)
                     }
                     .frame(height: 63)
                     .padding([.top,.bottom],16)
@@ -81,7 +81,7 @@ struct RideDetailsView: View {
                         )
                         .contentShape(Rectangle())
                     }
-                
+                    
                     ButtonView(
                         title:"START RIDE",
                         icon: AppIcon.JoinRide.nearMe,
@@ -165,10 +165,10 @@ struct ParticipantsStatusRow: View {
                     .clipShape(Circle())
                     .overlay(
                         RoundedRectangle(cornerRadius: 32.5)
-                            .stroke(rideDetails.status != "waiting for response." ? AppColor.green : AppColor.carrotOrange, lineWidth: 2.5)
+                            .stroke(statusColor, lineWidth: 2.5)
                     )
                 Circle()
-                    .fill(rideDetails.status != "waiting for response." ? AppColor.green : AppColor.carrotOrange)
+                    .fill(statusColor)
                     .frame(width: 13, height: 13)
                     .offset(x: 2, y: 2)
                     .overlay(
@@ -210,5 +210,11 @@ struct ParticipantsStatusRow: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(AppColor.darkGray, lineWidth: 1)
         )
+    }
+    
+    var statusColor: Color {
+        (rideDetails.status == "confirmed" || rideDetails.status == "Ride Creator")
+        ? AppColor.green
+        : AppColor.carrotOrange
     }
 }

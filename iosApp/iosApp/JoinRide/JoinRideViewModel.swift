@@ -44,6 +44,7 @@ final class JoinRideViewModel: ObservableObject {
     @Published var isRideLoading = false
     @Published var showRideAlreadyActivePopup = false
     @Published var totalRides:Int = 0
+    @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
         didSet {
             searchRides()
@@ -126,7 +127,6 @@ extension JoinRideViewModel {
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus,
                         participants: participants
-                        
                     )
                     joinRideModels.append(model)
                 }
@@ -304,5 +304,4 @@ extension JoinRideViewModel {
             }
         })
     }
-    
 }
