@@ -146,6 +146,14 @@ fun UsersList(viewModel: RidesDetailsViewModel) {
             )
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Text(
+            text = stringResource(R.string.participants),
+            style = TypographyMedium.titleMedium,
+            maxLines = 1,
+            modifier = Modifier.padding(start = Dimensions.padding16),
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
         val userList = viewModel.ridersList.value
         userList.forEach { user ->
             UserRow(user)
