@@ -461,12 +461,14 @@ fun NavigationRoot(
                             }
                         )
                     }
-//                    entry(AppNavKey.RatingRideNavKey) { key ->
-//                        AppNavKey.RatingRide(
-//                            key.
-//                        )
-//
-//                    }
+                    entry<AppNavKey.RatingRide> { key ->
+                        RatingThisRide(
+                            rideId = key.ridesID,
+                            userId = key.userId,
+                            onDismiss = {},
+                            onSubmit = {}
+                        )
+                    }
 
                     entry<AppNavKey.RideDetails> { key ->
                         RidesDetailsScreen(

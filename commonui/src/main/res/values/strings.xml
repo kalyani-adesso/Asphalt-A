@@ -250,8 +250,7 @@
     <string name="organizer">Organizer</string>
 
     <string name="reset_success_msg">A password reset email has been sent to your registered email address.</string>
-
-
+    <string name="rejoinRide">Rejoin Ride</string>
 
 
 </resources>

@@ -3,7 +3,6 @@ package com.asphalt.joinaride
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,15 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -56,8 +50,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.NeutralPink
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.StarBackGround
@@ -65,7 +57,6 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.joinaride.viewmodel.RatingViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,7 +65,8 @@ fun RatingThisRide(
     modifier: Modifier = Modifier,
     viewModel: RatingViewModel = koinViewModel(),
     onDismiss : () -> Unit,
-    onSubmit : () -> Unit
+    onSubmit : () -> Unit,
+    rideId:String?, userId: String?
 ) {
     val rating by viewModel.rating.collectAsState()
     val isSubmitted by viewModel.isSumitted.collectAsState()
@@ -92,7 +84,8 @@ fun RatingThisRide(
                 .fillMaxWidth()
                 .padding(horizontal = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING)
                 .verticalScroll(
-                    rememberScrollState())
+                    rememberScrollState()
+                )
         ) {
             Column(
                 modifier = Modifier.padding(
@@ -143,7 +136,8 @@ fun RatingThisRide(
                     onValueChange = {
                         viewModel.setComments(it)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .height(120.dp),
                     placeholder = { Text("Tell us about your ride experience...") },
                     singleLine = false,
@@ -156,7 +150,8 @@ fun RatingThisRide(
                     horizontalArrangement = Arrangement.spacedBy(
                         Dimensions.padding20, Alignment.CenterHorizontally
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(Dimensions.padding20)
                 ) {
 
@@ -168,8 +163,10 @@ fun RatingThisRide(
                         modifier = Modifier
                             .weight(1f)
                             .height(Dimensions.size60)
-                            .border(1.dp, color = PrimaryBrighterLightW75,
-                                shape = RoundedCornerShape(size = Dimensions.size10)),
+                            .border(
+                                1.dp, color = PrimaryBrighterLightW75,
+                                shape = RoundedCornerShape(size = Dimensions.size10)
+                            ),
                     ) {
                         Text(
                             stringResource(R.string.skip).uppercase(),
@@ -183,9 +180,10 @@ fun RatingThisRide(
                     GradientButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            viewModel.submit(rideId = "",
-                                userId = "")
+                            viewModel.submitFeedback(rideId = rideId ?: "",
+                                userId = userId ?: "")
                             onSubmit.invoke()
+                            onDismiss.invoke()
 
                         },
                         buttonHeight = Dimensions.size60,
@@ -319,6 +317,6 @@ fun RatingStar(
 @Composable
 fun RatingThisRidePreview() {
 
-    RatingThisRide(onDismiss = {}, onSubmit = {})
+    RatingThisRide(onDismiss = {}, onSubmit = {}, rideId = "", userId = "")
     
 }

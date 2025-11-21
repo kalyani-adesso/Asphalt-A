@@ -43,14 +43,6 @@ class JoinRideMapViewModel(
         Log.d("TAG", "setUserId: ${_userId.value}")
     }
 
-    fun checkOrganizer() {
-        // call api
-        // updateOrganizerStatus
-        viewModelScope.launch {
-           // val result = ridesRepository.updateOrganizerStatus(rideId = rideId, rideStatus = 0)
-
-        }
-    }
     fun getOngoingRides(ride: String) {
         viewModelScope.launch {
 

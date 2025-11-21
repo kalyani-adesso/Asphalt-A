@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -52,6 +53,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.GreenDark
+import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.SafetyOrange
@@ -334,42 +336,86 @@ fun RiderCard(
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
-                    GradientButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            val request = ConnectedRideRoot(
-                                rideID = ridersList.ridesID,
-                                userID = ridersList.participants[0].userId,
-                                currentLat = ridersList.startLatitude,
-                                currentLong = ridersList.startLongitude,
-                                dateTime = ridersList.startDate,
-                                isRejoined = false,
-                                status = "ACTIVE"
-                            )
-                            viewModel.joinRideClick(joinRide = request)
-                            navigateToConnectedRide.invoke()
-                        },
-                        buttonHeight = Dimensions.size50,
-                        contentPadding = PaddingValues(Dimensions.size0)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = Dimensions.padding10),
-                            horizontalArrangement = Arrangement.Center
+                    if (ridersList.rideStatus == RIDE_JOINED) {
+                        ElevatedButton (
+                            modifier = Modifier.weight(1f)
+                                .height(Dimensions.size50),
+                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
+                            onClick = {
+//                                val request = ConnectedRideRoot(
+//                                    rideID = ridersList.ridesID,
+//                                    userID = ridersList.participants[0].userId,
+//                                    currentLat = ridersList.startLatitude,
+//                                    currentLong = ridersList.startLongitude,
+//                                    dateTime = ridersList.startDate,
+//                                    isRejoined = false,
+//                                    status = "ACTIVE"
+//                                )
+                                //viewModel.updateRideStatus(userId = request.userID!!,status = RIDE_JOINED)
+                                navigateToConnectedRide.invoke()
+                            },
+                            contentPadding = PaddingValues(Dimensions.size0)
                         ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = R.drawable.moved_location),
-                                contentDescription = "Riders icon",
-                                tint = NeutralWhite)
-                            Text(
-                                stringResource(R.string.join_ride).uppercase(),
-                                color = NeutralWhite,
-                                style = TypographyBold.titleMedium,
-                                fontSize = Dimensions.textSize14,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = Dimensions.padding10),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.moved_location),
+                                    contentDescription = "Riders icon",
+                                    tint = NeutralWhite)
+                                Text(
+                                    stringResource(R.string.rejoinRide).uppercase(),
+                                    color = NeutralWhite,
+                                    style = TypographyBold.titleMedium,
+                                    fontSize = Dimensions.textSize14,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                        }
+                    } else  {
+                        GradientButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+//                                val request = ConnectedRideRoot(
+//                                    rideID = ridersList.ridesID,
+//                                    userID = ridersList.participants[0].userId,
+//                                    currentLat = ridersList.startLatitude,
+//                                    currentLong = ridersList.startLongitude,
+//                                    dateTime = ridersList.startDate,
+//                                    isRejoined = false,
+//                                    status = "ACTIVE"
+//                                )
+                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
+                                    status = RIDE_JOINED)
+                                navigateToConnectedRide.invoke()
+                            },
+                            buttonHeight = Dimensions.size50,
+                            contentPadding = PaddingValues(Dimensions.size0)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = Dimensions.padding10),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.moved_location),
+                                    contentDescription = "Riders icon",
+                                    tint = NeutralWhite)
+                                Text(
+                                    stringResource(R.string.join_ride).uppercase(),
+                                    color = NeutralWhite,
+                                    style = TypographyBold.titleMedium,
+                                    fontSize = Dimensions.textSize14,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
                         }
                     }
                 }

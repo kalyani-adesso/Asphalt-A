@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
+import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
@@ -27,19 +28,22 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 class JoinRideViewModel(
-    private val repository: JoinRideRepository) : ViewModel(), KoinComponent {
+    private val repository: JoinRideRepository
+) : ViewModel(), KoinComponent {
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
     val ridesRepo: RidesRepository by inject()
     val androidUserVM: AndroidUserVM by inject()
-   val rides = _rides.asStateFlow()
+    val rides = _rides.asStateFlow()
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
     val userRepoImpl: UserRepoImpl by inject()
 
+    private val currentUid = androidUserVM.userState.value?.uid
+
     // join ride
-    private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideRoot>?>(null)
-    val joinRideResult : StateFlow<APIResult<ConnectedRideRoot>?> = _joinRideResult
-    private val _createdBy =  MutableStateFlow("")
+    private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideDTO>?>(null)
+    val joinRideResult: StateFlow<APIResult<ConnectedRideDTO>?> = _joinRideResult
+    private val _createdBy = MutableStateFlow("")
     val createdBy = _createdBy.asStateFlow()
 
     val acceptedRides: StateFlow<List<RidesData>> =
@@ -50,8 +54,14 @@ class JoinRideViewModel(
             // STEP 1 → Filter ACCEPTED rides
             val accepted = ridesData.filter { ride ->
 
-                ride.participants.any { p ->
-                    p.inviteStatus == RIDE_ACCEPTED
+                // current user
+                if (ride.createdBy == currentUid) {
+                    true
+                } else {
+                    // participants
+                    ride.participants.any { p ->
+                        p.inviteStatus == RIDE_ACCEPTED
+                    }
                 }
             }
             // STEP 2 → Apply SEARCH on those accepted rides
@@ -65,7 +75,6 @@ class JoinRideViewModel(
                         titleMatch
                     }
                 }
-
             finalList
 
         }.stateIn(
@@ -73,9 +82,11 @@ class JoinRideViewModel(
             started = SharingStarted.Lazily,
             initialValue = emptyList()
         )
+
     init {
         getAllRiders()
     }
+
     fun getAllRiders() {
         viewModelScope.launch {
             var user = userRepoImpl.getUserDetails()
@@ -88,6 +99,7 @@ class JoinRideViewModel(
             }
         }
     }
+
     fun setCreatedBy(ride: RidesData) {
         val userDomain: UserDomain? = androidUserVM.getUser(userID = ride.createdBy.toString())
 
@@ -95,27 +107,40 @@ class JoinRideViewModel(
         Log.d("TAG", "setCreatedBy: $rideStatus")
         if (androidUserVM.getCurrentUserUID() == ride.createdBy) {
             _createdBy.value = "Me"
-        }
-        else {
+        } else {
             _createdBy.value = userDomain!!.name
         }
     }
+
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
 
-    fun joinRideClick(joinRide:ConnectedRideRoot) {
+    fun updateRideStatus(userId: String, rideId: String, status: Int) {
         viewModelScope.launch {
-            val result = ridesRepo.joinRideClick(joinRide = joinRide)
+            // organizer
+            if (userId == currentUid) {
+
+                val result =
+                    ridesRepo.updateOrganizerStatus(rideId = rideId, rideStatus = RIDE_JOINED)
+                Log.d("TAG", "updateOrganizerStatus:$result")
+            } else {
+                // participants status
+                val result = ridesRepo.changeRideInviteStatus(
+                    rideID = rideId,
+                    currentUid = currentUid!!, inviteStatus = status
+                )
+                Log.d("TAG", "changeRideInviteStatus:$result")
+            }
+        }
+    }
+
+    fun joinRideClick(joinRide: ConnectedRideRoot) {
+        viewModelScope.launch {
+            val result = ridesRepo.joinRide(joinRide = joinRide)
             _joinRideResult.value = result
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
-}
-
-sealed class RideUiState {
-    object Loading : RideUiState()
-    data class Success(val data: ConnectedRideRoot) : RideUiState()
-    data class Error(val message: String) : RideUiState()
 }

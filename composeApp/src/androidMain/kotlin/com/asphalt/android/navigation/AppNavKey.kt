@@ -63,8 +63,7 @@ sealed interface AppNavKey : NavKey {
     object RatingRideNavKey : AppNavKey
 
     @Serializable
-    data class RatingRide(
-        val ridesID: String? = null,
+    data class RatingRide(val ridesID: String? = null,
         val userId: String? = null) : AppNavKey
 
     @Serializable

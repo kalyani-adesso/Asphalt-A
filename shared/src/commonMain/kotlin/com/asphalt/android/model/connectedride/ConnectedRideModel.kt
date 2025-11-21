@@ -29,6 +29,9 @@ data class ConnectedRideRoot(
 
         @SerialName("isRejoined")
         val isRejoined: Boolean? = null,
+
+        @SerialName("rideJoinedID")
+        val rideJoinedID : String? = null,
 )
 
 data class ConnectedRideDTO(

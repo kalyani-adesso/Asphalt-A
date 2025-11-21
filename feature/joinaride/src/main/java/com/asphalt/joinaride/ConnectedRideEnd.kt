@@ -162,7 +162,7 @@ fun ConnectedRideEnd(
                 }
             }, onSubmit = {
 
-            })
+            }, rideId = "", userId = "")
         }
 
         Spacer(modifier=Modifier.weight(1f))
