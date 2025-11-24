@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.dashboard.constants.AdventureJourneyConstants
-import com.asphalt.dashboard.repository.AdventureJourneyRepo
 import com.asphalt.dashboard.sealedclasses.AdventureJourneyTimeFrameChoices
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import mappers.toJourneyDataUIModel
 import java.util.Calendar
 
-class AdventureJourneyViewModel(val adventureJourneyRepo: AdventureJourneyRepo) : ViewModel() {
+class AdventureJourneyViewModel : ViewModel() {
     private val _totalRides = MutableStateFlow(0)
     private val _colorList = MutableStateFlow<List<Color>>(emptyList())
     private val _valueList = MutableStateFlow<List<Float>>(emptyList())

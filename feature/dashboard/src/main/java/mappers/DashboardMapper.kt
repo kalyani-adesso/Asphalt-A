@@ -11,9 +11,12 @@ import com.asphalt.dashboard.data.AggregatedRideMetrics
 import com.asphalt.dashboard.data.DashboardRideInviteUIModel
 import com.asphalt.dashboard.data.DashboardSummaryUI
 import com.asphalt.dashboard.data.JourneyDataUIModel
+import com.asphalt.dashboard.data.PlacesVisitedGraphData
+import com.asphalt.dashboard.data.PlacesVisitedGraphUIModel
 import com.asphalt.dashboard.data.RideStatDataUIModel
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 import com.asphalt.dashboard.sealedclasses.RideStatType
+import java.text.DateFormatSymbols
 
 fun List<RideInvitesDomain>.toDashBoardInvites(
     userList: List<UserDomain>,
@@ -107,6 +110,7 @@ fun List<DashboardDomain>.toJourneyDataUIModel(): List<JourneyDataUIModel> {
         JourneyDataUIModel(RideGraphLegend.RideInvites, totalOrganiserGroupRides.toFloat()),
     )
 }
+
 fun List<PerMonthRideDataDomain>.aggregateMetrics(): AggregatedRideMetrics {
     val rides = this
 
@@ -127,5 +131,43 @@ fun List<PerMonthRideDataDomain>.aggregateMetrics(): AggregatedRideMetrics {
         totalOrganiserGroupRides = totalOrganiserGroupRides,
         uniqueEndLocations = uniqueEndLocations
     )
+}
+
+fun List<DashboardDomain>.fetchPlaceVisitedGraphData(
+    startMonthYear: Pair<Int, Int>,
+    endMonthYear: Pair<Int, Int>
+): List<PlacesVisitedGraphData> {
+    val (startMonth, startYear) = startMonthYear
+    val (endMonth, endYear) = endMonthYear
+    val startValue = startYear * 12 + startMonth
+    val endValue = endYear * 12 + endMonth
+    val filteredDomains = this.filter { domain ->
+        val domainMonth = domain.monthYear.month
+        val domainYear = domain.monthYear.year
+        val domainValue = domainYear * 12 + domainMonth
+
+        domainValue in startValue..endValue
+    }
+    val sortedFilteredDomains = filteredDomains.sortedWith(
+        compareBy<DashboardDomain> { it.monthYear.year }
+            .thenBy { it.monthYear.month }
+    )
+    return sortedFilteredDomains.map { domain ->
+        val rides = domain.perMonthData
+        val monthInt = domain.monthYear.month
+        val yearInt = domain.monthYear.year
+        val placesCount = rides.aggregateMetrics().uniqueEndLocations
+        PlacesVisitedGraphData(monthInt, yearInt, placesCount)
+    }
+}
+
+fun List<PlacesVisitedGraphData>.toPlaceVisitedGraphUIModel(): List<PlacesVisitedGraphUIModel> {
+    return this.map { item ->
+        val monthName = DateFormatSymbols().shortMonths[item.month - 1]
+        PlacesVisitedGraphUIModel(
+            month = "$monthName",
+            count = item.count
+        )
+    }
 }
 

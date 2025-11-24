@@ -145,6 +145,6 @@ fun DashBoardScreen(
         RideStatsPerMonth(dashboardSummary.value)
         DashboardUpcomingRide(upcomingRideClick)
         AdventureJourney(dashboardSummary.value)
-        PlacesVisitedGraph()
+        PlacesVisitedGraph(dashboardSummary.value)
     }
 }
