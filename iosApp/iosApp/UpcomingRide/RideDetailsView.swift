@@ -13,65 +13,46 @@ struct RideDetailsView: View {
     @State private var startRide = false
     @State private var showJoinRide: Bool = false
     var body: some View {
+        ZStack {
         NavigationStack {
-            SimpleCustomNavBar(title:ride.title, onBackToHome: {showJoinRide = true})
-            ScrollView {
-                VStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 22) {
-                        HStack(spacing: 11) {
-                            (rideIcon)
-                                .resizable()
-                                .modifier(RoundCorner(rideAction: ride.rideAction))
-                                .frame(width: 30, height: 30)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(ride.title)
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .foregroundColor(AppColor.black)
-                                Text("\(ride.routeStart) - \(ride.routeEnd)")
-                                    .font(KlavikaFont.regular.font(size: 12))
-                                    .foregroundColor(AppColor.stoneGray)
-                            }
-                            Spacer()
-                        }
-                        
-                        HStack {
-                            HStack(spacing: 5) {
-                                AppIcon.UpcomingRide.calender
+                SimpleCustomNavBar(title:ride.title, onBackToHome: {showJoinRide = true})
+                ScrollView {
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 22) {
+                            HStack(spacing: 11) {
+                                (rideIcon)
                                     .resizable()
-                                    .frame(width: 16, height: 16)
-                                Text(ride.date)
-                                    .font(KlavikaFont.regular.font(size: 16))
-                                    .foregroundStyle(AppColor.richBlack)
+                                    .modifier(RoundCorner(rideAction: ride.rideAction))
+                                    .frame(width: 30, height: 30)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(ride.title)
+                                        .font(KlavikaFont.bold.font(size: 16))
+                                        .foregroundColor(AppColor.black)
+                                    Text("\(ride.routeStart) - \(ride.routeEnd)")
+                                        .font(KlavikaFont.regular.font(size: 12))
+                                        .foregroundColor(AppColor.stoneGray)
+                                }
+                                Spacer()
                             }
-                            Spacer()
-                            HStack(spacing: 5) {
-                                AppIcon.UpcomingRide.group
-                                    .resizable()
-                                    .frame(width: 16, height: 16)
-                                Text("\(ride.riderCount) rides")
-                                    .font(KlavikaFont.regular.font(size: 16))
-                                    .foregroundStyle(AppColor.richBlack)
-                            }
-                        }
-                    }
-                    .padding([.leading,.trailing,.top,.bottom],16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .contentShape(Rectangle())
-                    
-                    HStack(spacing: 16) {
-                        StatusCard(count: viewModel.rideDetails.first?.confirmedCount ?? 0, title: "Confirmed", color: AppColor.spanishGreen)
-                        StatusCard(count: viewModel.rideDetails.first?.pendingCount ?? 0, title: "Pending", color: AppColor.lightOrange)
-                        StatusCard(count: viewModel.rideDetails.first?.declinedCount ?? 0, title: "Declined", color: AppColor.darkRed)
-                    }
-                    .frame(height: 63)
-                    .padding([.top,.bottom],16)
-                    if viewModel.rideDetails.count > 0 {
-                        VStack {
-                            ForEach(viewModel.rideDetails) { rideDetails in
-                                ParticipantsStatusRow(rideDetails:rideDetails )
+                            
+                            HStack {
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                    Text(ride.date)
+                                        .font(KlavikaFont.regular.font(size: 16))
+                                        .foregroundStyle(AppColor.richBlack)
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.group
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                    Text("\(ride.riderCount) rides")
+                                        .font(KlavikaFont.regular.font(size: 16))
+                                        .foregroundStyle(AppColor.richBlack)
+                                }
                             }
                         }
                         .padding([.leading,.trailing,.top,.bottom],16)
@@ -80,38 +61,62 @@ struct RideDetailsView: View {
                                 .fill(AppColor.listGray)
                         )
                         .contentShape(Rectangle())
-                    }
-                    
-                    ButtonView(
-                        title:"START RIDE",
-                        icon: AppIcon.JoinRide.nearMe,
-                        fontSize: 16 ,
-                        background: LinearGradient(
-                            gradient: Gradient(colors: [AppColor.dimGreen, AppColor.dimGreen]),
-                            startPoint: .leading,
-                            endPoint: .trailing),
-                        foregroundColor: AppColor.white,
-                        showShadow: false,
-                        onTap: {
-                            startRide = true
+                        
+                        HStack(spacing: 16) {
+                            StatusCard(count: viewModel.rideDetails.first?.confirmedCount ?? 0, title: "Confirmed", color: AppColor.spanishGreen)
+                            StatusCard(count: viewModel.rideDetails.first?.pendingCount ?? 0, title: "Pending", color: AppColor.lightOrange)
+                            StatusCard(count: viewModel.rideDetails.first?.declinedCount ?? 0, title: "Declined", color: AppColor.darkRed)
                         }
-                    )
-                    .padding([.top,.bottom],16)
-                    Spacer()
-                }
-                .padding(.all,16)
-                .navigationBarBackButtonHidden(true)
-                .navigationDestination(isPresented: $showJoinRide, destination: {
-                    UpcomingRideView()
-                })
-                .navigationDestination(isPresented:$startRide,  destination: {
-                    ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])
-                })
-                .onAppear {
-                    Task {
-                        await  viewModel.fetchAllUsers()
+                        .frame(height: 63)
+                        .padding([.top,.bottom],16)
+                        if viewModel.rideDetails.count > 0 {
+                            VStack {
+                                ForEach(viewModel.rideDetails) { rideDetails in
+                                    ParticipantsStatusRow(rideDetails:rideDetails )
+                                }
+                            }
+                            .padding([.leading,.trailing,.top,.bottom],16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.listGray)
+                            )
+                            .contentShape(Rectangle())
+                        }
+                        
+                        ButtonView(
+                            title:"START RIDE",
+                            icon: AppIcon.JoinRide.nearMe,
+                            fontSize: 16 ,
+                            background: LinearGradient(
+                                gradient: Gradient(colors: [AppColor.dimGreen, AppColor.dimGreen]),
+                                startPoint: .leading,
+                                endPoint: .trailing),
+                            foregroundColor: AppColor.white,
+                            showShadow: false,
+                            onTap: {
+                                startRide = true
+                            }
+                        )
+                        .padding([.top,.bottom],16)
+                        Spacer()
+                    }
+                    .padding(.all,16)
+                    .navigationBarBackButtonHidden(true)
+                    .navigationDestination(isPresented: $showJoinRide, destination: {
+                        UpcomingRideView()
+                    })
+                    .navigationDestination(isPresented:$startRide,  destination: {
+                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])
+                    })
+                    .onAppear {
+                        Task {
+                            await  viewModel.fetchAllUsers()
+                        }
                     }
                 }
+            }
+            if viewModel.isRideLoading {
+                ProgressViewReusable(title: "Loading ...")
             }
         }
         
@@ -199,7 +204,7 @@ struct ParticipantsStatusRow: View {
                     .background(AppColor.secondaryBlue)
                     .cornerRadius(6)
                 } else {
-                    rideDetails.status == "confirmed" ? AppIcon.JoinRide.rideConfirmed : AppIcon.JoinRide.ridePending
+                    statusIcon
                 }
             }
         }
@@ -213,8 +218,12 @@ struct ParticipantsStatusRow: View {
     }
     
     var statusColor: Color {
-        (rideDetails.status == "confirmed" || rideDetails.status == "Ride Creator")
+        (rideDetails.status == "confirmed" || rideDetails.status == "Ride Creator" ||  rideDetails.status == "completed")
         ? AppColor.green
         : AppColor.carrotOrange
+    }
+    
+    var statusIcon: Image {
+        (rideDetails.status == "confirmed" || rideDetails.status == "Ride Creator" ||  rideDetails.status == "completed") ? AppIcon.JoinRide.rideConfirmed : AppIcon.JoinRide.ridePending
     }
 }
