@@ -106,7 +106,12 @@ extension JoinRideViewModel {
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 self.totalRides = filteredRideArray.count
-                let rideJoinedStatus = (ride.participants.contains(where: { $0.inviteStatus == 3 })) || ride.rideStatus == 3
+                
+                let currentUserId = MBUserDefaults.userIdStatic
+                let userInviteStatus = ride.participants.first { $0.userId == currentUserId }?.inviteStatus
+                let isCreator = ride.createdBy == currentUserId
+                let rideJoinedStatus = (userInviteStatus == 3) || (ride.rideStatus == 3 && isCreator)
+
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
