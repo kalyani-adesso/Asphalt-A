@@ -28,7 +28,7 @@ object RidesFilter {
                         if (participant == null) {
                             UPCOMING
                         } else {
-                            QUEUE
+                            UPCOMING // previously it was "QUEUE " as per new discussion show all the rides with upcoming, may be there will be a logic change here
                         }
 
                     }
