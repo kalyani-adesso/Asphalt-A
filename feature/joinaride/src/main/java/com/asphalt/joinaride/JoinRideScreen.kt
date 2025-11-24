@@ -98,6 +98,8 @@ fun JoinRide(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
 
+    val sortedList = rides.sortedByDescending{ it .createdDate}
+
     Column {
         SearchView(
             query = searchQuery,
@@ -131,7 +133,7 @@ fun JoinRide(
         }
         else {
             LazyColumn {
-                items(items = rides) { rider ->
+                items(items = sortedList) { rider ->
                     RiderCard( navigateToConnectedRide = {navigateToConnectedRide.invoke()},
                         navigateToEndRide = { navigateToEndRide.invoke() },
                         ridersList = rider, viewModel = viewModel
@@ -163,7 +165,6 @@ fun RiderCard(
                 end = Dimensions.padding16,
                 bottom = Dimensions.padding16
             ),
-
         ) {
         Column(
             modifier = Modifier

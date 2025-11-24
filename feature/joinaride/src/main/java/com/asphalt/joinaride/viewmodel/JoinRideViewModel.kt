@@ -111,7 +111,6 @@ class JoinRideViewModel(
             _createdBy.value = userDomain!!.name
         }
     }
-
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -136,11 +135,19 @@ class JoinRideViewModel(
         }
     }
 
-    fun joinRideClick(joinRide: ConnectedRideRoot) {
+    fun joinRide(joinRide: ConnectedRideRoot) {
         viewModelScope.launch {
             val result = ridesRepo.joinRide(joinRide = joinRide)
             _joinRideResult.value = result
             Log.d("TAG", "JoinRideClick: $result")
+        }
+    }
+
+    fun reJoinRide(reJoinRide: ConnectedRideRoot) {
+        viewModelScope.launch {
+            val res = ridesRepo.reJoinRide(rejoinRide = reJoinRide, ongoingRideId = reJoinRide.rideJoinedID ?: "")
+            Log.d("TAG", "JoinRideClick: $res")
+
         }
     }
 }
