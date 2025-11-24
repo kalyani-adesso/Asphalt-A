@@ -1,8 +1,5 @@
 package com.asphalt.dashboard.di
 
-import com.asphalt.dashboard.repository.AdventureJourneyRepo
-import com.asphalt.dashboard.repository.PerMonthRideStatsRepo
-import com.asphalt.dashboard.repository.PlaceVisitedGraphRepo
 import com.asphalt.dashboard.viewmodels.AdventureJourneyViewModel
 import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
 import com.asphalt.dashboard.viewmodels.DashboardRideSummaryVM
@@ -15,16 +12,13 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val dashboardModule = module {
-    single { PerMonthRideStatsRepo() }
-    single { AdventureJourneyRepo() }
-    single { PlaceVisitedGraphRepo() }
-    viewModel { PerMonthRideStatsViewModel(get()) }
-    viewModel { DashboardRideInviteViewModel(get(),get()) }
-    viewModel { AdventureJourneyViewModel(get()) }
-    viewModel { PlacesVisitedGraphViewModel(get()) }
+    viewModel { PerMonthRideStatsViewModel() }
+    viewModel { DashboardRideInviteViewModel(get(), get()) }
+    viewModel { AdventureJourneyViewModel() }
+    viewModel { PlacesVisitedGraphViewModel() }
     viewModel { NotificationViewModel() }
     viewModel { RidesScreenViewModel(get()) }
     viewModel { RidesDetailsViewModel() }
-    viewModel { DashboardRideSummaryVM(get(),get()) }
+    viewModel { DashboardRideSummaryVM(get(), get()) }
 
 }
