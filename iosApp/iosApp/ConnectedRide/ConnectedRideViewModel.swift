@@ -60,7 +60,7 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0)]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
-    private var ongoingRideId = ""
+    @Published var ongoingRideId = ""
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private var userAPIService: UserAPIService
