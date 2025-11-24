@@ -44,6 +44,7 @@ final class JoinRideViewModel: ObservableObject {
     @Published var isRideLoading = false
     @Published var showRideAlreadyActivePopup = false
     @Published var totalRides:Int = 0
+    @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
         didSet {
             searchRides()
@@ -77,9 +78,10 @@ extension JoinRideViewModel {
             
             let filteredRideArray = rideArray.filter { ride in
                 guard let startEpoch = ride.startDate else { return false }
+                
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 // 1. Ignore past rides
-                guard startDate >= Calendar.current.startOfDay(for: Date()) else { return false }
+                guard startDate >= Date() else { return false }
                 // 2. Determine current user role
                 let isCreator = ride.createdBy == currentUserId
                 let participantRecord = ride.participants.first { $0.userId == currentUserId }
@@ -110,7 +112,7 @@ extension JoinRideViewModel {
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
                         title: ride.rideTitle ?? "",
-                        organizer: userName?.0 ?? "",
+                        organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
@@ -125,7 +127,6 @@ extension JoinRideViewModel {
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus,
                         participants: participants
-                        
                     )
                     joinRideModels.append(model)
                 }
@@ -247,8 +248,21 @@ extension JoinRideViewModel {
                 inviteStatus: 4
             )
         }
-        
         showRideAlreadyActivePopup = false
+        
+        endRide(rideId: active.ridesID ?? "")
+        
+    }
+    
+    func endRide(rideId: String) {
+        let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
+        rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
+            if let error = error {
+                print("Failed to end ride: \(error.localizedDescription)")
+            } else {
+                print("Successfully ended ride")
+            }
+        }
     }
     
     func getUserActiveRide() async -> RidesData? {
@@ -290,5 +304,4 @@ extension JoinRideViewModel {
             }
         })
     }
-    
 }

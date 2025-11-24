@@ -376,6 +376,7 @@ public struct AppStrings{
         static let joinaRideTitle = "Join a Ride"
         static let reJoinRideTitle = "ReJoin Ride"
         static let rideActive = "Ride Started! Navigation active."
+        
     }
     
     enum ConnectedRide {

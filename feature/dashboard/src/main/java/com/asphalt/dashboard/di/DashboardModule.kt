@@ -5,6 +5,7 @@ import com.asphalt.dashboard.repository.PerMonthRideStatsRepo
 import com.asphalt.dashboard.repository.PlaceVisitedGraphRepo
 import com.asphalt.dashboard.viewmodels.AdventureJourneyViewModel
 import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
+import com.asphalt.dashboard.viewmodels.DashboardRideSummaryVM
 import com.asphalt.dashboard.viewmodels.NotificationViewModel
 import com.asphalt.dashboard.viewmodels.PerMonthRideStatsViewModel
 import com.asphalt.dashboard.viewmodels.PlacesVisitedGraphViewModel
@@ -24,5 +25,6 @@ val dashboardModule = module {
     viewModel { NotificationViewModel() }
     viewModel { RidesScreenViewModel(get()) }
     viewModel { RidesDetailsViewModel() }
+    viewModel { DashboardRideSummaryVM(get(),get()) }
 
 }

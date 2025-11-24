@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		25FF5C842F90FE03AEDE041D /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C87AEDD8BC8FECABDEEE41E /* Pods_iosApp.framework */; };
 		CE9EBE652E86A8CC00CEC3E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */; };
-		DA440AC1CEDA43D2B915E812 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD92A2393AE4F611CD1EF37B /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,8 +40,6 @@
 		};
 		31ECD9733CAFFAF08705E2B1 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -204,9 +201,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -18,6 +18,7 @@ struct AppIcon {
         static let rememberLogin = Image("remember-login")
         static let validEmail = Image("vaild-Email")
         static let invalidPassword = Image("invalid-Password")
+        static let resetSent = Image("icon-resetSent")
     }
     
     struct SignUp {
@@ -129,6 +130,12 @@ struct AppIcon {
         static let movedLocation = Image("icon-movedLocation")
         static let location = Image("icon-location")
         static let route = Image("icon-route")
+        static let nearMe = Image("near-me")
+        static let ridePending = Image("icon-ridePending")
+        static let rideConfirmed = Image("icon-rideConfirmed")
+        static let orangePin = Image("orangePin")
+        static let greenPin = Image("greenPin")
+        static let yellowPin = Image("yellowPin")
     }
     
     struct ConnectedRide {

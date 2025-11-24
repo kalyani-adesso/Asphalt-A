@@ -11,7 +11,6 @@ struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
-    @State var showHome: Bool = false
     @Environment(\.dismiss) var dismiss
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
@@ -19,7 +18,7 @@ struct ProfileScreen: View {
             VStack {
                 HStack {
                     Button {
-                        showHome = true
+                        onBackToHome?()
                     } label: {
                         AppIcon.CreateRide.backButton
                             .frame(width: 24, height: 24)
@@ -87,9 +86,6 @@ struct ProfileScreen: View {
                     await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
                 }
             }
-            .navigationDestination(isPresented: $showHome, destination: {
-                BottomNavBar()
-            })
             .task {
                 await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
             }

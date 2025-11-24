@@ -152,6 +152,7 @@ extension CreateRideViewModel {
                 
                 let filteredParticpants = domainList
                     .filter { $0.uid != self.currentUserId }
+                    .filter {$0.primaryBike != ""}
                     .map { user in
                         Participant(
                             id: user.uid,

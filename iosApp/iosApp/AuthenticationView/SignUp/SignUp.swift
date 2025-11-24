@@ -12,7 +12,6 @@ struct SignUpView: View {
     @State private var isVerified: Bool = false
     var body: some View {
         VStack {
-            // Header
             HeaderView(
                 title: AppStrings.SignUpLabel.welcome.rawValue,
                 subtitle: AppStrings.SignUpLabel.welcomeSubtitle.rawValue
@@ -22,31 +21,28 @@ struct SignUpView: View {
                 .frame(width: 240, height: 240)
                 .padding(.bottom, 30)
             
-            // Form fields
             VStack(spacing: 21) {
                 FormFieldView(
                     label: AppStrings.SignInLabel.emailOrPhone.rawValue,
                     icon: AppIcon.Login.email,
                     placeholder: AppStrings.SignInPlaceholder.email.rawValue,
                     value: $emailOrPhone,
-                    isValidEmail: $isValidEmail
+                    isValidEmail: .constant(true)
                 )
                 
-                // Continue button (navigates to Verification)
-                ButtonView( title: AppStrings.SignUpLabel.continueButton.rawValue, onTap: {
-                        isVerified = true
-                    }
-                )
-                .navigationDestination(isPresented: $isVerified, destination: {
+                ButtonView(title: AppStrings.SignUpLabel.continueButton.rawValue) {
+                    isVerified = true
+                }
+                .navigationDestination(isPresented: $isVerified) {
                     if emailOrPhone.isValidEmail {
                         SignInView()
                     } else {
                         Verification(email: emailOrPhone)
                     }
-                })
+                }
             }
+            .padding(.horizontal, 24)
         }
-        .padding(.horizontal, 24)
     }
 }
 

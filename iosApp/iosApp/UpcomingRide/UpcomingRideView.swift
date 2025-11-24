@@ -23,10 +23,8 @@ struct UpcomingRideView: View {
     @State private var openGallery = false
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
-    
+
     var body: some View {
-        
-        
         ZStack{
             NavigationStack {
                 SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
@@ -124,9 +122,16 @@ struct UpcomingRideView: View {
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
-                        subMessage: "Your ride has been created and is now live for other riders to join."
-                    )
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.lightGreen,
+                                AppColor.lightGreen,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ), foregroundColor: .spanishGreen
                     
+                    )
                     Spacer()
                 }
                 .frame(width: 390, height: 620)
@@ -168,7 +173,6 @@ struct UpcomingRideView: View {
             await viewModel.fetchAllUsers()
         }
     }
-    
     
     private func handleUpload() {
         guard let rideId = selectedRideId else { return }
@@ -251,6 +255,7 @@ struct UpComingView: View {
     @State private var showSelectedPopup = false
     @State private var selectedImages: [UIImage] = []
     @State private var openGallery = false
+    @State private var showRideDetails: Bool = false
     var onAddPhotos: ((String) -> Void)? = nil
     
     var body: some View {
@@ -338,7 +343,12 @@ struct UpComingView: View {
                     
                     Button(action: {
                         Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            if ride.status == .upcoming {
+                                self.showRideDetails = true
+                                await viewModel.getSingleRide(rideId: ride.id)
+//                            } else {
+//                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            }
                         }
                     }) {
                         Text(ride.rideViewAction.rawValue.uppercased())
@@ -355,6 +365,9 @@ struct UpComingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(AppColor.listGray)
             )
+            .navigationDestination(isPresented: $showRideDetails, destination: {
+                RideDetailsView(viewModel: viewModel, ride: $ride)
+            })
             .contentShape(Rectangle())
         }
     }
@@ -440,7 +453,6 @@ struct ButtonBackground: ViewModifier {
         }
     }
 }
-
 
 #Preview {
     UpcomingRideView()
