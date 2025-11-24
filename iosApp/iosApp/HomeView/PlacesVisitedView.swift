@@ -128,6 +128,9 @@ struct PlacesVisitedView: View {
             .frame(height: 180)
             .padding(.top, 4)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .placesDataUpdated)) { _ in
+            updateVisiblePlaces()
+        }
         .onAppear {
             updateVisiblePlaces()
         }

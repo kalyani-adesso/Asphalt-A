@@ -14,33 +14,56 @@ struct JoinRideView: View {
     @State private var showConnectedRides: Bool = false
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
+    @State private var selectedRide: JoinRideModel? = nil
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         ZStack {
             NavigationStack {
                 SimpleCustomNavBar(title: AppStrings.JoinRide.joinaRideTitle, onBackToHome: {showHomeView = true})
-                VStack {
-                    searchBarView
-                        .font(KlavikaFont.regular.font(size: 14))
-                        .padding(.top)
-                    List(viewModel.filteredRides, id: \.id) { ride in
-                        JoinRideRow(ride: ride, viewModel: viewModel)
-                            .listRowSeparator(.hidden)
+                if #available(iOS 17.0, *) {
+                    VStack {
+                        searchBarView
+                            .font(KlavikaFont.regular.font(size: 14))
+                            .padding(.top)
+                        if viewModel.filteredRides.isEmpty {
+                            VStack(spacing: 12) {
+                                Text("No active rides found")
+                                    .font(KlavikaFont.bold.font(size: 18))
+                                    .foregroundColor(.gray)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 400)
+                        } else {
+                            List(viewModel.filteredRides.indices, id: \.self) { index in
+                                let ride = viewModel.filteredRides[index]
+
+                                JoinRideRow(
+                                    ride: ride,
+                                    index: index,
+                                    viewModel: viewModel, selectedRide: $selectedRide
+                                )
+                                .listRowSeparator(.hidden)
+                            }
+                            .listStyle(.plain)
+                        }
+                        Spacer()
                     }
-                    .listStyle(.plain)
-                    Spacer()
-                }
-                .navigationBarBackButtonHidden(true)
-                .navigationDestination(isPresented: $showHomeView, destination: {
-                    BottomNavBar()
-                })
-                .task {
-                    await viewModel.getRides()
-                }
-                .refreshable {
-                    Task {
+                    .navigationBarBackButtonHidden(true)
+                    .navigationDestination(isPresented: $showHomeView, destination: {
+                        BottomNavBar()
+                    })
+                    .navigationDestination(item: $selectedRide, destination: { ride in
+                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
+                    })
+                    .task {
                         await viewModel.getRides()
                     }
+                    .refreshable {
+                        Task {
+                            await viewModel.getRides()
+                        }
+                    }
+                } else {
+                    // Fallback on earlier versions
                 }
             }
             if viewModel.isRideLoading {
@@ -78,11 +101,11 @@ struct JoinRideView: View {
 }
 
 struct JoinRideRow: View {
-    var ride:JoinRideModel
+    var ride:JoinRideModel?
+    let index:Int
     @ObservedObject var viewModel:JoinRideViewModel
-    @State private var selectedRide: JoinRideModel? = nil
+    @Binding var selectedRide: JoinRideModel?
     var body: some View {
-        NavigationStack {
             VStack(alignment: .leading, spacing: 22) {
                 HStack(spacing: 11) {
                     AppIcon.Profile.profile
@@ -93,17 +116,17 @@ struct JoinRideRow: View {
                         )
                         .frame(width: 30, height: 30)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(ride.title)
+                        Text(ride?.title ?? "")
                             .font(KlavikaFont.bold.font(size: 16))
                             .foregroundColor(AppColor.black)
-                        Text("By \(ride.organizer)")
+                        Text("By \(ride?.organizer ?? "")")
                             .font(KlavikaFont.regular.font(size: 12))
                             .foregroundColor(AppColor.richBlack)
                     }
                     Spacer()
                 }
                 
-                Text(ride.description)
+                Text(ride?.description ?? "")
                     .font(KlavikaFont.regular.font(size: 14))
                     .foregroundColor(AppColor.stoneGray)
                 
@@ -112,7 +135,7 @@ struct JoinRideRow: View {
                         AppIcon.JoinRide.calenderToday
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(ride.date)
+                        Text(ride?.date ?? "")
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }
@@ -121,7 +144,7 @@ struct JoinRideRow: View {
                         AppIcon.JoinRide.joinGroup
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text("\(ride.ridersCount)/\(ride.maxRiders) rides")
+                        Text("\(ride?.ridersCount ?? "")/\(ride?.maxRiders ?? "") rides")
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }
@@ -132,7 +155,7 @@ struct JoinRideRow: View {
                         AppIcon.JoinRide.location
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(ride.route)
+                        Text(ride?.route ?? "")
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }
@@ -141,7 +164,7 @@ struct JoinRideRow: View {
                         AppIcon.JoinRide.route
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(ride.distance)
+                        Text(ride?.distance ?? "")
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }
@@ -149,7 +172,7 @@ struct JoinRideRow: View {
                 
                 HStack(spacing: 15) {
                     Button(action: {
-                        viewModel.callToRider(contactNumber: ride.contactNumber)
+                        viewModel.callToRider(contactNumber: ride?.contactNumber ?? "")
                     }) {
                         HStack {
                             AppIcon.NavigationSlider.call
@@ -173,7 +196,7 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title: ride.rideJoined ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: ride.rideJoined ?  LinearGradient(
+                        ButtonView(title: (ride?.rideJoined ?? false) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: (ride?.rideJoined ?? false) ?  LinearGradient(
                             gradient: Gradient(colors: [
                                 AppColor.vividGreen,
                                 AppColor.vividGreen,
@@ -188,14 +211,13 @@ struct JoinRideRow: View {
                             startPoint: .leading,
                             endPoint: .trailing
                         ),onTap: {
+                            viewModel.tappedIndex = index
                             Task {
-                                if let selected = await viewModel.handleJoin(for: ride) {
-                                    selectedRide = selected
-                                }
+                                if let ride = ride,
+                                  let selected = await viewModel.handleJoin(for: ride) {
+                                        selectedRide = selected
+                                    }
                             }
-                        })
-                        .navigationDestination(item: $selectedRide, destination: { ride in
-                            ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
                         })
                         .frame(maxWidth: .infinity)
                         .padding(.bottom,20)
@@ -214,14 +236,13 @@ struct JoinRideRow: View {
                 Button("Yes") {
                     Task {
                         await viewModel.endActiveRide()
-                        await viewModel.joinRide(ride)
-                        selectedRide = ride
+                        await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
+                        selectedRide = viewModel.filteredRides[viewModel.tappedIndex ?? 0]
                     }
                 }
             } message: {
                 Text("Do you want to end your current ride and join this one?")
             }
-        }
     }
 }
 

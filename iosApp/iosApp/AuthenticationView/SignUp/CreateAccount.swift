@@ -21,6 +21,7 @@ struct CreateAccount: View {
     @State private var showConfirmPassword: Bool = false
     @StateObject private var signUpViewModel =  SignUpViewModal()
     @State private var isSignupSuccess: Bool = false
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         ZStack {
             VStack {
@@ -90,8 +91,18 @@ struct CreateAccount: View {
                     .disabled(!isFormValid)
                     .opacity(isFormValid ? 1 : 0.5)
                     .navigationDestination(isPresented: $isSignupSuccess, destination: {
-                        SignInView()
+                        BottomNavBar()
                     })
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                dismiss()
+                            } label: {
+                                AppIcon.CreateRide.backButton
+                            }
+                        }
+                    }
                 }
             }
             

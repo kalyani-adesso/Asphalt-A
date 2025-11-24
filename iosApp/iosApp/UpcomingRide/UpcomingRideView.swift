@@ -122,9 +122,16 @@ struct UpcomingRideView: View {
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
-                        subMessage: "Your ride has been created and is now live for other riders to join."
-                    )
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.lightGreen,
+                                AppColor.lightGreen,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ), foregroundColor: .spanishGreen
                     
+                    )
                     Spacer()
                 }
                 .frame(width: 390, height: 620)
@@ -336,12 +343,12 @@ struct UpComingView: View {
                     
                     Button(action: {
                         Task {
-                            if ride.status == .upcoming {
+//                            if ride.status == .upcoming {
                                 self.showRideDetails = true
                                 await viewModel.getSingleRide(rideId: ride.id)
-                            } else {
-                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
-                            }
+//                            } else {
+//                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            }
                         }
                     }) {
                         Text(ride.rideViewAction.rawValue.uppercased())
@@ -362,6 +369,9 @@ struct UpComingView: View {
                 RideDetailsView(viewModel: viewModel, ride: $ride)
             })
             .contentShape(Rectangle())
+            .refreshable {
+                await viewModel.getSingleRide(rideId: ride.id)
+            }
         }
     }
     

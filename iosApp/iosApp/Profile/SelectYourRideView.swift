@@ -134,10 +134,8 @@ private struct SelectBikeTabView: View {
             }
             imageName
                 .resizable()
-                .scaledToFill()
                 .frame(width: 311, height: 164)
-                .clipShape(RoundedRectangle(cornerRadius: 40))
-                .clipped()
+                .cornerRadius(10)
                 .animation(.easeInOut, value: currentPage)
             
             Text(title)
