@@ -48,6 +48,10 @@ class AdventureJourneyViewModel : ViewModel() {
         val calendar = Calendar.getInstance()
         val todayMonth = calendar.get(Calendar.MONTH) + 1
         val todayYear = calendar.get(Calendar.YEAR)
+        val lastMonthCalendar = Calendar.getInstance()
+        lastMonthCalendar.add(Calendar.MONTH, -1)
+        val lastMonthTarget = lastMonthCalendar.get(Calendar.MONTH) + 1
+        val lastYearTarget = lastMonthCalendar.get(Calendar.YEAR)
 
         val cutoffTimeMillis: Long = when (filter) {
 
@@ -87,29 +91,31 @@ class AdventureJourneyViewModel : ViewModel() {
             }
 
             AdventureJourneyTimeFrameChoices.LastYear -> {
-                calendar.set(todayYear, 0, 1, 0, 0, 0)
+                calendar.add(Calendar.MONTH, -11)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
                 calendar.timeInMillis
             }
         }
 
         val filteredDomains = this.filter { domain ->
+            val domainMonth = domain.monthYear.month
+            val domainYear = domain.monthYear.year
             val domainDateMillis =
                 domain.perMonthData.minOfOrNull { it.endRideDate ?: Long.MAX_VALUE }
                     ?: Long.MAX_VALUE
+            val meetsLowerBound = domainDateMillis >= cutoffTimeMillis
 
             when (filter) {
-                AdventureJourneyTimeFrameChoices.LastYear
-                    -> {
-                    val domainYear = domain.monthYear.year
-                    domainYear == todayYear - 1
-                }
 
                 AdventureJourneyTimeFrameChoices.LastMonth -> {
-                    val domainMonth = domain.monthYear.month
-                    domainMonth == todayMonth - 1
+                    domainYear == lastYearTarget && domainMonth == lastMonthTarget
                 }
 
-                else -> domainDateMillis >= cutoffTimeMillis
+                else -> meetsLowerBound
             }
         }
 

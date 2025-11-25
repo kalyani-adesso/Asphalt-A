@@ -77,7 +77,8 @@ class RidesRepository(val apiService: RidesApIService) {
                 endLatitude = rowData.endLatitude,
                 endLongitude = rowData.endLongitude,
                 rideDistance = rowData.distance,
-                rideStatus = rowData.rideStatus
+                rideStatus = rowData.rideStatus,
+                endDate = rowData.endDate
             )
         } ?: emptyList()
     }

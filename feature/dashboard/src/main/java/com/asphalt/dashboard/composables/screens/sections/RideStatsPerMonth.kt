@@ -33,6 +33,7 @@ fun RideStatsPerMonth(
 ) {
     LaunchedEffect(dashboardSummary) {
         perMonthRideStatsViewModel.setSummaryData(dashboardSummary)
+        perMonthRideStatsViewModel.getRideStatsByDate()
     }
     val perMonthStats = perMonthRideStatsViewModel.perMonthStats.collectAsStateWithLifecycle()
 
