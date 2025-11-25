@@ -94,6 +94,8 @@ fun CreateRideScreen(
                     ParticipantSection(mod = Modifier.weight(1f), viewModel)
                 if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
                     ShareSection()
+                if (viewModel.tabSelectState.value != Constants.TAB_PARTICIPANT)
+                Spacer(Modifier.height(Dimensions.size132))
             }
             BottomButtons(viewModel, clickDone)
             // Fixed bottom button
