@@ -437,7 +437,17 @@ extension ConnectedRideViewModel {
             }
         }
     }
-
+    
+    func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId)
+        rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
+            if let error = error {
+                print("Error joining ride:", error.localizedDescription)
+            } else {
+                print("Message sent successfully")
+            }
+        })
+    }
 }
 
 class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {
