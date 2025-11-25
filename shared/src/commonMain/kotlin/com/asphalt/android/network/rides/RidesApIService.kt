@@ -6,6 +6,7 @@ import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
 import com.asphalt.android.model.rides.CreateRideRoot
+import  com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.UserInvites
 
 interface RidesApIService {
@@ -34,4 +35,7 @@ interface RidesApIService {
     suspend fun endRideSummary(userID: String, endRide: DashboardDTO) :  APIResult<FirebasePushResponse>
 
     suspend fun getRideSummary(userID: String) :  APIResult<Map<String, DashboardDTO>>?
+
+    suspend fun sendMessage(message: MessageRoot) : APIResult<Unit>
+
 }
