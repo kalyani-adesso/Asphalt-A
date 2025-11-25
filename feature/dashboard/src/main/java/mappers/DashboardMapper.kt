@@ -17,6 +17,7 @@ import com.asphalt.dashboard.data.RideStatDataUIModel
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 import com.asphalt.dashboard.sealedclasses.RideStatType
 import java.text.DateFormatSymbols
+import java.util.Calendar
 
 fun List<RideInvitesDomain>.toDashBoardInvites(
     userList: List<UserDomain>,
@@ -137,28 +138,49 @@ fun List<DashboardDomain>.fetchPlaceVisitedGraphData(
     startMonthYear: Pair<Int, Int>,
     endMonthYear: Pair<Int, Int>
 ): List<PlacesVisitedGraphData> {
+
     val (startMonth, startYear) = startMonthYear
     val (endMonth, endYear) = endMonthYear
+
     val startValue = startYear * 12 + startMonth
     val endValue = endYear * 12 + endMonth
-    val filteredDomains = this.filter { domain ->
-        val domainMonth = domain.monthYear.month
-        val domainYear = domain.monthYear.year
-        val domainValue = domainYear * 12 + domainMonth
 
-        domainValue in startValue..endValue
+    val existingDataMap = this
+        .filter { domain ->
+            val domainValue = domain.monthYear.year * 12 + domain.monthYear.month
+            domainValue in startValue..endValue
+        }
+        .associateBy { domain -> domain.monthYear.year * 12 + domain.monthYear.month }
+
+    val finalGraphData = mutableListOf<PlacesVisitedGraphData>()
+
+    val calendar = Calendar.getInstance()
+    calendar.set(startYear, startMonth - 1, 1)
+
+    val endCalendar = Calendar.getInstance()
+    endCalendar.set(endYear, endMonth - 1, 1)
+
+    while (calendar.timeInMillis <= endCalendar.timeInMillis) {
+        val currentMonth = calendar.get(Calendar.MONTH) + 1
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentValue = currentYear * 12 + currentMonth
+
+        val domain = existingDataMap[currentValue]
+
+        val placesCount = domain?.perMonthData?.aggregateMetrics()?.uniqueEndLocations ?: 0
+
+        finalGraphData.add(
+            PlacesVisitedGraphData(
+                month = currentMonth,
+                year = currentYear,
+                count = placesCount
+            )
+        )
+
+        calendar.add(Calendar.MONTH, 1)
     }
-    val sortedFilteredDomains = filteredDomains.sortedWith(
-        compareBy<DashboardDomain> { it.monthYear.year }
-            .thenBy { it.monthYear.month }
-    )
-    return sortedFilteredDomains.map { domain ->
-        val rides = domain.perMonthData
-        val monthInt = domain.monthYear.month
-        val yearInt = domain.monthYear.year
-        val placesCount = rides.aggregateMetrics().uniqueEndLocations
-        PlacesVisitedGraphData(monthInt, yearInt, placesCount)
-    }
+
+    return finalGraphData
 }
 
 fun List<PlacesVisitedGraphData>.toPlaceVisitedGraphUIModel(): List<PlacesVisitedGraphUIModel> {
