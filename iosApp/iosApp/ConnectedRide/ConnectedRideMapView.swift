@@ -110,7 +110,7 @@ struct ConnectedRideMapView: View {
                 Section {
                     VStack(spacing: 18) {
                         ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
-                        ForEach(viewModel.groupRiders, id: \.id) { rider in
+                        ForEach(viewModel.groupRiders.sorted(by: {$0.name < $1.name}), id: \.id) { rider in
                             GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup)
                         }
                     }
@@ -281,7 +281,7 @@ struct ConnectedRideMapView: View {
         // Invalidate any existing timer
         viewModel.ongoingRideTimer?.invalidate()
         // Schedule the timer to trigger every 2 min minutes (900 seconds)
-        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) {  _ in
             Task {
                 await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 
