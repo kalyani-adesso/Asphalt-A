@@ -31,6 +31,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.location.AndroidLocationProvider
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
@@ -49,9 +50,9 @@ import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesDetailsScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.joinaride.ConnectedRideEnd
-import com.asphalt.joinaride.ConnectedRideMap
+import com.asphalt.joinaride.ConnectedRideMapScreen
 import com.asphalt.joinaride.EndRidersScreenLoader
-import com.asphalt.joinaride.JoinRideScreen
+import com.asphalt.joinaride.JoinRideMainListScreen
 import com.asphalt.joinaride.RatingThisRide
 import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
@@ -154,7 +155,7 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideMapNavKey,
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
-        is AppNavKey.RideDetails -> true 
+        is AppNavKey.RideDetails -> true
         else -> false
     }
 
@@ -382,7 +383,7 @@ fun NavigationRoot(
                         NotificationScreen(setTopAppBarState = setTopAppBarState)
                     }
                     entry(AppNavKey.JoinRideNavKey) { key ->
-                        JoinRideScreen(
+                        JoinRideMainListScreen(
                             setTopAppBarState = setTopAppBarState,
                             navigateToConnectedRide = {
                                 backStack.add(AppNavKey.ConnectedRideNavKey)
@@ -412,26 +413,8 @@ fun NavigationRoot(
                             onBackPressed()
                         })
                     }
-                    entry(AppNavKey.ConnectedRideNavKey) { key ->
-                        RidersScreenLoader(
-                            setTopAppBarState = setTopAppBarState,
-                            onNavigateToMapScreen = {
-                                backStack.remove(AppNavKey.ConnectedRideNavKey)
-                                backStack.add(AppNavKey.ConnectedRideMapNavKey)
-
-                            }
-                        )
-                    }
-                    entry(AppNavKey.RideProgressNavKey) { key ->
-                        RideProgress(
-                            onClickEndRide = {
-                                backStack.remove(AppNavKey.RideProgressNavKey)
-                                backStack.add(AppNavKey.ConnectedRideNavKey)
-                            },
-                        )
-                    }
                     entry(AppNavKey.ConnectedRideMapNavKey) { key ->
-                        ConnectedRideMap(
+                        ConnectedRideMapScreen(
                             setTopAppBarState = setTopAppBarState,
 //                            onNavigateToMapScreen = {
 //                                backStack.add(AppNavKey.ConnectedRideMapNavKey),
@@ -442,6 +425,23 @@ fun NavigationRoot(
                                 backStack.add(AppNavKey.EndRideLoaderNavKey)
                             }
                         )
+                    }
+                    entry(AppNavKey.ConnectedRideNavKey) { key ->
+                        RidersScreenLoader(
+                            setTopAppBarState = setTopAppBarState,
+                            onNavigateToMapScreen = {
+                                backStack.remove(AppNavKey.ConnectedRideNavKey)
+                                backStack.add(AppNavKey.ConnectedRideMapNavKey)
+
+                            }
+                        )
+                    }
+
+                    entry<AppNavKey.RideProgressNavKey> { key ->
+                        RideProgress(key.ridesID,key.joinRideId, onClickEndRide = {
+                            backStack.remove(AppNavKey.RideProgressNavKey(key.ridesID,key.joinRideId))
+                            backStack.add(AppNavKey.ConnectedRideNavKey)
+                        })
                     }
                     entry(AppNavKey.EndRideLoaderNavKey) { key ->
                         EndRidersScreenLoader(

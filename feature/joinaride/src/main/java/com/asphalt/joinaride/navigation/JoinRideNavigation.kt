@@ -3,7 +3,6 @@ package com.asphalt.joinaride.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavKey
 import com.asphalt.commonui.AppBarState
-import com.asphalt.joinaride.JoinRideScreen
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -118,6 +118,7 @@ class RidesRepository(val apiService: RidesApIService) {
         return apiService.endRide(rideId, rideJoinedId)
     }
 
+    // map purpose  = movement action
     suspend fun getOngoingRides(rideId: String): APIResult<List<ConnectedRideDTO>> {
         return apiService.getJoinedRides(rideId).mapApiResult { response ->
             response.map { (joinedRideId, data) ->

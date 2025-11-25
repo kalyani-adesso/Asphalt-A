@@ -7,6 +7,7 @@ import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -24,15 +25,13 @@ class JoinRideMapViewModel(
    // private val rideId: String
     val androidUserVM: AndroidUserVM by inject()
 
+    val ridesRepo: RidesRepository by inject()
     private val _userId = MutableStateFlow("")
     val userId: StateFlow<String> = _userId
 
     private val _ongoingRides = MutableStateFlow<APIResult<List<ConnectedRideDTO>>?>(null)
     val ongoingRides: StateFlow<APIResult<List<ConnectedRideDTO>>?> = _ongoingRides
 
-    init {
-       // getOngoingRides(ride = rideId)
-    }
 
     fun setUserId() {
         val currentUser = androidUserVM.getCurrentUserUID()
@@ -46,15 +45,10 @@ class JoinRideMapViewModel(
     fun getOngoingRides(ride: String) {
         viewModelScope.launch {
 
-            val apiResult = APIHelperUI.runWithLoader {
-                ridesRepository.getOngoingRides(rideId = ride)
-            }
-        }
-    }
-
-    fun endRide(rideId: String,rideJoinedId: String) {
-        viewModelScope.launch {
-            val result = ridesRepository.endRide(rideId = rideId,rideJoinedId = rideJoinedId)
+//            val apiResult = APIHelperUI.runWithLoader {
+//                ridesRepository.getOngoingRides(rideId = ride)
+//                Log.d("TAG", "getOngoingRides: $ap")
+//            }
         }
     }
 }

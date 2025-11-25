@@ -23,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.asphalt.android.constants.APIConstants.END_RIDE
+import com.asphalt.android.constants.APIConstants.RIDE_JOINED
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -46,13 +51,16 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RideProgress(
+    rideId: String,
+    rideJoinedId: String,
     androidUserVM: AndroidUserVM = koinViewModel(),
+    viewmodel: JoinRideViewModel = koinViewModel(),
     onClickEndRide :() -> Unit,
-
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
 
@@ -190,6 +198,7 @@ fun RideProgress(
                         modifier = Modifier.weight(1f)) {
                         Button(
                             onClick = {
+                               // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
                                 onClickEndRide.invoke()
                             },
                             modifier = Modifier.widthIn(min = 130.dp, max = 130.dp)
@@ -210,11 +219,14 @@ fun RideProgress(
 
                 }
             }
-            Spacer(modifier = Modifier.height(Dimensions.padding10))
+            Spacer(modifier = Modifier.height(height = Dimensions.padding10))
             // end ride button
             RedButton(
                 onClick = {
+                    viewmodel.updateRideStatus(userId = rideId, rideId = rideJoinedId,
+                        status = END_RIDE)
                     onClickEndRide.invoke()
+                    viewmodel.endRide(rideId=rideId, rideJoinedId = rideJoinedId)
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)
@@ -236,6 +248,6 @@ fun RideProgress(
 @Composable
 fun RideProgressPreview() {
 
-    RideProgress(onClickEndRide = {})
+   // RideProgress(onClickEndRide = {})
 
 }

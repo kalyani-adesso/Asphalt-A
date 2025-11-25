@@ -40,12 +40,22 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
+    override suspend fun updateOrganizerStatus(rideId: String, rideStatus: Int): APIResult<Unit> {
+        val rideStatus = mapOf<Any?, Any?>(
+            "rideStatus" to rideStatus
+        )
+        return safeApiCall {
+            patch(rideStatus, "$RIDES_URL/$rideId").body()
+        }
+    }
+
     override suspend fun getSingleRide(rideID: String): APIResult<CreateRideRoot> {
         return safeApiCall {
             get(url = RIDES_URL + "/${rideID}").body()
         }
     }
 
+    // map screen
     override suspend fun joinRide(joinRide: ConnectedRideRoot): APIResult<FirebasePushResponse> {
         return safeApiCall {
             post(joinRide, "$ONGOING_RIDE_URL/${joinRide.rideID}").body()
@@ -67,6 +77,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
+    // button click end ride
     override suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit> {
         return safeApiCall {
             delete("$ONGOING_RIDE_URL/$rideId/$rideJoinedId").body()
@@ -86,15 +97,6 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         return safeApiCall {
             get(url = "$END_RIDE_SUMMARY_URL/$userID").body()
 
-        }
-    }
-
-    override suspend fun updateOrganizerStatus(rideId: String, rideStatus: Int): APIResult<Unit> {
-        val rideStatus = mapOf<Any?, Any?>(
-            "rideStatus" to rideStatus
-        )
-        return safeApiCall {
-            patch(rideStatus, "$RIDES_URL/$rideId").body()
         }
     }
 

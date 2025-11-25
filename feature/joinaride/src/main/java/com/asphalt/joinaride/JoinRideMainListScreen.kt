@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -40,7 +39,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
-import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -67,12 +65,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 @Composable
-fun JoinRideScreen(
+fun JoinRideMainListScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     navigateToConnectedRide:() -> Unit,
-    navigateToEndRide : () -> Unit
-)
+    navigateToEndRide : () -> Unit)
 {
     var toolbarTitle by remember { mutableStateOf("") }
     toolbarTitle = stringResource(R.string.join_ride)
@@ -93,7 +90,7 @@ fun JoinRideScreen(
 fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: () -> Unit,
-    navigateToEndRide: () -> Unit
+    navigateToEndRide: () -> Unit,
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
@@ -315,6 +312,7 @@ fun RiderCard(
                         Dimensions.size8, Alignment.CenterHorizontally
                     ), modifier = Modifier.fillMaxWidth()
                 ) {
+                    // call rider button
                     ElevatedButton(
                         onClick = {
                             navigateToEndRide.invoke()
@@ -337,26 +335,20 @@ fun RiderCard(
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
+                    // join/ rejoin ride button
                     if (ridersList.rideStatus == RIDE_JOINED) {
                         ElevatedButton (
-                            modifier = Modifier.weight(1f)
-                                .height(Dimensions.size50),
+                            modifier = Modifier.weight(weight = 1f)
+                                .height(height = Dimensions.size50),
                             shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
                             colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
                             onClick = {
-//                                val request = ConnectedRideRoot(
-//                                    rideID = ridersList.ridesID,
-//                                    userID = ridersList.participants[0].userId,
-//                                    currentLat = ridersList.startLatitude,
-//                                    currentLong = ridersList.startLongitude,
-//                                    dateTime = ridersList.startDate,
-//                                    isRejoined = false,
-//                                    status = "ACTIVE"
-//                                )
-                                //viewModel.updateRideStatus(userId = request.userID!!,status = RIDE_JOINED)
+//
+//                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
+//                                    status = RIDE_JOINED)
                                 navigateToConnectedRide.invoke()
                             },
-                            contentPadding = PaddingValues(Dimensions.size0)
+                            contentPadding = PaddingValues(all = Dimensions.size0)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -379,20 +371,14 @@ fun RiderCard(
                             }
                         }
                     } else  {
+                        // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
                             onClick = {
-//                                val request = ConnectedRideRoot(
-//                                    rideID = ridersList.ridesID,
-//                                    userID = ridersList.participants[0].userId,
-//                                    currentLat = ridersList.startLatitude,
-//                                    currentLong = ridersList.startLongitude,
-//                                    dateTime = ridersList.startDate,
-//                                    isRejoined = false,
-//                                    status = "ACTIVE"
-//                                )
+                                ridersList.ridesID
+                                // if user trying to join another ride previous will end then new ride join logic pending
                                 viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
-                                    status = RIDE_JOINED)
+                                    status = RIDE_JOINED) // status 3
                                 navigateToConnectedRide.invoke()
                             },
                             buttonHeight = Dimensions.size50,

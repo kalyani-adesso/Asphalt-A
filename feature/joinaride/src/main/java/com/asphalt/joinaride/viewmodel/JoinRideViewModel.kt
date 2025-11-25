@@ -38,11 +38,11 @@ class JoinRideViewModel(
     val searchQuery = _searchQuery.asStateFlow()
     val userRepoImpl: UserRepoImpl by inject()
 
-    private val currentUid = androidUserVM.userState.value?.uid
-
     // join ride
     private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideDTO>?>(null)
     val joinRideResult: StateFlow<APIResult<ConnectedRideDTO>?> = _joinRideResult
+
+    private val currentUid = androidUserVM.userState.value?.uid
     private val _createdBy = MutableStateFlow("")
     val createdBy = _createdBy.asStateFlow()
 
@@ -108,7 +108,7 @@ class JoinRideViewModel(
         if (androidUserVM.getCurrentUserUID() == ride.createdBy) {
             _createdBy.value = "Me"
         } else {
-            _createdBy.value = userDomain!!.name
+            _createdBy.value = userDomain?.name ?: ""
         }
     }
     // Called from UI
@@ -148,6 +148,17 @@ class JoinRideViewModel(
             val res = ridesRepo.reJoinRide(rejoinRide = reJoinRide, ongoingRideId = reJoinRide.rideJoinedID ?: "")
             Log.d("TAG", "JoinRideClick: $res")
 
+        }
+    }
+
+    private val _endRideResult = MutableStateFlow<APIResult<Unit>?>(null)
+    val endRideResult = _endRideResult
+
+    fun endRide(rideId: String,rideJoinedId: String) {
+        viewModelScope.launch {
+            val result = ridesRepo.endRide(rideId = rideId,rideJoinedId = rideJoinedId)
+            _endRideResult.value = result
+            Log.d("TAG", "endRide: $result")
         }
     }
 }
