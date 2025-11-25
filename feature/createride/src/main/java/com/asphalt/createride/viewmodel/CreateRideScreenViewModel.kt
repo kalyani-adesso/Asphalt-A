@@ -37,8 +37,10 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
     val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
+    val show_EndDatePicker = mutableStateOf(false)
 
     val show_timePicker = mutableStateOf(false)
+    val show_EndTimePicker = mutableStateOf(false)
 
     private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
     val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
@@ -48,7 +50,9 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val _showRideTypeError = mutableStateOf(false)
     val _showRideTitleError = mutableStateOf(false)
     val _showRideDateError = mutableStateOf(false)
+    val _showRideEndDateError = mutableStateOf(false)
     val _showRideTimeError = mutableStateOf(false)
+    val _showRideEndTimeError = mutableStateOf(false)
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
     val show_participant_Tab = mutableStateOf(true)
@@ -117,6 +121,14 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             _showRideTimeError.value = true
             return false
         }
+        if (_rideDetailsMutableState.value.endDateString == null) {
+            _showRideEndDateError.value = true
+            return false
+        }
+        if (_rideDetailsMutableState.value.endHour == null) {
+            _showRideEndTimeError.value = true
+            return false
+        }
         return true
     }
 
@@ -154,6 +166,12 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             _rideDetailsMutableState.value.copy(dateMils = dateInMills, dateString = dateString)
     }
 
+    fun updateEndDate(dateInMills: Long?, dateString: String) {
+
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(endDateMils = dateInMills, endDateString = dateString)
+    }
+
     fun updateTime(hrs: Int?, min: Int?, isAm: Boolean, time_text: String) {
         _rideDetailsMutableState.value =
             _rideDetailsMutableState.value.copy(
@@ -161,6 +179,16 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                 mins = min,
                 isAm = isAm,
                 displayTime = time_text
+            )
+    }
+
+    fun updateEndTime(hrs: Int?, min: Int?, isAm: Boolean, time_text: String) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(
+                endHour = hrs,
+                endMins = min,
+                isEndAm = isAm,
+                endDisplayTime = time_text
             )
     }
 
@@ -193,6 +221,14 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     fun showTimePicker(isShow: Boolean) {
         show_timePicker.value = isShow
+    }
+
+    fun showEndDatePicker(isShow: Boolean) {
+        show_EndDatePicker.value = isShow
+    }
+
+    fun showEndTimePicker(isShow: Boolean) {
+        show_EndTimePicker.value = isShow
     }
 
     fun updateParticipantTab(showTab: Boolean) {
