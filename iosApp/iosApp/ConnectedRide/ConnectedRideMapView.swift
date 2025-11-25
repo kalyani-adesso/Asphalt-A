@@ -197,6 +197,11 @@ struct ConnectedRideMapView: View {
                     self.elapsedSeconds += 1
                 }
             }
+            .onChange(of: viewModel.ongoingRideId) { ride in
+                if !ride.isEmpty {
+                    startOngoingRideTimer()
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     HStack() {
@@ -276,7 +281,7 @@ struct ConnectedRideMapView: View {
         // Invalidate any existing timer
         viewModel.ongoingRideTimer?.invalidate()
         // Schedule the timer to trigger every 2 min minutes (900 seconds)
-        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) {  _ in
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
             Task {
                 await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 
@@ -292,6 +297,8 @@ struct ConnectedRideMapView: View {
     }
     
     func stopTimer() {
+        viewModel.ongoingRideTimer?.invalidate()
+        viewModel.ongoingRideTimer = nil
         self.timer?.invalidate()
         self.timer = nil
     }

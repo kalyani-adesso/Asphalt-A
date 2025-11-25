@@ -369,6 +369,9 @@ struct UpComingView: View {
                 RideDetailsView(viewModel: viewModel, ride: $ride)
             })
             .contentShape(Rectangle())
+            .refreshable {
+                await viewModel.getSingleRide(rideId: ride.id)
+            }
         }
     }
     
