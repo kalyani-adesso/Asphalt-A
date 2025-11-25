@@ -348,7 +348,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.date),
+                    text = stringResource(R.string.start_date),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
                     //modifier = Modifier.padding(start = Dimensions.padding16)
@@ -470,7 +470,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "End Date",//stringResource(R.string.date),
+                    text =stringResource(R.string.end_date),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
                     //modifier = Modifier.padding(start = Dimensions.padding16)

@@ -282,7 +282,13 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             startLongitude = _rideDetailsMutableState.value.startLon ?: 0.0,
             endLatitude = _rideDetailsMutableState.value.endLat ?: 0.0,
             endLongitude = _rideDetailsMutableState.value.endLon ?: 0.0,
-            distance = distanceKm
+            distance = distanceKm,
+            endDate = Utils.getDate(
+                _rideDetailsMutableState.value.endDateMils ?: 0,
+                _rideDetailsMutableState.value.endHour ?: 0,
+                _rideDetailsMutableState.value.endMins ?: 0,
+                _rideDetailsMutableState.value.isEndAm
+            )
         )
 
 
