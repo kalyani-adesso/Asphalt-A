@@ -5,12 +5,14 @@ import com.asphalt.android.constants.APIConstants.PARTICIPANTS_URL
 import com.asphalt.android.constants.APIConstants.RIDES_URL
 import com.asphalt.android.constants.APIConstants.ONGOING_RIDE_URL
 import com.asphalt.android.constants.APIConstants.RATINGS
+import com.asphalt.android.constants.APIConstants.MESSAGES
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.GenericResponse
 import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
+import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.BaseAPIService
@@ -85,7 +87,12 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
     override suspend fun getRideSummary(userID: String): APIResult<Map<String, DashboardDTO>>? {
         return safeApiCall {
             get(url = "$END_RIDE_SUMMARY_URL/$userID").body()
+        }
+    }
 
+    override suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {
+        return safeApiCall {
+            post(message, "MESSAGES/${message.onGoingRideID}").body()
         }
     }
 
