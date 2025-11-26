@@ -56,6 +56,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
     val show_participant_Tab = mutableStateOf(true)
+    val assembly_point_check = mutableStateOf(false)
 
 
     private val _fullList = mutableStateOf(ArrayList<RidersList>())
@@ -198,6 +199,15 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     fun updateEnLocation(loc: String) {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(endLocation = loc)
+    }
+
+    fun updateAssembleLocation(loc: String) {
+        _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(assemblyLocation = loc)
+    }
+
+    fun updateAssembleLocation(lat: Double, lon: Double) {
+        _rideDetailsMutableState.value =
+            _rideDetailsMutableState.value.copy(assemblyLat = lat, assemblyLon = lon)
     }
 
     fun updateStartLocation(lat: Double, lon: Double) {
