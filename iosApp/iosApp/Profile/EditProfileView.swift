@@ -70,10 +70,7 @@ struct EditProfileView: View {
                             MechanicView(isOn: $enableMechanic)
                             HStack(spacing: 19) {
                                 ButtonView( title: "CANCEL",
-                                            background: LinearGradient(
-                                                gradient: Gradient(colors: [.white, .white]),
-                                                startPoint: .leading,
-                                                endPoint: .trailing),
+                                            background:AppColor.white,
                                             foregroundColor: AppColor.darkRed,
                                             showShadow: false ,
                                             borderColor: AppColor.darkRed,

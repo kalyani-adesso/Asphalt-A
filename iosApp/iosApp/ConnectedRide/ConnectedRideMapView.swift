@@ -22,6 +22,8 @@ struct ConnectedRideMapView: View {
     @State var showMessagePopup:Bool = false
     @State private var position: MapCameraPosition = .automatic
     @State private var elapsedSeconds = 0
+    @State private var selectedRiderName: String = ""
+    @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
     @State private var index: Int = 0
     var rideModel: JoinRideModel
@@ -584,6 +586,7 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
+                        onMessageTap?()
                         showMessagePopup = true
                         onMessageTap(index)
                     }, label: {
