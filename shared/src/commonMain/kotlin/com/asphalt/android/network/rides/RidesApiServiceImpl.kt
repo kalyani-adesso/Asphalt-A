@@ -92,7 +92,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
 
     override suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {
         return safeApiCall {
-            post(message, "MESSAGES/${message.onGoingRideID}").body()
+            post(message, "$MESSAGES/${message.onGoingRideID}").body()
         }
     }
 
