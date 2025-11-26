@@ -19,7 +19,6 @@ import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
-import com.asphalt.commonui.util.LocationUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
@@ -55,6 +54,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val _showRideEndTimeError = mutableStateOf(false)
     val _showRideStartLocError = mutableStateOf(false)
     val _showRideEndLocError = mutableStateOf(false)
+    val _showRideAssemblyLocError = mutableStateOf(false)
     val show_participant_Tab = mutableStateOf(true)
     val assembly_point_check = mutableStateOf(false)
 
@@ -142,6 +142,12 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             _showRideEndLocError.value = true
             return false
         }
+        if (!assembly_point_check.value) {
+            if (_rideDetailsMutableState.value.assemblyLocation.isNullOrEmpty()) {
+                _showRideAssemblyLocError.value = true
+                return false
+            }
+        }
         return true
     }
 
@@ -170,7 +176,10 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     fun updateEndDate(dateInMills: Long?, dateString: String) {
 
         _rideDetailsMutableState.value =
-            _rideDetailsMutableState.value.copy(endDateMils = dateInMills, endDateString = dateString)
+            _rideDetailsMutableState.value.copy(
+                endDateMils = dateInMills,
+                endDateString = dateString
+            )
     }
 
     fun updateTime(hrs: Int?, min: Int?, isAm: Boolean, time_text: String) {
@@ -258,11 +267,13 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     suspend fun createRide() {
         val totalDistance = FloatArray(2)
-        Location.distanceBetween(_rideDetailsMutableState.value.startLat ?: 0.0,
+        Location.distanceBetween(
+            _rideDetailsMutableState.value.startLat ?: 0.0,
             _rideDetailsMutableState.value.startLon ?: 0.0,
             _rideDetailsMutableState.value.endLat ?: 0.0,
-            _rideDetailsMutableState.value.endLon ?: 0.0,totalDistance)
-        val distanceKm : Double = (totalDistance[0]/1000).toDouble()
+            _rideDetailsMutableState.value.endLon ?: 0.0, totalDistance
+        )
+        val distanceKm: Double = (totalDistance[0] / 1000).toDouble()
         Log.d("TAG", "MapWithCurrentLocation: distance $distanceKm")
         val cal = Calendar.getInstance()
         val userDetails = userRepoImpl.getUserDetails()
@@ -273,6 +284,24 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                         acceptInvite = 0
                     )
                 } ?: emptyMap()
+
+        var hasAssemblyPoint: Boolean = false
+        var assemblyPoint: String? = null
+        var assemblyLat: Double = 0.0
+        var assemblyLon: Double = 0.0
+
+        if (assembly_point_check.value) {
+            hasAssemblyPoint = false
+            assemblyPoint = _rideDetailsMutableState.value.startLocation
+            assemblyLat = _rideDetailsMutableState.value.startLat ?: 0.0
+            assemblyLon = _rideDetailsMutableState.value.startLon ?: 0.0
+        } else {
+            hasAssemblyPoint = true
+            assemblyPoint = _rideDetailsMutableState.value.assemblyLocation
+            assemblyLat = _rideDetailsMutableState.value.assemblyLat ?: 0.0
+            assemblyLon = _rideDetailsMutableState.value.assemblyLon ?: 0.0
+        }
+
         var createRide: CreateRideRoot = CreateRideRoot(
             userID = userDetails?.uid,
             rideType = _rideDetailsMutableState.value.rideType,
@@ -298,9 +327,12 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                 _rideDetailsMutableState.value.endHour ?: 0,
                 _rideDetailsMutableState.value.endMins ?: 0,
                 _rideDetailsMutableState.value.isEndAm
-            )
+            ),
+            hasAssemblyPoint = hasAssemblyPoint,
+            assemblyPoint = assemblyPoint,
+            assemblyLat = assemblyLat,
+            assemblyLon = assemblyLon
         )
-
 
 
         val apiResult = APIHelperUI.runWithLoader {
@@ -331,7 +363,7 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                                             bike = it.primaryBike,
                                             job = if (it.isMechanic)
                                                 "Mechanic" else "",
-                                            imgUrl=it.profilePic
+                                            imgUrl = it.profilePic
                                         )
                                     })
                         _ridersListMutable.value = _fullList.value

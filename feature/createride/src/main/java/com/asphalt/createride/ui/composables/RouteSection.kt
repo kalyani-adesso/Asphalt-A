@@ -69,7 +69,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             }else if(bottomSheetType == assemblyLocation){
                 viewModel.updateAssembleLocation(locName)
                 viewModel.updateAssembleLocation(lat, lon)
-                //viewModel._showRideEndLocError.value = false
+                viewModel._showRideAssemblyLocError.value = false
             }
             bottomSheetType = 0
         }, onDismiss = {
@@ -285,7 +285,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    bottomSheetType = endLocation
+                    bottomSheetType = assemblyLocation
                 }
                 .height(Dimensions.padding50)
                 .padding(start = Dimensions.padding16, end = Dimensions.padding16)
@@ -293,7 +293,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
                 )
                 .then(
-                    if (viewModel._showRideEndLocError.value) {
+                    if (viewModel._showRideAssemblyLocError.value) {
                         Modifier.border(
                             width = Dimensions.padding1,
                             color = VividRed,
@@ -318,10 +318,10 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             )
 
             Text(
-                text = viewModel.rideDetailsState.value.endLocation
+                text = viewModel.rideDetailsState.value.assemblyLocation
                     ?: stringResource(R.string.enter_destination),
                 style = Typography.bodyMedium, maxLines = 1,
-                color = if (viewModel.rideDetailsState.value.endLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
+                color = if (viewModel.rideDetailsState.value.assemblyLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
             )
         }
     }
