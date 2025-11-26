@@ -22,13 +22,15 @@ struct ConnectedRideMapView: View {
     @State var showMessagePopup:Bool = false
     @State private var position: MapCameraPosition = .automatic
     @State private var elapsedSeconds = 0
+    @State private var selectedRiderName: String = ""
+    @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
     var rideModel: JoinRideModel
     
     var body: some View {
         ZStack{
             if showMessagePopup{
-                MessagePopupView(isPresented: $showMessagePopup, riderName: "Sooraj" , delayText: "delayed by 10mins")
+                MessagePopupView(isPresented: $showMessagePopup, riderName: selectedRiderName  , delayText: selectedRiderDelayText)
                     .transition(.scale)
                     .zIndex(1)
             }
@@ -111,7 +113,11 @@ struct ConnectedRideMapView: View {
                     VStack(spacing: 18) {
                         ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
                         ForEach(viewModel.groupRiders, id: \.id) { rider in
-                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup)
+                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup,
+                                           onMessageTap: {
+                                selectedRiderName = rider.name
+                                selectedRiderDelayText = rider.status.rawValue
+                            })
                         }
                     }
                     .padding(.bottom,16)
@@ -536,6 +542,7 @@ struct GroupRiderView: View {
     let speed: String
     let subTitle:String
     @Binding var showMessagePopup: Bool
+    var onMessageTap: (() -> Void)?
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -578,6 +585,7 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
+                        onMessageTap?()
                         showMessagePopup = true
                     }, label: {
                         AppIcon.Home.message
