@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object Dimensions {
+
     val padding = 16.dp
     val padding1 = 1.dp
     val padding2 = 2.dp
@@ -107,8 +108,10 @@ object Dimensions {
     val size50 = 50.dp
     val size56 = 56.dp
 
+
     val size73 = 73.dp
     val size81 = 81.dp
+    val size140=140.dp
     val size220 = 220.dp
     val size200 = 200.dp
     val size210 = 210.dp

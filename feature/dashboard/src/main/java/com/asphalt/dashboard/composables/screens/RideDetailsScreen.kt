@@ -146,6 +146,14 @@ fun UsersList(viewModel: RidesDetailsViewModel) {
             )
     ) {
         Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Text(
+            text = stringResource(R.string.participants),
+            style = TypographyMedium.titleMedium,
+            maxLines = 1,
+            modifier = Modifier.padding(start = Dimensions.padding16),
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
         val userList = viewModel.ridersList.value
         userList.forEach { user ->
             UserRow(user)
@@ -187,8 +195,9 @@ fun UserRow(user: RidersList) {
                             modifier = Modifier.border(
                                 width = Dimensions.size2pt5,
                                 color = if (user.inviteStatus ==
-                                    APIConstants.RIDE_ACCEPTED||
-                                    user.inviteStatus == APIConstants.RIDE_JOINED)
+                                    APIConstants.RIDE_ACCEPTED ||
+                                    user.inviteStatus == APIConstants.RIDE_JOINED
+                                )
                                     GreenLIGHT
                                 else if (user.inviteStatus == APIConstants.RIDE_INVITED)
                                     LightOrange
@@ -202,8 +211,9 @@ fun UserRow(user: RidersList) {
                         Image(
                             painter =
                                 if (user.inviteStatus ==
-                                    APIConstants.RIDE_ACCEPTED||
-                                    user.inviteStatus == APIConstants.RIDE_JOINED)
+                                    APIConstants.RIDE_ACCEPTED ||
+                                    user.inviteStatus == APIConstants.RIDE_JOINED
+                                )
                                     painterResource(R.drawable.ic_online_icon)
                                 else if (user.inviteStatus == APIConstants.RIDE_INVITED)
                                     painterResource(R.drawable.ic_online_icon_orange)
@@ -272,8 +282,9 @@ fun UserRow(user: RidersList) {
                             } else {
                                 Image(
                                     painter = if (user.inviteStatus ==
-                                        APIConstants.RIDE_ACCEPTED||
-                                        user.inviteStatus == APIConstants.RIDE_JOINED)
+                                        APIConstants.RIDE_ACCEPTED ||
+                                        user.inviteStatus == APIConstants.RIDE_JOINED
+                                    )
                                         painterResource(R.drawable.ic_tick_accept)
                                     else if (user.inviteStatus == APIConstants.RIDE_INVITED)
                                         painterResource(R.drawable.ic_pending)
@@ -443,8 +454,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
+                val count = viewModel.ridesData.value?.participants?.size ?: 0
                 Text(
-                    text = "${viewModel.ridesData.value?.participants?.size ?: ""}" + " " + stringResource(
+                    text = "${(count + 1)}" + " " + stringResource(
                         R.string.riders
                     ),
                     style = Typography.bodyMedium,

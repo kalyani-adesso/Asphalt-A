@@ -84,7 +84,13 @@ actual class AuthenticatorImpl {
     }
 
     actual suspend fun resetPassword(email: String): Result<String> {
-        TODO("Not yet implemented")
+        return try {
+            val auth = FirebaseAuth.getInstance()
+            auth.sendPasswordResetEmail(email).await()  // <- suspend until complete
+            Result.success("Password reset email sent successfully")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     actual suspend fun logout(): Result<String> {

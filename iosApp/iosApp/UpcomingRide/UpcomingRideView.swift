@@ -23,10 +23,8 @@ struct UpcomingRideView: View {
     @State private var openGallery = false
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
-    
+
     var body: some View {
-        
-        
         ZStack{
             NavigationStack {
                 SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
@@ -63,17 +61,27 @@ struct UpcomingRideView: View {
                     .contentShape(Rectangle())
                     VStack {
                         List {
+                            let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                            
+                            if filtered.isEmpty {
+                                Text("No rides found")
+                                    .font(KlavikaFont.bold.font(size: 16))
+                                    .foregroundColor(AppColor.stoneGray)
+                            }
+                            else{
+                                
                             ForEach($viewModel.rides.indices.filter { index in
                                 viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
                             }, id: \.self) { index in
                                 UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
-                                    selectedRideId = rideId  // open upload flow for this ride
-                                    selectedImages = []  // clear previously selected images
-                                    withAnimation(.easeInOut) { activePopup = .uploadOptions } 
+                                    selectedRideId = rideId
+                                    selectedImages = []
+                                    withAnimation(.easeInOut) { activePopup = .uploadOptions }
                                 }
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                             }
+                        }
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
@@ -114,9 +122,16 @@ struct UpcomingRideView: View {
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
-                        subMessage: "Your ride has been created and is now live for other riders to join."
-                    )
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: LinearGradient(
+                            gradient: Gradient(colors: [
+                                AppColor.lightGreen,
+                                AppColor.lightGreen,
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ), foregroundColor: .spanishGreen
                     
+                    )
                     Spacer()
                 }
                 .frame(width: 390, height: 620)
@@ -147,8 +162,6 @@ struct UpcomingRideView: View {
                 withAnimation { activePopup = .previewSelected }
             }
         }) {
-            //TODO: Check photo picker file is missing.
-//            PhotoPicker(images: $selectedImages)
         }
         .zIndex(showpopup ? 2 : 0)
         .task{
@@ -160,7 +173,6 @@ struct UpcomingRideView: View {
             await viewModel.fetchAllUsers()
         }
     }
-    
     
     private func handleUpload() {
         guard let rideId = selectedRideId else { return }
@@ -243,6 +255,7 @@ struct UpComingView: View {
     @State private var showSelectedPopup = false
     @State private var selectedImages: [UIImage] = []
     @State private var openGallery = false
+    @State private var showRideDetails: Bool = false
     var onAddPhotos: ((String) -> Void)? = nil
     
     var body: some View {
@@ -330,7 +343,12 @@ struct UpComingView: View {
                     
                     Button(action: {
                         Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            if ride.status == .upcoming {
+                                self.showRideDetails = true
+                                await viewModel.getSingleRide(rideId: ride.id)
+//                            } else {
+//                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            }
                         }
                     }) {
                         Text(ride.rideViewAction.rawValue.uppercased())
@@ -347,7 +365,13 @@ struct UpComingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(AppColor.listGray)
             )
+            .navigationDestination(isPresented: $showRideDetails, destination: {
+                RideDetailsView(viewModel: viewModel, ride: $ride)
+            })
             .contentShape(Rectangle())
+            .refreshable {
+                await viewModel.getSingleRide(rideId: ride.id)
+            }
         }
     }
     
@@ -432,7 +456,6 @@ struct ButtonBackground: ViewModifier {
         }
     }
 }
-
 
 #Preview {
     UpcomingRideView()

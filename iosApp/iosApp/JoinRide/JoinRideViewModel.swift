@@ -29,6 +29,7 @@ struct JoinRideModel: Identifiable,Hashable {
     let endLat:Double
     let endLong:Double
     let rideJoined:Bool
+    let participants: [ParticipantData]? 
 }
 
 @MainActor
@@ -41,6 +42,9 @@ final class JoinRideViewModel: ObservableObject {
     private var userRepository: UserRepository
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     @Published var isRideLoading = false
+    @Published var showRideAlreadyActivePopup = false
+    @Published var totalRides:Int = 0
+    @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
         didSet {
             searchRides()
@@ -71,11 +75,24 @@ extension JoinRideViewModel {
         do {
             self.isRideLoading = true
             let rideArray = try await getAllRidesAsync()
-
-            let filteredRideArray = rideArray.filter {
-                $0.createdBy == MBUserDefaults.userIdStatic ||
-                ($0.participants.first(where: { $0.userId == MBUserDefaults.userIdStatic })?.inviteStatus == 1)
+            
+            let filteredRideArray = rideArray.filter { ride in
+                guard let startEpoch = ride.startDate else { return false }
+                
+                let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
+                // 1. Ignore past rides
+                guard startDate >= Date() else { return false }
+                // 2. Determine current user role
+                let isCreator = ride.createdBy == currentUserId
+                let participantRecord = ride.participants.first { $0.userId == currentUserId }
+                let isParticipant = participantRecord != nil
+                // 3. Hide ended rides
+                if isCreator, ride.rideStatus == 4 { return false }
+                if isParticipant, participantRecord?.inviteStatus == 4 { return false }
+                // 4. Show only creator or participant rides
+                return isCreator || isParticipant
             }
+            
             
             var joinRideModels: [JoinRideModel] = []
             
@@ -83,17 +100,24 @@ extension JoinRideViewModel {
                 guard let startEpoch = ride.startDate else { continue }
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 let dateString = self.formatDate(startDate)
+                let participants = ride.participants
                 
                 // Fetch user name asynchronously
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
-                let rideJoinedStatus = ride.participants.first(where: {$0.userId == (MBUserDefaults.userIdStatic ?? "") })?.inviteStatus == 3
+                self.totalRides = filteredRideArray.count
+                
+                let currentUserId = MBUserDefaults.userIdStatic
+                let userInviteStatus = ride.participants.first { $0.userId == currentUserId }?.inviteStatus
+                let isCreator = ride.createdBy == currentUserId
+                let rideJoinedStatus = (userInviteStatus == 3) || (ride.rideStatus == 3 && isCreator)
+
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
                         title: ride.rideTitle ?? "",
-                        organizer: userName?.0 ?? "",
+                        organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
@@ -105,8 +129,9 @@ extension JoinRideViewModel {
                         startLat: ride.startLatitude,
                         startLong: ride.startLongitude,
                         endLat: ride.endLatitude,
-                        endLong: ride.endLongitude, rideJoined: rideJoinedStatus
-                        
+                        endLong: ride.endLongitude,
+                        rideJoined: rideJoinedStatus,
+                        participants: participants
                     )
                     joinRideModels.append(model)
                 }
@@ -145,7 +170,7 @@ extension JoinRideViewModel {
                 if let success = result as? APIResultSuccess<AnyObject>,
                    let domainList = success.data as? [UserDomain],
                    let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
-
+                    
                     let userName = matchedUser.name
                     let contactNumber = matchedUser.contactNumber
                     continuation.resume(returning: (userName, contactNumber))
@@ -155,7 +180,7 @@ extension JoinRideViewModel {
             }
         }
     }
-
+    
     func changeRideInviteStatus(rideId:String, userId:String, inviteStatus:Int32) {
         rideRepository.changeRideInviteStatus(
             rideID: rideId,
@@ -189,5 +214,99 @@ extension JoinRideViewModel {
             ride.description.lowercased().contains(query) ||
             ride.route.lowercased().contains(query)
         }
+    }
+    // MARK: - Join Flow
+    func handleJoin(for ride: JoinRideModel) async -> JoinRideModel? {
+        if ride.rideJoined { return ride }
+        
+        if let active = await getUserActiveRide() {
+            if active.ridesID != ride.rideId {
+                showRideAlreadyActivePopup = true
+                return nil
+            }
+        }
+        
+        await joinRide(ride)
+        return ride
+    }
+    
+    func joinRide(_ ride: JoinRideModel) async {
+        let uid = currentUserId
+        
+        if ride.userId == uid {
+            updateOrganizerStatus(rideId: ride.rideId, rideStatus: 3)
+        } else {
+            changeRideInviteStatus(rideId: ride.rideId, userId: uid, inviteStatus: 3)
+        }
+    }
+    
+    func endActiveRide() async {
+        guard let active = await getUserActiveRide() else { return }
+        let uid = currentUserId
+        
+        if active.createdBy == uid {
+            updateOrganizerStatus(rideId: active.ridesID ?? "", rideStatus: 4)
+        } else {
+            changeRideInviteStatus(
+                rideId: active.ridesID ?? "",
+                userId: uid,
+                inviteStatus: 4
+            )
+        }
+        showRideAlreadyActivePopup = false
+        
+        endRide(rideId: active.ridesID ?? "")
+        
+    }
+    
+    func endRide(rideId: String) {
+        let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
+        rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
+            if let error = error {
+                print("Failed to end ride: \(error.localizedDescription)")
+            } else {
+                print("Successfully ended ride")
+            }
+        }
+    }
+    
+    func getUserActiveRide() async -> RidesData? {
+        do {
+            let result = try await rideRepository.getAllRide()
+            guard
+                let success = result as? APIResultSuccess<AnyObject>,
+                let rides = success.data as? [RidesData]
+            else { return nil }
+            
+            let uid = currentUserId
+            let today = Calendar.current.startOfDay(for: Date())
+            
+            return rides.first { ride in
+                guard let epoch = ride.startDate else { return false }
+                let date = Date(timeIntervalSince1970: Double(truncating: epoch) / 1000)
+                if date < today { return false }
+                
+                let isCreator = ride.createdBy == uid && ride.rideStatus == 3
+                let isParticipant = ride.participants.contains {
+                    $0.userId == uid && $0.inviteStatus == 3
+                }
+                
+                return isCreator || isParticipant
+            }
+        }
+        catch {
+            print("Error checking ongoing ride:", error)
+        }
+        return nil
+    }
+    
+    func updateOrganizerStatus(rideId:String,rideStatus:Int) {
+        rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus:Int32(rideStatus) , completionHandler: { status, error in
+            if let error = error {
+                print("Failed to update ride status: \(error.localizedDescription)")
+            } else {
+                print("Successfully updated ride status")
+            }
+        })
     }
 }

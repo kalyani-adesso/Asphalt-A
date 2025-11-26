@@ -10,8 +10,8 @@ import Charts
 
 struct JourneyCardView: View {
     @EnvironmentObject var home: HomeViewModel 
-    @State private var selectedOption = "Last 4 months"
-    @State private var currentSlices: [JourneySlice] = []
+    @State private var selectedOption = "This month"
+   
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -45,7 +45,7 @@ struct JourneyCardView: View {
                 }
             }
             VStack {
-                DonutChartView(slices: currentSlices)
+                DonutChartView(slices: home.currentSlices)
                     .frame(width: 190, height: 190)
                 
                 VStack(spacing: 8) {
@@ -71,11 +71,12 @@ struct JourneyCardView: View {
         )
         .padding(.top,20)
         .onAppear {
-            currentSlices = home.getJourneySlices(for: selectedOption)
+            home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
         }
         .onChange(of: selectedOption) { newValue in
             withAnimation {
-                currentSlices = home.getJourneySlices(for: newValue)
+                home.currentSlices = home.getJourneySlices(for: newValue)
+                home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: newValue)
             }
         }
     }
@@ -121,7 +122,7 @@ extension Array {
 // MARK: - Donut Chart
 struct DonutChartView: View {
     let slices: [JourneySlice]
-    
+    @EnvironmentObject var home: HomeViewModel 
     var body: some View {
         Chart {
             ForEach(slices) { s in
@@ -142,7 +143,7 @@ struct DonutChartView: View {
             VStack {
                 AppIcon.Home.chart
                     .frame(width: 38, height: 38)
-                Text("Total \(Int(slices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
+                Text("Total \(Int(home.currentSlices.first(where: { $0.category == "Total Rides" })?.value ?? 0)) Rides")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

@@ -41,6 +41,7 @@ import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
 import com.asphalt.dashboard.composables.screens.sections.DashboardUpcomingRide
 import com.asphalt.dashboard.composables.screens.sections.PlacesVisitedGraph
 import com.asphalt.dashboard.composables.screens.sections.RideStatsPerMonth
+import com.asphalt.dashboard.viewmodels.DashboardRideSummaryVM
 import com.asphalt.dashboard.viewmodels.NotificationViewModel
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
@@ -56,7 +57,8 @@ fun DashBoardScreen(
     notificationViewModel: NotificationViewModel = koinActivityViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     notificationsClick: () -> Unit, creatRideClick: () -> Unit,
-    joinRideClick : () -> Unit
+    joinRideClick: () -> Unit,
+    dashboardRideSummaryVM: DashboardRideSummaryVM = koinViewModel()
 ) {
 
     val context = LocalContext.current
@@ -96,7 +98,7 @@ fun DashBoardScreen(
         }
     }
     val helloUser = stringResource(R.string.hello_user)
-    LaunchedEffect(Unit,locationStatus) {
+    LaunchedEffect(Unit, locationStatus) {
 
         setTopAppBarState(
             AppBarState(
@@ -123,6 +125,10 @@ fun DashBoardScreen(
                 })
         )
     }
+    LaunchedEffect(Unit) {
+        dashboardRideSummaryVM.getRidesData()
+    }
+    val dashboardSummary = dashboardRideSummaryVM.dashboardSummary.collectAsStateWithLifecycle()
 
 
     ComposeUtils.DefaultColumnRoot(
@@ -136,9 +142,9 @@ fun DashBoardScreen(
         }, {
             joinRideClick.invoke()
         })
-        RideStatsPerMonth()
+        RideStatsPerMonth(dashboardSummary.value)
         DashboardUpcomingRide(upcomingRideClick)
-        AdventureJourney()
-        PlacesVisitedGraph()
+        AdventureJourney(dashboardSummary.value)
+        PlacesVisitedGraph(dashboardSummary.value)
     }
 }

@@ -48,6 +48,8 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             val userList = ridesDetails.value?.participants ?: emptyList()
             val list = ArrayList(userList.mapNotNull { participant ->
+                if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
+
                 users.find { it.uid == participant.userId }?.let { user ->
                     RidersList(
                         uid = user.uid,
@@ -71,9 +73,14 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
             val organizer = ridesDetails.value?.createdBy ?: ""
             if (!organizer.isNullOrEmpty()) {
                 val organizerData = users.find { it.uid == organizer }
+                var name = if (organizerData?.uid == user?.uid) {
+                    "You"
+                } else {
+                    organizerData?.name
+                }
                 val temp = RidersList(
                     organizerData?.uid ?: "",
-                    organizerData?.name ?: "",
+                    name ?: "",//organizerData?.name ?: "",
                     organizerData?.profilePic ?: "",
                     true,
                     APIConstants.RIDE_ACCEPTED,

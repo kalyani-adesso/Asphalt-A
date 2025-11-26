@@ -191,13 +191,13 @@ object Utils {
         val hour = hour
         val minute = mins
 
-
-        calendar.set(Calendar.HOUR, hour) // 1–12 hour format
+        val hour24 = if (isAm) hour % 12 else (hour % 12) + 12
+        calendar.set(Calendar.HOUR_OF_DAY, hour24)
         calendar.set(Calendar.MINUTE, minute)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
 
-        calendar.set(Calendar.AM_PM, if (isAm) Calendar.AM else Calendar.PM)
+        //calendar.set(Calendar.AM_PM, if (isAm) Calendar.AM else Calendar.PM)
 
         val updatedMillis = calendar.timeInMillis
         return updatedMillis;

@@ -1,7 +1,7 @@
 package com.asphalt.android.model.rides
 
 class RidesData(
-    var ridesID:String?=null,
+    var ridesID: String? = null,
     var createdBy: String? = null,
     var rideType: String? = null,
     var rideTitle: String? = null,
@@ -15,5 +15,7 @@ class RidesData(
     var startLongitude: Double = 0.0,
     var endLatitude: Double = 0.0,
     var endLongitude: Double = 0.0,
-    var rideDistance:Double = 0.0
+    var rideDistance: Double = 0.0,
+    var rideStatus: Int = 0,
+    var endDate: Long? = null
 )

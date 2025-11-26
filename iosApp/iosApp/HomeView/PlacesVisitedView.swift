@@ -11,7 +11,7 @@ import Charts
 struct PlacesVisitedView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var monthOffset = 0
-    @State private var visiblePlaces: [PlacesMonth] = []
+    @State private var visiblePlaces: [HomeViewModel.PlacesMonth] = []
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
@@ -90,11 +90,15 @@ struct PlacesVisitedView: View {
                 }
             }
             .chartYAxis {
-                AxisMarks(position: .leading, values: .automatic(desiredCount: 6)) { value in
+                AxisMarks(
+                    position: .leading,
+                    values: Array(stride(from: 0, through: 10, by: 2))
+                ) { value in
                     AxisGridLine()
                     AxisValueLabel()
                 }
             }
+
             .chartXAxis {
                 AxisMarks(values: .automatic) { value in
                     AxisValueLabel()
@@ -124,6 +128,9 @@ struct PlacesVisitedView: View {
             .frame(height: 180)
             .padding(.top, 4)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .placesDataUpdated)) { _ in
+            updateVisiblePlaces()
+        }
         .onAppear {
             updateVisiblePlaces()
         }
@@ -138,13 +145,27 @@ struct PlacesVisitedView: View {
         let baseDate = calendar.date(byAdding: .month, value: monthOffset, to: Date()) ?? Date()
         
         visiblePlaces = (0..<6).compactMap { i in
-            if let monthDate = calendar.date(byAdding: .month, value: -i, to: baseDate) {
-                let monthName = formatter.string(from: monthDate)
-                let count = home.placesByMonth.first(where: { $0.month == monthName })?.placesCount ?? Int.random(in: 0...8)
-                return PlacesMonth(month: monthName, placesCount: count)
+            if let monthDate = calendar.date(byAdding: .month, value: Int(-i), to: baseDate) {
+                
+                let m = calendar.component(.month, from: monthDate)
+                let y = calendar.component(.year, from: monthDate)
+                let short = formatter.string(from: monthDate)
+                
+                if let dataPoint = home.placesByMonth.first(where: {
+                    $0.monthIndex == m && $0.year == y
+                }) {
+                    return dataPoint
+                } else {
+                    return HomeViewModel.PlacesMonth(
+                        month: short,
+                        year: y,
+                        placesCount: 0, monthIndex: m
+                    )
+                }
             }
             return nil
-        }.reversed()
+        }
+        .reversed()
     }
 }
 

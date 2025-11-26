@@ -14,11 +14,18 @@ object APIConstants {
     const val GENERIC_ERROR_MSG = "Something went wrong!"
     const val PLACE_SEARCH = "/search"
 
+    const val RATINGS = "/ratings"
+
     const val ONGOING_RIDE_URL = "/ongoing_ride"
+
+    const val END_RIDE_SUMMARY_URL = "/endRide_summary"
+
+    const val MESSAGES = "/messages"
 
     //Ride Invite Status
     const val RIDE_INVITED = 0
     const val RIDE_ACCEPTED = 1
     const val RIDE_DECLINED = 2
     const val RIDE_JOINED = 3
+    const val END_RIDE = 4
 }
