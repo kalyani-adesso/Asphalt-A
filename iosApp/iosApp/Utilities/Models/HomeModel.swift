@@ -11,8 +11,7 @@ import SwiftUI
 struct RideStat: Identifiable {
     let id = UUID()
     let title: String
-    let value: Int
-    let color: Color
+    let value: String
     let icon: Image
 }
 
