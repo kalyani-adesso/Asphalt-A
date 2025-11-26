@@ -96,10 +96,7 @@ struct QueryPopupView: View {
                 
                 HStack(spacing: 19) {
                     ButtonView( title: AppStrings.Query.qsCancel,
-                                background: LinearGradient(
-                                    gradient: Gradient(colors: [.white, .white]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing),
+                                background: AppColor.white,
                                 foregroundColor: AppColor.darkRed,
                                 showShadow: false ,
                                 borderColor: AppColor.darkRed, onTap: {

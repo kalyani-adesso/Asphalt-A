@@ -176,10 +176,7 @@ struct RidePopupView: View {
             ButtonView(
                 title: AppStrings.RidePopup.cancel ,
                 fontSize: 16 ,
-                background: LinearGradient(
-                    gradient: Gradient(colors: [.white, .white]),
-                    startPoint: .leading,
-                    endPoint: .trailing),
+                background: AppColor.white,
                 foregroundColor: AppColor.black,
                 showShadow: false,
                 borderColor: AppColor.stoneGray.opacity(0.3),
@@ -192,10 +189,7 @@ struct RidePopupView: View {
                 ButtonView(
                     title: AppStrings.RidePopup.addMore,
                     fontSize: 16 ,
-                    background: LinearGradient(
-                        gradient: Gradient(colors: [AppColor.celticBlue, AppColor.celticBlue]),
-                        startPoint: .leading,
-                        endPoint: .trailing),
+                    background: AppColor.celticBlue,
                     foregroundColor: AppColor.white,
                     showShadow: false,
                     borderColor: AppColor.stoneGray.opacity(0.3),
@@ -207,10 +201,7 @@ struct RidePopupView: View {
             ButtonView(
                 title: activePopup == .uploadOptions ? "SELECT PHOTOS" : "UPLOAD" ,
                 fontSize: 16 ,
-                background: LinearGradient(
-                    gradient: Gradient(colors: [AppColor.celticBlue, AppColor.celticBlue]),
-                    startPoint: .leading,
-                    endPoint: .trailing),
+                background:  AppColor.celticBlue,
                 foregroundColor: AppColor.white,
                 showShadow: false,
                 borderColor: AppColor.stoneGray.opacity(0.3),

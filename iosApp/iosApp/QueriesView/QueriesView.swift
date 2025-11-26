@@ -15,13 +15,6 @@ struct QueriesView: View {
     var onBackToHome: (() -> Void)? = nil
     var body: some View {
         NavigationStack {
-            CustomTopNavBar(
-                title: "Queries",
-                onBack: onBackToHome,
-                onAskTapped: {
-                    showAskPopup = true
-                }
-            )
             ZStack {
                 VStack(spacing: 0) {
                     // Fixed top area (search + filters)
