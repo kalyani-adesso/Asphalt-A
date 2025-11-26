@@ -61,11 +61,7 @@ struct RouteView: View {
         HStack(spacing: 15) {
             ButtonView(
                 title: AppStrings.CreateRideButton.previous.rawValue,
-                background: LinearGradient(
-                    gradient: Gradient(colors: [.white, .white]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ),
+                background:AppColor.white,
                 foregroundColor: AppColor.celticBlue,
                 showShadow: false,
                 borderColor: AppColor.celticBlue,

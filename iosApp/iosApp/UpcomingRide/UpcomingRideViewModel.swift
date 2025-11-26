@@ -131,8 +131,8 @@ class UpcomingRideViewModel: ObservableObject {
                     // Creator ride status 3 = joined = upcoming
                     if ride.rideStatus == 3 {
                         rideAction = .upcoming
-                        rideStatus = .queue
-                        rideViewAction = .checkResponse
+                        rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
+                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
                     }
                     
                     // Creator ride status 4 = ended = history
@@ -145,8 +145,8 @@ class UpcomingRideViewModel: ObservableObject {
                     // Default creator: future ride
                     else {
                         rideAction = .upcoming
-                        rideStatus = ride.participants.isEmpty ? .upcoming : .queue
-                        rideViewAction = ride.participants.isEmpty ? .viewDetails : .checkResponse
+                        rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
+                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
                     }
                 }
                 
@@ -159,18 +159,13 @@ class UpcomingRideViewModel: ObservableObject {
                         rideStatus = .invite
                         rideViewAction = .decline
                         
-                    case 1:
+                    case 1, 3 :
                         rideAction = .upcoming
-                        rideStatus = ride.participants.isEmpty ? .upcoming : .queue
-                        rideViewAction = ride.participants.isEmpty ? .viewDetails : .checkResponse
+                        rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
+                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
                         
                     case 2:
                         continue  // hide
-                        
-                    case 3:
-                        rideAction = .upcoming
-                        rideStatus = .queue
-                        rideViewAction = .checkResponse
                         
                     case 4:
                         rideAction = .history
@@ -348,9 +343,9 @@ class UpcomingRideViewModel: ObservableObject {
             }
 
             // Count statuses
-            let pendingCount = finalParticipants.filter { $0.inviteStatus == 0 }.count
-            let declinedCount = finalParticipants.filter { $0.inviteStatus == 2 }.count
-            let confirmedCount = finalParticipants.filter { [1,3].contains($0.inviteStatus) }.count
+            let pendingCount = finalParticipants.filter { $0.inviteStatus == 0 && $0.userId != currentUserId }.count
+            let declinedCount = finalParticipants.filter { $0.inviteStatus == 2 && $0.userId != currentUserId }.count
+            let confirmedCount = finalParticipants.filter { [1,3].contains($0.inviteStatus) && $0.userId != currentUserId }.count
 
             // Joined or not
             let rideJoinedStatus = finalParticipants.contains { $0.userId == currentUserId && $0.inviteStatus == 3 }

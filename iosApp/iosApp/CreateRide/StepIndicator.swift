@@ -22,22 +22,8 @@ struct StepIndicator: View {
                 .padding(10)
                 .background(
                     isActive
-                    ? LinearGradient(
-                        gradient: Gradient(colors: [
-                            AppColor.royalBlue,
-                            AppColor.pursianBlue
-                        ]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    : LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.clear,
-                            Color.clear,
-                        ]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
+                    ? AppColor.celticBlue
+                    : AppColor.white
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             

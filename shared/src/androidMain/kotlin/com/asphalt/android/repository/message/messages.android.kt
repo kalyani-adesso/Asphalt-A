@@ -4,7 +4,7 @@ import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.message.MessageDTO
 import kotlinx.coroutines.flow.Flow
 
-actual class messages {
+actual class MessageImpl {
     actual suspend fun receiveMessage(rideId: String): Flow<APIResult<List<MessageDTO>>> {
         TODO("Not yet implemented")
     }

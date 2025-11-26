@@ -11,7 +11,7 @@ struct Snackbar: View {
     let message: String
     let subMessage: String
     let icon: Image
-    var background: LinearGradient? = nil
+    var background: Color? = nil
     var foregroundColor: Color = AppColor.white
     var showShadow: Bool = true
     var borderColor: Color? = nil
@@ -36,15 +36,7 @@ struct Snackbar: View {
             }
             .padding(.all, 15)
             .background(
-                background ??
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        AppColor.royalBlue,
-                        AppColor.pursianBlue,
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                background
             )
             .cornerRadius(15)
             .overlay(

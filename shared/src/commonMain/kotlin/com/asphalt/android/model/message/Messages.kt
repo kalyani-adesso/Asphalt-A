@@ -30,5 +30,5 @@ data class MessageDTO(
     val receiverID: String,
     val receiverName: String,
     val message: String,
-    val onGoingRideID: Double
+    val onGoingRideID: String
 )

@@ -9,9 +9,8 @@ import SwiftUI
 
 struct MessagePopupView: View {
     @Binding var isPresented: Bool
-    let riderName: String
-    let delayText: String
-        
+    let viewModel:ConnectedRideViewModel
+
         @State private var message: String = ""
         @Environment(\.dismiss) var dismiss
 
@@ -33,7 +32,7 @@ struct MessagePopupView: View {
                             .clipShape(Circle())
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Message \(riderName)")
+                            Text("Message \(viewModel.rider.name)")
                                 .foregroundColor(AppColor.black)
                                 .font(KlavikaFont.bold.font(size: 18))
                             
@@ -42,60 +41,117 @@ struct MessagePopupView: View {
                                     .fill(Color.orange)
                                     .frame(width: 8, height: 8)
                                 
-                                Text(delayText)
+                                Text(rideStatus)
                                     .foregroundColor(AppColor.grey)
                                     .font(KlavikaFont.regular.font(size: 14))
                             }
                         }
-                        
-                        Spacer()
                     }
+                    
+                    Spacer()
+                }
+                // PREVIOUS MESSAGE CARD
+                if let last = previousMessages.last {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Quick Messages")
-                            .foregroundColor(AppColor.darkCharcol)
-                            .font(KlavikaFont.regular.font(size: 14))
                         
-                        // Grid buttons
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12) {
-                            ForEach(quickMessages, id: \.self) { text in
-                                Button {
-                                    message = text
-                                } label: {
-                                    Text(text)
-                                        .foregroundColor(AppColor.black)
-                                        .font(KlavikaFont.bold.font(size: 14))
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 14)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(AppColor.bluishGray, lineWidth: 2)
-                                        )
+                        // Header row with the rider avatar + name + time
+                        HStack(spacing: 12) {
+                            AppImage.Profile.profile
+                                .resizable()
+                                .frame(width: 36, height: 36)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(AppColor.green, lineWidth: 2))
+                            
+                            HStack(spacing: 2) {
+                                Text("Sooraj ")
+                                    .font(KlavikaFont.bold.font(size: 16))
+                                    .foregroundColor(AppColor.black)
+                                Spacer()
+                                HStack(spacing: 4) {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.gray)
+                                    
+                                    Text("Just now")
+                                        .font(KlavikaFont.regular.font(size: 12))
+                                        .foregroundColor(.gray)
                                 }
+                            }
+                            
+                            Spacer()
+                        }
+                        
+                        // Chat bubble
+                        Text(last)
+                            .font(KlavikaFont.regular.font(size: 15))
+                            .foregroundColor(AppColor.black)
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding()
+                    .background(AppColor.lightGreen)
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(AppColor.darkGray, lineWidth: 1)
+                    )
+                    Spacer()
+                }
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Quick Messages")
+                        .foregroundColor(AppColor.darkCharcol)
+                        .font(KlavikaFont.regular.font(size: 14))
+                    
+                    // Grid buttons
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2), spacing: 12) {
+                        ForEach(activeQuickMessages, id: \.self) { text in
+                            Button {
+                                isCustomFocused = true
+                                message = text
+                            } label: {
+                                Text(text)
+                                    .foregroundColor(AppColor.black)
+                                    .font(KlavikaFont.bold.font(size: 14))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(AppColor.bluishGray, lineWidth: 2)
+                                    )
                             }
                         }
                     }
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Custom Message")
-                            .foregroundColor(AppColor.darkCharcol)
-                            .font(KlavikaFont.regular.font(size: 14))
-                        
-                        TextField("Type your message...", text: $message, axis: .vertical)
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundColor(AppColor.charcol)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .frame(minHeight: 100, alignment: .topLeading)
-                            .background(AppColor.listGray)
-                            .cornerRadius(10)
-                    }
-                    ButtonsView
                 }
-                .padding()
-                .frame(width: 342, height: 500)
-                .background(Color.white)
-                .cornerRadius(22)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Custom Message")
+                        .foregroundColor(AppColor.darkCharcol)
+                        .font(KlavikaFont.regular.font(size: 14))
+                    
+                    TextField("Type your message...", text: $message, axis: .vertical)
+                        .font(KlavikaFont.regular.font(size: 16))
+                        .foregroundColor(AppColor.charcol)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .frame(minHeight: 100, alignment: .topLeading)
+                        .background(AppColor.listGray)
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(isCustomFocused ? Color.black : AppColor.bluishGray, lineWidth: 2)
+                        )
+                        .cornerRadius(10)
+                        .focused($isCustomFocused)
+                }
+                ButtonsView
             }
+            .padding()
+            .frame(width: 342)
+            .fixedSize(horizontal: false, vertical: true)
+            .background(Color.white)
+            .cornerRadius(22)
         }
+    }
     @ViewBuilder var ButtonsView: some View {
         HStack(spacing: 20) {
             Button(action: {
@@ -115,11 +171,11 @@ struct MessagePopupView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(AppColor.stoneGray.opacity(0.2), lineWidth: 1)
                 )
-                
             }
             .buttonStyle(.plain)
             Button(action: {
                 isPresented = false
+                viewModel.sendMessage(senderName: MBUserDefaults.userNameStatic ?? "", receiverName: viewModel.rider.name, senderId: MBUserDefaults.userIdStatic ?? "", receiverId: viewModel.rider.receiverId, message: message, rideId: viewModel.rider.rideId)
             }) {
                 HStack {
                     Text("SEND")
@@ -142,8 +198,23 @@ struct MessagePopupView: View {
         }
         .padding()
     }
+    
+    // create a computed property that is going to tell about ride status
+    
+    var rideStatus: String {
+        let status = viewModel.rider.status
+        let time = viewModel.rider.timeSinceUpdate
+        
+        switch status {
+        case .connected, .stopped:
+            return "\(status.rawValue) from \(time)"
+            
+        case .delayed:
+            return "\(status.rawValue) by \(time)"
+            
+        default:
+            return "Available"
+        }
+    }
 }
 
-#Preview {
-    MessagePopupView(isPresented: .constant(true), riderName: "Sooraj Rajan", delayText: "Delayed by 15min" )
-}

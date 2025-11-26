@@ -35,14 +35,7 @@ struct LoginSucessView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                     .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                AppColor.royalBlue,
-                                AppColor.pursianBlue,
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
+                        AppColor.celticBlue
                     )
                     .cornerRadius(15)
                     .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
