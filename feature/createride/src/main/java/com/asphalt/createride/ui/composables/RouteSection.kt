@@ -267,7 +267,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             }
             Spacer(modifier = Modifier.width(Dimensions.padding16))
             Text(
-                text = "Assembly point same as starting location",//stringResource(string.keep_signed_in),
+                text = stringResource(string.assembly_msg),
                 style = Typography.bodyMedium,
                 color = NeutralDarkGrey
             )
@@ -275,7 +275,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
         Spacer(modifier = Modifier.height(Dimensions.padding30))
         if (!viewModel.assembly_point_check.value) {
         Text(
-            text = "Assembly Point",//stringResource(R.string.destination),
+            text = stringResource(R.string.assembly_point),
             style = TypographyMedium.bodyMedium,
             color = NeutralBlack,
             modifier = Modifier.padding(start = Dimensions.padding16)
@@ -319,7 +319,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
 
             Text(
                 text = viewModel.rideDetailsState.value.assemblyLocation
-                    ?: stringResource(R.string.enter_destination),
+                    ?: stringResource(R.string.enter_assembly),
                 style = Typography.bodyMedium, maxLines = 1,
                 color = if (viewModel.rideDetailsState.value.assemblyLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
             )
