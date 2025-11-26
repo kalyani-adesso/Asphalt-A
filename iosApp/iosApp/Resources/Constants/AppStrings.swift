@@ -173,7 +173,7 @@ public struct AppStrings{
         case places = "Places Explored"
         case groups = "Ride Groups"
         case invites = "Ride Invites"
-        case title = "Adventure\nJourney"
+        case title = "Adventure Journey"
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
