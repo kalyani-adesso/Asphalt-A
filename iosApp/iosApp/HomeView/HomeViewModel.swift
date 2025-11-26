@@ -93,9 +93,9 @@ class HomeViewModel: ObservableObject {
         }) else {
             
             self.stats = [
-                RideStat(title: "Total Rides", value: 0, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
-                RideStat(title: "Locations", value: 0, color: AppColor.skyBlue, icon: AppIcon.Home.location),
-                RideStat(title: "Total KMs", value: 0, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
+                RideStat(title: "Total Rides", value: "0", icon: AppIcon.Home.createRide),
+                RideStat(title: "Locations", value: "0",  icon: AppIcon.Home.location),
+                RideStat(title: "Total KMs", value: "0", icon: AppIcon.Home.nearMe)
             ]
             return
         }
@@ -103,16 +103,17 @@ class HomeViewModel: ObservableObject {
         let rides = selectedDash.perMonthData
         
         let totalRides = rides.count
-        let totalDistance = Int(rides.reduce(0) { $0 + Int($1.rideDistance ?? 0) })
+        let rawDistance = rides.reduce(0) { $0 + Int($1.rideDistance ?? 0) }
+        let totalDistance = formatDistance(rawDistance)
         let locations = Set(rides.map { $0.endLocation ?? "" }).count
         let organiser = rides.filter { $0.isOrganiserGroupRide == true }.count
         let participant = rides.filter { $0.isParticipantGroupRide == true }.count
         
         // MARK: - Dashboard Stat Cards
         self.stats = [
-            RideStat(title: "Total Rides", value: totalRides, color: AppColor.vividBlue, icon: AppIcon.Home.createRide),
-            RideStat(title: "Locations", value: locations, color: AppColor.skyBlue, icon: AppIcon.Home.location),
-            RideStat(title: "Total KMs", value: totalDistance, color: AppColor.strongCyan, icon: AppIcon.Home.nearMe)
+            RideStat(title: "Total Rides", value: "\(totalRides)", icon: AppIcon.Home.createRide),
+            RideStat(title: "Locations", value: "\(locations)", icon: AppIcon.Home.location),
+            RideStat(title: "Total KMs", value: totalDistance,  icon: AppIcon.Home.nearMe)
         ]
     }
     // MARK: - Donut chart
@@ -161,7 +162,17 @@ class HomeViewModel: ObservableObject {
             return []
         }
     }
-    
+    func formatDistance(_ meters: Int) -> String {
+        if meters >= 1000 {
+            let kValue = meters / 1000
+            let isExact = meters % 1000 == 0
+            
+            return isExact ? "\(kValue)K" : "\(kValue)K+"
+        } else {
+            return "\(meters)"
+        }
+    }
+
     
     
     func getJourneySlices(for range: String) -> [JourneySlice] {

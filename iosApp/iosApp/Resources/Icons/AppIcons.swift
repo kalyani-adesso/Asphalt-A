@@ -95,7 +95,7 @@ struct AppIcon {
         static let navigation = Image("navigation")
         static let pointer = Image("pointer")
         static let rides = Image("rides")
-        static let badge = Image("badge")
+        static let badge = Image("Badge")
     }
 
     struct CreateRide {

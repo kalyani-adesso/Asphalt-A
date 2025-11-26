@@ -20,7 +20,6 @@ struct JourneyCardView: View {
                 DonutChartView(slices: home.currentSlices)
                     .frame(width: 190, height: 190)
             }
-            .padding(.top, 10)
             VStack(spacing:50){
                 ZStack{
                     RoundedRectangle(cornerRadius: 5)
@@ -46,7 +45,7 @@ struct JourneyCardView: View {
                         .foregroundColor(AppColor.stoneGray)
                     }
                 }
-                .padding(.top, 10)
+                .padding(.bottom, 30)
                 VStack(alignment: .leading, spacing: 8) {
                     let chunks = home.journeySlices.chunked(into: 3)
                     ForEach(chunks.indices, id: \.self) { rowIndex in
@@ -60,7 +59,6 @@ struct JourneyCardView: View {
                 
                 .frame(maxWidth: .infinity, alignment: .center)
             }
-            .padding(.bottom, 50)
         }
         .padding()
         .background(AppColor.backgroundLight)
