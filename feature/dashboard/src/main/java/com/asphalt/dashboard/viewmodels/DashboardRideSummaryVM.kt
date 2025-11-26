@@ -24,7 +24,7 @@ class DashboardRideSummaryVM(
             APIHelperUI.handleApiResult(
                 APIHelperUI.runWithLoader {
                     ridesRepository.getRideSummary(userUID)
-                    ridesRepository.getRideSummary("NUIAgBiffTUBtoxtgRGcn8wR9bR2")
+//                    ridesRepository.getRideSummary("NUIAgBiffTUBtoxtgRGcn8wR9bR2")
 
                 }, viewModelScope
             ) {
