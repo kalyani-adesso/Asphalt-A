@@ -150,11 +150,11 @@ class HomeViewModel: ObservableObject {
             }
             
         case "Last year":
-            let currentYear = calendar.component(.year, from: now)
-            let lastYear = currentYear - 1
-            
+            let start = calendar.date(byAdding: .month, value: -12, to: now)!
             return dashboardData.filter {
-                $0.monthYear.year == lastYear
+                guard let date = calendar.date(from: DateComponents(year: Int($0.monthYear.year),
+                                                                    month: Int($0.monthYear.month))) else { return false }
+                return date >= start
             }
             
         default:

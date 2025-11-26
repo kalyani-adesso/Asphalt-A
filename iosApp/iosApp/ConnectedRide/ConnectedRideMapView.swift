@@ -19,12 +19,22 @@ struct ConnectedRideMapView: View {
     @State private var showToast: Bool = true
     @State var showJoinRideView:Bool = false
     @State var showMapViewFullScreen:Bool = false
+    @State var showMessagePopup:Bool = false
     @State private var position: MapCameraPosition = .automatic
     @State private var elapsedSeconds = 0
+    @State private var selectedRiderName: String = ""
+    @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
     var rideModel: JoinRideModel
     
     var body: some View {
+        ZStack{
+            if showMessagePopup{
+                MessagePopupView(isPresented: $showMessagePopup, riderName: selectedRiderName  , delayText: selectedRiderDelayText)
+                    .transition(.scale)
+                    .zIndex(1)
+            }
+        
         List {
             Section {
                 VStack {
@@ -103,7 +113,11 @@ struct ConnectedRideMapView: View {
                     VStack(spacing: 18) {
                         ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
                         ForEach(viewModel.groupRiders, id: \.id) { rider in
-                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate)
+                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup,
+                                           onMessageTap: {
+                                selectedRiderName = rider.name
+                                selectedRiderDelayText = rider.status.rawValue
+                            })
                         }
                     }
                     .padding(.bottom,16)
@@ -182,11 +196,16 @@ struct ConnectedRideMapView: View {
                 if !rideModel.rideJoined {
                     viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 } else {
-                    viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                    startOngoingRideTimer()
                 }
                 viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                     self.elapsedSeconds += 1
+                }
+            }
+            .onChange(of: viewModel.ongoingRideId) { ride in
+                if !ride.isEmpty {
+                    startOngoingRideTimer()
                 }
             }
             .toolbar {
@@ -238,6 +257,7 @@ struct ConnectedRideMapView: View {
                     }
                 }
                 
+                
                 ToolbarItemGroup(placement: .topBarLeading) {
                     HStack {
                         Button(action: {
@@ -260,6 +280,19 @@ struct ConnectedRideMapView: View {
             .navigationDestination(isPresented: $showJoinRideView, destination: {
                 JoinRideView()
             })
+        }
+    }
+    
+    func startOngoingRideTimer() {
+        // Invalidate any existing timer
+        viewModel.ongoingRideTimer?.invalidate()
+        // Schedule the timer to trigger every 2 min minutes (900 seconds)
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
+            Task {
+                await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                
+            }
+        }
     }
     
     func formatTime(_ totalSeconds: Int) -> String {
@@ -270,6 +303,8 @@ struct ConnectedRideMapView: View {
     }
     
     func stopTimer() {
+        viewModel.ongoingRideTimer?.invalidate()
+        viewModel.ongoingRideTimer = nil
         self.timer?.invalidate()
         self.timer = nil
     }
@@ -506,7 +541,8 @@ struct GroupRiderView: View {
     let status:String
     let speed: String
     let subTitle:String
-    
+    @Binding var showMessagePopup: Bool
+    var onMessageTap: (() -> Void)?
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -549,7 +585,8 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
-                        
+                        onMessageTap?()
+                        showMessagePopup = true
                     }, label: {
                         AppIcon.Home.message
                     })

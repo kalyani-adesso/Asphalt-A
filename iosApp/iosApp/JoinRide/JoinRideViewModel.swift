@@ -44,6 +44,7 @@ final class JoinRideViewModel: ObservableObject {
     @Published var isRideLoading = false
     @Published var showRideAlreadyActivePopup = false
     @Published var totalRides:Int = 0
+    @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
         didSet {
             searchRides()
@@ -105,13 +106,18 @@ extension JoinRideViewModel {
                 let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 self.totalRides = filteredRideArray.count
-                let rideJoinedStatus = (ride.participants.contains(where: { $0.inviteStatus == 3 })) || ride.rideStatus == 3
+                
+                let currentUserId = MBUserDefaults.userIdStatic
+                let userInviteStatus = ride.participants.first { $0.userId == currentUserId }?.inviteStatus
+                let isCreator = ride.createdBy == currentUserId
+                let rideJoinedStatus = (userInviteStatus == 3) || (ride.rideStatus == 3 && isCreator)
+
                 if startDate >= Calendar.current.startOfDay(for: Date()) {
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
                         title: ride.rideTitle ?? "",
-                        organizer: userName?.0 ?? "",
+                        organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
@@ -126,7 +132,6 @@ extension JoinRideViewModel {
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus,
                         participants: participants
-                        
                     )
                     joinRideModels.append(model)
                 }
@@ -304,5 +309,4 @@ extension JoinRideViewModel {
             }
         })
     }
-    
 }

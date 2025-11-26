@@ -10,6 +10,8 @@ import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.dashboard.DashboardDomain
+import com.asphalt.android.model.dashboard.PerMonthRideDataDomain
+import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.RideInvitesDomain
@@ -74,7 +76,8 @@ class RidesRepository(val apiService: RidesApIService) {
                 endLatitude = rowData.endLatitude,
                 endLongitude = rowData.endLongitude,
                 rideDistance = rowData.distance,
-                rideStatus = rowData.rideStatus
+                rideStatus = rowData.rideStatus,
+                endDate = rowData.endDate
             )
         } ?: emptyList()
     }
@@ -118,7 +121,6 @@ class RidesRepository(val apiService: RidesApIService) {
         return apiService.endRide(rideId, rideJoinedId)
     }
 
-    // map purpose  = movement action
     suspend fun getOngoingRides(rideId: String): APIResult<List<ConnectedRideDTO>> {
         return apiService.getJoinedRides(rideId).mapApiResult { response ->
             response.map { (joinedRideId, data) ->
@@ -174,6 +176,10 @@ class RidesRepository(val apiService: RidesApIService) {
         comments: String
     ): APIResult<Unit> {
         return apiService.rateYourRide(rideId, userId, stars, comments)
+    }
+
+    suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {
+        return apiService.sendMessage(message)
     }
 
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {

@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -23,15 +25,22 @@ import com.asphalt.commonui.ui.barchart.CustomBarChart
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.viewmodels.PlacesVisitedGraphViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun PlacesVisitedGraph(placesVisitedGraphViewModel: PlacesVisitedGraphViewModel = koinViewModel()) {
+fun PlacesVisitedGraph(
+    dashboardData: List<DashboardDomain>,
+    placesVisitedGraphViewModel: PlacesVisitedGraphViewModel = koinViewModel()
+) {
+
     val startDate = placesVisitedGraphViewModel.startDate.collectAsStateWithLifecycle()
     val endDate = placesVisitedGraphViewModel.endDate.collectAsStateWithLifecycle()
     val xValues = placesVisitedGraphViewModel.xValuesList.collectAsStateWithLifecycle()
     val yValues = placesVisitedGraphViewModel.yValueList.collectAsStateWithLifecycle()
     val isArrowEnabled = placesVisitedGraphViewModel.isArrowEnabled.collectAsStateWithLifecycle()
+    LaunchedEffect(dashboardData) {
+        placesVisitedGraphViewModel.populateGraph(dashboardData)
+    }
 
     Column(
         modifier = Modifier

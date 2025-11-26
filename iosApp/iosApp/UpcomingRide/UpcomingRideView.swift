@@ -343,12 +343,12 @@ struct UpComingView: View {
                     
                     Button(action: {
                         Task {
-                            if ride.status == .upcoming {
+//                            if ride.status == .upcoming {
                                 self.showRideDetails = true
                                 await viewModel.getSingleRide(rideId: ride.id)
-                            } else {
-                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
-                            }
+//                            } else {
+//                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+//                            }
                         }
                     }) {
                         Text(ride.rideViewAction.rawValue.uppercased())
@@ -369,6 +369,9 @@ struct UpComingView: View {
                 RideDetailsView(viewModel: viewModel, ride: $ride)
             })
             .contentShape(Rectangle())
+            .refreshable {
+                await viewModel.getSingleRide(rideId: ride.id)
+            }
         }
     }
     

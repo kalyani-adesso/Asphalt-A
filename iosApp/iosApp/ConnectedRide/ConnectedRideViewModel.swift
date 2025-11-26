@@ -60,12 +60,12 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0)]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
-    private var ongoingRideId = ""
+    @Published var ongoingRideId = ""
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
-    private var ongoingRideTimer: Timer?
+    var ongoingRideTimer:Timer?
     private var previousRidersDict: [String: Rider] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
@@ -82,7 +82,6 @@ final class ConnectedRideViewModel: ObservableObject {
         self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
-        startOngoingRideTimer()
     }
     deinit {
          stopOngoingRideTimer()
@@ -148,12 +147,14 @@ extension ConnectedRideViewModel {
     func joinRide(rideId: String, userId: String, currentLat: Double, currentLong: Double, speed: Double)  {
         let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
         
+        let status = getRideStatus()
+
         let connectedRideRoot = ConnectedRideRoot(
             rideID: rideId,
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed), status: "Stopped",
+            speedInKph: KotlinDouble(value: speed), status: getRideStatus().rawValue,
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: false)
         )
@@ -173,13 +174,13 @@ extension ConnectedRideViewModel {
     
     func reJoinRide(rideId: String, userId: String, currentLat: Double, currentLong: Double, speed: Double) {
         let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
-        
+        let status = getRideStatus()
         let connectedRideRoot = ConnectedRideRoot(
             rideID: rideId,
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed), status: "Stopped",
+            speedInKph: KotlinDouble(value: speed), status: getRideStatus().rawValue ,
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: true)
         )
@@ -217,13 +218,13 @@ extension ConnectedRideViewModel {
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
-//                                let status = self.getRideStatus()
+                                let status = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                 let rider = Rider(
                                     name: userDetails?.0 ?? "",
                                     speed: Int(ongoingRide.speedInKph),
-                                    status: RiderStatus(rawValue: ongoingRide.status) ?? .delayed,
+                                    status: RiderStatus(rawValue: ongoingRide.status) ?? .stopped,
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: ongoingRide.currentLat,
@@ -403,20 +404,7 @@ extension ConnectedRideViewModel {
             return "\(diff / 3600)h ago"
         }
     }
-    func startOngoingRideTimer() {
-        // Invalidate any existing timer
-        ongoingRideTimer?.invalidate()
-        // Schedule the timer to trigger every 15 minutes (900 seconds)
-        ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            
-            Task {
-                await self.getOnGoingRides(
-                    rideId: self.ongoingRideId
-                )
-            }
-        }
-    }
+
     
     func stopOngoingRideTimer() {
         ongoingRideTimer?.invalidate()
@@ -450,7 +438,16 @@ extension ConnectedRideViewModel {
         }
     }
     
-   
+    func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId)
+        rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
+            if let error = error {
+                print("Error joining ride:", error.localizedDescription)
+            } else {
+                print("Message sent successfully")
+            }
+        })
+    }
 }
 
 class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {

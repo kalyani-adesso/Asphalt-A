@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -33,14 +34,21 @@ import com.asphalt.dashboard.composables.components.SelectJourneyTimeFrame
 import com.asphalt.dashboard.sealedclasses.AdventureJourneyTimeFrameChoices
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 import com.asphalt.dashboard.viewmodels.AdventureJourneyViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AdventureJourney(
+    dashboardData: List<DashboardDomain>,
     adventureJourneyViewModel: AdventureJourneyViewModel = koinViewModel()
 ) {
+
     val options = AdventureJourneyTimeFrameChoices.getAllChoices()
     val selectedItem = remember { mutableStateOf(options[0]) }
+    LaunchedEffect(dashboardData) {
+        adventureJourneyViewModel.setDashboardData(dashboardData)
+        adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)
+
+    }
     LaunchedEffect(selectedItem.value) {
         adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)
     }
@@ -81,7 +89,8 @@ fun AdventureJourney(
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Box {
-                    DonutChart(values = remember(valueList.value) { valueList.value },
+                    DonutChart(
+                        values = remember(valueList.value) { valueList.value },
                         colors = remember(colorList.value) { colorList.value })
                     Column(
                         modifier = Modifier.align(Alignment.Center),

@@ -2,35 +2,35 @@ package com.asphalt.dashboard.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.commonui.utils.Utils
-import com.asphalt.dashboard.data.RidePerMonthDto
-import com.asphalt.dashboard.data.RideStatData
-import com.asphalt.dashboard.repository.PerMonthRideStatsRepo
+import com.asphalt.dashboard.data.DashboardSummaryUI
+import com.asphalt.dashboard.data.RideStatDataUIModel
 import com.asphalt.dashboard.sealedclasses.RideStatType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import mappers.toDashboardSummaryUI
+import mappers.toRideStatUiModel
 import java.util.Calendar
 
-class PerMonthRideStatsViewModel(val rideStatsRepo: PerMonthRideStatsRepo) : ViewModel() {
+class PerMonthRideStatsViewModel() : ViewModel() {
     private val _perMonthStats =
         MutableStateFlow(getDefaultStats())
-    val perMonthStats: StateFlow<List<RideStatData>> = _perMonthStats
+    val perMonthStats: StateFlow<List<RideStatDataUIModel>> = _perMonthStats
     private val _calendar = MutableStateFlow<Calendar>(Calendar.getInstance())
     val calendar: StateFlow<Calendar> = _calendar
+    private var dashboardSummaryUI = emptyList<DashboardSummaryUI>()
 
-    init {
-        getRideStatsByDate()
-    }
 
     fun getRideStatsByDate() {
         viewModelScope.launch {
             val (month, year) = Utils.getMonthYearFromCalendarInstance(_calendar.value)
-            val rideStats = rideStatsRepo.getRideStats(
-                month,
-                year
-            )
-            _perMonthStats.value = rideStats
+            val perMonthRideData = dashboardSummaryUI.find {
+                year == it.monthYear.year
+                        && month == it.monthYear.month
+            }.toRideStatUiModel()
+            _perMonthStats.value = perMonthRideData
         }
     }
 
@@ -50,13 +50,17 @@ class PerMonthRideStatsViewModel(val rideStatsRepo: PerMonthRideStatsRepo) : Vie
         getRideStatsByDate()
     }
 
-    private fun getDefaultStats(): List<RideStatData> {
+    private fun getDefaultStats(): List<RideStatDataUIModel> {
         return listOf(
-            RideStatData(RideStatType.TotalRides, 0),
-            RideStatData(RideStatType.TotalKms, 0),
-            RideStatData(RideStatType.Locations, 0)
+            RideStatDataUIModel(RideStatType.TotalRides, 0),
+            RideStatDataUIModel(RideStatType.TotalKms, 0),
+            RideStatDataUIModel(RideStatType.Locations, 0)
         )
 
+    }
+
+    fun setSummaryData(dashboardSummary: List<DashboardDomain>) {
+        dashboardSummaryUI = dashboardSummary.toDashboardSummaryUI()
     }
 
 

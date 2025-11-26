@@ -62,6 +62,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     val rideType = viewModel.getRideType(context)
     val am = stringResource(R.string.am)
     val pm = stringResource(R.string.pm)
+    //Start Date
     if (viewModel.show_timePicker.value) {
         CustomTimePickerDialog(onDismiss = {
             viewModel.showTimePicker(false)
@@ -87,6 +88,34 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
             viewModel.showDatePicker(false)
             viewModel._showRideDateError.value = false
+        })
+    }
+//End Date
+    if (viewModel.show_EndTimePicker.value) {
+        CustomTimePickerDialog(onDismiss = {
+            viewModel.showEndTimePicker(false)
+        }, onTimeSelected = { hr, min, isAm ->
+            var time_text = "$hr:${String.format("%02d", min)} ${
+                if (isAm) {
+                    am
+                } else {
+                    pm
+                }
+            }"
+            viewModel.updateEndTime(hr, min, isAm, time_text)
+            viewModel.showEndTimePicker(false)
+            viewModel._showRideEndTimeError.value = false
+        })
+    }
+
+    if (viewModel.show_EndDatePicker.value) {
+        DatePickerSample(onCancel = {
+            viewModel.showEndDatePicker(false)
+        }, onOkClick = { timeMils ->
+            viewModel.updateEndDate(timeMils, Utils.convertMillisToFormattedDate(timeMils))
+            //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
+            viewModel.showEndDatePicker(false)
+            viewModel._showRideEndDateError.value = false
         })
     }
 
@@ -319,10 +348,10 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.date),
+                    text = stringResource(R.string.start_date),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
-                    modifier = Modifier.padding(start = Dimensions.padding16)
+                    //modifier = Modifier.padding(start = Dimensions.padding16)
                 )
                 Spacer(modifier = Modifier.height(Dimensions.size8))
                 Row(
@@ -378,7 +407,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     text = stringResource(R.string.time),
                     style = TypographyMedium.bodyMedium,
                     color = NeutralBlack,
-                    modifier = Modifier.padding(start = Dimensions.padding16)
+                    // modifier = Modifier.padding(start = Dimensions.padding16)
                 )
                 Spacer(modifier = Modifier.height(Dimensions.size8))
                 Row(
@@ -432,9 +461,131 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             }
 
         }
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = Dimensions.padding16, end = Dimensions.padding16),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.size10)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text =stringResource(R.string.end_date),
+                    style = TypographyMedium.bodyMedium,
+                    color = NeutralBlack,
+                    //modifier = Modifier.padding(start = Dimensions.padding16)
+                )
+                Spacer(modifier = Modifier.height(Dimensions.size8))
+                Row(
+                    modifier = Modifier
+                        .height(Dimensions.padding50)
+                        .fillMaxWidth()
+                        .background(
+                            NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10),
+                        )
+                        .then(
+                            if (viewModel._showRideEndDateError.value) {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = VividRed,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            } else {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = NeutralWhite,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            }
+                        )
+                        .clickable { viewModel.showEndDatePicker(true) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(Dimensions.size10))
+                    Image(
+                        painter = painterResource(R.drawable.ic_calendar_blue),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(NeutralDarkGrey),
+                        modifier = Modifier
+                            .height(Dimensions.spacing20)
+                            .width(Dimensions.spacing20)
+                    )
+                    Spacer(Modifier.width(Dimensions.size10))
+                    Text(
+                        text = if (viewModel.rideDetailsState.value.endDateString.isNullOrEmpty()) {
+                            stringResource(R.string.pick_date)
+                        } else {
+                            viewModel.rideDetailsState.value.endDateString.toString()
+                        },
+                        style = Typography.bodyMedium,
+                        color = if (viewModel.rideDetailsState.value.endDateString.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey,
+                        modifier = Modifier
+                    )
+                }
 
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.time),
+                    style = TypographyMedium.bodyMedium,
+                    color = NeutralBlack,
+                    //modifier = Modifier.padding(start = Dimensions.padding16)
+                )
+                Spacer(modifier = Modifier.height(Dimensions.size8))
+                Row(
+                    modifier = Modifier
+                        .height(Dimensions.padding50)
+                        .fillMaxWidth()
+                        .background(
+                            NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10),
+                        )
+                        .then(
+                            if (viewModel._showRideEndTimeError.value) {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = VividRed,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            } else {
+                                Modifier.border(
+                                    width = Dimensions.padding1,
+                                    color = NeutralWhite,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                )
+                            }
+                        )
+                        .clickable {
+                            viewModel.showEndTimePicker(true)
+                        }, verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(Dimensions.size10))
+                    Image(
+                        painter = painterResource(R.drawable.ic_clock),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(NeutralDarkGrey),
+                        modifier = Modifier
+                            .height(Dimensions.spacing20)
+                            .width(Dimensions.spacing20)
+                    )
+                    Spacer(Modifier.width(Dimensions.size10))
+                    Text(
+                        text = if (viewModel.rideDetailsState.value.endDisplayTime.isNullOrEmpty()) {
+                            stringResource(R.string.pick_time)
+                        } else {
+                            viewModel.rideDetailsState.value.endDisplayTime.toString()
+                        },
+                        style = Typography.bodyMedium,
+                        color = if (viewModel.rideDetailsState.value.endDisplayTime.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey,
+                        modifier = Modifier
+                    )
+                }
+
+            }
+
+        }
         //padding
         Spacer(modifier = Modifier.height(Dimensions.padding16))
+
     }
 }
 

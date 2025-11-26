@@ -26,6 +26,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -66,6 +70,7 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.dashboard.composables.screens.gallery.GalleryDialog
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
@@ -303,6 +308,12 @@ fun UpcomingRides(
 
 @Composable
 fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDataModel) {
+    var showGalleryDialog by remember { mutableStateOf(false) }
+    if (showGalleryDialog) {
+        GalleryDialog(onDismiss = {
+            showGalleryDialog = false
+        })
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -403,7 +414,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
         ) {
             BorderedButton(
                 onClick = {
-
+                    showGalleryDialog = true
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)
