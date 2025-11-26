@@ -31,7 +31,7 @@ struct ConnectedRideMapView: View {
     var body: some View {
         ZStack{
             if showMessagePopup{
-                MessagePopupView(isPresented: $showMessagePopup , viewModel: viewModel)
+                MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup)
                     .transition(.scale)
                     .zIndex(1)
             }
@@ -586,7 +586,6 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
-                        onMessageTap?()
                         showMessagePopup = true
                         onMessageTap(index)
                     }, label: {

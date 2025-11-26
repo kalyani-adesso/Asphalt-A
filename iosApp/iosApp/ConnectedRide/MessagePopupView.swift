@@ -5,46 +5,61 @@
 //  Created by Lavanya Selvan on 21/11/25.
 //
 
+//
+//  MessagePopupView.swift
+//  iosApp
+//
+//  Created by Lavanya Selvan on 21/11/25.
+//
+
 import SwiftUI
 
 struct MessagePopupView: View {
+    @ObservedObject var viewModel: ConnectedRideViewModel
     @Binding var isPresented: Bool
-    let viewModel:ConnectedRideViewModel
-
-        @State private var message: String = ""
-        @Environment(\.dismiss) var dismiss
-
-        private let quickMessages = [
-            "All good!",
-            "Taking a break",
-            "Fuel stop",
-            "Road issue"
-        ]
-
-        var body: some View {
-            ZStack {
-                Color.black.opacity(0.6)
-                    .ignoresSafeArea()
-                VStack(spacing: 20) {
-                    HStack(alignment: .center, spacing: 12) {
-                        AppImage.Profile.profile.resizable()
-                            .frame(width: 40, height: 40)
-                            .clipShape(Circle())
+    let previousMessages: [String] = []
+    @State private var message: String = ""
+    @Environment(\.dismiss) var dismiss
+    @FocusState private var isCustomFocused: Bool
+    
+    private let quickMessages = [
+        "All good!",
+        "Taking a break",
+        "Fuel stop",
+        "Road issue"
+    ]
+    private let quickReplyMessages = [
+        "All good!",
+        "Take your time",
+        "Okay",
+        "We will wait"
+    ]
+    private var activeQuickMessages: [String] {
+        previousMessages.isEmpty ? quickMessages : quickReplyMessages
+    }
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+            VStack(spacing: 20) {
+                HStack(alignment: .center, spacing: 12) {
+                    AppImage.Profile.profile.resizable()
+                        .frame(width: 40, height: 40)
+                        .clipShape(Circle())
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Message \(viewModel.rider.name)")
+                            .foregroundColor(AppColor.black)
+                            .font(KlavikaFont.bold.font(size: 18))
                         
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Message \(viewModel.rider.name)")
-                                .foregroundColor(AppColor.black)
-                                .font(KlavikaFont.bold.font(size: 18))
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(Color.orange)
+                                .frame(width: 8, height: 8)
                             
-                            HStack(spacing: 6) {
-                                Circle()
-                                    .fill(Color.orange)
-                                    .frame(width: 8, height: 8)
-                                
-                                Text(rideStatus)
-                                    .foregroundColor(AppColor.grey)
-                                    .font(KlavikaFont.regular.font(size: 14))
-                            }
+                            Text(rideStatus)
+                                .foregroundColor(AppColor.grey)
+                                .font(KlavikaFont.regular.font(size: 14))
                         }
                     }
                     
@@ -171,6 +186,7 @@ struct MessagePopupView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(AppColor.stoneGray.opacity(0.2), lineWidth: 1)
                 )
+                
             }
             .buttonStyle(.plain)
             Button(action: {
@@ -198,9 +214,7 @@ struct MessagePopupView: View {
         }
         .padding()
     }
-    
     // create a computed property that is going to tell about ride status
-    
     var rideStatus: String {
         let status = viewModel.rider.status
         let time = viewModel.rider.timeSinceUpdate
@@ -217,4 +231,8 @@ struct MessagePopupView: View {
         }
     }
 }
+
+
+
+
 

@@ -26,7 +26,7 @@ struct BottomNavBar: View {
                             .environmentObject(homeViewModel)
                             .environmentObject(upcomingRideViewModel)
                     case 1:
-                        UpcomingRideView(onBackToHome: { selectedTab = 0 })
+                        UpcomingRideView(showpopup: false)
                             .environmentObject(upcomingRideViewModel)
                             .environmentObject(homeViewModel)
                     case 2:
