@@ -25,12 +25,13 @@ struct ConnectedRideMapView: View {
     @State private var selectedRiderName: String = ""
     @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
+    @State private var index: Int = 0
     var rideModel: JoinRideModel
     
     var body: some View {
         ZStack{
             if showMessagePopup{
-                MessagePopupView(isPresented: $showMessagePopup, riderName: selectedRiderName  , delayText: selectedRiderDelayText)
+                MessagePopupView(isPresented: $showMessagePopup , viewModel: viewModel)
                     .transition(.scale)
                     .zIndex(1)
             }
@@ -112,11 +113,11 @@ struct ConnectedRideMapView: View {
                 Section {
                     VStack(spacing: 18) {
                         ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
-                        ForEach(viewModel.groupRiders, id: \.id) { rider in
-                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup,
-                                           onMessageTap: {
-                                selectedRiderName = rider.name
-                                selectedRiderDelayText = rider.status.rawValue
+                        
+                        ForEach(viewModel.groupRiders.indices, id: \.self) { index in
+                            let rider = viewModel.groupRiders[index]
+                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                viewModel.messageIndex = val
                             })
                         }
                     }
@@ -256,7 +257,6 @@ struct ConnectedRideMapView: View {
                         }
                     }
                 }
-                
                 
                 ToolbarItemGroup(placement: .topBarLeading) {
                     HStack {
@@ -541,8 +541,9 @@ struct GroupRiderView: View {
     let status:String
     let speed: String
     let subTitle:String
+    let index: Int
     @Binding var showMessagePopup: Bool
-    var onMessageTap: (() -> Void)?
+    var onMessageTap: (Int) -> Void
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -587,6 +588,7 @@ struct GroupRiderView: View {
                     Button(action: {
                         onMessageTap?()
                         showMessagePopup = true
+                        onMessageTap(index)
                     }, label: {
                         AppIcon.Home.message
                     })

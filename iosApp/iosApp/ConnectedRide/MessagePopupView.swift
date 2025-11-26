@@ -9,52 +9,42 @@ import SwiftUI
 
 struct MessagePopupView: View {
     @Binding var isPresented: Bool
-    let riderName: String
-    let delayText: String
-    let previousMessages: [String] = ["Fuel Stop"]
-    @State private var message: String = ""
-    @Environment(\.dismiss) var dismiss
-    @FocusState private var isCustomFocused: Bool
-    
-    private let quickMessages = [
-        "All good!",
-        "Taking a break",
-        "Fuel stop",
-        "Road issue"
-    ]
-    private let quickReplyMessages = [
-        "All good!",
-        "Take your time",
-        "Okay",
-        "We will wait"
-    ]
-    private var activeQuickMessages: [String] {
-        previousMessages.isEmpty ? quickMessages : quickReplyMessages
-    }
-    
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.6)
-                .ignoresSafeArea()
-            VStack(spacing: 20) {
-                HStack(alignment: .center, spacing: 12) {
-                    AppImage.Profile.profile.resizable()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Message \(riderName)")
-                            .foregroundColor(AppColor.black)
-                            .font(KlavikaFont.bold.font(size: 18))
+    let viewModel:ConnectedRideViewModel
+
+        @State private var message: String = ""
+        @Environment(\.dismiss) var dismiss
+
+        private let quickMessages = [
+            "All good!",
+            "Taking a break",
+            "Fuel stop",
+            "Road issue"
+        ]
+
+        var body: some View {
+            ZStack {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+                VStack(spacing: 20) {
+                    HStack(alignment: .center, spacing: 12) {
+                        AppImage.Profile.profile.resizable()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
                         
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(Color.orange)
-                                .frame(width: 8, height: 8)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Message \(viewModel.rider.name)")
+                                .foregroundColor(AppColor.black)
+                                .font(KlavikaFont.bold.font(size: 18))
                             
-                            Text(delayText)
-                                .foregroundColor(AppColor.grey)
-                                .font(KlavikaFont.regular.font(size: 14))
+                            HStack(spacing: 6) {
+                                Circle()
+                                    .fill(Color.orange)
+                                    .frame(width: 8, height: 8)
+                                
+                                Text(rideStatus)
+                                    .foregroundColor(AppColor.grey)
+                                    .font(KlavikaFont.regular.font(size: 14))
+                            }
                         }
                     }
                     
@@ -181,11 +171,11 @@ struct MessagePopupView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(AppColor.stoneGray.opacity(0.2), lineWidth: 1)
                 )
-                
             }
             .buttonStyle(.plain)
             Button(action: {
                 isPresented = false
+                viewModel.sendMessage(senderName: MBUserDefaults.userNameStatic ?? "", receiverName: viewModel.rider.name, senderId: MBUserDefaults.userIdStatic ?? "", receiverId: viewModel.rider.receiverId, message: message, rideId: viewModel.rider.rideId)
             }) {
                 HStack {
                     Text("SEND")
@@ -208,8 +198,23 @@ struct MessagePopupView: View {
         }
         .padding()
     }
+    
+    // create a computed property that is going to tell about ride status
+    
+    var rideStatus: String {
+        let status = viewModel.rider.status
+        let time = viewModel.rider.timeSinceUpdate
+        
+        switch status {
+        case .connected, .stopped:
+            return "\(status.rawValue) from \(time)"
+            
+        case .delayed:
+            return "\(status.rawValue) by \(time)"
+            
+        default:
+            return "Available"
+        }
+    }
 }
 
-#Preview {
-    MessagePopupView(isPresented: .constant(true), riderName: "Sooraj Rajan", delayText: "Delayed by 15min" )
-}

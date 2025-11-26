@@ -13,6 +13,4 @@ class PlacesServiceImpl(client: KtorClient) : BaseAPIService(client), PlacesServ
             getPlaces(PLACE_SEARCH + "?q=${query}&format=json&limit=${5}").body()
         }
     }
-
-
 }

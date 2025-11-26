@@ -41,6 +41,8 @@ struct Rider: Identifiable {
     let contactNumber: String
     let currentLat:Double
     let currentLong:Double
+    let rideId:String
+    let receiverId:String
 }
 
 struct RideStop: Identifiable {
@@ -57,7 +59,7 @@ enum MapType: String, CaseIterable, Hashable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0)]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -69,7 +71,10 @@ final class ConnectedRideViewModel: ObservableObject {
     private var previousRidersDict: [String: Rider] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
-
+    @Published var messageIndex:Int = 0
+    var rider : Rider {
+        groupRiders[messageIndex]
+    }
     var lastLat: Double?
     var lastLong: Double?
     var lastSpeed: Double = 0.0
@@ -218,7 +223,7 @@ extension ConnectedRideViewModel {
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
-                                let status = self.getRideStatus()
+                                _ = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                 let rider = Rider(
@@ -228,7 +233,10 @@ extension ConnectedRideViewModel {
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: ongoingRide.currentLat,
-                                    currentLong: ongoingRide.currentLong
+                                    currentLong: ongoingRide.currentLong,
+                                    rideId: ongoingRide.rideID,
+                                    receiverId: ongoingRide.userID
+                                    
                                 )
                                 
                                 // Update or add to dictionary (ensures uniqueness by userID)
@@ -447,6 +455,12 @@ extension ConnectedRideViewModel {
                 print("Message sent successfully")
             }
         })
+    }
+    
+    func receiveMessage(rideId:String) {
+        MessageImpl().receiveMessage(rideId: rideId) { result, error in
+            
+        }
     }
 }
 
