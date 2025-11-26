@@ -1,5 +1,7 @@
 package com.asphalt.android.model.rides
 
+import kotlinx.serialization.SerialName
+
 class RidesData(
     var ridesID: String? = null,
     var createdBy: String? = null,
@@ -17,5 +19,10 @@ class RidesData(
     var endLongitude: Double = 0.0,
     var rideDistance: Double = 0.0,
     var rideStatus: Int = 0,
-    var endDate: Long? = null
+    var endDate: Long? = null,
+
+    var hasAssemblyPoint: Boolean = false,
+    var assemblyPoint: String? = null,
+    var assemblyLat: Double = 0.0,
+    var assemblyLon: Double = 0.0,
 )

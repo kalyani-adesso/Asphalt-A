@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -687,33 +688,49 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .then(
-                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
-                        Modifier.background(
-                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
-                            shape = RoundedCornerShape(Dimensions.size10)
-                        )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                            Modifier.background(
+                                brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                                shape = RoundedCornerShape(Dimensions.size10)
+                            )
+                        } else {
+                            Modifier.background(
+                                color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                            )
+                        }
+                    )
+                    .clickable {
+                        ridesScreenViewModel.updateTab(RideStatConstants.INVITES_RIDES)
+                    }, contentAlignment = Alignment.Center
+
+
+            ) {
+                Text(
+                    text = stringResource(R.string.invite),
+                    style = TypographyMedium.titleMedium,
+                    color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                        NeutralWhite
                     } else {
-                        Modifier.background(
-                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
-                        )
+                        NeutralBlack
                     }
                 )
-                .clickable {
-                    ridesScreenViewModel.updateTab(RideStatConstants.INVITES_RIDES)
-                }, contentAlignment = Alignment.Center
-
-
-        ) {
-            Text(
-                text = stringResource(R.string.invite),
-                style = TypographyMedium.titleMedium,
-                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
-                    NeutralWhite
-                } else {
-                    NeutralBlack
-                }
-            )
+            }
+            if (ridesScreenViewModel.showInviteNotification.value) {
+                Image(
+                    painter = painterResource(R.drawable.ic_invite_notificationicon),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .height(Dimensions.size25)
+                        .width(Dimensions.size25)
+                        .offset((6).dp, -5.dp)
+                )
+            }
         }
     }
 }
