@@ -39,7 +39,7 @@ struct UpcomingRidesView: View {
         }
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
-            UpcomingRideView(startingTab: .invities)
+            UpcomingRideView(startingTab: .upcoming, navigationDone: true)
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })
@@ -52,6 +52,7 @@ struct UpcomingRidesView: View {
 struct UpcomingRideCard: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
+    @State private var showRideDetails = false
     var hostName: String {
         viewModel.usersById[ride.createdBy] ?? "Unknown"
     }
@@ -128,12 +129,12 @@ struct UpcomingRideCard: View {
                 HStack {
                     ButtonView(title: "VIEW DETAILS", fontSize: 14, onTap :{
                         Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
+                            showRideDetails = true
                         }
                     }, height: 32)
                     ButtonView(title: "CANCEL RIDE",  fontSize: 14,  background: AppColor.darkRed, onTap :{
                         Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+                            await viewModel.deleteRide(rideId: ride.id)
                         }
                     },height: 32)
                     
@@ -158,6 +159,9 @@ struct UpcomingRideCard: View {
             }
             
         }
+        .navigationDestination(isPresented: $showRideDetails, destination: {
+            RideDetailsView(viewModel: viewModel, ride: $ride)
+        })
         .padding()
         .frame(width: 290)
         .background(AppColor.backgroundLight)

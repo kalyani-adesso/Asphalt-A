@@ -15,6 +15,7 @@ struct UpcomingRideView: View {
     @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
     @State var showpopup: Bool = false
+    @State var navigationDone: Bool
     var hasPendingInvites: Bool {
         viewModel.rides.contains { $0.rideAction == .invities }
     }
@@ -22,9 +23,10 @@ struct UpcomingRideView: View {
     @State private var openGallery = false
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
+    @State private var showNotification = false
+    @State private var showSlideBar = false
 
     var body: some View {
-        AppToolBar{
             ZStack{
                 VStack {
                     ReusableHeader {
@@ -138,7 +140,6 @@ struct UpcomingRideView: View {
                     ProgressViewReusable(title: "Loading Rides...")
                 }
                 
-            }
         }
             .overlay {
                 if activePopup != nil {
@@ -169,6 +170,45 @@ struct UpcomingRideView: View {
                 await viewModel.fetchAllRides()
                 await viewModel.fetchAllUsers()
             }
+            .toolbar {
+                if navigationDone{
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button {
+                            showHome = true
+                        } label: {
+                            AppIcon.CreateRide.backButton
+                        }
+                        
+                    }
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button {
+                            showNotification = true
+                        } label: {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(AppColor.celticBlue)
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
+                        }
+                        
+                        Button {
+                            showSlideBar = true
+                        } label: {
+                            AppIcon.Home.navigation
+                        }
+                    }
+                }
+            }
+            .navigationDestination(isPresented: $showSlideBar, destination: {
+                NavigationSlideBar()
+            })
+            .navigationDestination(isPresented: $showNotification, destination: {
+                NotificationView()
+            })
         }
     
     private func handleUpload() {
@@ -455,7 +495,7 @@ struct ButtonBackground: ViewModifier {
 }
 
 #Preview {
-    UpcomingRideView()
+    UpcomingRideView( navigationDone: true)
         .environmentObject(HomeViewModel())
         .environmentObject(UpcomingRideViewModel())
 }

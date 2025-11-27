@@ -53,6 +53,15 @@ struct RouteView: View {
                 }
                 Button(action: {
                     isAssemblySameAsStart.toggle()
+                    if !isAssemblySameAsStart {
+                        viewModel.ride.assemblyPoint = viewModel.ride.assemblyPoint
+                            viewModel.ride.assemblyLat = viewModel.ride.assemblyLat
+                            viewModel.ride.assemblyLon = viewModel.ride.assemblyLon
+                        } else {
+                            viewModel.ride.assemblyPoint = ""
+                            viewModel.ride.assemblyLat = 0.0
+                            viewModel.ride.assemblyLon = 0.0
+                        }
                 }) {
                     HStack {
                         Image(systemName: isAssemblySameAsStart ? "checkmark.square.fill" : "square")
@@ -85,7 +94,10 @@ struct RouteView: View {
                 PlaceSearchView(
                     searchText: searchText,
                     isSelectingStart: isSelectingStart,
-                    isSelectingDestination: isSelectingDestination, isSelectingAssembly: isSelectingAssembly, dismiss: { showLocationPicker = false }
+                    isSelectingDestination: isSelectingDestination,
+                    isSelectingAssembly: isSelectingAssembly,
+                    isAssemblySameAsStart : isAssemblySameAsStart,
+                    dismiss: { showLocationPicker = false }
                 )
             }
             .frame(width: 343)

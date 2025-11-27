@@ -197,22 +197,41 @@ struct DetailsView: View {
                             viewModel.selectedStartDate = Date()
                         }
                         activePicker = nil
-                    }
+                    }, minimumDate: Date()
                 )
                 
             case .endDate:
                 CustomDatePicker(
                     selectedDate: Binding(
-                        get: { viewModel.selectedEndDate ?? Date() },
-                        set: { viewModel.selectedEndDate = $0 }
+                        get: {
+                            // If end date is nil or before start date, default to start date
+                            if let end = viewModel.selectedEndDate,
+                               let start = viewModel.selectedStartDate,
+                               end >= start {
+                                return end
+                            } else {
+                                return viewModel.selectedStartDate ?? Date()
+                            }
+                        },
+                        set: { newEnd in
+                            // Ensure end date is always >= start date
+                            if let start = viewModel.selectedStartDate, newEnd >= start {
+                                viewModel.selectedEndDate = newEnd
+                            } else {
+                                viewModel.selectedEndDate = viewModel.selectedStartDate
+                            }
+                        }
                     ),
                     onDismiss: {
+                        // Default end date if nil
                         if viewModel.selectedEndDate == nil {
-                            viewModel.selectedEndDate = Date()
+                            viewModel.selectedEndDate = viewModel.selectedStartDate ?? Date()
                         }
                         activePicker = nil
-                    }
+                    },
+                    minimumDate: viewModel.selectedStartDate ?? Date()
                 )
+
                 
             case .startTime:
                 CustomTimePicker(

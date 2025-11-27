@@ -12,7 +12,6 @@ struct ProfileScreen: View {
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
     @Environment(\.dismiss) var dismiss
-    var onBackToHome: (() -> Void)? = nil
     var body: some View {
             ZStack {
                 VStack {

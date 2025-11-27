@@ -71,7 +71,7 @@ struct ShareView: View {
             .padding()
         }
         .navigationDestination(isPresented: $isPresented, destination: {
-            UpcomingRideView(showpopup: true)
+            UpcomingRideView(showpopup: true, navigationDone: true)
                 .environmentObject(UpcomingViewModel)
                 .environmentObject(home)
             

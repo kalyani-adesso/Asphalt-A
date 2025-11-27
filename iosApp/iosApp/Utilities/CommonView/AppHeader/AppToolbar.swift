@@ -11,6 +11,7 @@ struct AppToolBar<Content: View>: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showNotification = false
     @State private var showSlideBar = false
+    @State var showHome: Bool = false
     
     let content: Content
     
@@ -25,7 +26,7 @@ struct AppToolBar<Content: View>: View {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     
                     Button {
-                        dismiss()
+                       showHome = true
                     } label: {
                         AppIcon.CreateRide.backButton
                     }
@@ -58,6 +59,9 @@ struct AppToolBar<Content: View>: View {
             })
             .navigationDestination(isPresented: $showNotification, destination: {
                 NotificationView()
+            })
+            .navigationDestination(isPresented: $showHome, destination: {
+                BottomNavBar()
             })
     }
 }
