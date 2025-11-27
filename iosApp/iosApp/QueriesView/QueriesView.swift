@@ -11,8 +11,6 @@ struct QueriesView: View {
     @StateObject private var viewModel = QueryViewModel()
     @State private var selectedStatus: String? = nil
     @State private var showAskPopup = false
-    
-    var onBackToHome: (() -> Void)? = nil
     var body: some View {
         NavigationStack {
             ZStack {

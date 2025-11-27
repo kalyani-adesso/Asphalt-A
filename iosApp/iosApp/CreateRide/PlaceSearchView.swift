@@ -14,6 +14,7 @@ struct PlaceSearchView: View {
     var isSelectingStart: Bool
     var isSelectingDestination: Bool
     var isSelectingAssembly: Bool
+    var isAssemblySameAsStart: Bool
     var dismiss: () -> Void
     
     var body: some View {
@@ -21,7 +22,7 @@ struct PlaceSearchView: View {
             List(viewModel.results, id: \.self) { result in
                 Text(result.title)
                     .onTapGesture {
-                        viewModel.selectPlace(result, isStart: isSelectingStart,isAssembly: isSelectingAssembly, isDestination: isSelectingDestination)
+                        viewModel.selectPlace(result, isStart: isSelectingStart,isAssembly: isSelectingAssembly, isDestination: isSelectingDestination, isAssemblySameAsStart: isAssemblySameAsStart)
                         dismiss()
                     }
             }
