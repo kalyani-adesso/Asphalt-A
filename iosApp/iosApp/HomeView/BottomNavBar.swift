@@ -29,7 +29,7 @@ struct BottomNavBar: View {
                         UpcomingRideView(showpopup: false)
                             .environmentObject(upcomingRideViewModel)
                             .environmentObject(homeViewModel)
-                            
+                        
                     case 2:
                         QueriesView(onBackToHome: { selectedTab = 0 })
                     case 3:
@@ -62,17 +62,18 @@ struct BottomNavBar: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
-           
+            
             .toolbar {
+    
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                        if selectedTab != 0 {
-                            Button {
-                                selectedTab = 0
-                            } label: {
-                                AppIcon.CreateRide.backButton
-                            }
+                    if selectedTab != 0 {
+                        Button {
+                            selectedTab = 0
+                        } label: {
+                            AppIcon.CreateRide.backButton
                         }
                     }
+                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         self.showNotification = true
@@ -94,6 +95,7 @@ struct BottomNavBar: View {
                     }
                 }
             }
+            
             .navigationDestination(isPresented: $showSlideBar, destination: {
                 NavigationSlideBar()
             })
@@ -102,6 +104,7 @@ struct BottomNavBar: View {
             })
             .navigationBarBackButtonHidden(true)
         }
+        
     }
     
     // MARK: - Tab Item View
