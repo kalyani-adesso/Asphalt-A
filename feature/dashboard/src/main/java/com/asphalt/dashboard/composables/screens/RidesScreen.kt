@@ -332,32 +332,12 @@ fun UpcomingRides(
             )
 
         }
-        Spacer(modifier = Modifier.height(Dimensions.size25))
+        Spacer(modifier = Modifier.height(Dimensions.size10))
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
                 Dimensions.padding16
             )
         ) {
-            GradientButton(
-                onClick = {
-
-                },
-                buttonHeight = Dimensions.size50,
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(Dimensions.size0),
-                buttonRadius = Dimensions.size10,
-            ) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(
-                        stringResource(R.string.share).uppercase(),
-                        style = TypographyMedium.bodySmall,
-                        color = NeutralWhite,
-
-                        )
-                }
-
-            }
-//
             BorderedButton(
                 onClick = {
                     upComingViewDetails.invoke(upconing.ridesId.toString())
@@ -369,6 +349,8 @@ fun UpcomingRides(
                 buttonRadius = Dimensions.size10,
                 contentPaddingValues = PaddingValues(0.dp)
             ) {
+                Image(painter = painterResource(R.drawable.ic_eye_blue), contentDescription = "")
+                Spacer(Modifier.width(Dimensions.size8))
                 Text(
                     text = if (upconing.rideStatus == UPCOMING) {
                         stringResource(R.string.view_details).uppercase()
@@ -377,6 +359,45 @@ fun UpcomingRides(
                     }, style = TypographyMedium.bodySmall, color = PrimaryDarkerLightB75
                 )
             }
+
+            BorderedButton(
+                onClick = {
+                   // upComingViewDetails.invoke(upconing.ridesId.toString())
+                },
+                modifier = Modifier
+                    .height(Dimensions.size50)
+                    .background(NeutralWhite)
+                    .weight(1f),
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
+            ) {
+                Image(painter = painterResource(R.drawable.ic_share_blue), contentDescription = "")
+                Spacer(Modifier.width(Dimensions.size8))
+                Text(
+                    text = stringResource(R.string.share).uppercase(),
+                    style = TypographyMedium.bodySmall,
+                    color = PrimaryDarkerLightB75
+                )
+            }
+            /*BorderedButton(
+                onClick = {
+                    //upComingViewDetails.invoke(upconing.ridesId.toString())
+                },
+                modifier = Modifier
+                    .height(Dimensions.size50)
+                    .background(NeutralWhite)
+                    .weight(1f),
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
+            ) {
+                    Text(
+                        text=stringResource(R.string.share).uppercase(),
+                        style = TypographyMedium.bodySmall,
+                        color = NeutralWhite,
+
+                        )
+
+            }*/
 
 //
         }
