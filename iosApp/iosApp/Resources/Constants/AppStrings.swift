@@ -124,7 +124,6 @@ public struct AppStrings{
         case validateConfirmPassword = "Passwords do not match"
     }
 
-
     enum userdefaultKeys: String {
         case rememberMeData = "com.adesso.rider.club.rememberMeData"
         case hasSeenOnboarding = "com.adesso.rider.club.hasSeenOnboarding"
@@ -313,8 +312,6 @@ public struct AppStrings{
             }
         }
     }
-    
-  
 
     enum EditProfile {
         static let editProfile = "Edit Profile"
@@ -454,6 +451,10 @@ public struct AppStrings{
         static let noPhoto = "No photos selected"
         static let cancel =  "CANCEL"
         static let addMore =  "ADD MORE"
+    }
+    
+    enum RideDetails {
+        static let deleteRide = "DELETE RIDE"
     }
 }
 

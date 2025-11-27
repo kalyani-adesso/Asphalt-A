@@ -19,7 +19,8 @@ struct JoinRideModel: Identifiable,Hashable {
     let description: String
     let route: String
     let distance: String
-    let date: String
+    let startDate: String
+    let endDate: String
     let ridersCount: String
     let maxRiders: String
     let riderImage: String
@@ -98,8 +99,11 @@ extension JoinRideViewModel {
             
             for ride in filteredRideArray {
                 guard let startEpoch = ride.startDate else { continue }
+                guard let endEpoch = ride.endDate else { continue }
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
-                let dateString = self.formatDate(startDate)
+                let endDate = Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000)
+                let startDateStr = self.formatDate(startDate)
+                let endDateString = self.formatDate(endDate)
                 let participants = ride.participants
                 
                 // Fetch user name asynchronously
@@ -121,7 +125,8 @@ extension JoinRideViewModel {
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                         distance: "\(Int(ride.rideDistance)) km",
-                        date: dateString,
+                        startDate: startDateStr,
+                        endDate: endDateString,
                         ridersCount: "\(joinedCount)",
                         maxRiders: "\(ride.participants.count)",
                         riderImage: "rider_avatar",

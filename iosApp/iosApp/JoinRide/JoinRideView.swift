@@ -136,7 +136,7 @@ struct JoinRideRow: View {
                         AppIcon.JoinRide.calenderToday
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(ride?.date ?? "")
+                        Text(ride?.startDate ?? "")
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }

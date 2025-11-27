@@ -291,7 +291,7 @@ struct UpComingView: View {
                         AppIcon.UpcomingRide.calender
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(ride.date)
+                        Text(ride.startDateStr)
                             .font(KlavikaFont.regular.font(size: 16))
                             .foregroundStyle(AppColor.richBlack)
                     }

@@ -35,14 +35,25 @@ struct RideDetailsView: View {
                                 Spacer()
                             }
                             
-                            HStack {
+                            VStack {
                                 HStack(spacing: 5) {
                                     AppIcon.UpcomingRide.calender
                                         .resizable()
                                         .frame(width: 16, height: 16)
-                                    Text(ride.date)
+                                    Text(ride.startDateStr)
                                         .font(KlavikaFont.regular.font(size: 16))
                                         .foregroundStyle(AppColor.richBlack)
+                                    Spacer()
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                    Text(ride.endDateStr)
+                                        .font(KlavikaFont.regular.font(size: 16))
+                                        .foregroundStyle(AppColor.richBlack)
+                                    Spacer()
                                 }
                                 Spacer()
                                 HStack(spacing: 5) {
@@ -52,6 +63,7 @@ struct RideDetailsView: View {
                                     Text("\(ride.riderCount) rides")
                                         .font(KlavikaFont.regular.font(size: 16))
                                         .foregroundStyle(AppColor.richBlack)
+                                    Spacer()
                                 }
                             }
                         }
@@ -84,12 +96,13 @@ struct RideDetailsView: View {
                         }
                         
                         ButtonView(
-                            title:"START RIDE",
-                            icon: AppIcon.JoinRide.nearMe,
+                            title:AppStrings.RideDetails.deleteRide,
                             fontSize: 16 ,
-                            background: AppColor.dimGreen,
-                            foregroundColor: AppColor.white,
+                            background: AppColor.white,
+                            foregroundColor: AppColor.darkRed,
                             showShadow: false,
+                            borderColor: AppColor.darkRed,
+                            borderWidth: 2,
                             onTap: {
                                 startRide = true
                             }

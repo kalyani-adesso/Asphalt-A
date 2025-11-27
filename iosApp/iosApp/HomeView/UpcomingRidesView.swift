@@ -82,7 +82,7 @@ struct UpcomingRideCard: View {
             }
             HStack(spacing: 8) {
                 AppIcon.Home.calender
-                Text(ride.date)
+                Text(ride.startDateStr)
                     .font(KlavikaFont.regular.font(size: 12))
                     .foregroundColor(AppColor.stoneGray)
                 Spacer()

@@ -41,7 +41,8 @@ struct RideModel: Identifiable,Hashable {
     var status: RideStatus
     var rideViewAction: RideViewAction
     var rideAction: RideAction
-    let date: String
+    let startDateStr:String
+    let endDateStr:String
     let riderCount: Int
     let createdBy: String
     var hasPhotos: Bool = false
@@ -77,7 +78,7 @@ class UpcomingRideViewModel: ObservableObject {
     private let userRepo: UserRepository
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
-    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
+    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "",startDate: "",endDate: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -112,7 +113,10 @@ class UpcomingRideViewModel: ObservableObject {
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
                 if startDate.addingTimeInterval(60) < now { continue }
-                let dateString = formatDate(startDate)
+                let endDate = Date(timeIntervalSince1970: Double(ride.endDate?.int64Value ?? 0) / 1000)
+                let startDateString = formatDate(startDate)
+                let endDateString = formatDate(endDate)
+                
                 let participantsExcludingCreator = ride.participants.filter { $0.userId != ride.createdBy }
                 let participantCount = participantsExcludingCreator.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
@@ -189,7 +193,8 @@ class UpcomingRideViewModel: ObservableObject {
                     status: rideStatus,
                     rideViewAction: rideViewAction,
                     rideAction: rideAction,
-                    date: dateString,
+                    startDateStr: startDateString,
+                    endDateStr: endDateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
                     startDate: startDate,
@@ -322,7 +327,8 @@ class UpcomingRideViewModel: ObservableObject {
             guard
                 let success = result as? APIResultSuccess<AnyObject>,
                 let ride = success.data as? RidesData,
-                let startEpoch = ride.startDate
+                let startEpoch = ride.startDate,
+                let endEpoch = ride.endDate
             else {
                 self.isRideLoading = false
                 return
@@ -330,7 +336,8 @@ class UpcomingRideViewModel: ObservableObject {
 
             let currentUserId = MBUserDefaults.userIdStatic ?? ""
             let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
-            let dateString = self.formatDate(startDate)
+            let startDateString = self.formatDate(startDate)
+            let endDateString = self.formatDate(Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000))
 
             // -------------------------
             // MARK: Build Final Participants List
@@ -369,7 +376,8 @@ class UpcomingRideViewModel: ObservableObject {
                     description: ride.description_ ?? "",
                     route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
                     distance: "\(Int(ride.rideDistance)) km",
-                    date: dateString,
+                    startDate: startDateString,
+                    endDate: endDateString,
                     ridersCount: "\(confirmedCount)",
                     maxRiders: "\(finalParticipants.count)",
                     riderImage: "rider_avatar",
