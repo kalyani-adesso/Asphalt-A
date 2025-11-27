@@ -22,13 +22,18 @@ data class MessageRoot(
 
     @SerialName("onGoingRideID")
     val onGoingRideID: String? = null,
+
+    @SerialName("timeStamp")
+    val timeStamp: Long? = null
 )
 
 data class MessageDTO(
+    val id: String,
     val senderID: String,
     val senderName: String,
     val receiverID: String,
     val receiverName: String,
     val message: String,
-    val onGoingRideID: String
+    val onGoingRideID: String,
+    val timeStamp: Long
 )
