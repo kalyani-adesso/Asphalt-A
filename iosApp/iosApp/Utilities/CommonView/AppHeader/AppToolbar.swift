@@ -12,25 +12,24 @@ struct AppToolBar<Content: View>: View {
     @State private var showNotification = false
     @State private var showSlideBar = false
     
-    let showBack: Bool
     let content: Content
-
-    init(showBack: Bool = true, @ViewBuilder content: () -> Content) {
-        self.showBack = showBack
+    
+    init( @ViewBuilder content: () -> Content) {
+        
         self.content = content()
     }
-
+    
     var body: some View {
         content
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    if showBack {
-                        Button {
-                            dismiss()
-                        } label: {
-                            AppIcon.CreateRide.backButton
-                        }
+                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        AppIcon.CreateRide.backButton
                     }
+                    
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
@@ -46,7 +45,7 @@ struct AppToolBar<Content: View>: View {
                                 .offset(x: -2, y: 1)
                         }
                     }
-
+                    
                     Button {
                         showSlideBar = true
                     } label: {
@@ -54,6 +53,12 @@ struct AppToolBar<Content: View>: View {
                     }
                 }
             }
+            .navigationDestination(isPresented: $showSlideBar, destination: {
+                NavigationSlideBar()
+            })
+            .navigationDestination(isPresented: $showNotification, destination: {
+                NotificationView()
+            })
     }
 }
 
