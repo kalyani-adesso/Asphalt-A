@@ -464,7 +464,7 @@ fun NavigationRoot(
                     entry<AppNavKey.RideDetails> { key ->
                         RidesDetailsScreen(
                             rideId = key.ridesID,
-                            setTopAppBarState = setTopAppBarState,
+                            setTopAppBarState = setTopAppBarState, onBack = ::onBackPressed
                         )
                     }
                 }

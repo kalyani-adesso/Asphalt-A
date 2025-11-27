@@ -13,6 +13,8 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -95,5 +97,19 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             _ridersList.value = list
         }
+    }
+
+    fun deleteRide(ridesId: String, successMessage: String, deleteSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val apiResult = APIHelperUI.runWithLoader {
+                ridesRepo.deleteRide(ridesId)
+
+            }
+            APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
+                UIStateHandler.sendEvent(UIState.SUCCESS(successMessage))
+                deleteSuccess.invoke()
+            }
+        }
+
     }
 }

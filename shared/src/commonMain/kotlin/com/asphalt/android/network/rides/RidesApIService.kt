@@ -38,4 +38,6 @@ interface RidesApIService {
 
     suspend fun sendMessage(message: MessageRoot) : APIResult<Unit>
 
+    suspend fun deleteRide(rideId:String) : APIResult<Unit>
+
 }

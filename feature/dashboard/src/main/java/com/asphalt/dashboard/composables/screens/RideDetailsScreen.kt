@@ -38,13 +38,14 @@ import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.RidersList
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.LightBlue
 import com.asphalt.commonui.theme.LightGreen30
-import com.asphalt.commonui.theme.LightGreen40
 import com.asphalt.commonui.theme.LightOrange
 import com.asphalt.commonui.theme.MagentaDeep
 import com.asphalt.commonui.theme.NeutralBlack
@@ -61,7 +62,6 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
-import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.viewmodels.RidesDetailsViewModel
@@ -70,7 +70,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RidesDetailsScreen(
     rideId: String?, setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidesDetailsViewModel = koinViewModel()
+    viewModel: RidesDetailsViewModel = koinViewModel(), onBack: () -> Unit
 ) {
     //val ridesData by viewModel.ridesData
     //viewModel.getUserList()
@@ -114,35 +114,38 @@ fun RidesDetailsScreen(
                     .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
             ) {
 
-               /* GradientButton(
-                    onClick = {},
-                    startColor = LightGreen40,
-                    endColor = LightGreen40,
-                    buttonHeight = Dimensions.size50, buttonRadius = Dimensions.radius15
+                /* GradientButton(
+                     onClick = {},
+                     startColor = LightGreen40,
+                     endColor = LightGreen40,
+                     buttonHeight = Dimensions.size50, buttonRadius = Dimensions.radius15
 
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_navigate),
-                            contentDescription = ""
-                        )
-                        Spacer(modifier = Modifier.width(Dimensions.size10))
-                        Text(
-                            "Start Ride".uppercase(),
-                            color = NeutralWhite,
-                            fontSize = Dimensions.textSize16,
-                            style = TypographyBold.labelLarge,
-                        )
-                    }
-                }
-                Spacer(Modifier.height(Dimensions.size20))*/
-                if (viewModel.showDeleteButton.value){
+                 ) {
+                     Row(
+                         modifier = Modifier.fillMaxWidth(),
+                         horizontalArrangement = Arrangement.Center
+                     ) {
+                         Image(
+                             painter = painterResource(R.drawable.ic_navigate),
+                             contentDescription = ""
+                         )
+                         Spacer(modifier = Modifier.width(Dimensions.size10))
+                         Text(
+                             "Start Ride".uppercase(),
+                             color = NeutralWhite,
+                             fontSize = Dimensions.textSize16,
+                             style = TypographyBold.labelLarge,
+                         )
+                     }
+                 }
+                 Spacer(Modifier.height(Dimensions.size20))*/
+                if (viewModel.showDeleteButton.value) {
+                    val message =stringResource(R.string.delete_ride_success)
                     BorderedButton(
                         onClick = {
-                            // upComingViewDetails.invoke(upconing.ridesId.toString())
+                            viewModel.deleteRide(rideId ?: "",message) {
+                                onBack.invoke()
+                            }
                         },
                         modifier = Modifier
                             .height(Dimensions.size50)
@@ -163,10 +166,10 @@ fun RidesDetailsScreen(
                             color = VividRed,
                         )
                     }
+                }
             }
         }
     }
-}
 
 
 }
@@ -626,5 +629,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
 @Composable
 fun RideDetailsPreview() {
     val viewModel = RidesDetailsViewModel()
-    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel)
+    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel){
+
+    }
 }
