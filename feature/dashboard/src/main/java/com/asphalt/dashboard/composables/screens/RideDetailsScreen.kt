@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,7 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
+import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.viewmodels.RidesDetailsViewModel
@@ -432,7 +434,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(modifier = Modifier.weight(1f)) {
+            Row(modifier = Modifier.weight(1.5f)) {
                 ColorIconRounded(
                     backColor = MagentaDeep,
                     resId = R.drawable.ic_location
@@ -458,6 +460,20 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                 }
 
             }
+            RoundedBox(
+                modifier = Modifier.size(Dimensions.size30),
+                cornerRadius = Dimensions.size10,
+                backgroundColor = PrimaryDarkerLightB75
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_message),
+                        null,
+                        modifier = Modifier.clickable {
+                            //TODO:Click action for message
+                        })
+                }
+            }
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
         Row(
@@ -466,7 +482,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(modifier = Modifier.weight(1.4f)) {
+            Row(modifier = Modifier.weight(1.5f)) {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
@@ -494,7 +510,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                         painter = painterResource(R.drawable.ic_clock_blue),
                         contentDescription = ""
                     )
-                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
                     Text(
                         text = viewModel.ridesData.value?.startDate?.let {
                             Utils.getTime(
@@ -515,7 +531,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(modifier = Modifier.weight(1.4f)) {
+            Row(modifier = Modifier.weight(1.5f)) {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
@@ -543,7 +559,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                         painter = painterResource(R.drawable.ic_clock_blue),
                         contentDescription = ""
                     )
-                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Spacer(modifier = Modifier.width(Dimensions.size8))
                     Text(
                         text = viewModel.ridesData.value?.endDate?.let {
                             Utils.getTime(
