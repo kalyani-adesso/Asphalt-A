@@ -139,32 +139,34 @@ fun RidesDetailsScreen(
                     }
                 }
                 Spacer(Modifier.height(Dimensions.size20))
-                BorderedButton(
-                    onClick = {
-                        // upComingViewDetails.invoke(upconing.ridesId.toString())
-                    },
-                    modifier = Modifier
-                        .height(Dimensions.size50)
-                        .background(NeutralWhite)
-                        .fillMaxWidth(),
-                    buttonRadius = Dimensions.radius15,
-                    buttonHeight = Dimensions.size50, borderColor = VividRed
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_cancel_ride_icon),
-                        contentDescription = ""
-                    )
-                    Spacer(Modifier.width(Dimensions.size10))
-                    Text(
-                        text = stringResource(R.string.cancel_ride).uppercase(),
-                        fontSize = Dimensions.textSize16,
-                        style = TypographyBold.labelLarge,
-                        color = VividRed,
-                    )
-                }
+                if (viewModel.showDeleteButton.value){
+                    BorderedButton(
+                        onClick = {
+                            // upComingViewDetails.invoke(upconing.ridesId.toString())
+                        },
+                        modifier = Modifier
+                            .height(Dimensions.size50)
+                            .background(NeutralWhite)
+                            .fillMaxWidth(),
+                        buttonRadius = Dimensions.radius15,
+                        buttonHeight = Dimensions.size50, borderColor = VividRed
+                    ) {
+                        /* Image(
+                            painter = painterResource(R.drawable.ic_cancel_ride_icon),
+                            contentDescription = ""
+                        )*/
+                        Spacer(Modifier.width(Dimensions.size10))
+                        Text(
+                            text = stringResource(R.string.delete_ride).uppercase(),
+                            fontSize = Dimensions.textSize16,
+                            style = TypographyBold.labelLarge,
+                            color = VividRed,
+                        )
+                    }
             }
         }
     }
+}
 
 
 }
@@ -317,7 +319,7 @@ fun UserRow(user: RidersList) {
                                 Image(
                                     painter = if (user.inviteStatus ==
                                         APIConstants.RIDE_ACCEPTED ||
-                                        user.inviteStatus == APIConstants.RIDE_JOINED|| user.inviteStatus == APIConstants.END_RIDE
+                                        user.inviteStatus == APIConstants.RIDE_JOINED || user.inviteStatus == APIConstants.END_RIDE
                                     )
                                         painterResource(R.drawable.ic_tick_accept)
                                     else if (user.inviteStatus == APIConstants.RIDE_INVITED)

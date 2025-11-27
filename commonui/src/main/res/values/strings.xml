@@ -259,7 +259,7 @@
     <string name="assembly_point">Assembly Point</string>
     <string name="enter_assembly">Enter assembly point</string>
     <string name="assembly_msg">Assembly point same as starting location</string>
-    <string name="cancel_ride">CANCEL RIDE</string>
+    <string name="delete_ride">Delete Ride</string>
 
 
 
