@@ -151,7 +151,9 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = (viewModel.rideDetailsState.value.dateString ?: "") +" - "+
-                            viewModel.rideDetailsState.value.displayTime ,
+                            viewModel.rideDetailsState.value.displayTime +" - "+
+                                    (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
+                                    viewModel.rideDetailsState.value.endDisplayTime,
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )

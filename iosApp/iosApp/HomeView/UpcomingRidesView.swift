@@ -11,7 +11,7 @@ struct UpcomingRidesView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
-  
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
@@ -127,15 +127,12 @@ struct UpcomingRideCard: View {
                     Task {
                         await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
                     }
-                }, height: 50)
-                ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: LinearGradient(
-                    gradient: Gradient(colors: [AppColor.darkRed, AppColor.darkRed]),
-                    startPoint: .leading,
-                    endPoint: .trailing), onTap :{
-                        Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
-                        }
-                    },height: 50)
+                }, height: 32)
+                ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: AppColor.darkRed, onTap :{
+                    Task {
+                        await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+                    }
+                },height: 32)
                 
             }
             .padding(.vertical,10)
@@ -161,11 +158,11 @@ var emptyStateView: some View {
             AppIcon.UpcomingRide.message
                 .resizable()
                 .frame(width: 25, height: 25)
-
+            
             Text("No Upcoming Rides !!!")
                 .font(KlavikaFont.bold.font(size: 16))
                 .foregroundColor(AppColor.richBlack)
-
+            
         }
         Text("You’ll see your ride invites here once someone adds you.")
             .font(KlavikaFont.regular.font(size: 12))

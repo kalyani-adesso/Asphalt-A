@@ -13,35 +13,46 @@ struct DashboardView: View {
     
     
     var body: some View {
-            HStack(alignment: .top, spacing: 15) {
-                VStack(spacing: 10) {
-                    Button {
-                        currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
-                    } label: {
-                        AppIcon.Home.arrow
-                    }
-                    .buttonStyle(.plain)
-                    let yearString = Calendar.current.component(.year, from: currentDate)  % 100
-                    Text(CalendarFormat().dateFormatter.string(from: currentDate))
-                        .font(KlavikaFont.medium.font(size: 18))
-                    Text(String(yearString))
-                        .font(KlavikaFont.bold.font(size: 30))
-                    let isToday = Calendar.current.isDateInToday(currentDate)
-                    Button {
-                        let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
-                        if nextDate <= Date()
-                        {
-                            currentDate = nextDate
-                        }
-                    } label: {
-                        AppIcon.Home.arrow
-                            .rotationEffect(.degrees(180))
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isToday)
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 8)
+            VStack(spacing: 15) {
+                HStack {
+                               VStack(alignment: .leading, spacing: 2) {
+                                   Text("Your Ride Stats")
+                                       .font(KlavikaFont.bold.font(size: 18))
+
+                                   let yearString = Calendar.current.component(.year, from: currentDate)
+                                   Text("\((CalendarFormat().dateFormatter.string(from: currentDate))) - \(String(yearString))")
+                                       .font(KlavikaFont.bold.font(size: 12))
+                                       .foregroundColor(AppColor.mediumDarkGray)
+                               }
+
+                               Spacer()
+
+                               HStack(spacing: 20) {
+                                   Button {
+                                       currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                                   } label: {
+                                       Image(systemName: "chevron.left")
+                                           .font(.system(size: 16, weight: .semibold))
+                                           .foregroundColor(AppColor.celticBlue)
+                                   }
+                                   .buttonStyle(.plain)
+                                   let isToday = Calendar.current.isDateInToday(currentDate)
+                                   Button {
+                                       let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+                                       if nextDate <= Date()
+                                       {
+                                           currentDate = nextDate
+                                       }
+                                   } label: {
+                                       Image(systemName: "chevron.right")
+                                           .font(.system(size: 16, weight: .semibold))
+                                           .foregroundColor(isToday ? AppColor.grey : AppColor.celticBlue)
+                                   }
+                                   .buttonStyle(.plain)
+                                   .disabled(isToday)
+                               }
+                           }
+                .padding(.horizontal, 10)
                 .cornerRadius(12)
                 HStack(spacing: 15) {
                     ForEach(home.stats) { stat in
@@ -49,7 +60,6 @@ struct DashboardView: View {
                     }
                 }
             }
-            .frame(width: 345)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(15)
@@ -77,31 +87,27 @@ struct StatCardView: View {
     let stat: RideStat
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            stat.icon
-                .frame(width: 21, height: 19)
-            
-            LinearGradient(
-                gradient: Gradient(colors: [.white.opacity(0), .white, .white.opacity(0)]),
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-            .frame(width: 53, height: 1)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(stat.value)")
-                    .font(KlavikaFont.medium.font(size: 16))
-                Text(stat.title)
-                    .font(KlavikaFont.regular.font(size: 12))
+            VStack(alignment: .leading, spacing: 8) {
+                stat.icon
+                    .renderingMode(.template)
+                    .foregroundColor(AppColor.celticBlue)
+                    .frame(width: 28, height: 24)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(stat.value)")
+                        .font(KlavikaFont.medium.font(size: 24))
+                    Text(stat.title)
+                        .font(KlavikaFont.light.font(size: 12))
+                }
             }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(AppColor.mediumGray)
+            .cornerRadius(14)
         }
-        .frame(width: 80, height: 114)
-        .background(stat.color)
-        .cornerRadius(10)
-        .foregroundColor(.white)
-    }
 }
 
 #Preview {
     DashboardView()
+        .environmentObject(HomeViewModel())
 }

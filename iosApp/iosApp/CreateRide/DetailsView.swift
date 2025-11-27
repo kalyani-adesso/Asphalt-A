@@ -12,6 +12,11 @@ struct DetailsView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showDatePicker = false
     @State private var showTimePicker = false
+    @State private var activePicker: PickerType?
+    enum PickerType: String, Identifiable {
+        case startDate, endDate, startTime, endTime
+        var id: String { rawValue }
+    }
     
     
     var body: some View {
@@ -65,49 +70,97 @@ struct DetailsView: View {
                         .font(KlavikaFont.regular.font(size: 16))
                         .foregroundColor(AppColor.richBlack)
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 8)    
+                        .padding(.vertical, 8)
                         .frame(minHeight: 100, alignment: .topLeading)
                         .background(Color.white)
                         .cornerRadius(10)
                     
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(AppStrings.CreateRide.date).font(KlavikaFont.medium.font(size: 16))
+                            Text(AppStrings.CreateRide.startDate).font(KlavikaFont.medium.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             Button {
+                                activePicker = .startDate
                                 showDatePicker.toggle()
                             } label: {
                                 HStack{
                                     AppIcon.CreateRide.calendar_month
                                         .renderingMode(.template)
-                                        .foregroundColor(viewModel.selectedDate != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedStartDate != nil ? AppColor.richBlack : AppColor.stoneGray)
                                         .frame(width: 24, height: 24)
-                                    Text(viewModel.selectedDate != nil ? DateFormatter.displayDate.string(from: viewModel.selectedDate!): "Pick date")
+                                    Text(viewModel.selectedStartDate != nil ? DateFormatter.displayDate.string(from: viewModel.selectedStartDate!): "select")
                                         .font(KlavikaFont.regular.font(size: 14))
-                                        .foregroundColor(viewModel.selectedDate != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedStartDate != nil ? AppColor.richBlack : AppColor.stoneGray)
                                 }
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(10)
                             }
                         }
                         VStack(alignment: .leading) {
-                            Text(AppStrings.CreateRide.time).font(KlavikaFont.medium.font(size: 16))
+                            Text(AppStrings.CreateRide.startTime).font(KlavikaFont.medium.font(size: 16))
                                 .foregroundColor(AppColor.black)
                             Button {
+                                activePicker = .startTime
                                 showTimePicker.toggle()
                             } label: {
                                 HStack{
                                     AppIcon.CreateRide.timePicker
                                         .renderingMode(.template)
-                                        .foregroundColor(viewModel.selectedTime != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedStartTime != nil ? AppColor.richBlack : AppColor.stoneGray)
                                         .frame(width: 24, height: 24)
-                                    Text(viewModel.selectedTime != nil ? DateFormatter.displayTime.string(from: viewModel.selectedTime!): "Pick time")
+                                    Text(viewModel.selectedStartTime != nil ? DateFormatter.displayTime.string(from: viewModel.selectedStartTime!): "select")
                                         .font(KlavikaFont.regular.font(size: 14))
-                                        .foregroundColor(viewModel.selectedTime != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .foregroundColor(viewModel.selectedStartTime != nil ? AppColor.richBlack : AppColor.stoneGray)
                                 }
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
+                            }
+                        }
+                    }
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(AppStrings.CreateRide.endDate).font(KlavikaFont.medium.font(size: 16))
+                                .foregroundColor(AppColor.black)
+                            Button {
+                                activePicker = .endDate
+                                showDatePicker.toggle()
+                            } label: {
+                                HStack{
+                                    AppIcon.CreateRide.calendar_month
+                                        .renderingMode(.template)
+                                        .foregroundColor(viewModel.selectedEndDate != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .frame(width: 24, height: 24)
+                                    Text(viewModel.selectedEndDate != nil ? DateFormatter.displayDate.string(from: viewModel.selectedEndDate!): "select")
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(viewModel.selectedEndDate != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
+                            }
+                        }
+                        VStack(alignment: .leading) {
+                            Text(AppStrings.CreateRide.endTime).font(KlavikaFont.medium.font(size: 16))
+                                .foregroundColor(AppColor.black)
+                            Button {
+                                activePicker = .endTime
+                                showTimePicker.toggle()
+                            } label: {
+                                HStack{
+                                    AppIcon.CreateRide.timePicker
+                                        .renderingMode(.template)
+                                        .foregroundColor(viewModel.selectedEndTime != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                        .frame(width: 24, height: 24)
+                                    Text(viewModel.selectedEndTime != nil ? DateFormatter.displayTime.string(from: viewModel.selectedEndTime!): "select")
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(viewModel.selectedEndTime != nil ? AppColor.richBlack : AppColor.stoneGray)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(10)
@@ -115,7 +168,7 @@ struct DetailsView: View {
                         }
                     }
                 }
-                .frame(width: 343, height: 440)
+                .frame(width: 343, height: 573)
                 .padding()
                 .background(AppColor.backgroundLight)
                 .cornerRadius(10)
@@ -130,25 +183,61 @@ struct DetailsView: View {
             .disabled(!viewModel.isDetailsValid)
             .padding()
         }
-        .sheet(isPresented: $showDatePicker) {
-            CustomDatePicker(selectedDate: Binding(
-                get: { viewModel.selectedDate ?? Date() },
-                set: { viewModel.selectedDate = $0 }), onDismiss:
-                                {
-                if viewModel.selectedDate == nil {
-                    viewModel.selectedDate = Date()
-                }
-                showDatePicker = false
-            })
+        .sheet(item: $activePicker) { picker in
+            switch picker {
+                
+            case .startDate:
+                CustomDatePicker(
+                    selectedDate: Binding(
+                        get: { viewModel.selectedStartDate ?? Date() },
+                        set: { viewModel.selectedStartDate = $0 }
+                    ),
+                    onDismiss: {
+                        if viewModel.selectedStartDate == nil {
+                            viewModel.selectedStartDate = Date()
+                        }
+                        activePicker = nil
+                    }
+                )
+                
+            case .endDate:
+                CustomDatePicker(
+                    selectedDate: Binding(
+                        get: { viewModel.selectedEndDate ?? Date() },
+                        set: { viewModel.selectedEndDate = $0 }
+                    ),
+                    onDismiss: {
+                        if viewModel.selectedEndDate == nil {
+                            viewModel.selectedEndDate = Date()
+                        }
+                        activePicker = nil
+                    }
+                )
+                
+            case .startTime:
+                CustomTimePicker(
+                    selectedTime: Binding(
+                        get: { viewModel.selectedStartTime ?? Date() },
+                        set: { viewModel.selectedStartTime = $0 }
+                    ),
+                    onDismiss: {
+                        activePicker = nil
+                    }
+                )
+                
+            case .endTime:
+                CustomTimePicker(
+                    selectedTime: Binding(
+                        get: { viewModel.selectedEndTime ?? Date() },
+                        set: { viewModel.selectedEndTime = $0 }
+                    ),
+                    onDismiss: {
+                        activePicker = nil
+                    }
+                )
+            }
         }
-        .sheet(isPresented: $showTimePicker) {
-            CustomTimePicker(selectedTime: Binding(
-                get: { viewModel.selectedTime ?? Date() },
-                set: { viewModel.selectedTime = $0 }), onDismiss:
-                                {
-                showTimePicker = false
-            })
-        }
+        
     }
     
     
@@ -178,7 +267,6 @@ extension DateFormatter {
         return df
     }()
 }
-
 
 #Preview {
     DetailsView()

@@ -173,7 +173,7 @@ public struct AppStrings{
         case places = "Places Explored"
         case groups = "Ride Groups"
         case invites = "Ride Invites"
-        case title = "Adventure\nJourney"
+        case title = "Adventure Journey"
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
@@ -213,8 +213,10 @@ public struct AppStrings{
         static let rideTitleLabel =  "Enter ride name..."
         static let description = "Description"
         static let descriptionLabel = "Describe the vibe..."
-        static let date = "Date"
-        static let time = "time"
+        static let startDate = "Start Date"
+        static let startTime = "Time"
+        static let endDate = "End Date"
+        static let endTime = "Time"
         static let createRide = "Create a Ride"
         static let inviteContacts = "Invite Contacts"
         static let search = "Search by name ,number or bike type..."

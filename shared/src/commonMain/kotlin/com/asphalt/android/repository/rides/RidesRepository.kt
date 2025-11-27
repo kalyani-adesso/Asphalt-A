@@ -10,7 +10,6 @@ import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.dashboard.DashboardDomain
-import com.asphalt.android.model.dashboard.PerMonthRideDataDomain
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
@@ -18,7 +17,6 @@ import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.rides.RidesApIService
-import io.ktor.util.date.getTimeMillis
 import kotlinx.datetime.TimeZone
 
 class RidesRepository(val apiService: RidesApIService) {
@@ -78,7 +76,12 @@ class RidesRepository(val apiService: RidesApIService) {
                 endLongitude = rowData.endLongitude,
                 rideDistance = rowData.distance,
                 rideStatus = rowData.rideStatus,
-                endDate = rowData.endDate
+                endDate = rowData.endDate,
+                hasAssemblyPoint = rowData.hasAssemblyPoint,
+                assemblyPoint = rowData.assemblyPoint,
+                assemblyLat = rowData.assemblyLat,
+                assemblyLon = rowData.assemblyLon
+
             )
         } ?: emptyList()
     }
@@ -205,7 +208,12 @@ class RidesRepository(val apiService: RidesApIService) {
             endLatitude = this.endLatitude,
             endLongitude = this.endLongitude,
             rideDistance = this.distance,
-            rideStatus = this.rideStatus
+            rideStatus = this.rideStatus,
+            endDate = this.endDate,
+            hasAssemblyPoint = this.hasAssemblyPoint,
+            assemblyPoint = this.assemblyPoint,
+            assemblyLat = this.assemblyLat,
+            assemblyLon = this.assemblyLon
         )
     }
 }

@@ -13,12 +13,14 @@ struct JourneyCardView: View {
     @State private var selectedOption = "This month"
    
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 20){
                 Text(AppStrings.JourneyChart.title.rawValue)
                     .font(KlavikaFont.bold.font(size: 18))
-                    .multilineTextAlignment(.leading)
-                Spacer()
+                DonutChartView(slices: home.currentSlices)
+                    .frame(width: 190, height: 190)
+            }
+            VStack(spacing:50){
                 ZStack{
                     RoundedRectangle(cornerRadius: 5)
                         .fill(Color.white)
@@ -43,22 +45,18 @@ struct JourneyCardView: View {
                         .foregroundColor(AppColor.stoneGray)
                     }
                 }
-            }
-            VStack {
-                DonutChartView(slices: home.currentSlices)
-                    .frame(width: 190, height: 190)
-                
-                VStack(spacing: 8) {
+                .padding(.bottom, 30)
+                VStack(alignment: .leading, spacing: 8) {
                     let chunks = home.journeySlices.chunked(into: 3)
                     ForEach(chunks.indices, id: \.self) { rowIndex in
-                        HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 12) {
                             ForEach(chunks[rowIndex]) { slice in
                                 CategoryList(color: slice.color, label: slice.category)
                             }
                         }
                     }
                 }
-                .padding()
+                
                 .frame(maxWidth: .infinity, alignment: .center)
             }
         }
@@ -69,7 +67,7 @@ struct JourneyCardView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
-        .padding(.top,20)
+        .padding(.horizontal, 5)
         .onAppear {
             home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
         }
@@ -153,4 +151,5 @@ struct DonutChartView: View {
 
 #Preview {
     JourneyCardView()
+        .environmentObject(HomeViewModel())
 }

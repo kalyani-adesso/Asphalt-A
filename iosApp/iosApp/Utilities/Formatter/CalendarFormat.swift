@@ -10,7 +10,7 @@ import Foundation
 class CalendarFormat : ObservableObject{
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
+        formatter.dateFormat = "MMMM"
         return formatter
     }
     

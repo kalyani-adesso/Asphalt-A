@@ -22,10 +22,7 @@ struct ActionButtonView: View {
             )
             ButtonView( title: AppStrings.HomeLabel.joinRide.rawValue,
                         icon: AppIcon.Home.group,
-                        fontSize: 16, background: LinearGradient(
-                            gradient: Gradient(colors: [.white, .white]),
-                            startPoint: .leading,
-                            endPoint: .trailing),
+                        fontSize: 16,background: AppColor.white,
                         foregroundColor: AppColor.celticBlue,
                         showShadow: false,
                         borderColor: AppColor.celticBlue,onTap: {

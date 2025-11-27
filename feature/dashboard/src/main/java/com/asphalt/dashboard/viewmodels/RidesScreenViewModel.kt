@@ -34,8 +34,14 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
     )
     val ridesListState: State<YourRideRoot> = _ridesListMutableState
 
+    private val _showInviteNotification = mutableStateOf(false)
+    val showInviteNotification: State<Boolean> = _showInviteNotification
+
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
+    }
+    fun updateInviteStatus(isShow:Boolean){
+        _showInviteNotification.value=isShow
     }
 
     fun getRides() {
@@ -60,15 +66,22 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
                 historyList.addAll(history)
+                if(inviteList.isNotEmpty()){
+                    updateInviteStatus(true)
+                }else{
+                    updateInviteStatus(false)
+                }
                 if (upcomiList.isNotEmpty()) {
-                    upcomiList.removeAll{ride ->
-                        ride.startDate?.let { it < currentTime } ?: false}
+                    upcomiList.removeAll { ride ->
+                        ride.startDate?.let { it < currentTime } ?: false
+                    }
                 }
                 var ridesList =
                     YourRideRoot(
                         upcoming = upcomiList,
                         invite = inviteList,
-                    history = historyList)//history = hirtoryList, invite = inviteList
+                        history = historyList
+                    )//history = hirtoryList, invite = inviteList
                 _ridesListMutableState.value = ridesList
             }
             //response.mapApiResult { it }
