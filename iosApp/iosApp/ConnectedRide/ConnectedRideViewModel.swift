@@ -483,7 +483,7 @@ extension ConnectedRideViewModel {
                 collector: ReceiveMessageCollector(
                     onValue: { kmpMessages in
                         Task { @MainActor in
-                            self.chatMessages = kmpMessages.map { item in
+                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic }).map { item in
                                 MessageUIModel(
                                     id: item.id,
                                     senderId: item.senderID,
