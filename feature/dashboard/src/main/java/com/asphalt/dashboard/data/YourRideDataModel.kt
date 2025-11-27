@@ -13,6 +13,11 @@ class YourRideDataModel(
     var createdBy: String? = null,
     var createdUSerName: String? = null,
     var profileImageUrl: String? = null,
-    var startDate: Long? = null
-) {
+    var startDate: Long? = null,
+    var startTime: String? = null,
+    var endDateDisplay: String? = "",
+    var endDate: Long? = null,
+    var endTime: String? = null,
+
+    ) {
 }

@@ -6,7 +6,6 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.RideStatConstants.HISTORY
-import com.asphalt.dashboard.constants.RideStatConstants.QUEUE
 import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
 import com.asphalt.dashboard.data.YourRideDataModel
 
@@ -54,11 +53,16 @@ object RidesFilter {
                 title = ride.rideTitle ?: "",
                 place = (ride.startLocation ?: "") + "-" + (ride.endLocation ?: ""),
                 rideStatus = rideStatus,
-                date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
+                date = ride.startDate?.let { Utils.getDateWithOutTime(ride.startDate) } ?: "",
                 riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
-                startDate = ride.startDate
-            )
+                startDate = ride.startDate,
+                startTime = ride.startDate?.let { Utils.getTime(ride.startDate) } ?: "",
+                endDateDisplay = ride.endDate?.let { Utils.getDateWithOutTime(ride.endDate) } ?: "",
+                endDate = ride.startDate,
+                endTime = ride.endDate?.let { Utils.getTime(ride.endDate) } ?: "",
+
+                )
         }
     }
 

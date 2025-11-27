@@ -71,11 +71,11 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 }else{
                     updateInviteStatus(false)
                 }
-                if (upcomiList.isNotEmpty()) {
+             /*   if (upcomiList.isNotEmpty()) {
                     upcomiList.removeAll { ride ->
                         ride.startDate?.let { it < currentTime } ?: false
                     }
-                }
+                }*/
                 var ridesList =
                     YourRideRoot(
                         upcoming = upcomiList,

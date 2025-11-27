@@ -226,8 +226,17 @@ fun UpcomingRides(
 
         }
         Spacer(modifier = Modifier.height(Dimensions.size25))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = Dimensions.padding16,
+                    end = Dimensions.padding16
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row() {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
@@ -236,25 +245,92 @@ fun UpcomingRides(
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
-                Text(text = upconing.date ?: "", style = Typography.bodyMedium, color = GrayDark)
-
+                Text(
+                    text = "Start: " + upconing.date ?: "",
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
             }
             Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+                if (!upconing.startTime.isNullOrEmpty()) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = upconing.startTime ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = Dimensions.padding16,
+                    end = Dimensions.padding16
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row() {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
                         .width(Dimensions.padding20),
-                    painter = painterResource(R.drawable.ic_group_blue),
+                    painter = painterResource(R.drawable.ic_calendar_blue),
                     contentDescription = ""
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Text(
-                    text = "${upconing.riders}" + " " + stringResource(R.string.riders),
+                    text = "End: " + upconing.endDateDisplay ?: "",
                     style = Typography.bodyMedium,
                     color = GrayDark
                 )
-
             }
+            Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+                if (!upconing.endTime.isNullOrEmpty()) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = upconing.endTime ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size10))
+        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = Modifier
+                    .height(Dimensions.padding20)
+                    .width(Dimensions.padding20),
+                painter = painterResource(R.drawable.ic_group_blue),
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.width(Dimensions.size10))
+            Text(
+                text = "${upconing.riders}" + " " + stringResource(R.string.riders),
+                style = Typography.bodyMedium,
+                color = GrayDark
+            )
+
         }
         Spacer(modifier = Modifier.height(Dimensions.size25))
         Row(
@@ -745,5 +821,6 @@ fun RidesPreview() {
     )
     var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
 
-    RidesScreen(ridesScreenViewModel, {}, {})
+    //RidesScreen(ridesScreenViewModel, {}, {})
+    UpcomingRides(ridesScreenViewModel, YourRideDataModel()) { }
 }
