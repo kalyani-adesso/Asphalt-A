@@ -422,6 +422,123 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.size25))
         Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(modifier = Modifier.weight(1.4f)) {
+                Image(
+                    modifier = Modifier
+                        .height(Dimensions.padding20)
+                        .width(Dimensions.padding20),
+                    painter = painterResource(R.drawable.ic_calendar_blue),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.width(Dimensions.size5))
+                Text(
+                    text = "Start: " + (viewModel.ridesData.value?.startDate?.let {
+                        Utils.getDateWithOutTime(
+                            viewModel.ridesData.value?.startDate
+                        )
+                    } ?: ""),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
+            }
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
+                if (viewModel.ridesData.value?.startDate != null) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = viewModel.ridesData.value?.startDate?.let {
+                            Utils.getTime(
+                                viewModel.ridesData.value?.startDate
+                            )
+                        } ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(modifier = Modifier.weight(1.4f)) {
+                Image(
+                    modifier = Modifier
+                        .height(Dimensions.padding20)
+                        .width(Dimensions.padding20),
+                    painter = painterResource(R.drawable.ic_calendar_blue),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.width(Dimensions.size5))
+                Text(
+                    text = "End: " + (viewModel.ridesData.value?.endDate?.let {
+                        Utils.getDateWithOutTime(
+                            viewModel.ridesData.value?.endDate
+                        )
+                    } ?: ""),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
+            }
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
+                if (viewModel.ridesData.value?.endDate != null) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = viewModel.ridesData.value?.endDate?.let {
+                            Utils.getTime(
+                                viewModel.ridesData.value?.endDate
+                            )
+                        } ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size10))
+        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = Modifier
+                    .height(Dimensions.padding20)
+                    .width(Dimensions.padding20),
+                painter = painterResource(R.drawable.ic_group_blue),
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.width(Dimensions.size10))
+            val count = viewModel.ridesData.value?.participants?.size ?: 0
+            Text(
+                text = "${(count + 1)}" + " " + stringResource(
+                    R.string.riders
+                ),
+                style = Typography.bodyMedium,
+                color = GrayDark
+            )
+
+        }
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -464,7 +581,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                 )
 
             }
-        }
+        }*/
     }
 }
 

@@ -236,7 +236,7 @@ fun UpcomingRides(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(modifier = Modifier.weight(1.4f)) {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
@@ -251,7 +251,7 @@ fun UpcomingRides(
                     color = GrayDark
                 )
             }
-            Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
                 if (!upconing.startTime.isNullOrEmpty()) {
                     Image(
                         modifier = Modifier
@@ -281,7 +281,7 @@ fun UpcomingRides(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(modifier = Modifier.weight(1.4f)) {
                 Image(
                     modifier = Modifier
                         .height(Dimensions.padding20)
@@ -296,7 +296,7 @@ fun UpcomingRides(
                     color = GrayDark
                 )
             }
-            Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
                 if (!upconing.endTime.isNullOrEmpty()) {
                     Image(
                         modifier = Modifier
