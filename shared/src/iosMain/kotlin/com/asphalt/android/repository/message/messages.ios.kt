@@ -26,7 +26,7 @@ actual class MessageImpl {
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun receiveMessage(rideId: String): Flow<APIResult<List<MessageDTO>>> = callbackFlow {
         val dbRef = FIRDatabase.database().reference()
-            .child("message")
+            .child("messages")
             .child(rideId)
 
         val listener = dbRef.observeEventType(
