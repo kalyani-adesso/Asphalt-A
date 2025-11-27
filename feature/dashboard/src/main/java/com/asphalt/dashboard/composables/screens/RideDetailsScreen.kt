@@ -114,7 +114,7 @@ fun RidesDetailsScreen(
                     .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
             ) {
 
-                GradientButton(
+               /* GradientButton(
                     onClick = {},
                     startColor = LightGreen40,
                     endColor = LightGreen40,
@@ -138,7 +138,7 @@ fun RidesDetailsScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(Dimensions.size20))
+                Spacer(Modifier.height(Dimensions.size20))*/
                 if (viewModel.showDeleteButton.value){
                     BorderedButton(
                         onClick = {
