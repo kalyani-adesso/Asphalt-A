@@ -16,10 +16,10 @@ struct ReviewView: View {
                 VStack(spacing: 20) {
                     stepIndicator
                     VStack(alignment: .leading, spacing: 20) {
-                        HStack {
+                  
                             Text(AppStrings.CreateRide.reviewSubTitle)
                                 .font(KlavikaFont.medium.font(size: 16))
-                        }
+                        
                         ReviewCard(
                             icon: AppIcon.Home.nearMe,
                             iconColor: AppColor.lightBlue,
@@ -42,7 +42,7 @@ struct ReviewView: View {
                             title: AppStrings.CreateRide.reviewParticipants,
                             subtitle:"\(viewModel.selectedParticipants.count) riders selected")
                     }
-                    .frame(width: 343, height: 430)
+                    .frame(width: 343)
                     .padding()
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
@@ -109,4 +109,5 @@ struct ReviewView: View {
 
 #Preview {
     ReviewView()
+        .environmentObject(CreateRideViewModel())
 }
