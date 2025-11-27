@@ -12,6 +12,8 @@ struct PlaceSearchView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
     var searchText: String
     var isSelectingStart: Bool
+    var isSelectingDestination: Bool
+    var isSelectingAssembly: Bool
     var dismiss: () -> Void
     
     var body: some View {
@@ -19,7 +21,7 @@ struct PlaceSearchView: View {
             List(viewModel.results, id: \.self) { result in
                 Text(result.title)
                     .onTapGesture {
-                        viewModel.selectPlace(result, isStart: isSelectingStart)
+                        viewModel.selectPlace(result, isStart: isSelectingStart,isAssembly: isSelectingAssembly, isDestination: isSelectingDestination)
                         dismiss()
                     }
             }
