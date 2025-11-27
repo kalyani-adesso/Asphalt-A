@@ -57,18 +57,16 @@ public struct WelcomeScreen: View {
                             Text(AppStrings.WelcomeStrings.getStarted)
                             Spacer()
                             AppIcon.Welcome.arrow
-                            
                         }
-                        .padding(.horizontal, 30)
+                        .padding(.horizontal, 20)
                         .frame(width: 296, height: 60)
                         .background(
                             AppColor.celticBlue
                         )
+                        .overlay(RoundedRectangle(cornerRadius: 15).stroke(AppColor.white, lineWidth: 1))
                         .cornerRadius(15)
-                        .shadow(color: Color.black.opacity(0.20), radius: 4, x: 0, y: 2)
                         .foregroundStyle(AppColor.white)
                         .font(KlavikaFont.bold.font(size: 18))
-                        
                     }
                     .padding(.bottom, 100)
                     .navigationDestination(isPresented: $showSignin, destination: {

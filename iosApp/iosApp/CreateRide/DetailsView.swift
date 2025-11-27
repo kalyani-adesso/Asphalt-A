@@ -168,13 +168,13 @@ struct DetailsView: View {
                         }
                     }
                 }
-                .frame(width: 343, height: 573)
+                .frame(width: 343)
                 .padding()
                 .background(AppColor.backgroundLight)
                 .cornerRadius(10)
                 
             }
-            Spacer()
+       
             ButtonView( title: AppStrings.CreateRideButton.nextStep.rawValue,
                         showShadow: false , onTap: {
                 viewModel.nextStep()
@@ -237,9 +237,7 @@ struct DetailsView: View {
                 )
             }
         }
-        
     }
-    
     
     private var stepIndicator: some View {
         HStack(spacing: 32) {
@@ -270,4 +268,5 @@ extension DateFormatter {
 
 #Preview {
     DetailsView()
+        .environmentObject(CreateRideViewModel())
 }

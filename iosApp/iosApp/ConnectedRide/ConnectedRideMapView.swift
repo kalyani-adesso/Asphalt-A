@@ -31,7 +31,7 @@ struct ConnectedRideMapView: View {
     var body: some View {
         ZStack{
             if showMessagePopup{
-                MessagePopupView(isPresented: $showMessagePopup , viewModel: viewModel)
+                MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup)
                     .transition(.scale)
                     .zIndex(1)
             }
@@ -203,6 +203,10 @@ struct ConnectedRideMapView: View {
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                     self.elapsedSeconds += 1
                 }
+                
+            }
+            .task {
+                await viewModel.receiveMessage(rideId: rideModel.rideId)
             }
             .onChange(of: viewModel.ongoingRideId) { ride in
                 if !ride.isEmpty {
@@ -586,7 +590,6 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
-                        onMessageTap?()
                         showMessagePopup = true
                         onMessageTap(index)
                     }, label: {

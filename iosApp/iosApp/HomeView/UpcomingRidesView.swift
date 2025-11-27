@@ -127,12 +127,12 @@ struct UpcomingRideCard: View {
                     Task {
                         await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
                     }
-                }, height: 50)
+                }, height: 32)
                 ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: AppColor.darkRed, onTap :{
                     Task {
                         await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
                     }
-                },height: 50)
+                },height: 32)
                 
             }
             .padding(.vertical,10)

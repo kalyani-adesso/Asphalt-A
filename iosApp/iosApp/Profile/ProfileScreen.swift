@@ -16,26 +16,20 @@ struct ProfileScreen: View {
     var body: some View {
             ZStack {
                 VStack {
-                    HStack {
-                        
+                    ReusableHeader {
                         Text(AppStrings.Profile.profileTitle)
-                            .font(KlavikaFont.bold.font(size: 19))
+                            .font(KlavikaFont.bold.font(size: 22))
                             .foregroundColor(AppColor.black)
-                        
-                        Spacer()
-                        Button {
-                            showEditProfile = true
-                        } label: {
-                            AppIcon.Profile.editProfile
-                                .frame(width: 30 , height: 30)
+                    } trailing: {
+                        HStack(spacing: 16) {
+                            Button {
+                                showEditProfile = true
+                            } label: {
+                                AppIcon.Profile.editProfile
+                                    .frame(width: 30 , height: 30)
+                            }
                         }
-                        
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 12)
-                    .background(AppColor.white)
-                    .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-                    
                     ZStack{
                         
                         List {

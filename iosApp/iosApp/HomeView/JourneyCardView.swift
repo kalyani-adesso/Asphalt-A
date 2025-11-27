@@ -13,14 +13,13 @@ struct JourneyCardView: View {
     @State private var selectedOption = "This month"
    
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top,spacing: 12) {
             VStack(alignment: .leading, spacing: 20){
                 Text(AppStrings.JourneyChart.title.rawValue)
                     .font(KlavikaFont.bold.font(size: 18))
                 DonutChartView(slices: home.currentSlices)
                     .frame(width: 190, height: 190)
             }
-            .padding(.top, 10)
             VStack(spacing:50){
                 ZStack{
                     RoundedRectangle(cornerRadius: 5)
@@ -46,7 +45,6 @@ struct JourneyCardView: View {
                         .foregroundColor(AppColor.stoneGray)
                     }
                 }
-                .padding(.top, 10)
                 VStack(alignment: .leading, spacing: 8) {
                     let chunks = home.journeySlices.chunked(into: 3)
                     ForEach(chunks.indices, id: \.self) { rowIndex in
@@ -60,7 +58,6 @@ struct JourneyCardView: View {
                 
                 .frame(maxWidth: .infinity, alignment: .center)
             }
-            .padding(.bottom, 50)
         }
         .padding()
         .background(AppColor.backgroundLight)
