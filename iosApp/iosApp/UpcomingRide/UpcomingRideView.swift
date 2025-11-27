@@ -15,7 +15,6 @@ struct UpcomingRideView: View {
     @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
     @State var showpopup: Bool = false
-    var onBackToHome: (() -> Void)? = nil
     var hasPendingInvites: Bool {
         viewModel.rides.contains { $0.rideAction == .invities }
     }
@@ -133,6 +132,7 @@ struct UpcomingRideView: View {
                     ProgressViewReusable(title: "Loading Rides...")
                 }
             }
+            .toolbar(showpopup ? .hidden : .visible)
             .overlay {
                 if activePopup != nil {
                     RidePopupView(

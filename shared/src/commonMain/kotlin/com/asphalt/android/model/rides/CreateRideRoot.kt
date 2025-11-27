@@ -53,4 +53,17 @@ class CreateRideRoot(
     @SerialName("endDate")
     var endDate: Long? = null,
 
+    @SerialName("hasAssemblyPoint")
+    var hasAssemblyPoint: Boolean = false,
+
+    @SerialName("assemblyPoint")
+    var assemblyPoint: String? = null,
+
+    @SerialName("assemblyLat")
+    var assemblyLat: Double = 0.0,
+
+    @SerialName("assemblyLon")
+    var assemblyLon: Double = 0.0,
+
+
     )
