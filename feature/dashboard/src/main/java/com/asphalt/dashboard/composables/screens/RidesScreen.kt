@@ -842,6 +842,6 @@ fun RidesPreview() {
     )
     var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
 
-    //RidesScreen(ridesScreenViewModel, {}, {})
-    UpcomingRides(ridesScreenViewModel, YourRideDataModel()) { }
+    RidesScreen(ridesScreenViewModel, {}, {})
+    //UpcomingRides(ridesScreenViewModel, YourRideDataModel()) { }
 }
