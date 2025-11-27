@@ -48,7 +48,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             val userList = ridesDetails.value?.participants ?: emptyList()
             val list = ArrayList(userList.mapNotNull { participant ->
-                if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
+                //if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
 
                 users.find { it.uid == participant.userId }?.let { user ->
                     RidersList(
@@ -60,7 +60,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
                         displayStatusString =
                             when (participant.inviteStatus) {
                                 APIConstants.RIDE_INVITED -> R.string.waiting_response
-                                APIConstants.RIDE_ACCEPTED, APIConstants.RIDE_JOINED -> R.string.confirmed
+                                APIConstants.RIDE_ACCEPTED, APIConstants.RIDE_JOINED, APIConstants.END_RIDE-> R.string.confirmed
                                 APIConstants.RIDE_DECLINED -> R.string.decline
                                 else -> R.string.empty_string
 
