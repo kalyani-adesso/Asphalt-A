@@ -29,6 +29,7 @@ struct BottomNavBar: View {
                         UpcomingRideView(showpopup: false)
                             .environmentObject(upcomingRideViewModel)
                             .environmentObject(homeViewModel)
+                            
                     case 2:
                         QueriesView(onBackToHome: { selectedTab = 0 })
                     case 3:

@@ -25,114 +25,119 @@ struct UpcomingRideView: View {
 
     var body: some View {
             ZStack{
-                NavigationStack {
-                    
-                    VStack {
-                        HStack(spacing: 12) {
-                            let rideStatuses = viewModel.rideStatus
-                            
-                            ForEach(rideStatuses, id: \.self) { status in
-                                let isSelected = viewModel.selectedTab == status
-                                let showDot = status == .invities && hasPendingInvites
-                                SegmentButtonView(
-                                    rideStatus: status.rawValue,
-                                    isSelected: isSelected,
-                                    showNotificationDot: showDot
-                                ) {
-                                    withAnimation {
-                                        viewModel.selectedTab = status
-                                    }
-                                }
-                            }
-                        }
-                        
-                        .frame(maxWidth: .infinity)
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(AppColor.listGray)
-                        )
-                        .padding([.leading, .trailing])
-                        .contentShape(Rectangle())
                         VStack {
-                            List {
-                                let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                            ReusableHeader {
+                                Text("Your Rides")
+                                    .font(KlavikaFont.bold.font(size: 22))
+                                    .foregroundColor(AppColor.black)
+                            } trailing: {
+                                EmptyView()
+                            }
+                            
+                            HStack(spacing: 12) {
+                                let rideStatuses = viewModel.rideStatus
                                 
-                                if filtered.isEmpty {
-                                    Text("No rides found")
-                                        .font(KlavikaFont.bold.font(size: 16))
-                                        .foregroundColor(AppColor.stoneGray)
-                                }
-                                else{
-                                    
-                                    ForEach($viewModel.rides.indices.filter { index in
-                                        viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
-                                    }, id: \.self) { index in
-                                        UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
-                                            selectedRideId = rideId
-                                            selectedImages = []
-                                            withAnimation(.easeInOut) { activePopup = .uploadOptions }
+                                ForEach(rideStatuses, id: \.self) { status in
+                                    let isSelected = viewModel.selectedTab == status
+                                    let showDot = status == .invities && hasPendingInvites
+                                    SegmentButtonView(
+                                        rideStatus: status.rawValue,
+                                        isSelected: isSelected,
+                                        showNotificationDot: showDot
+                                    ) {
+                                        withAnimation {
+                                            viewModel.selectedTab = status
                                         }
-                                        .listRowSeparator(.hidden)
-                                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                                     }
                                 }
                             }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
+                            
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.listGray)
+                            )
+                            .padding([.leading, .trailing])
+                            .contentShape(Rectangle())
+                            VStack {
+                                List {
+                                    let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                                    
+                                    if filtered.isEmpty {
+                                        Text("No rides found")
+                                            .font(KlavikaFont.bold.font(size: 16))
+                                            .foregroundColor(AppColor.stoneGray)
+                                    }
+                                    else{
+                                        
+                                        ForEach($viewModel.rides.indices.filter { index in
+                                            viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
+                                        }, id: \.self) { index in
+                                            UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
+                                                selectedRideId = rideId
+                                                selectedImages = []
+                                                withAnimation(.easeInOut) { activePopup = .uploadOptions }
+                                            }
+                                            .listRowSeparator(.hidden)
+                                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                        }
+                                    }
+                                }
+                                .listStyle(.plain)
+                                .scrollContentBackground(.hidden)
+                            }
                         }
+                        .onAppear {
+                            viewModel.selectedTab = .upcoming
+                            if showpopup {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    withAnimation(.easeInOut) {
+                                        showpopup = false
+                                    }
+                                }
+                            }
                     }
+                    .navigationBarBackButtonHidden(true)
+                    .navigationDestination(isPresented: $showHome, destination: {
+                        BottomNavBar()
+                    })
                     .onAppear {
-                        viewModel.selectedTab = .upcoming
-                        if showpopup {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                withAnimation(.easeInOut) {
+                        viewModel.selectedTab = startingTab
+                    }
+                    
+                    // Popup overlay (always stays above)
+                    if showpopup {
+                        // Dimmed background
+                        AppColor.backgroundLight.opacity(0.7)
+                            .ignoresSafeArea()
+                            .zIndex(1)
+                            .onTapGesture {
+                                withAnimation {
                                     showpopup = false
                                 }
                             }
+                        
+                        // Popup content
+                        VStack {
+                            Snackbar(
+                                message: "Ride Created Successfully",
+                                subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: AppColor.lightGreen,
+                                foregroundColor: .spanishGreen
+                                
+                            )
+                            Spacer()
                         }
+                        .frame(width: 390, height: 620)
+                        .transition(.scale)
+                        .zIndex(2)
                     }
-                }
-                .navigationBarBackButtonHidden(true)
-                .navigationDestination(isPresented: $showHome, destination: {
-                    BottomNavBar()
-                })
-                .onAppear {
-                    viewModel.selectedTab = startingTab
-                }
-                
-                // Popup overlay (always stays above)
-                if showpopup {
-                    // Dimmed background
-                    AppColor.backgroundLight.opacity(0.7)
-                        .ignoresSafeArea()
-                        .zIndex(1)
-                        .onTapGesture {
-                            withAnimation {
-                                showpopup = false
-                            }
-                        }
                     
-                    // Popup content
-                    VStack {
-                        Snackbar(
-                            message: "Ride Created Successfully",
-                            subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: AppColor.lightGreen,
-                            foregroundColor: .spanishGreen
-                            
-                        )
-                        Spacer()
+                    if viewModel.isRideLoading {
+                        ProgressViewReusable(title: "Loading Rides...")
                     }
-                    .frame(width: 390, height: 620)
-                    .transition(.scale)
-                    .zIndex(2)
-                }
                 
-                if viewModel.isRideLoading {
-                    ProgressViewReusable(title: "Loading Rides...")
-                }
             }
-            .toolbar(showpopup ? .hidden : .visible)
             .overlay {
                 if activePopup != nil {
                     RidePopupView(
