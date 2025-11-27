@@ -22,6 +22,10 @@ struct Ride: Identifiable {
     var endLat: Double?
     var endLng: Double?
     var rideDistance: Double?
+    var hasAssemblyPoint: Bool?
+    var assemblyPoint: String = ""
+    var assemblyLat: Double?
+    var assemblyLon: Double?
 }
 
 enum RideType: String, CaseIterable, Identifiable {

@@ -11,47 +11,84 @@ struct RouteView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
     @State private var showLocationPicker = false
     @State private var searchText = ""
+    @State private var isAssemblySameAsStart = false // checkbox
     @State private var isSelectingStart = true
+    @State private var isSelectingAssembly = false
+    @State private var isSelectingDestination = false
+    
     
     var body: some View {
         VStack(spacing: 20) {
             stepIndicator
             
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 30) {
                 
                 LocationFieldView(
                     label: "Starting Point",
                     icon: AppIcon.CreateRide.route,
-                    placeholder: "Enter starting location",
+                    placeholder: "Select",
                     iconColor: AppColor.darkLime,
                     value: $viewModel.ride.startLocation,
                     backgroundColor: AppColor.white
                 ) {
                     isSelectingStart = true
+                    isSelectingAssembly = false
+                    isSelectingDestination = false
                     showLocationPicker = true
+                    
                 }
                 
                 LocationFieldView(
                     label: "Destination",
                     icon: AppIcon.CreateRide.route,
-                    placeholder: "Enter destination",
+                    placeholder: "Select",
                     iconColor: AppColor.darkRed,
                     value: $viewModel.ride.endLocation,
                     backgroundColor: AppColor.white
                 ) {
                     isSelectingStart = false
-                    searchText = ""
+                    isSelectingAssembly = false
+                    isSelectingDestination = true
                     showLocationPicker = true
+                }
+                Button(action: {
+                    isAssemblySameAsStart.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: isAssemblySameAsStart ? "checkmark.square.fill" : "square")
+                            .foregroundColor(isAssemblySameAsStart ? AppColor.celticBlue : AppColor.celticBlue)
+                        Text("Assembly point same as starting location")
+                            .foregroundColor(AppColor.stoneGray)
+                            .font(KlavikaFont.regular.font(size: 16))
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding()
+                
+                if !isAssemblySameAsStart {
+                    LocationFieldView(
+                        label: "Assembly Point",
+                        icon: AppIcon.CreateRide.route,
+                        placeholder: "Select",
+                        iconColor: AppColor.darkLime,
+                        value: $viewModel.ride.assemblyPoint,
+                        backgroundColor: AppColor.white
+                    ) {
+                        isSelectingStart = false
+                        isSelectingAssembly = true
+                        isSelectingDestination = false
+                        showLocationPicker = true
+                    }
                 }
             }
             .sheet(isPresented: $showLocationPicker) {
                 PlaceSearchView(
                     searchText: searchText,
                     isSelectingStart: isSelectingStart,
-                    dismiss: { showLocationPicker = false }
+                    isSelectingDestination: isSelectingDestination, isSelectingAssembly: isSelectingAssembly, dismiss: { showLocationPicker = false }
                 )
             }
-            .frame(width: 343, height: 241)
+            .frame(width: 343)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(10)
@@ -148,4 +185,5 @@ struct LocationFieldView: View {
 
 #Preview {
     RouteView()
+        .environmentObject(CreateRideViewModel())
 }
