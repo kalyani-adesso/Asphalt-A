@@ -225,7 +225,7 @@ fun UpcomingRides(
             }
 
         }
-        Spacer(modifier = Modifier.height(Dimensions.size25))
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -315,7 +315,7 @@ fun UpcomingRides(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(Dimensions.size10))
+        Spacer(modifier = Modifier.height(Dimensions.padding16))
         Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
             Image(
                 modifier = Modifier
