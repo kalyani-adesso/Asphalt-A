@@ -38,13 +38,14 @@ import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.RidersList
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.LightBlue
 import com.asphalt.commonui.theme.LightGreen30
-import com.asphalt.commonui.theme.LightGreen40
 import com.asphalt.commonui.theme.LightOrange
 import com.asphalt.commonui.theme.MagentaDeep
 import com.asphalt.commonui.theme.NeutralBlack
@@ -58,8 +59,9 @@ import com.asphalt.commonui.theme.RedLight
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividRed
+import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.CircularNetworkImage
-import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.viewmodels.RidesDetailsViewModel
@@ -68,7 +70,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RidesDetailsScreen(
     rideId: String?, setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidesDetailsViewModel = koinViewModel()
+    viewModel: RidesDetailsViewModel = koinViewModel(), onBack: () -> Unit
 ) {
     //val ridesData by viewModel.ridesData
     //viewModel.getUserList()
@@ -101,33 +103,69 @@ fun RidesDetailsScreen(
                 CountSection(viewModel)
                 Spacer(Modifier.height(Dimensions.size20))
                 UsersList(viewModel)
-                Spacer(Modifier.height(Dimensions.size50))
+                //Spacer(Modifier.height(Dimensions.size10))
+                Spacer(Modifier.height(200.dp))
             }
-
-            GradientButton(
-                onClick = {},
-                startColor = LightGreen40,
-                endColor = LightGreen40,
+            Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .background(NeutralWhite)
                     .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_navigate),
-                        contentDescription = ""
-                    )
-                    Spacer(modifier = Modifier.width(Dimensions.size10))
-                    Text(
-                        "Start Ride".uppercase(),
-                        color = NeutralWhite,
-                        fontSize = Dimensions.textSize18,
-                        style = TypographyBold.labelLarge,
-                    )
+
+                /* GradientButton(
+                     onClick = {},
+                     startColor = LightGreen40,
+                     endColor = LightGreen40,
+                     buttonHeight = Dimensions.size50, buttonRadius = Dimensions.radius15
+
+                 ) {
+                     Row(
+                         modifier = Modifier.fillMaxWidth(),
+                         horizontalArrangement = Arrangement.Center
+                     ) {
+                         Image(
+                             painter = painterResource(R.drawable.ic_navigate),
+                             contentDescription = ""
+                         )
+                         Spacer(modifier = Modifier.width(Dimensions.size10))
+                         Text(
+                             "Start Ride".uppercase(),
+                             color = NeutralWhite,
+                             fontSize = Dimensions.textSize16,
+                             style = TypographyBold.labelLarge,
+                         )
+                     }
+                 }
+                 Spacer(Modifier.height(Dimensions.size20))*/
+                if (viewModel.showDeleteButton.value) {
+                    val message =stringResource(R.string.delete_ride_success)
+                    BorderedButton(
+                        onClick = {
+                            viewModel.deleteRide(rideId ?: "",message) {
+                                onBack.invoke()
+                            }
+                        },
+                        modifier = Modifier
+                            .height(Dimensions.size50)
+                            .background(NeutralWhite)
+                            .fillMaxWidth(),
+                        buttonRadius = Dimensions.radius15,
+                        buttonHeight = Dimensions.size50, borderColor = VividRed
+                    ) {
+                        /* Image(
+                            painter = painterResource(R.drawable.ic_cancel_ride_icon),
+                            contentDescription = ""
+                        )*/
+                        Spacer(Modifier.width(Dimensions.size10))
+                        Text(
+                            text = stringResource(R.string.delete_ride).uppercase(),
+                            fontSize = Dimensions.textSize16,
+                            style = TypographyBold.labelLarge,
+                            color = VividRed,
+                        )
+                    }
                 }
             }
         }
@@ -196,7 +234,7 @@ fun UserRow(user: RidersList) {
                                 width = Dimensions.size2pt5,
                                 color = if (user.inviteStatus ==
                                     APIConstants.RIDE_ACCEPTED ||
-                                    user.inviteStatus == APIConstants.RIDE_JOINED
+                                    user.inviteStatus == APIConstants.RIDE_JOINED || user.inviteStatus == APIConstants.END_RIDE
                                 )
                                     GreenLIGHT
                                 else if (user.inviteStatus == APIConstants.RIDE_INVITED)
@@ -212,7 +250,8 @@ fun UserRow(user: RidersList) {
                             painter =
                                 if (user.inviteStatus ==
                                     APIConstants.RIDE_ACCEPTED ||
-                                    user.inviteStatus == APIConstants.RIDE_JOINED
+                                    user.inviteStatus == APIConstants.RIDE_JOINED ||
+                                    user.inviteStatus == APIConstants.END_RIDE
                                 )
                                     painterResource(R.drawable.ic_online_icon)
                                 else if (user.inviteStatus == APIConstants.RIDE_INVITED)
@@ -283,7 +322,7 @@ fun UserRow(user: RidersList) {
                                 Image(
                                     painter = if (user.inviteStatus ==
                                         APIConstants.RIDE_ACCEPTED ||
-                                        user.inviteStatus == APIConstants.RIDE_JOINED
+                                        user.inviteStatus == APIConstants.RIDE_JOINED || user.inviteStatus == APIConstants.END_RIDE
                                     )
                                         painterResource(R.drawable.ic_tick_accept)
                                     else if (user.inviteStatus == APIConstants.RIDE_INVITED)
@@ -312,7 +351,7 @@ fun CountSection(viewModel: RidesDetailsViewModel) {
 
     val acceptedCount = participants.count {
         it.inviteStatus == APIConstants.RIDE_ACCEPTED ||
-                it.inviteStatus == APIConstants.RIDE_JOINED
+                it.inviteStatus == APIConstants.RIDE_JOINED || it.inviteStatus == APIConstants.END_RIDE
     }
     val pendingCount = participants.count { it.inviteStatus == APIConstants.RIDE_INVITED }
     val declinedCount = participants.count { it.inviteStatus == APIConstants.RIDE_DECLINED }
@@ -422,6 +461,123 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
         }
         Spacer(modifier = Modifier.height(Dimensions.size25))
         Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(modifier = Modifier.weight(1.4f)) {
+                Image(
+                    modifier = Modifier
+                        .height(Dimensions.padding20)
+                        .width(Dimensions.padding20),
+                    painter = painterResource(R.drawable.ic_calendar_blue),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.width(Dimensions.size5))
+                Text(
+                    text = "Start: " + (viewModel.ridesData.value?.startDate?.let {
+                        Utils.getDateWithOutTime(
+                            viewModel.ridesData.value?.startDate
+                        )
+                    } ?: ""),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
+            }
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
+                if (viewModel.ridesData.value?.startDate != null) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = viewModel.ridesData.value?.startDate?.let {
+                            Utils.getTime(
+                                viewModel.ridesData.value?.startDate
+                            )
+                        } ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size8))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(modifier = Modifier.weight(1.4f)) {
+                Image(
+                    modifier = Modifier
+                        .height(Dimensions.padding20)
+                        .width(Dimensions.padding20),
+                    painter = painterResource(R.drawable.ic_calendar_blue),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.width(Dimensions.size5))
+                Text(
+                    text = "End: " + (viewModel.ridesData.value?.endDate?.let {
+                        Utils.getDateWithOutTime(
+                            viewModel.ridesData.value?.endDate
+                        )
+                    } ?: ""),
+                    style = Typography.bodyMedium,
+                    color = GrayDark
+                )
+            }
+            Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
+                if (viewModel.ridesData.value?.endDate != null) {
+                    Image(
+                        modifier = Modifier
+                            .height(Dimensions.padding20)
+                            .width(Dimensions.padding20),
+                        painter = painterResource(R.drawable.ic_clock_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.size5))
+                    Text(
+                        text = viewModel.ridesData.value?.endDate?.let {
+                            Utils.getTime(
+                                viewModel.ridesData.value?.endDate
+                            )
+                        } ?: "",
+                        style = Typography.bodyMedium,
+                        color = GrayDark
+                    )
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size10))
+        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = Modifier
+                    .height(Dimensions.padding20)
+                    .width(Dimensions.padding20),
+                painter = painterResource(R.drawable.ic_group_blue),
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.width(Dimensions.size10))
+            val count = viewModel.ridesData.value?.participants?.size ?: 0
+            Text(
+                text = "${(count + 1)}" + " " + stringResource(
+                    R.string.riders
+                ),
+                style = Typography.bodyMedium,
+                color = GrayDark
+            )
+
+        }
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -464,7 +620,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                 )
 
             }
-        }
+        }*/
     }
 }
 
@@ -473,5 +629,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
 @Composable
 fun RideDetailsPreview() {
     val viewModel = RidesDetailsViewModel()
-    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel)
+    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel){
+
+    }
 }

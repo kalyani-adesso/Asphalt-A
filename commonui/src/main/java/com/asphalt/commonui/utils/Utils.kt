@@ -210,4 +210,19 @@ object Utils {
         else
             return ""
     }
+
+    fun getDateWithOutTime(millis: Long?): String {
+        val sdf = SimpleDateFormat("EEE, MMM dd", Locale.getDefault())
+        if (millis != null)
+            return sdf.format(Date(millis))
+        else
+            return ""
+    }
+
+    fun getTime(millis: Long?): String {
+        if (millis == null) return ""
+
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return sdf.format(Date(millis))
+    }
 }

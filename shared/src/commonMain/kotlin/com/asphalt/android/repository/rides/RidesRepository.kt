@@ -185,6 +185,9 @@ class RidesRepository(val apiService: RidesApIService) {
     suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {
         return apiService.sendMessage(message)
     }
+    suspend fun deleteRide(rideId: String): APIResult<Unit> {
+        return apiService.deleteRide(rideId)
+    }
 
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {
         return RidesData(
