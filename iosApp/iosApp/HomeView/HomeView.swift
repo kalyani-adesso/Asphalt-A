@@ -14,8 +14,8 @@ struct HomeView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack{
-                    Color.clear.frame(height: 50)
+                VStack(spacing: 15){
+                    TopNavBar()
                     ActionButtonView()
                     DashboardView()
                     UpcomingRidesView()
@@ -26,8 +26,6 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            TopNavBar()
-                .ignoresSafeArea(edges: .top)
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }

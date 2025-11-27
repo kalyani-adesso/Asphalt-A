@@ -11,13 +11,13 @@ struct ButtonView: View {
     let title: String
     var icon: Image? = nil
     var fontSize: CGFloat = 18
-    var background: LinearGradient? = nil
+    var background: Color? = AppColor.celticBlue
     var foregroundColor: Color = AppColor.white
     var showShadow: Bool = true
     var borderColor: Color? = nil
     var borderWidth: CGFloat = 1
     var onTap: (() -> Void)? = nil
-    var height: CGFloat? = 50
+    var height: CGFloat? = 51
     var body: some View {
         Button(action: {
             onTap?()
@@ -29,15 +29,7 @@ struct ButtonView: View {
             .frame(maxWidth: .infinity)
             .frame(height: height)
             .background(
-                background ??
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        AppColor.royalBlue,
-                        AppColor.pursianBlue,
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                background
             )
             .cornerRadius(15)
             .overlay(

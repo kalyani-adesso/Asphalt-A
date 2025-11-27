@@ -81,6 +81,26 @@ struct CustomTimePicker: View {
         .background(AppColor.white)
         .cornerRadius(15)
         .shadow(radius: 2)
+        .onAppear {
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: selectedTime)
+                let hour24 = comps.hour ?? 0
+
+                if hour24 == 0 {
+                    hours = 12
+                    isAM = true
+                } else if hour24 < 12 {
+                    hours = hour24
+                    isAM = true
+                } else if hour24 == 12 {
+                    hours = 12
+                    isAM = false
+                } else {
+                    hours = hour24 - 12
+                    isAM = false
+                }
+
+                minutes = comps.minute ?? 0
+            }
     }
 }
 

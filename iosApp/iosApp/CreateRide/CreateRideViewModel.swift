@@ -15,8 +15,10 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var currentStep = 1
     @Published var selectedParticipants: [Participant] = []
     @Published var shareLink = "https://adessoriderclub.app/12121312"
-    @Published var selectedTime: Date? = nil
-    @Published var selectedDate: Date? = nil
+    @Published var selectedStartTime: Date? = nil
+    @Published var selectedStartDate: Date? = nil
+    @Published var selectedEndTime: Date? = nil
+    @Published var selectedEndDate: Date? = nil
     @Published var isRideLoading = false
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     
@@ -187,11 +189,15 @@ extension CreateRideViewModel {
         
         let createdDateLong = Int64(Date().timeIntervalSince1970 * 1000)
         var startDateLong: Int64 = 0
-        if let merged = combine(date: selectedDate, time: selectedTime) {
+        if let merged = combine(date: selectedStartDate, time: selectedStartTime) {
             startDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
+        var endDateLong: Int64 = 0
+        if let merged = combine(date: selectedEndDate, time: selectedEndTime) {
+            endDateLong = Int64(merged.timeIntervalSince1970 * 1000)
+        }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: startDateLong))
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong))
         
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
@@ -231,8 +237,10 @@ extension CreateRideViewModel {
         guard let type = ride.type,
               !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
               !ride.description.trimmingCharacters(in: .whitespaces).isEmpty,
-              selectedDate != nil,
-              selectedTime != nil
+              selectedStartDate != nil,
+              selectedStartTime != nil,
+              selectedEndDate != nil,
+              selectedEndTime != nil
         else { return false }
         return true
     }
@@ -243,4 +251,3 @@ extension CreateRideViewModel {
         !ride.endLocation.trimmingCharacters(in: .whitespaces).isEmpty
     }
 }
-

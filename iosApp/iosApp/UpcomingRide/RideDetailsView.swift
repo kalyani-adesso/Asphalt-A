@@ -13,9 +13,9 @@ struct RideDetailsView: View {
     @State private var startRide = false
     @State private var showJoinRide: Bool = false
     var body: some View {
+        AppToolBar{
         ZStack {
-        NavigationStack {
-                SimpleCustomNavBar(title:ride.title, onBackToHome: {showJoinRide = true})
+            NavigationStack {
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(alignment: .leading, spacing: 22) {
@@ -87,10 +87,7 @@ struct RideDetailsView: View {
                             title:"START RIDE",
                             icon: AppIcon.JoinRide.nearMe,
                             fontSize: 16 ,
-                            background: LinearGradient(
-                                gradient: Gradient(colors: [AppColor.dimGreen, AppColor.dimGreen]),
-                                startPoint: .leading,
-                                endPoint: .trailing),
+                            background: AppColor.dimGreen,
                             foregroundColor: AppColor.white,
                             showShadow: false,
                             onTap: {
@@ -123,6 +120,7 @@ struct RideDetailsView: View {
         var declinedCount:Int  {
             ride.participantAcceptedCount > 0 ? (ride.riderCount  - ride.participantAcceptedCount) : 0
         }
+    }
     }
     
     struct StatusCard: View {
