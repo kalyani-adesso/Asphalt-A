@@ -48,7 +48,7 @@ struct ParticipantsView: View {
                     }
                 }
             }
-            .frame(width: 343, height: 472)
+            .frame(width: 343, height: 448)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(10)
@@ -102,4 +102,5 @@ struct ParticipantsView: View {
 
 #Preview {
     ParticipantsView()
+        .environmentObject(CreateRideViewModel())
 }
