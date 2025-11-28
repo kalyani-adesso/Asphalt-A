@@ -154,11 +154,7 @@ struct QSegmentButtonView: View {
                 .background(
                     Group {
                         if isSelected {
-                            LinearGradient(
-                                gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                            AppColor.celticBlue
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         } else {
                             RoundedRectangle(cornerRadius: 10)
