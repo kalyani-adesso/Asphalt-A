@@ -256,7 +256,10 @@ fun GalleryDialog(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = stringResource(R.string.select_photos).uppercase(),
+                                text = if(selectedUris.isNullOrEmpty())
+                                    stringResource(R.string.select_photos).uppercase()
+                                else
+                                    "Upload".uppercase(),
                                 style = TypographyMedium.bodySmall,
                                 color = NeutralWhite,
 
