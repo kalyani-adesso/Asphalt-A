@@ -15,7 +15,7 @@ struct NotificationView: View {
     @State var showSlideBar: Bool = false
     
     var body: some View {
-        AppToolBar{
+        AppToolBar(showBack: false){
             VStack {
                 List(viewModel.notifications, id: \.id) { notification in
                     HStack(spacing: 17) {

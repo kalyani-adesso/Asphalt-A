@@ -13,7 +13,7 @@ struct RideDetailsView: View {
     @State private var startRide = false
     @State private var showJoinRide: Bool = false
     var body: some View {
-        AppToolBar{
+        AppToolBar(showBack: true){
         ZStack {
             NavigationStack {
                 ScrollView {
