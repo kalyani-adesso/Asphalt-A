@@ -13,6 +13,8 @@ import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.ParticipantData
+import com.asphalt.android.model.rides.Ratings
+import com.asphalt.android.model.rides.RatingsData
 import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.UserInvites
@@ -80,7 +82,10 @@ class RidesRepository(val apiService: RidesApIService) {
                 hasAssemblyPoint = rowData.hasAssemblyPoint,
                 assemblyPoint = rowData.assemblyPoint,
                 assemblyLat = rowData.assemblyLat,
-                assemblyLon = rowData.assemblyLon
+                assemblyLon = rowData.assemblyLon,
+                ratings = rowData.ratings?.map { (id, data) ->
+                    RatingsData(stars = data.stars,userId = id)
+                } ?: emptyList()
 
             )
         } ?: emptyList()
@@ -182,8 +187,16 @@ class RidesRepository(val apiService: RidesApIService) {
         return apiService.rateYourRide(rideId, userId, stars, comments)
     }
 
+    suspend fun updateRatings(rideID: String, userID: String, stars: Int): APIResult<Unit> {
+        return apiService.updateRatings(rideID, Ratings(stars), userID)
+    }
+
     suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {
         return apiService.sendMessage(message)
+    }
+
+    suspend fun deleteRide(rideId: String): APIResult<Unit> {
+        return apiService.deleteRide(rideId)
     }
 
     fun CreateRideRoot.toSingleRide(rideId: String): RidesData {

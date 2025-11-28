@@ -45,6 +45,15 @@ struct Rider: Identifiable {
     let receiverId:String
 }
 
+struct MessageUIModel: Identifiable {
+    let id: String
+    let senderId: String
+    let senderName: String
+    let message: String
+    let timestamp: String
+    let isCurrentUser: Bool
+}
+
 struct RideStop: Identifiable {
     let id = UUID()
     let name: String
@@ -55,6 +64,13 @@ enum MapType: String, CaseIterable, Hashable {
     case standard
     case hybrid
     case imagery
+}
+
+struct ConnectedRideMessage: Identifiable {
+    let id = UUID()
+    let message: String
+    let senderName: String
+    let date: Date
 }
 
 final class ConnectedRideViewModel: ObservableObject {
@@ -72,9 +88,13 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
-    var rider : Rider {
-        groupRiders[messageIndex]
+    @Published var chatMessages: [MessageUIModel] = []
+    var rider: Rider? {
+        guard !groupRiders.isEmpty else { return nil }
+        guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
+        return groupRiders[messageIndex]
     }
+
     var lastLat: Double?
     var lastLong: Double?
     var lastSpeed: Double = 0.0
@@ -327,13 +347,23 @@ extension ConnectedRideViewModel {
     }
     
     func rateYourRide(ratings:Int,comments:String) {
-        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { [self] result, error in
             if let error = error {
                 print("Error while rating your ride \(error)")
             } else {
                 print("Sucesss!")
             }
         }
+    }
+    
+    func updateRating(stars:Int,rideId:String) {
+        rideRepository.updateRatings(rideID:rideId, userID: MBUserDefaults.userIdStatic ?? "", stars: Int32(stars), completionHandler: { result, error in
+            if let error = error {
+                print("Error while rating your ride \(error)")
+            } else {
+                print("Sucesss!")
+            }
+        })
     }
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {
@@ -447,7 +477,8 @@ extension ConnectedRideViewModel {
     }
     
     func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
-        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId)
+        let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis), isRideOnGoing: KotlinBoolean(bool: true) )
         rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
             if let error = error {
                 print("Error joining ride:", error.localizedDescription)
@@ -456,10 +487,35 @@ extension ConnectedRideViewModel {
             }
         })
     }
-    
-    func receiveMessage(rideId:String) {
-        MessageImpl().receiveMessage(rideId: rideId) { result, error in
-            
+
+    func receiveMessage(rideId: String) async {
+        do {
+            let flow = try await MessageImpl().receiveMessage(rideId: rideId)
+
+            try await flow.collect(
+                collector: ReceiveMessageCollector(
+                    onValue: { kmpMessages in
+                        Task { @MainActor in
+                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }).map { item in
+                                MessageUIModel(
+                                    id: item.id,
+                                    senderId: item.senderID,
+                                    senderName: item.senderName,
+                                    message: item.message,
+                                    timestamp: self.formatTime(from: item.timeStamp),
+                                    isCurrentUser: item.senderID == MBUserDefaults.userIdStatic
+                                )
+                            }
+                        }
+                    },
+                    onError: { error in
+                        print("Receive Message Error:", error.localizedDescription)
+                    }
+                )
+            )
+
+        } catch {
+            print("Outer Receive Message Error:", error.localizedDescription)
         }
     }
 }
@@ -477,6 +533,30 @@ class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {
         if let apiResult = value as? APIResultSuccess<AnyObject>,
            let rides = apiResult.data as? [ConnectedRideDTO] {
             onValue(rides)
+            completionHandler(nil)
+        } else if let apiError = value as? APIResultError {
+            onError(apiError.exception as! any Error)
+            completionHandler(nil)
+        } else {
+            onError(NSError(domain: "UnknownResult", code: 0, userInfo: nil))
+            completionHandler(nil)
+        }
+    }
+}
+
+class ReceiveMessageCollector: Kotlinx_coroutines_coreFlowCollector {
+    let onValue: ([MessageDTO]) -> Void
+    let onError: (Error) -> Void
+    
+    init(onValue: @escaping ([MessageDTO]) -> Void, onError: @escaping (Error) -> Void) {
+        self.onValue = onValue
+        self.onError = onError
+    }
+    
+    func emit(value: Any?, completionHandler: @escaping ((any Error)?) -> Void) {
+        if let apiResult = value as? APIResultSuccess<AnyObject>,
+           let messages = apiResult.data as? [MessageDTO] {
+            onValue(messages)
             completionHandler(nil)
         } else if let apiError = value as? APIResultError {
             onError(apiError.exception as! any Error)

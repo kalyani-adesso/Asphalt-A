@@ -367,7 +367,6 @@ public struct AppStrings{
         static let yourRide = "Your Rides"
         static let share = "Share"
         static let viewPhotos = "View Photos"
-        static let addPhotos = "Add Photos"
         static let accept = "Accept"
     }
     
@@ -378,7 +377,12 @@ public struct AppStrings{
         static let joinaRideTitle = "Join a Ride"
         static let reJoinRideTitle = "ReJoin Ride"
         static let rideActive = "Ride Started! Navigation active."
-        
+        static let noActiveRidesFound = "No active rides found"
+        static let confirmEndCurrentRide = "Do you want to end your current ride and join this one?"
+        static let rideAlreadyActive = "Ride already active"
+        static let loading = "Loading..."
+        static let yes = "Yes"
+        static let no = "No"
     }
     
     enum ConnectedRide {

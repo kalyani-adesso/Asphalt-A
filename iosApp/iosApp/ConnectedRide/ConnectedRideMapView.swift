@@ -203,6 +203,10 @@ struct ConnectedRideMapView: View {
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                     self.elapsedSeconds += 1
                 }
+                
+            }
+            .task {
+                await viewModel.receiveMessage(rideId: rideModel.rideId)
             }
             .onChange(of: viewModel.ongoingRideId) { ride in
                 if !ride.isEmpty {

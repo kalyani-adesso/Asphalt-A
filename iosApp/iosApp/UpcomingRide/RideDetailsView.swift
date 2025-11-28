@@ -13,7 +13,7 @@ struct RideDetailsView: View {
     @State private var startRide = false
     @State private var showJoinRide: Bool = false
     var body: some View {
-        AppToolBar{
+        AppToolBar(showBack: true){
         ZStack {
             NavigationStack {
                 ScrollView {
@@ -100,7 +100,7 @@ struct RideDetailsView: View {
                     .padding(.all,16)
                     .navigationBarBackButtonHidden(true)
                     .navigationDestination(isPresented: $showJoinRide, destination: {
-                        UpcomingRideView()
+                        UpcomingRideView(navigationDone: true)
                     })
                     .navigationDestination(isPresented:$startRide,  destination: {
                         ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])

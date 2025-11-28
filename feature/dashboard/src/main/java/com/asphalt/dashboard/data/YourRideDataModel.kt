@@ -1,9 +1,10 @@
 package com.asphalt.dashboard.data
 
+import com.asphalt.android.model.rides.RatingsData
 import kotlinx.serialization.Serializable
 
 @Serializable
-class YourRideDataModel(
+data class YourRideDataModel(
     var ridesId: String? = null,
     var title: String? = "",
     var place: String? = "",
@@ -13,6 +14,14 @@ class YourRideDataModel(
     var createdBy: String? = null,
     var createdUSerName: String? = null,
     var profileImageUrl: String? = null,
-    var startDate: Long? = null
+    var startDate: Long? = null,
+    var startTime: String? = null,
+    var endDateDisplay: String? = "",
+    var endDate: Long? = null,
+    var endTime: String? = null,
+    var ratings: List<RatingsData> = emptyList(),
+    var starsCount: Int = 0,
+    var images : ArrayList<GalleryModel> = arrayListOf()
+
 ) {
 }

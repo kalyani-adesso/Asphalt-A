@@ -26,7 +26,7 @@ actual class MessageImpl {
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun receiveMessage(rideId: String): Flow<APIResult<List<MessageDTO>>> = callbackFlow {
         val dbRef = FIRDatabase.database().reference()
-            .child("message")
+            .child("messages")
             .child(rideId)
 
         val listener = dbRef.observeEventType(
@@ -47,14 +47,19 @@ actual class MessageImpl {
                     val dict = child.value as? NSDictionary ?: continue
                     val root = dict.toMessageRoot()
 
+                    val messageId = child.key
+
                     dtoList.add(
                         MessageDTO(
+                            id = messageId,
                             senderID = root.senderID ?: "",
                             senderName = root.senderName ?: "",
                             receiverID = root.receiverID ?: "",
                             receiverName = root.receiverName ?: "",
                             message = root.message ?: "",
-                            onGoingRideID = root.onGoingRideID ?: ""
+                            onGoingRideID = root.onGoingRideID ?: "",
+                            timeStamp = root.timeStamp ?: 0L,
+                            isRideOnGoing = root.isRideOnGoing ?: false
                         )
                     )
                 }
@@ -79,6 +84,8 @@ fun NSDictionary.toMessageRoot(): MessageRoot {
        receiverID = this.objectForKey("receiverID") as? String,
         receiverName = this.objectForKey("receiverName") as? String,
         message = this.objectForKey("message") as? String,
-        onGoingRideID = this.objectForKey("onGoingRideID") as? String
+        onGoingRideID = this.objectForKey("onGoingRideID") as? String,
+        timeStamp = (this.objectForKey("timeStamp") as? NSNumber)?.longValue,
+        isRideOnGoing = this.objectForKey("isRideOnGoing") as? Boolean
     )
 }

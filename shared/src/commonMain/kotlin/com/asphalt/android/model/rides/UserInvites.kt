@@ -11,6 +11,12 @@ import kotlinx.serialization.Serializable
     var acceptInvite: Int = APIConstants.RIDE_INVITED // 0 - invite sent,1- invite accept, 2- invite declined, 3 - participant joined.
 )
 
+@Serializable
+data class Ratings (
+    @SerialName("stars")
+    var stars: Int = 0,
+)
+
 data class RideInvitesDomain(
     val rideID: String,
     val inviter: String,
@@ -18,4 +24,10 @@ data class RideInvitesDomain(
     val destination: String,
     val startDateTime: Long?,
     val acceptedParticipants: List<String>
+)
+
+@Serializable
+data class RatingsData (
+    var stars: Int = 0,
+    var userId:String
 )

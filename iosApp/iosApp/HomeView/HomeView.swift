@@ -35,12 +35,11 @@ struct HomeView: View {
             
             async let rides = viewModel.fetchAllUsers()
             async let allRides = viewModel.fetchAllRides()
-            async let allInvites =  viewModel.getInvites()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             async let stats =  home.updateStatsFor(month: month, year: year)
             
-            _ = await (rides, allRides, allInvites, stats)
+            _ = await (rides, allRides, stats)
             
             viewModel.isRideLoading = false
         }
