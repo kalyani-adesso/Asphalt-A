@@ -8,6 +8,7 @@ import com.asphalt.android.model.connectedride.FirebasePushResponse
 import com.asphalt.android.model.rides.CreateRideRoot
 import  com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.UserInvites
+import com.asphalt.android.model.rides.Ratings
 
 interface RidesApIService {
     suspend fun createRide(
@@ -27,6 +28,7 @@ interface RidesApIService {
 
     suspend fun updateOrganizerStatus(rideId:String, rideStatus:Int): APIResult<Unit>
 
+    suspend fun updateRatings(rideID: String, ratings: Ratings, userID: String): APIResult<Unit>
 
     suspend fun rateYourRide(rideId:String, userId:String, stars:Int, comments:String): APIResult<Unit>
 

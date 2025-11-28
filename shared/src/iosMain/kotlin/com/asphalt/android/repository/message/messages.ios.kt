@@ -58,7 +58,8 @@ actual class MessageImpl {
                             receiverName = root.receiverName ?: "",
                             message = root.message ?: "",
                             onGoingRideID = root.onGoingRideID ?: "",
-                            timeStamp = root.timeStamp ?: 0L
+                            timeStamp = root.timeStamp ?: 0L,
+                            isRideOnGoing = root.isRideOnGoing ?: false
                         )
                     )
                 }
@@ -83,6 +84,8 @@ fun NSDictionary.toMessageRoot(): MessageRoot {
        receiverID = this.objectForKey("receiverID") as? String,
         receiverName = this.objectForKey("receiverName") as? String,
         message = this.objectForKey("message") as? String,
-        onGoingRideID = this.objectForKey("onGoingRideID") as? String
+        onGoingRideID = this.objectForKey("onGoingRideID") as? String,
+        timeStamp = (this.objectForKey("timeStamp") as? NSNumber)?.longValue,
+        isRideOnGoing = this.objectForKey("isRideOnGoing") as? Boolean
     )
 }

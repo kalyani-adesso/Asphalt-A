@@ -89,9 +89,12 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
     @Published var chatMessages: [MessageUIModel] = []
-    var rider : Rider {
-        groupRiders[messageIndex]
+    var rider: Rider? {
+        guard !groupRiders.isEmpty else { return nil }
+        guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
+        return groupRiders[messageIndex]
     }
+
     var lastLat: Double?
     var lastLong: Double?
     var lastSpeed: Double = 0.0
@@ -344,13 +347,23 @@ extension ConnectedRideViewModel {
     }
     
     func rateYourRide(ratings:Int,comments:String) {
-        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { [self] result, error in
             if let error = error {
                 print("Error while rating your ride \(error)")
             } else {
                 print("Sucesss!")
             }
         }
+    }
+    
+    func updateRating(stars:Int,rideId:String) {
+        rideRepository.updateRatings(rideID:rideId, userID: MBUserDefaults.userIdStatic ?? "", stars: Int32(stars), completionHandler: { result, error in
+            if let error = error {
+                print("Error while rating your ride \(error)")
+            } else {
+                print("Sucesss!")
+            }
+        })
     }
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {
@@ -465,7 +478,7 @@ extension ConnectedRideViewModel {
     
     func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
         let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
-        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis) )
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis), isRideOnGoing: KotlinBoolean(bool: true) )
         rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
             if let error = error {
                 print("Error joining ride:", error.localizedDescription)
@@ -483,7 +496,7 @@ extension ConnectedRideViewModel {
                 collector: ReceiveMessageCollector(
                     onValue: { kmpMessages in
                         Task { @MainActor in
-                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic }).map { item in
+                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }).map { item in
                                 MessageUIModel(
                                     id: item.id,
                                     senderId: item.senderID,

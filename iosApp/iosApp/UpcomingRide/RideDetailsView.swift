@@ -100,7 +100,7 @@ struct RideDetailsView: View {
                     .padding(.all,16)
                     .navigationBarBackButtonHidden(true)
                     .navigationDestination(isPresented: $showJoinRide, destination: {
-                        UpcomingRideView()
+                        UpcomingRideView(navigationDone: true)
                     })
                     .navigationDestination(isPresented:$startRide,  destination: {
                         ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])

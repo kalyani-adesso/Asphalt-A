@@ -27,7 +27,7 @@ struct JoinRideView: View {
                                 .padding(.top)
                             if viewModel.filteredRides.isEmpty {
                                 VStack(spacing: 12) {
-                                    Text("No active rides found")
+                                    Text(AppStrings.JoinRide.noActiveRidesFound)
                                         .font(KlavikaFont.bold.font(size: 18))
                                         .foregroundColor(.gray)
                                 }
@@ -69,7 +69,7 @@ struct JoinRideView: View {
                 if viewModel.isRideLoading {
                     Color.black.opacity(0.5)
                         .ignoresSafeArea()
-                    ProgressView("Loading...")
+                    ProgressView(AppStrings.JoinRide.loading)
                         .progressViewStyle(CircularProgressViewStyle())
                         .padding(.top, 100)
                         .foregroundColor(.white)
@@ -218,10 +218,9 @@ struct JoinRideRow: View {
                     .fill(AppColor.listGray)
             )
             .contentShape(Rectangle())
-            .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
-                Button("No", role: .cancel) { }
-
-                Button("Yes") {
+            .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
+                Button(AppStrings.JoinRide.no, role: .cancel) { }
+                Button(AppStrings.JoinRide.yes) {
                     Task {
                         await viewModel.endActiveRide()
                         await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
@@ -229,7 +228,7 @@ struct JoinRideRow: View {
                     }
                 }
             } message: {
-                Text("Do you want to end your current ride and join this one?")
+                Text(AppStrings.JoinRide.confirmEndCurrentRide)
             }
     }
 }
@@ -237,3 +236,5 @@ struct JoinRideRow: View {
 #Preview {
     JoinRideView()
 }
+
+

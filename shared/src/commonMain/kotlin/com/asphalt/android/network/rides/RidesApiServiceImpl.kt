@@ -14,6 +14,7 @@ import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.Ratings
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.BaseAPIService
 import com.asphalt.android.network.KtorClient
@@ -102,6 +103,16 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         )
         return safeApiCall {
             patch(rideStatus, "$RIDES_URL/$rideId").body()
+        }
+    }
+
+    override suspend fun updateRatings(
+        rideID: String,
+        ratings: Ratings,
+        userID: String
+    ): APIResult<Unit> {
+        return safeApiCall {
+            patch(ratings, "$RIDES_URL/$rideID$RATINGS/$userID").body()
         }
     }
 

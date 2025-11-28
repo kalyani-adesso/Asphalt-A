@@ -18,6 +18,7 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.rides.RidesApIService
 import kotlinx.datetime.TimeZone
+import com.asphalt.android.model.rides.Ratings
 
 class RidesRepository(val apiService: RidesApIService) {
     suspend fun createRide(createRideRoot: CreateRideRoot): APIResult<GenericResponse> {
@@ -180,6 +181,10 @@ class RidesRepository(val apiService: RidesApIService) {
         comments: String
     ): APIResult<Unit> {
         return apiService.rateYourRide(rideId, userId, stars, comments)
+    }
+
+    suspend fun updateRatings(rideID: String, userID: String, stars: Int): APIResult<Unit> {
+       return  apiService.updateRatings(rideID, Ratings(stars),userID)
     }
 
     suspend fun sendMessage(message: MessageRoot): APIResult<Unit> {

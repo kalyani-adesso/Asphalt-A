@@ -30,12 +30,11 @@ struct ConnectedRideCompleteView: View {
             .padding(.horizontal,16)
             
             if showPopup {
-                RatingSheetView(isPresented: $showPopup)
-                        .transition(.scale)
-                        .zIndex(1)
-                }
+                RatingSheetView(isPresented: $showPopup,rideModel:viewModel)
+                    .transition(.scale)
+                    .zIndex(1)
+            }
         }
-        
         .navigationDestination(isPresented: $showHome, destination: {
             BottomNavBar()
         })

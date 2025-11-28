@@ -24,7 +24,10 @@ data class MessageRoot(
     val onGoingRideID: String? = null,
 
     @SerialName("timeStamp")
-    val timeStamp: Long? = null
+    val timeStamp: Long? = null,
+
+    @SerialName("isRideOnGoing")
+    val isRideOnGoing: Boolean? = null
 )
 
 data class MessageDTO(
@@ -35,5 +38,6 @@ data class MessageDTO(
     val receiverName: String,
     val message: String,
     val onGoingRideID: String,
-    val timeStamp: Long
+    val timeStamp: Long,
+    val isRideOnGoing: Boolean
 )

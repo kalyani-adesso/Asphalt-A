@@ -210,6 +210,8 @@ class UpcomingRideViewModel: ObservableObject {
             invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites
             
+            self.upcomingInvitesRide = upcomingRides + inviteRides
+            
             self.rides = upcomingRides + historyRides + inviteRides
             
             isRideLoading = false
@@ -292,6 +294,25 @@ class UpcomingRideViewModel: ObservableObject {
             print("Error fetching users:", error)
         }
     }
+    
+    
+    @MainActor
+    func deleteRide(rideId: String)  async {
+        self.isRideLoading = true
+        do {
+            let result = try await rideRepository.deleteRide(
+                rideId: rideId
+            )
+          
+            if result is APIResultSuccess<GenericResponse> {
+                print(" deleted ride")
+                await self.fetchAllRides()
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
+    }
+    
     
     func getAllUsers(createdBy: String) async -> (String,String)? {
         
@@ -430,41 +451,6 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
 
-
-    @MainActor
-    func getInvites() async {
-        do {
-            let result = try await rideRepository.getRideInvites(userID: MBUserDefaults.userIdStatic ?? "")
-            if let success = result as? APIResultSuccess<AnyObject>,
-               let invites = success.data as? [RideInvitesDomain] {
-                let mapped: [RideModel] = invites.compactMap { domain in
-
-                    let millis = domain.startDateTime ?? 0
-                    let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
-
-                    guard startDate >= Date() else { return nil }
-
-                    return RideModel(
-                        id: domain.rideID,
-                        title: "Ride Invite",
-                        routeStart: domain.startLocation,
-                        routeEnd: domain.destination,
-                        status: .invite,
-                        rideViewAction: .decline,
-                        rideAction: .invities,
-                        date: formatDate(startDate),
-                        riderCount: domain.acceptedParticipants.count,
-                        createdBy: domain.inviter,
-                        startDate: startDate,
-                        participantAcceptedCount: domain.acceptedParticipants.count
-                    )
-                }
-                self.upcomingInvitesRide = mapped
-            }
-        } catch {
-            print("Error fetching users:", error)
-        }
-    }
 }
 
 // Extension to help with async mapping (if not already available)
