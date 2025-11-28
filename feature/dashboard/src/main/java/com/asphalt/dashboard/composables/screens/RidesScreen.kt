@@ -48,6 +48,7 @@ import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.ReadOnlyRatingBar
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
@@ -362,7 +363,7 @@ fun UpcomingRides(
 
             BorderedButton(
                 onClick = {
-                   // upComingViewDetails.invoke(upconing.ridesId.toString())
+                    // upComingViewDetails.invoke(upconing.ridesId.toString())
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)
@@ -547,6 +548,11 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                     color = PrimaryDarkerLightB75
                 )
             }
+        }
+        Spacer(modifier = Modifier.height(Dimensions.size25))
+        Row() {
+            Text(text = "Your Rating: ", style = Typography.bodyMedium)
+            ReadOnlyRatingBar(rating = 3, starSize = Dimensions.size14)
         }
     }
 }
@@ -842,6 +848,7 @@ fun RidesPreview() {
     )
     var ridesScreenViewModel: RidesScreenViewModel = RidesScreenViewModel(androidVM)
 
-    RidesScreen(ridesScreenViewModel, {}, {})
+    //RidesScreen(ridesScreenViewModel, {}, {})
     //UpcomingRides(ridesScreenViewModel, YourRideDataModel()) { }
+    HistoryRides(ridesScreenViewModel, YourRideDataModel())
 }
