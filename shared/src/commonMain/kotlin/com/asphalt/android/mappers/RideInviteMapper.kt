@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.asphalt.android.mappers
 
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 fun RidesData.getUserInviteStatus(userID: String): Int? {
     val participantData = participants.find { it.userId == userID }
@@ -24,11 +28,15 @@ fun RidesData.isOrganiser(userID: String): Boolean {
 fun List<RidesData>.toRideInviteListDomain(userID: String): List<RideInvitesDomain> {
     return with(this) {
         mapNotNull { ridesData ->
-            val organiser = ridesData.isOrganiser(userID)
-            if (ridesData.isUserInvited(userID) || organiser) ridesData.toRideInvitesDomain(
-                organiser
-            ) else null
-        }
+            ridesData.startDate?.let {
+                if (it > Clock.System.now().toEpochMilliseconds()) {
+                    val organiser = ridesData.isOrganiser(userID)
+                    if (ridesData.isUserInvited(userID) || organiser) ridesData.toRideInvitesDomain(
+                        organiser
+                    ) else null
+                } else null
+            }
+        }.sortedBy { it.startDateTime }
     }
 }
 
