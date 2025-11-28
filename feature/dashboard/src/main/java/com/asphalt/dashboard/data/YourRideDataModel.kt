@@ -1,5 +1,6 @@
 package com.asphalt.dashboard.data
 
+import com.asphalt.android.model.rides.RatingsData
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,6 +19,7 @@ class YourRideDataModel(
     var endDateDisplay: String? = "",
     var endDate: Long? = null,
     var endTime: String? = null,
+    var ratings: List<RatingsData> = emptyList()
 
-    ) {
+) {
 }

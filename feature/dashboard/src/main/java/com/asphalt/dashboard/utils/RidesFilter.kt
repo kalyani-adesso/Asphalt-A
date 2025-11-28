@@ -115,7 +115,8 @@ object RidesFilter {
                 date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
                 riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
-                startDate = ride.startDate
+                startDate = ride.startDate,
+                ratings = ride.ratings
             )
         }
     }
