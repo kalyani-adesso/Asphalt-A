@@ -465,7 +465,7 @@ extension ConnectedRideViewModel {
     
     func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
         let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
-        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis) )
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis), isRideOnGoing: KotlinBoolean(bool: true) )
         rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
             if let error = error {
                 print("Error joining ride:", error.localizedDescription)
@@ -483,7 +483,7 @@ extension ConnectedRideViewModel {
                 collector: ReceiveMessageCollector(
                     onValue: { kmpMessages in
                         Task { @MainActor in
-                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic }).map { item in
+                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }).map { item in
                                 MessageUIModel(
                                     id: item.id,
                                     senderId: item.senderID,
