@@ -19,7 +19,8 @@ class YourRideDataModel(
     var endDateDisplay: String? = "",
     var endDate: Long? = null,
     var endTime: String? = null,
-    var ratings: List<RatingsData> = emptyList()
+    var ratings: List<RatingsData> = emptyList(),
+    var starsCount: Int = 0
 
 ) {
 }

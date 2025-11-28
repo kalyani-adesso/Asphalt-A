@@ -552,7 +552,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
         Spacer(modifier = Modifier.height(Dimensions.size25))
         Row() {
             Text(text = "Your Rating: ", style = Typography.bodyMedium)
-            ReadOnlyRatingBar(rating = 3, starSize = Dimensions.size14)
+            ReadOnlyRatingBar(rating = history.starsCount, starSize = Dimensions.size14)
         }
     }
 }

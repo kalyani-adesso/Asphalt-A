@@ -116,7 +116,8 @@ object RidesFilter {
                 riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
                 startDate = ride.startDate,
-                ratings = ride.ratings
+                ratings = ride.ratings,
+                starsCount = ride.ratings.find { it.userId == userId }?.stars ?: 0
             )
         }
     }

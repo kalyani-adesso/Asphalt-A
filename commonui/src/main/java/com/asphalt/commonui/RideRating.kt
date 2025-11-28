@@ -16,7 +16,7 @@ import com.asphalt.commonui.theme.Dimensions
 
 @Composable
 fun ReadOnlyRatingBar(
-    rating: Int = 1,
+    rating: Int = 0,
     maxRating: Int = 5,
     starSize: Dp = 24.dp,
     spaceBetween: Dp =5.dp,
