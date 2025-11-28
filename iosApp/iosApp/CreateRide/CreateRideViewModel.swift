@@ -196,7 +196,13 @@ extension CreateRideViewModel {
                 (participant.userId, UserInvites(acceptInvite: 0))
             }
         )
-        
+        let allUsers = selectedParticipants.map { $0.userId } + [MBUserDefaults.userIdStatic ?? ""]
+
+        let ratings: [String: Ratings] = Dictionary(
+            uniqueKeysWithValues: allUsers.map { userId in
+                (userId, Ratings(stars: 0))
+            }
+        )
         let createdDateLong = Int64(Date().timeIntervalSince1970 * 1000)
         var startDateLong: Int64 = 0
         if let merged = combine(date: selectedStartDate, time: selectedStartTime) {
@@ -206,7 +212,7 @@ extension CreateRideViewModel {
         if let merged = combine(date: selectedEndDate, time: selectedEndTime) {
             endDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
-        let ratings = [MBUserDefaults.userIdStatic ?? "" : Ratings(stars: 0)]
+        
         let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, ratings: ratings, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong), hasAssemblyPoint: ride.hasAssemblyPoint ?? false, assemblyPoint: ride.assemblyPoint, assemblyLat:  ride.assemblyLat ?? 0.0, assemblyLon: ride.assemblyLon ?? 0.0)
         
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in

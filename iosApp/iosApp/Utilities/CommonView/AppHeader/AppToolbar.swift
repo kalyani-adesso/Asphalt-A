@@ -12,11 +12,12 @@ struct AppToolBar<Content: View>: View {
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
+    @State var showBack: Bool = false
     
     let content: Content
     
-    init( @ViewBuilder content: () -> Content) {
-        
+    init( showBack: Bool = false, @ViewBuilder content: () -> Content) {
+        _showBack = State(initialValue: showBack)
         self.content = content()
     }
     
@@ -24,9 +25,14 @@ struct AppToolBar<Content: View>: View {
         content
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    
                     Button {
-                       showHome = true
+                        if showBack{
+                            dismiss()
+                        }
+                        else{
+                            showHome = true
+                        }
+                       
                     } label: {
                         AppIcon.CreateRide.backButton
                     }

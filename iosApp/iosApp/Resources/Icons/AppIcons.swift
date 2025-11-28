@@ -169,6 +169,14 @@ struct AppIcon {
         static let add = Image("add")
         static let crisis_alert = Image("crisis_alert")
     }
+    struct YourRides {
+        static let photos = Image("photos")
+        static let share = Image("share")
+        static let time = Image("time")
+        static let view = Image("view")
+        static let rating = Image("rating")
+       
+    }
 }
 
 
