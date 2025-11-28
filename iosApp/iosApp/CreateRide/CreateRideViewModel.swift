@@ -78,7 +78,11 @@ class CreateRideViewModel: NSObject, ObservableObject {
 
 // MARK: - Search Place Delegates
 extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
-    func selectPlace(_ completion: MKLocalSearchCompletion, isStart: Bool, isAssembly: Bool, isDestination: Bool) {
+    func selectPlace(_ completion: MKLocalSearchCompletion,
+                     isStart: Bool,
+                     isAssembly: Bool,
+                     isDestination: Bool,
+                     isAssemblySameAsStart: Bool) {
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         
@@ -92,10 +96,11 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
                     self.ride.startLocation = placeName
                     self.ride.startLat = item.placemark.coordinate.latitude
                     self.ride.startLng = item.placemark.coordinate.longitude
-                } else if isAssembly {
+                }
+                else if isAssembly {
                     self.ride.assemblyPoint = placeName
                     self.ride.assemblyLat = item.placemark.coordinate.latitude
-                    self.ride.assemblyLon = item.placemark.coordinate.longitude
+                    self.ride.assemblyLon = item.placemark.coordinate.latitude
                 }
                 else if isDestination {
                     self.ride.endLocation = placeName

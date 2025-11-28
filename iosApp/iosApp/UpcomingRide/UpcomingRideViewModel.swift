@@ -295,6 +295,25 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
     
+    
+    @MainActor
+    func deleteRide(rideId: String)  async {
+        self.isRideLoading = true
+        do {
+            let result = try await rideRepository.deleteRide(
+                rideId: rideId
+            )
+          
+            if result is APIResultSuccess<GenericResponse> {
+                print(" deleted ride")
+                await self.fetchAllRides()
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
+    }
+    
+    
     func getAllUsers(createdBy: String) async -> (String,String)? {
         
         await withCheckedContinuation { continuation in

@@ -340,7 +340,6 @@ class QueryViewModel: ObservableObject {
                 queryId: query.apiId
                 
             )
-            print(result)
             if result is APIResultSuccess<GenericResponse> {
                 print(" Removed Like from Query successfully!")
                 self.fetchAllQueries(showLoader: false)
