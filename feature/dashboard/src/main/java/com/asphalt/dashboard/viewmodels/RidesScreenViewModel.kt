@@ -54,7 +54,7 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
-                val sortedArray = response.sortedByDescending { it.createdDate }
+                val sortedArray = response.sortedBy{ it.startDate }
 
                 var upcoming =
                     RidesFilter.getUComingRides(sortedArray, user?.uid ?: "", androidUserVM)
