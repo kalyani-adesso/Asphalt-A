@@ -105,7 +105,7 @@ object RidesFilter {
     ): List<YourRideDataModel> {
         return rides.filter { ride ->
             (ride.createdBy == userId && ride.rideStatus == APIConstants.END_RIDE) ||
-                    (ride.participants.any { it.userId == userId && ride.rideStatus == APIConstants.END_RIDE })
+                    (ride.participants.any { it.userId == userId && it.inviteStatus == APIConstants.END_RIDE })
         }.map { ride ->
             YourRideDataModel(
                 ridesId = ride.ridesID,
