@@ -89,9 +89,12 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
     @Published var chatMessages: [MessageUIModel] = []
-    var rider : Rider {
-        groupRiders[messageIndex]
+    var rider: Rider? {
+        guard !groupRiders.isEmpty else { return nil }
+        guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
+        return groupRiders[messageIndex]
     }
+
     var lastLat: Double?
     var lastLong: Double?
     var lastSpeed: Double = 0.0
@@ -344,13 +347,23 @@ extension ConnectedRideViewModel {
     }
     
     func rateYourRide(ratings:Int,comments:String) {
-        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { [self] result, error in
             if let error = error {
                 print("Error while rating your ride \(error)")
             } else {
                 print("Sucesss!")
             }
         }
+    }
+    
+    func updateRating(stars:Int,rideId:String) {
+        rideRepository.updateRatings(rideID:rideId, userID: MBUserDefaults.userIdStatic ?? "", stars: Int32(stars), completionHandler: { result, error in
+            if let error = error {
+                print("Error while rating your ride \(error)")
+            } else {
+                print("Sucesss!")
+            }
+        })
     }
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {

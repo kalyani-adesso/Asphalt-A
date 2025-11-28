@@ -49,7 +49,7 @@ struct MessagePopupView: View {
             .cornerRadius(22)
         }
         .task {
-            await viewModel.receiveMessage(rideId: viewModel.rider.rideId)
+            await viewModel.receiveMessage(rideId: viewModel.rider?.rideId ?? "")
         }
     }
 
@@ -61,7 +61,7 @@ struct MessagePopupView: View {
                 .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Message \(viewModel.rider.name)")
+                Text("Message \(viewModel.rider?.name ?? "")")
                     .foregroundColor(AppColor.black)
                     .font(KlavikaFont.bold.font(size: 18))
                 
@@ -189,11 +189,11 @@ struct MessagePopupView: View {
                 isPresented = false
                 viewModel.sendMessage(
                     senderName: MBUserDefaults.userNameStatic ?? "",
-                    receiverName: viewModel.rider.name,
+                    receiverName: viewModel.rider?.name ?? "",
                     senderId: MBUserDefaults.userIdStatic ?? "",
-                    receiverId: viewModel.rider.receiverId,
+                    receiverId: viewModel.rider?.receiverId ?? "",
                     message: message,
-                    rideId: viewModel.rider.rideId
+                    rideId: viewModel.rider?.rideId ?? ""
                 )
             }
             .font(KlavikaFont.bold.font(size: 16))
@@ -207,14 +207,14 @@ struct MessagePopupView: View {
 
     // MARK: - Ride Status
     var rideStatus: String {
-        let status = viewModel.rider.status
-        let time = viewModel.rider.timeSinceUpdate
+        let status = viewModel.rider?.status
+        let time = viewModel.rider?.timeSinceUpdate
         
         switch status {
         case .connected, .stopped:
-            return "\(status.rawValue) from \(time)"
+            return "\(status?.rawValue) from \(time)"
         case .delayed:
-            return "\(status.rawValue) by \(time)"
+            return "\(status?.rawValue) by \(time)"
         default:
             return "Available"
         }
