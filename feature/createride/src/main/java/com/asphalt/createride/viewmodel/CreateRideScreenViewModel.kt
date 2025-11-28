@@ -13,6 +13,7 @@ import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.Ratings
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
@@ -285,6 +286,19 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
                     )
                 } ?: emptyMap()
 
+        var ratings: Map<String, Ratings> =
+            _ridersListMutable.value.filter { it.isSelect == true }
+                .associate { rider ->
+                    rider.id.orEmpty() to Ratings(
+                        stars = 0
+                    )
+                } ?: emptyMap()
+        ratings = ratings.plus(
+            (userDetails?.uid ?: "") to Ratings(
+                stars = 0
+            )
+        )
+
         var hasAssemblyPoint: Boolean = false
         var assemblyPoint: String? = null
         var assemblyLat: Double = 0.0
@@ -331,7 +345,9 @@ class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             hasAssemblyPoint = hasAssemblyPoint,
             assemblyPoint = assemblyPoint,
             assemblyLat = assemblyLat,
-            assemblyLon = assemblyLon
+            assemblyLon = assemblyLon,
+            ratings = ratings
+
         )
 
 
