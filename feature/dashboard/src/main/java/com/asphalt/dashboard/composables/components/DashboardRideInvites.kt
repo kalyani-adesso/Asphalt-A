@@ -224,7 +224,7 @@ fun DashboardRideInviteUI(
                         updateInviteStatus(dashboardRideInvite.rideID, APIConstants.RIDE_ACCEPTED)
 
                     },
-                    buttonHeight = Dimensions.size50,
+                    buttonHeight = Dimensions.size32,
                     contentPadding = PaddingValues(Dimensions.size0)
                 ) {
                     Row(
@@ -246,7 +246,7 @@ fun DashboardRideInviteUI(
                     colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                     modifier = Modifier
                         .weight(1f)
-                        .height(Dimensions.size50),
+                        .height(Dimensions.size32),
                     shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS)
                 ) {
                     Text(

@@ -99,3 +99,6 @@ val LightGreen40 = Color(0xFF019C65)
 val LightGray40 = Color(0xFFD1D5DC)
 val LightGray45 = Color(0xFF6A7282)
 val DarkRed = Color(0xFFD4183D)
+val NeutralTaupe = Color(0xFF724D4D)
+
+val NeutralTaupe20 = Color(0x34724D4D)

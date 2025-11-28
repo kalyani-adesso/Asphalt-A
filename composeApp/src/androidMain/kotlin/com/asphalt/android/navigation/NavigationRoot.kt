@@ -78,7 +78,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun NavigationRoot(
     androidUserVM: AndroidUserVM = koinViewModel()
 ) {
-    val backStack = rememberNavBackStack(AppNavKey.SplashKey)
+    val backStack = rememberNavBackStack(SplashKey)
     val datastore: DataStoreManager = koinInject()
     val context = LocalContext.current
     val locationProvider = remember { AndroidLocationProvider(context.applicationContext) }
@@ -109,13 +109,13 @@ fun NavigationRoot(
         }
     }
 
-   /* val showBottomBar = backStack.lastOrNull() in listOf(
-        AppNavKey.DashboardNavKey,
-        AppNavKey.RidesScreenNav,
-        AppNavKey.QueriesKey,
-        AppNavKey.ProfileKey,
-        AppNavKey.RideDetails(null),
-    )*/
+    /* val showBottomBar = backStack.lastOrNull() in listOf(
+         AppNavKey.DashboardNavKey,
+         AppNavKey.RidesScreenNav,
+         AppNavKey.QueriesKey,
+         AppNavKey.ProfileKey,
+         AppNavKey.RideDetails(null),
+     )*/
     /*val showTopAppBar = backStack.lastOrNull() in listOf(
         AppNavKey.DashboardNavKey,
         AppNavKey.RidesScreenNav,
@@ -138,6 +138,7 @@ fun NavigationRoot(
         is AppNavKey.QueriesKey,
         is AppNavKey.ProfileKey,
         is AppNavKey.RideDetails -> true
+
         else -> false
     }
 
@@ -153,7 +154,8 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideMapNavKey,
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
-        is AppNavKey.RideDetails -> true 
+        is AppNavKey.RideDetails -> true
+
         else -> false
     }
 
@@ -221,7 +223,10 @@ fun NavigationRoot(
                         drawerState,
                         topAppBarState,
                         onBack = ::onBackPressed,
-                        isDashboard = backStack.lastOrNull() == AppNavKey.DashboardNavKey
+                        isDashboard = backStack.lastOrNull() == AppNavKey.DashboardNavKey,
+                        notificationsClick = {
+                            backStack.add(AppNavKey.NotificationNav)
+                        },
                     )
                 }
             },
@@ -346,10 +351,7 @@ fun NavigationRoot(
                                 backStack.add(AppNavKey.RidesScreenNav)
                                 selectedKey = AppNavKey.RidesScreenNav
                             },
-                            setTopAppBarState = setTopAppBarState, notificationsClick = {
-                                backStack.add(AppNavKey.NotificationNav)
-
-                            }, creatRideClick = {
+                            setTopAppBarState = setTopAppBarState, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
                             },
                             joinRideClick = {

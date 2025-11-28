@@ -74,66 +74,49 @@ fun AdventureJourney(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
+                    Spacer(Modifier.height(Dimensions.size5))
                     Text(
-                        stringResource(R.string.adventure),
+                        stringResource(R.string.adventure_journey),
                         style = TypographyBold.headlineLarge,
                         fontSize = Dimensions.textSize18
                     )
-                }
-                SelectJourneyTimeFrame(selectedItem, options)
-            }
-            Text(
-                stringResource(R.string.journey), style = TypographyBold.headlineLarge,
-                fontSize = Dimensions.textSize18,
-                modifier = Modifier.absoluteOffset(Dimensions.spacing0, Dimensions.spacingNeg4)
-            )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Box {
-                    DonutChart(
-                        values = remember(valueList.value) { valueList.value },
-                        colors = remember(colorList.value) { colorList.value })
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(painter = painterResource(R.drawable.ic_directions_bike), null)
-                        Spacer(Modifier.height(Dimensions.spacing5))
-                        Text(
-                            stringResource(
-                                R.string.total_rides_info_chart,
-                                totalRides.value
-                            ),
-                            fontSize = Dimensions.textSize12,
-                            style = TypographyMedium.bodySmall,
-                            color = NeutralDarkGrey
-                        )
+                    Spacer(Modifier.height(Dimensions.size20))
+                    Box {
+                        DonutChart(
+                            values = remember(valueList.value) { valueList.value },
+                            colors = remember(colorList.value) { colorList.value })
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(painter = painterResource(R.drawable.ic_total_rides), null)
+                            Spacer(Modifier.height(Dimensions.spacing10))
+                            Text(
+                                stringResource(
+                                    R.string.total_rides_info_chart,
+                                    totalRides.value
+                                ),
+                                fontSize = Dimensions.textSize12,
+                                style = TypographyMedium.bodySmall,
+                                color = NeutralDarkGrey
+                            )
+                        }
                     }
+
+                }
+                Column(verticalArrangement = Arrangement.SpaceBetween) {
+                    SelectJourneyTimeFrame(selectedItem, options)
+                    Spacer(Modifier.height(Dimensions.size25))
+                    RideGraphLegendUI(RideGraphLegend.TotalRides)
+                    RideGraphLegendUI(RideGraphLegend.PlacesExplored)
+                    RideGraphLegendUI(RideGraphLegend.RideGroups)
+                    RideGraphLegendUI(RideGraphLegend.RideInvites)
+
+
                 }
             }
-            Spacer(Modifier.height(Dimensions.spacing15))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(
-                    Dimensions.size8,
-                    alignment = Alignment.CenterHorizontally
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                RideGraphLegendUI(RideGraphLegend.TotalRides)
-                RideGraphLegendUI(RideGraphLegend.PlacesExplored)
-                RideGraphLegendUI(RideGraphLegend.RideGroups)
 
-            }
-            Spacer(Modifier.height(Dimensions.size8))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(
-                    Dimensions.size8,
-                    alignment = Alignment.CenterHorizontally
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                RideGraphLegendUI(RideGraphLegend.RideInvites)
-            }
         }
     }
 
