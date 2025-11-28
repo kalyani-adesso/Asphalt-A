@@ -10,6 +10,7 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
 import com.asphalt.dashboard.utils.RidesFilter
@@ -105,6 +106,23 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
         }
 
 
+    }
+    fun updateImages(images: ArrayList<GalleryModel>,ridesID:String){
+        val currentState = _ridesListMutableState.value
+
+        // find particular ride in history
+        val updatedHistory = currentState.history.map { ride ->
+            if (ride.ridesId == ridesID) {
+                ride.copy(
+                    images = ArrayList(images) // replace images
+                )
+            } else ride
+        }.toCollection(ArrayList())
+
+        // update state with new root object
+        _ridesListMutableState.value = currentState.copy(
+            history = updatedHistory
+        )
     }
 
 

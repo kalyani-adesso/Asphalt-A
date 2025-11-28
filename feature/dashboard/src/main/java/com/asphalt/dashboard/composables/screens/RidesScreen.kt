@@ -85,10 +85,12 @@ fun RidesScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     upComingViewDetails: (String) -> Unit
 ) {
+
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
         //ridesScreenViewModel.getRides()
     }
+    ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
     ridesScreenViewModel.getRides()
     AsphaltTheme {
         Column(
@@ -407,10 +409,24 @@ fun UpcomingRides(
 
 @Composable
 fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDataModel) {
+    var addPhotos by remember { mutableStateOf(false) }
     var showGalleryDialog by remember { mutableStateOf(false) }
+    var showViewPhotos by remember { mutableStateOf(history.images.size > 0) }
+    if (addPhotos) {
+        GalleryDialog(isShowUpload = true, onDismiss = {
+            addPhotos = false
+        }, onUpload = { images ->
+            showViewPhotos = true
+            addPhotos = false
+            ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+
+        })
+    }
     if (showGalleryDialog) {
-        GalleryDialog(onDismiss = {
+        GalleryDialog(images = history.images, isShowUpload = false, onDismiss = {
             showGalleryDialog = false
+        }, onUpload = { images ->
+            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
         })
     }
     Column(
@@ -511,39 +527,48 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                 Dimensions.padding16
             )
         ) {
+            if (showViewPhotos) {
+                BorderedButton(
+                    onClick = {
+                        showGalleryDialog = true
+                    },
+                    modifier = Modifier
+                        .height(Dimensions.size50)
+                        .background(NeutralWhite)
+                        .weight(1f),
+                    buttonRadius = Dimensions.size10,
+                    contentPaddingValues = PaddingValues(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_eye_blue),
+                        contentDescription = ""
+                    )
+                    Spacer(Modifier.width(Dimensions.size8))
+                    Text(
+                        text = stringResource(R.string.view_photos).uppercase(),
+                        style = TypographyMedium.bodySmall,
+                        color = PrimaryDarkerLightB75
+                    )
+                }
+            }
+            //Spacer(Modifier.width(Dimensions.padding15))
+
             BorderedButton(
                 onClick = {
-                    showGalleryDialog = true
+                    addPhotos = true
                 },
                 modifier = Modifier
+                    .fillMaxWidth()
                     .height(Dimensions.size50)
                     .background(NeutralWhite)
                     .weight(1f),
                 buttonRadius = Dimensions.size10,
                 contentPaddingValues = PaddingValues(0.dp)
             ) {
+                Image(painter = painterResource(R.drawable.ic_image_icon), contentDescription = "")
+                Spacer(Modifier.width(Dimensions.size8))
                 Text(
-                    text = stringResource(R.string.view_photos).uppercase(),
-                    style = TypographyMedium.bodySmall,
-                    color = PrimaryDarkerLightB75
-                )
-            }
-            //Spacer(Modifier.width(Dimensions.padding15))
-
-            BorderedButton(
-                onClick = {
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.size50)
-                    .background(NeutralWhite)
-                    .weight(1.4f),
-                buttonRadius = Dimensions.size10,
-                contentPaddingValues = PaddingValues(0.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.share_exp).uppercase(),
+                    text = stringResource(R.string.add_photos).uppercase(),
                     style = TypographyMedium.bodySmall,
                     color = PrimaryDarkerLightB75
                 )
