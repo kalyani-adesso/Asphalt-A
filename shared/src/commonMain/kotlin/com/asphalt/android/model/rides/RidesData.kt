@@ -25,4 +25,5 @@ class RidesData(
     var assemblyPoint: String? = null,
     var assemblyLat: Double = 0.0,
     var assemblyLon: Double = 0.0,
+    var ratings: List<RatingsData> = emptyList(),
 )

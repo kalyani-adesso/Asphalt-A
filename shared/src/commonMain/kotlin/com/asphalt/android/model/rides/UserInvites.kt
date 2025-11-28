@@ -25,3 +25,9 @@ data class RideInvitesDomain(
     val startDateTime: Long?,
     val acceptedParticipants: List<String>
 )
+
+@Serializable
+data class RatingsData (
+    var stars: Int = 0,
+    var userId:String
+)

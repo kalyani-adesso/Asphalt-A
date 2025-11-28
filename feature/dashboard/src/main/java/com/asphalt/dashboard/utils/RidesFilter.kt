@@ -105,7 +105,7 @@ object RidesFilter {
     ): List<YourRideDataModel> {
         return rides.filter { ride ->
             (ride.createdBy == userId && ride.rideStatus == APIConstants.END_RIDE) ||
-                    (ride.participants.any { it.userId == userId && ride.rideStatus == APIConstants.END_RIDE })
+                    (ride.participants.any { it.userId == userId && it.inviteStatus == APIConstants.END_RIDE })
         }.map { ride ->
             YourRideDataModel(
                 ridesId = ride.ridesID,
@@ -115,7 +115,9 @@ object RidesFilter {
                 date = ride.startDate?.let { Utils.getDateWithTime(ride.startDate) } ?: "",
                 riders = ride.participants.size + 1,// need to count the organizer
                 createdBy = ride.createdBy,
-                startDate = ride.startDate
+                startDate = ride.startDate,
+                ratings = ride.ratings,
+                starsCount = ride.ratings.find { it.userId == userId }?.stars ?: 0
             )
         }
     }
