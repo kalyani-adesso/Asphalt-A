@@ -261,6 +261,10 @@
     <string name="delete_ride">Delete Ride</string>
     <string name="delete_ride_success">Your ride has been deleted successfully</string>
     <string name="add_photos">Add photos</string>
+    <string name="your_ride_stats">Your Ride Stats</string>
+    <string name="cancel_ride">Cancel Ride</string>
+
+
 
 
 

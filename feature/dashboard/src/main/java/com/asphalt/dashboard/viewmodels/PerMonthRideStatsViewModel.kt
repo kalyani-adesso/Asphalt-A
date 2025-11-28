@@ -53,8 +53,8 @@ class PerMonthRideStatsViewModel() : ViewModel() {
     private fun getDefaultStats(): List<RideStatDataUIModel> {
         return listOf(
             RideStatDataUIModel(RideStatType.TotalRides, 0),
+            RideStatDataUIModel(RideStatType.Locations, 0),
             RideStatDataUIModel(RideStatType.TotalKms, 0),
-            RideStatDataUIModel(RideStatType.Locations, 0)
         )
 
     }

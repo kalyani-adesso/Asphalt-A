@@ -15,15 +15,24 @@ fun RidesData.isUserInvited(userID: String): Boolean {
     }
 }
 
+fun RidesData.isOrganiser(userID: String): Boolean {
+    return with(this) {
+        this.createdBy == userID
+    }
+}
+
 fun List<RidesData>.toRideInviteListDomain(userID: String): List<RideInvitesDomain> {
     return with(this) {
         mapNotNull { ridesData ->
-            if (ridesData.isUserInvited(userID)) ridesData.toRideInvitesDomain() else null
+            val organiser = ridesData.isOrganiser(userID)
+            if (ridesData.isUserInvited(userID) || organiser) ridesData.toRideInvitesDomain(
+                organiser
+            ) else null
         }
     }
 }
 
-private fun RidesData.toRideInvitesDomain(): RideInvitesDomain {
+private fun RidesData.toRideInvitesDomain(organiser: Boolean): RideInvitesDomain {
     return with(this) {
         RideInvitesDomain(
             ridesID.orEmpty(),
@@ -35,7 +44,9 @@ private fun RidesData.toRideInvitesDomain(): RideInvitesDomain {
                 if (it.inviteStatus == APIConstants.RIDE_ACCEPTED)
                     it.userId
                 else null
-            }
+            },
+            isOrganiser = organiser,
+            rideTitle = this.rideTitle.orEmpty()
         )
     }
 }

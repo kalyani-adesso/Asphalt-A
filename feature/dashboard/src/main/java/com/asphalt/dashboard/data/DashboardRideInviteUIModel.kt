@@ -7,5 +7,7 @@ data class DashboardRideInviteUIModel(
     val startPoint: String,
     val destination: String,
     val dateTime: String,
-    val inviteesProfilePicUrls: List<String>
+    val inviteesProfilePicUrls: List<String>,
+    val rideTitle:String,
+    val isOrganiser:Boolean
 )

@@ -102,3 +102,6 @@ val DarkRed = Color(0xFFD4183D)
 val NeutralTaupe = Color(0xFF724D4D)
 
 val NeutralTaupe20 = Color(0x34724D4D)
+val PaleLavender = Color(0xFFF1EFF7)
+val LightPlatinum = Color(0xFFE6E6E6)
+val DarkLiver = Color(0xFF4D4D4D)

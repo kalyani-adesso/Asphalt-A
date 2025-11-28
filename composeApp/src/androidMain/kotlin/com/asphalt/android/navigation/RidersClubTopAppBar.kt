@@ -88,18 +88,7 @@ fun RidersClubTopAppBar(
 
                 },
                 actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            tint = PrimaryDarkerLightB75
-                        )
 
-                    }
 
 
                     IconButton(onClick = {
@@ -121,6 +110,18 @@ fun RidersClubTopAppBar(
                                     cornerRadius = Dimensions.size8
                                 ) {}
                         }
+                    }
+                    IconButton(onClick = {
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    }) {
+                        Icon(
+                            Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = PrimaryDarkerLightB75
+                        )
+
                     }
 
                 }

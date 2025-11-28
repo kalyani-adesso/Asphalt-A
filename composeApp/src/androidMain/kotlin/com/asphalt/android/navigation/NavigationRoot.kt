@@ -356,6 +356,9 @@ fun NavigationRoot(
                             },
                             joinRideClick = {
                                 backStack.add(AppNavKey.JoinRideNavKey)
+                            },
+                            viewRideDetails = { ridesID ->
+                                backStack.add(AppNavKey.RideDetails(ridesID))
                             }
                         )
                     }

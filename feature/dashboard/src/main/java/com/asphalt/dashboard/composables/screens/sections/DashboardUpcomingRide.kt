@@ -18,7 +18,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.dashboard.composables.components.DashboardRideInviteList
 
 @Composable
-fun DashboardUpcomingRide(upcomingRideClick:()->Unit) {
+fun DashboardUpcomingRide(upcomingRideClick:()->Unit,viewRideDetails:(String)->Unit) {
     Column {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -37,7 +37,9 @@ fun DashboardUpcomingRide(upcomingRideClick:()->Unit) {
             )
         }
         Spacer(Modifier.height(Dimensions.spacing19))
-        DashboardRideInviteList()
+        DashboardRideInviteList({
+            viewRideDetails(it)
+        })
     }
 }
 

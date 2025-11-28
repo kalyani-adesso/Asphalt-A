@@ -61,6 +61,7 @@ fun DashBoardScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     creatRideClick: () -> Unit,
     joinRideClick: () -> Unit,
+    viewRideDetails: (String) -> Unit,
     dashboardRideSummaryVM: DashboardRideSummaryVM = koinViewModel()
 ) {
 
@@ -104,7 +105,6 @@ fun DashBoardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-//                                vertical = Dimensions.padding30,
                                 horizontal = Dimensions.padding20
                             ),
                         horizontalArrangement = Arrangement.spacedBy(Dimensions.spacing20),
@@ -124,7 +124,12 @@ fun DashBoardScreen(
                         }
 
                         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing5)) {
-                            Text(helloUser, fontFamily = FontFamily(Font(R.font.klavika_light)), fontSize = Dimensions.textSize16, lineHeight = 18.sp,)
+                            Text(
+                                helloUser,
+                                fontFamily = FontFamily(Font(R.font.klavika_light)),
+                                fontSize = Dimensions.textSize16,
+                                lineHeight = 18.sp,
+                            )
                             Text(
                                 currentUser.value?.name ?: "", style = TypographyBold.bodyMedium,
                                 fontSize = Dimensions.textSize28
@@ -166,7 +171,9 @@ fun DashBoardScreen(
             joinRideClick.invoke()
         })
         RideStatsPerMonth(dashboardSummary.value)
-        DashboardUpcomingRide(upcomingRideClick)
+        DashboardUpcomingRide(upcomingRideClick, {
+            viewRideDetails.invoke(it)
+        })
         AdventureJourney(dashboardSummary.value)
         PlacesVisitedGraph(dashboardSummary.value)
     }
