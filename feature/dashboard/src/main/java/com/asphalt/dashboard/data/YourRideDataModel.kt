@@ -4,7 +4,7 @@ import com.asphalt.android.model.rides.RatingsData
 import kotlinx.serialization.Serializable
 
 @Serializable
-class YourRideDataModel(
+data class YourRideDataModel(
     var ridesId: String? = null,
     var title: String? = "",
     var place: String? = "",
@@ -20,7 +20,8 @@ class YourRideDataModel(
     var endDate: Long? = null,
     var endTime: String? = null,
     var ratings: List<RatingsData> = emptyList(),
-    var starsCount: Int = 0
+    var starsCount: Int = 0,
+    var images : ArrayList<GalleryModel> = arrayListOf()
 
 ) {
 }
