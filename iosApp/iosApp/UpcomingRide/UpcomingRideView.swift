@@ -442,39 +442,42 @@ struct UpComingView: View {
                     case .history:
                         VStack(alignment: .leading, spacing: 20){
                             if ride.hasPhotos {
-                                Button(action: {
-                                    onAddPhotos?(ride.id)
-                                }) {
-                                    HStack{
-                                        AppIcon.YourRides.photos
-                                        Text(ride.rideViewAction.rawValue.uppercased())
+                                HStack{
+                                    Button(action: {
+                                        onAddPhotos?(ride.id)
+                                    }) {
+                                        HStack{
+                                            AppIcon.YourRides.photos
+                                            Text(ride.rideViewAction.rawValue.uppercased())
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(AppColor.white)
+                                        .foregroundColor(AppColor.celticBlue)
+                                        .font(KlavikaFont.bold.font(size: 14))
+                                        .overlay(RoundedRectangle(cornerRadius: 10)
+                                            .stroke(AppColor.celticBlue, lineWidth: 1))
+                                        
                                     }
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 50)
-                                    .background(AppColor.white)
-                                    .foregroundColor(AppColor.celticBlue)
-                                    .font(KlavikaFont.bold.font(size: 14))
-                                    .overlay(RoundedRectangle(cornerRadius: 10)
-                                        .stroke(AppColor.celticBlue, lineWidth: 1))
                                     
-                                }
-                                
-                                
-                                Button(action: {
-                                    // open viewer
-                                }) {
-                                    HStack{
-                                        AppIcon.YourRides.view
-                                        Text(AppStrings.UpcomingRide.viewPhotos.uppercased())
+                                    
+                                    Button(action: {
+                                        // open viewer
+                                    }) {
+                                        HStack{
+                                            AppIcon.YourRides.view
+                                            Text(AppStrings.UpcomingRide.viewPhotos.uppercased())
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(AppColor.white)
+                                        .foregroundColor(AppColor.celticBlue)
+                                        .font(KlavikaFont.bold.font(size: 14))
+                                        .cornerRadius(10)
+                                        .overlay(RoundedRectangle(cornerRadius: 10)
+                                            .stroke(AppColor.celticBlue, lineWidth: 1))
                                     }
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 50)
-                                    .background(AppColor.white)
-                                    .foregroundColor(AppColor.celticBlue)
-                                    .font(KlavikaFont.bold.font(size: 14))
-                                    .cornerRadius(10)
-                                    .overlay(RoundedRectangle(cornerRadius: 10)
-                                        .stroke(AppColor.celticBlue, lineWidth: 1))
+                                    
                                 }
                                 
                             } else {
