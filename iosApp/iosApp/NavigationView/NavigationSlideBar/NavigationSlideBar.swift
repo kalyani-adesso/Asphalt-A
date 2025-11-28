@@ -12,7 +12,7 @@ struct NavigationSlideBar: View {
     @Environment(\.dismiss) var dismiss
     @State var showHome: Bool = false
     var body: some View {
-        AppToolBar{
+        AppToolBar(showBack: false){
             VStack {
                 List(viewModel.sections, id: \.self) { item in
                     MenuItemRow(viewModel: viewModel, item: item)

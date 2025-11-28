@@ -367,7 +367,6 @@ public struct AppStrings{
         static let yourRide = "Your Rides"
         static let share = "Share"
         static let viewPhotos = "View Photos"
-        static let addPhotos = "Add Photos"
         static let accept = "Accept"
     }
     
