@@ -43,15 +43,6 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
-    override suspend fun updateOrganizerStatus(rideId: String, rideStatus: Int): APIResult<Unit> {
-        val rideStatus = mapOf<Any?, Any?>(
-            "rideStatus" to rideStatus
-        )
-        return safeApiCall {
-            patch(rideStatus, "$RIDES_URL/$rideId").body()
-        }
-    }
-
     override suspend fun getSingleRide(rideID: String): APIResult<CreateRideRoot> {
         return safeApiCall {
             get(url = RIDES_URL + "/${rideID}").body()
