@@ -88,7 +88,10 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
+    @Published var showRecieveMessagePopup = false
+    @Published var lastMessageId: String?
     @Published var chatMessages: [MessageUIModel] = []
+    @Published var latestIncomingSenderName: String = ""
     var rider: Rider? {
         guard !groupRiders.isEmpty else { return nil }
         guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
@@ -496,16 +499,33 @@ extension ConnectedRideViewModel {
                 collector: ReceiveMessageCollector(
                     onValue: { kmpMessages in
                         Task { @MainActor in
-                            self.chatMessages = kmpMessages.filter({$0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }).map { item in
-                                MessageUIModel(
-                                    id: item.id,
-                                    senderId: item.senderID,
-                                    senderName: item.senderName,
-                                    message: item.message,
-                                    timestamp: self.formatTime(from: item.timeStamp),
-                                    isCurrentUser: item.senderID == MBUserDefaults.userIdStatic
-                                )
+                            let filtered = kmpMessages
+                                        .filter { $0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }
+
+                                    let mapped = filtered.map { item in
+                                        MessageUIModel(
+                                            id: item.id,
+                                            senderId: item.senderID,
+                                            senderName: item.senderName,
+                                            message: item.message,
+                                            timestamp: self.formatTime(from: item.timeStamp),
+                                            isCurrentUser: item.senderID == MBUserDefaults.userIdStatic
+                                        )
+                                    }
+
+                                    // detect new message
+                            if let latest = mapped.last, latest.id != self.lastMessageId {
+                                self.lastMessageId = latest.id
+                                
+                                // store sender name for popup
+                                self.latestIncomingSenderName = latest.senderName
+                                
+                                if !self.chatMessages.isEmpty {
+                                    self.showRecieveMessagePopup = true
+                                }
                             }
+
+                            self.chatMessages = mapped
                         }
                     },
                     onError: { error in

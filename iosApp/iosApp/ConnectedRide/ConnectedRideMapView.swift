@@ -37,12 +37,16 @@ struct ConnectedRideMapView: View {
                     .transition(.scale)
                     .zIndex(1)
             }
+            
             VStack(spacing: 0) {
                 if showMessageNotification {
                     showToast(title: "Message sent to \(selectedRiderName)")
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
-                
+                if viewModel.showRecieveMessagePopup {
+                    showToast(title: "New Message from \(viewModel.latestIncomingSenderName)")
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 List {
                     Section {
                         VStack {
@@ -286,6 +290,15 @@ struct ConnectedRideMapView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation {
                                     showMessageNotification = false
+                                }
+                            }
+                        }
+                    }
+                    .onChange(of: viewModel.showRecieveMessagePopup) { isShowingMessage in
+                        if isShowingMessage {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    viewModel.showRecieveMessagePopup = false
                                 }
                             }
                         }
