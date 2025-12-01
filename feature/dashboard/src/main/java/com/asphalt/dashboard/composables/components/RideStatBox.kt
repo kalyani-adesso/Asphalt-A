@@ -8,15 +8,19 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.asphalt.commonui.theme.DarkLiver
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyLight
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.FadingLine
 
@@ -24,17 +28,16 @@ import com.asphalt.commonui.ui.FadingLine
 fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .padding(Dimensions.padding13)
+            .padding(Dimensions.padding8)
             .fillMaxHeight()
     ) {
-        Image(
+        Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
             modifier = Modifier.align(Alignment.TopStart)
-                .padding(top = Dimensions.padding5)
+                .padding(top = Dimensions.padding8, start = Dimensions.padding10), tint = PrimaryDarkerLightB75
         )
 
-        FadingLine(Modifier.align(Alignment.Center))
 
         Column(
             modifier = Modifier
@@ -43,18 +46,17 @@ fun RideStatBox(iconRes: Int, data: String, description: String, modifier: Modif
         ) {
             Text(
                 data,
-                fontSize = Dimensions.textSize17,
-                color = NeutralWhite,
+                fontSize = Dimensions.textSize24,
+                color = DarkLiver,
                 lineHeight = Dimensions.lineSpacing5,
                 style = TypographyMedium.headlineLarge
             )
-            Spacer(Modifier.height(Dimensions.spacing5))
             Text(
                 description,
-                fontSize = Dimensions.textSize12pt5,
-                color = NeutralWhite,
+                fontSize = Dimensions.textSize12,
+                color = DarkLiver,
                 lineHeight = Dimensions.lineSpacing5,
-                style = Typography.headlineLarge
+                style = TypographyLight.headlineLarge
             )
         }
     }

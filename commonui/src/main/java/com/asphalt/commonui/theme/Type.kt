@@ -284,7 +284,83 @@ val TypographyMedium = Typography(
         letterSpacing = 0.14.sp
     )
 )
-
+val TypographyLight = Typography(
+    bodyLarge = Typography.bodyLarge.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal, // Changed to Normal for light style
+        letterSpacing = 0.18.sp
+    ),
+    bodyMedium = Typography.bodyMedium.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.16.sp
+    ),
+    bodySmall = Typography.bodySmall.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.14.sp
+    ),
+    displayLarge = Typography.displayLarge.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.57.sp
+    ),
+    displayMedium = Typography.displayMedium.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.48.sp
+    ),
+    displaySmall = Typography.displaySmall.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.4.sp
+    ),
+    headlineLarge = Typography.headlineLarge.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.33.sp
+    ),
+    headlineMedium = Typography.headlineMedium.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.28.sp
+    ),
+    headlineSmall = Typography.headlineSmall.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.23.sp
+    ),
+    titleLarge = Typography.titleLarge.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.2.sp
+    ),
+    titleMedium = Typography.titleMedium.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.16.sp
+    ),
+    titleSmall = Typography.titleSmall.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.14.sp
+    ),
+    labelLarge = Typography.labelLarge.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.18.sp
+    ),
+    labelMedium = Typography.labelMedium.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.03.sp
+    ),
+    labelSmall = Typography.labelSmall.copy(
+        fontFamily = FontFamily(Font(R.font.klavika_light)),
+        fontWeight = FontWeight.Normal,
+        letterSpacing = 0.14.sp
+    )
+)
 val BodyXSRegular = TextStyle(
     fontSize = 12.sp,
     lineHeight = 18.sp,

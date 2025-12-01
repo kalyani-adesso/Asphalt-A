@@ -15,9 +15,8 @@
     <string name="upcoming_ride">Upcoming Ride</string>
     <string name="view_all">View All</string>
     <string name="all">All</string>
-    <string name="adventure">Adventure</string>
-    <string name="journey">Journey</string>
-    <string name="total_rides_info_chart">Total %1$d Rides</string>
+    <string name="adventure_journey">Adventure Journey</string>
+    <string name="total_rides_info_chart">%1$d Rides</string>
     <string name="invite_from">Invite from %1$s</string>
     <string name="start_to_destination">%1$s - %2$s</string>
     <string name="people_joined">%1$s people joined this ride</string>
@@ -134,7 +133,7 @@
     <string name="phone_number">Phone Number</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="phone_number_error">Phone number cannot be empty</string>
-    <string name="hello_user">Hello %1$s</string>
+    <string name="hello">Hello</string>
     <string name="ask_question">Ask question</string>
     <string name="queries">Queries</string>
     <string name="answered">Answered</string>
@@ -262,6 +261,10 @@
     <string name="delete_ride">Delete Ride</string>
     <string name="delete_ride_success">Your ride has been deleted successfully</string>
     <string name="add_photos">Add photos</string>
+    <string name="your_ride_stats">Your Ride Stats</string>
+    <string name="cancel_ride">Cancel Ride</string>
+
+
 
 
 

@@ -13,10 +13,13 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
@@ -26,10 +29,11 @@ import com.asphalt.commonui.theme.NeutralWhite
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: @Composable () -> Unit) {
-
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             ModalDrawerSheet(drawerContainerColor = NeutralWhite) {
                 Column(
                     modifier = Modifier
@@ -162,9 +166,11 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                         }
                     )
                 }
-            }
+            }}
         }
     ) {
-        content()
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            content()
+        }
     }
-}
+}}
