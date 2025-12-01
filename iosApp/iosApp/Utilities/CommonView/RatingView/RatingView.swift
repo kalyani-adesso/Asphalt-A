@@ -11,6 +11,8 @@ import SwiftUI
 struct RatingView: View {
     @Binding var rating: Int
     let maxRating: Int = 5
+    var height: CGFloat? = 48
+    var width: CGFloat? = 51
     let iconRate: Image
     let iconNotRate: Image
     var didSelect: (() -> Void)? = nil
@@ -21,16 +23,16 @@ struct RatingView: View {
                     rating = index
                     didSelect?()
                 } label: {
-                   (index <= rating ? iconRate : iconNotRate)
+                    (index <= rating ? iconRate : iconNotRate)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 51, height: 48)
+                        .frame(width: width, height: height)
                         .animation(.easeInOut(duration: 0.2), value: rating)
                 }
                 .buttonStyle(.plain)
             }
         }
-
+        
         .frame(maxWidth: .infinity)
     }
 }
