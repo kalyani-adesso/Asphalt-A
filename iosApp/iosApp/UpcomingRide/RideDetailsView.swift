@@ -33,27 +33,67 @@ struct RideDetailsView: View {
                                         .foregroundColor(AppColor.stoneGray)
                                 }
                                 Spacer()
+                                Button(action: {
+                                    
+                                }) {
+                                    AppIcon.UpcomingRide.message
+                                        .resizable()
+                                        .frame(width:30, height:30)
+                                }
+                                .buttonStyle(.plain)
                             }
                             
-                            HStack {
-                                HStack(spacing: 5) {
-                                    AppIcon.UpcomingRide.calender
-                                        .resizable()
-                                        .frame(width: 16, height: 16)
-                                    Text(ride.date)
-                                        .font(KlavikaFont.regular.font(size: 16))
-                                        .foregroundStyle(AppColor.richBlack)
+                           
+                             VStack (alignment: .leading, spacing: 11){
+                                HStack{
+                                    HStack(spacing: 10) {
+                                        AppIcon.UpcomingRide.calender
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text("Start: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 10) {
+                                        AppIcon.YourRides.time
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text(ride.startTime ?? "")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
                                 }
-                                Spacer()
-                                HStack(spacing: 5) {
-                                    AppIcon.UpcomingRide.group
-                                        .resizable()
-                                        .frame(width: 16, height: 16)
-                                    Text("\(ride.riderCount) rides")
-                                        .font(KlavikaFont.regular.font(size: 16))
-                                        .foregroundStyle(AppColor.richBlack)
+                                HStack{
+                                    HStack(spacing: 10) {
+                                        AppIcon.UpcomingRide.calender
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text("End: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.last?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 10) {
+                                        AppIcon.YourRides.time
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text(ride.endTime ?? "")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
                                 }
-                            }
+                                 Spacer()
+                                 HStack(spacing: 5) {
+                                     AppIcon.UpcomingRide.group
+                                         .resizable()
+                                         .frame(width: 16, height: 16)
+                                     Text("\(ride.riderCount) rides")
+                                         .font(KlavikaFont.regular.font(size: 16))
+                                         .foregroundStyle(AppColor.richBlack)
+                                 }
+                           
+                        }
                         }
                         .padding([.leading,.trailing,.top,.bottom],16)
                         .background(
