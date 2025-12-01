@@ -10,7 +10,7 @@ data class Query(
     val postedByName: String,
     val postedByUrl: String,
     val likeCount: Int,
-    val answerCount: Int,
+    var answerCount: Int,
     val answers: List<Answer>,
     val isUserLiked: Boolean = false
 )
