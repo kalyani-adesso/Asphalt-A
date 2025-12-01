@@ -20,5 +20,11 @@ class RidesData(
     var endLongitude: Double = 0.0,
     var rideDistance: Double = 0.0,
     var rideStatus: Int = 0,
-    var endDate: Long? = null
+    var endDate: Long? = null,
+
+    var hasAssemblyPoint: Boolean = false,
+    var assemblyPoint: String? = null,
+    var assemblyLat: Double = 0.0,
+    var assemblyLon: Double = 0.0,
+    var ratings: List<RatingsData> = emptyList(),
 )

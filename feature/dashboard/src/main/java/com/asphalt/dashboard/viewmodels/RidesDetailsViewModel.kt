@@ -13,6 +13,8 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -26,6 +28,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
     private val _ridersList = mutableStateOf<List<RidersList>>(emptyList())
     val ridersList: State<List<RidersList>> = _ridersList
+    val showDeleteButton = mutableStateOf(false)
 
     fun getSingleRide(ridesId: String) {
         viewModelScope.launch {
@@ -48,7 +51,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             val userList = ridesDetails.value?.participants ?: emptyList()
             val list = ArrayList(userList.mapNotNull { participant ->
-                if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
+                //if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
 
                 users.find { it.uid == participant.userId }?.let { user ->
                     RidersList(
@@ -60,7 +63,7 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
                         displayStatusString =
                             when (participant.inviteStatus) {
                                 APIConstants.RIDE_INVITED -> R.string.waiting_response
-                                APIConstants.RIDE_ACCEPTED, APIConstants.RIDE_JOINED -> R.string.confirmed
+                                APIConstants.RIDE_ACCEPTED, APIConstants.RIDE_JOINED, APIConstants.END_RIDE -> R.string.confirmed
                                 APIConstants.RIDE_DECLINED -> R.string.decline
                                 else -> R.string.empty_string
 
@@ -74,9 +77,12 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
             if (!organizer.isNullOrEmpty()) {
                 val organizerData = users.find { it.uid == organizer }
                 var name = if (organizerData?.uid == user?.uid) {
+                    showDeleteButton.value = true
                     "You"
                 } else {
+                    showDeleteButton.value = false
                     organizerData?.name
+
                 }
                 val temp = RidersList(
                     organizerData?.uid ?: "",
@@ -91,5 +97,19 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             _ridersList.value = list
         }
+    }
+
+    fun deleteRide(ridesId: String, successMessage: String, deleteSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val apiResult = APIHelperUI.runWithLoader {
+                ridesRepo.deleteRide(ridesId)
+
+            }
+            APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
+                UIStateHandler.sendEvent(UIState.SUCCESS(successMessage))
+                deleteSuccess.invoke()
+            }
+        }
+
     }
 }

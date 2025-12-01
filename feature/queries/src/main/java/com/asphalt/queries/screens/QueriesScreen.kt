@@ -123,7 +123,6 @@ fun QueriesScreen(
         bottomPadding = Dimensions.size0,
         isScrollable = false
     ) {
-        Spacer(Modifier.height(Dimensions.padding20))
         SearchQueries({
             queriesVM.search(it)
         })

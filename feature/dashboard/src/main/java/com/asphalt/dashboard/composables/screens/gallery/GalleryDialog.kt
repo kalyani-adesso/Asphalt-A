@@ -1,6 +1,5 @@
 package com.asphalt.dashboard.composables.screens.gallery
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import coil.size.Dimension
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.LightGray40
@@ -60,19 +58,28 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.utils.rememberImagePicker
+import com.asphalt.dashboard.data.GalleryModel
 
 @Composable
-fun GalleryDialog(onDismiss: () -> Unit) {
+fun GalleryDialog(
+    images: ArrayList<GalleryModel> = arrayListOf(),
+    isShowUpload: Boolean = true,
+    onDismiss: () -> Unit,
+    onUpload: (ArrayList<GalleryModel>) -> Unit
+) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     var showGallery by remember { mutableStateOf(false) }
-    var selectedUris by remember { mutableStateOf<List<Uri>>(arrayListOf()) }
+    var selectedUris by remember { mutableStateOf<ArrayList<GalleryModel>>(images) }
 
     val context = LocalContext.current
     val (selectedImageUris, openGallery) = rememberImagePicker(10)
     LaunchedEffect(selectedImageUris) {
-        selectedUris = (selectedUris + selectedImageUris).distinct()
+        val newImages =
+            selectedImageUris.map { uri -> GalleryModel(uri = uri.toString(), isFromLocal = true) }
+        selectedUris = (selectedUris + newImages).distinctBy { it.uri } as ArrayList<GalleryModel>
     }
+
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -147,7 +154,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
 
                                 ) {
                                     AsyncImage( // Use AsyncImage for URIs
-                                        model = images,
+                                        model = images.uri,
                                         modifier = Modifier
                                             .height(Dimensions.size132)
                                             .width(Dimensions.size132)
@@ -163,7 +170,7 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                                             .offset((6).dp, -5.dp)
                                             .clickable {
                                                 selectedUris = selectedUris.toMutableList()
-                                                    .also { it.remove(images) }
+                                                    .also { it.remove(images) } as ArrayList<GalleryModel>
                                             }
                                     )
                                 }
@@ -226,30 +233,38 @@ fun GalleryDialog(onDismiss: () -> Unit) {
                         )
                     }
                     //Spacer(Modifier.width(Dimensions.padding15))
+                    if (isShowUpload) {
+                        Box(
+                            modifier = Modifier
+                                .height(Dimensions.size50)
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .background(
+                                    color = PrimaryDarkerLightB75,
+                                    shape = RoundedCornerShape(Dimensions.spacing12)
+                                )
+                                .clickable {
+                                    if (selectedUris.isNullOrEmpty())
+                                        openGallery()
+                                    else
+                                        onUpload.invoke(selectedUris)
 
-                    Box(
-                        modifier = Modifier
-                            .height(Dimensions.size50)
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .background(
-                                color = PrimaryDarkerLightB75,
-                                shape = RoundedCornerShape(Dimensions.spacing12)
-                            )
-                            .clickable {
-                                openGallery()
-                                /*multiplePhotoPickerLauncher.launch(
+                                    /*multiplePhotoPickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )*/
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.select_photos).uppercase(),
-                            style = TypographyMedium.bodySmall,
-                            color = NeutralWhite,
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if(selectedUris.isNullOrEmpty())
+                                    stringResource(R.string.select_photos).uppercase()
+                                else
+                                    "Upload".uppercase(),
+                                style = TypographyMedium.bodySmall,
+                                color = NeutralWhite,
 
-                            )
+                                )
+                        }
                     }
 
                     /*GradientButton(
@@ -282,5 +297,5 @@ fun GalleryDialog(onDismiss: () -> Unit) {
 @Preview
 @Composable
 fun GalleryDialogPreview() {
-    GalleryDialog({})
+    GalleryDialog(isShowUpload = true, onDismiss = {}, onUpload = {})
 }

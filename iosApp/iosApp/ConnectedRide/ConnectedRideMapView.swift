@@ -20,267 +20,294 @@ struct ConnectedRideMapView: View {
     @State var showJoinRideView:Bool = false
     @State var showMapViewFullScreen:Bool = false
     @State var showMessagePopup:Bool = false
+    @State var showMessageNotification: Bool = false
     @State private var position: MapCameraPosition = .automatic
     @State private var elapsedSeconds = 0
     @State private var selectedRiderName: String = ""
     @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
+    @State private var index: Int = 0
     var rideModel: JoinRideModel
     
     var body: some View {
+        
         ZStack{
             if showMessagePopup{
-                MessagePopupView(isPresented: $showMessagePopup, riderName: selectedRiderName  , delayText: selectedRiderDelayText)
+                MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup, showMessageNotification: $showMessageNotification, riderName: $selectedRiderName)
                     .transition(.scale)
                     .zIndex(1)
             }
-        
-        List {
-            Section {
-                VStack {
-                    ZStack(alignment: .topLeading) {
-                        BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack)
-                            .cornerRadius(12)
-                            .ignoresSafeArea(edges: .top)
-                        VStack {
-                            ZStack{
-                                HStack {
-                                    mapActionButton()
-                                }
-                                if showToast {
-                                    showToast(title: AppStrings.ConnectedRide.rideStarted)
-                                }
-                                if startTrack && viewModel.showPopup {
-                                    ConnectedRideOfflineView(title: viewModel.popupTitle, image: AppIcon.ConnectedRide.warning)
-                                        .padding(.horizontal, 16)
-                                }
-                            }
-                            
-                            Spacer()
-                            HStack {
-                                distanceAndETA()
-                                Spacer()
-                                floatingButton()
-                            }
-                        }
-                    }
-                    .frame(height: showMapViewFullScreen ? 760 : 534)
-                    Spacer()
-                }
-            }
-            .listRowSeparator(.hidden)
-            Section {
-                VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-                    
-                    ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
-                    
-                    Button(action: {
-                        self.rideComplted = true
-                        if rideModel.userId != MBUserDefaults.userIdStatic {
-                            joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  MBUserDefaults.userIdStatic ?? "", inviteStatus: 4)
-                        } else {
-                            joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
-                        }
-                        
-                        viewModel.endRide(rideId:rideModel.rideId)
-                        viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
-                        viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
-                        stopTimer()
-                    }, label: {
-                        Text(AppStrings.ConnectedRide.endRideButton)
-                            .frame(maxWidth: .infinity,minHeight: 60)
-                            .font(KlavikaFont.bold.font(size: 18))
-                            .foregroundColor(AppColor.white)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.red)
-                            )
-                    })
-                    .padding([.leading,.trailing,.bottom],16)
-                    .buttonStyle(.plain)
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-            }
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-            
-            if viewModel.groupRiders.count >= 1 {
-                Section {
-                    VStack(spacing: 18) {
-                        ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
-                        ForEach(viewModel.groupRiders, id: \.id) { rider in
-                            GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, showMessagePopup: $showMessagePopup,
-                                           onMessageTap: {
-                                selectedRiderName = rider.name
-                                selectedRiderDelayText = rider.status.rawValue
-                            })
-                        }
-                    }
-                    .padding(.bottom,16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-            }
-            Section {
-                VStack(spacing: 18) {
-                    ConnectedRideHeaderView(title: AppStrings.ConnectedRide.emergencyActionsTitle, subtitle: "", image: AppIcon.ConnectedRide.emergency)
-                    HStack(spacing: 16) {
-                        Button(action: {
-                            
-                        }) {
-                            HStack(alignment: .center,spacing: 5) {
-                                AppIcon.ConnectedRide.sos
-                                Text(AppStrings.ConnectedRide.emergencySOSButton)
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .foregroundStyle(AppColor.black)
-                            }
-                            .padding()
-                            .frame( height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.white)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(AppColor.darkGray, lineWidth: 2)
-                            )
-                        }
-                        Button(action: {
-                            
-                        }) {
-                            HStack(alignment: .center,spacing: 5) {
-                                AppIcon.ConnectedRide.shareLocation
-                                Text(AppStrings.ConnectedRide.shareLocationButton)
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .foregroundStyle(AppColor.black)
-                            }
-                            .padding()
-                            .frame( height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.white)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(AppColor.darkGray, lineWidth: 2)
-                            )
-                        }
-                    }
-                    .padding(.bottom)
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-            }
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-        }.listStyle(.plain)
-            .listRowSeparator(.hidden)
-            .navigationBarBackButtonHidden()
-            .navigationDestination(isPresented: $rideComplted, destination: {
-                ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel, rideCompleteModel: viewModel.rideCompleteModel)
-            })
-            .onAppear() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    showToast = false
-                }
-                if !rideModel.rideJoined {
-                    viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                } else {
-                    startOngoingRideTimer()
-                }
-                viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                    self.elapsedSeconds += 1
-                }
-            }
-            .onChange(of: viewModel.ongoingRideId) { ride in
-                if !ride.isEmpty {
-                    startOngoingRideTimer()
-                }
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    HStack() {
-                        Button {
-                        } label: {
-                            HStack(alignment:.center, spacing: 6) {
-                                Rectangle()
-                                    .fill(startTrack ? .spanishGreen : .grayishBlue)
-                                    .frame(width: 9, height: 9)
-                                
-                                Text(startTrack ? TrackingStatus.Live.rawValue.uppercased() : TrackingStatus.Paused.rawValue.uppercased())
-                                    .font(KlavikaFont.regular.font(size: 12))
-                                    .foregroundStyle(startTrack ? .spanishGreen : .grayishBlue)
-                                    .frame(height: 9)
-                            }
-                            .frame(width: 69, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.white)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(startTrack ? .spanishGreen : .grayishBlue, lineWidth: 1)
-                            )
-                        }
-                        Button {
-                            print("Menu tapped")
-                        } label: {
-                            HStack {
-                                AppIcon.ConnectedRide.rideDuration
-                                    .resizable()
-                                    .frame(width:12,height: 12)
-                                Text(formatTime(elapsedSeconds))
-                                    .font(KlavikaFont.regular.font(size: 12))
-                                    .foregroundStyle(AppColor.celticBlue)
-                            }
-                            .frame(width: 83, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.white)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(AppColor.celticBlue, lineWidth: 1)
-                            )
-                        }
-                    }
-                }
-                
-                
-                ToolbarItemGroup(placement: .topBarLeading) {
+            AppToolBar {
+                VStack(spacing: 0) {
                     HStack {
-                        Button(action: {
-                            showJoinRideView = true
-                        }, label:{
-                            AppIcon.CreateRide.backButton
-                        })
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(AppStrings.ConnectedRide.connectedRide)
-                                .font(KlavikaFont.bold.font(size: 16))
-                                .foregroundColor(AppColor.black)
-                            
-                            Text(rideModel.title)
-                                .font(KlavikaFont.regular.font(size: 12))
-                                .foregroundColor(AppColor.black)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(AppStrings.ConnectedRide.connectedRide)
+                                    .font(KlavikaFont.bold.font(size: 16))
+                                    .foregroundColor(AppColor.black)
+                                Text(rideModel.title)
+                                    .font(KlavikaFont.regular.font(size: 12))
+                                    .foregroundColor(AppColor.black)
+                            }
+                        }
+                        Spacer()
+                        HStack {
+                            Button {
+                            } label: {
+                                HStack(alignment:.center, spacing: 6) {
+                                    Rectangle()
+                                        .fill(startTrack ? .spanishGreen : .grayishBlue)
+                                        .frame(width: 9, height: 9)
+                                    
+                                    Text(startTrack ? TrackingStatus.Live.rawValue.uppercased() : TrackingStatus.Paused.rawValue.uppercased())
+                                        .font(KlavikaFont.regular.font(size: 12))
+                                        .foregroundStyle(startTrack ? .spanishGreen : .grayishBlue)
+                                        .frame(height: 9)
+                                }
+                                .frame(width: 69, height: 30)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppColor.white)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(startTrack ? .spanishGreen : .grayishBlue, lineWidth: 1)
+                                )
+                            }
+                            Button {
+                                print("Menu tapped")
+                            } label: {
+                                HStack {
+                                    AppIcon.ConnectedRide.rideDuration
+                                        .resizable()
+                                        .frame(width:12,height: 12)
+                                    Text(formatTime(elapsedSeconds))
+                                        .font(KlavikaFont.regular.font(size: 12))
+                                        .foregroundStyle(AppColor.celticBlue)
+                                }
+                                .frame(width: 83, height: 30)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppColor.white)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(AppColor.celticBlue, lineWidth: 1)
+                                )
+                            }
                         }
                     }
+                    .padding(EdgeInsets(top: 25, leading: 16, bottom: 20, trailing: 16))
+                    if showMessageNotification {
+                        showToast(title: "Message sent to \(selectedRiderName)")
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    if viewModel.showRecieveMessagePopup {
+                        showToast(title: "New Message from \(viewModel.latestIncomingSenderName)")
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    List {
+                        Section {
+                            VStack {
+                                ZStack(alignment: .topLeading) {
+                                    BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack)
+                                        .cornerRadius(12)
+                                        .ignoresSafeArea(edges: .top)
+                                    VStack {
+                                        ZStack{
+                                            HStack {
+                                                mapActionButton()
+                                            }
+                                            if showToast {
+                                                showToast(title: AppStrings.ConnectedRide.rideStarted)
+                                            }
+                                            if startTrack && viewModel.showPopup {
+                                                ConnectedRideOfflineView(title: viewModel.popupTitle, image: AppIcon.ConnectedRide.warning)
+                                                    .padding(.horizontal, 16)
+                                            }
+                                        }
+                                        
+                                        Spacer()
+                                        HStack {
+                                            distanceAndETA()
+                                            Spacer()
+                                            floatingButton()
+                                        }
+                                    }
+                                }
+                                .frame(height: showMapViewFullScreen ? 760 : 534)
+                                Spacer()
+                            }
+                        }
+                        .listRowSeparator(.hidden)
+                        Section {
+                            VStack(spacing: 18) {
+                                ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
+                                
+                                ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+                                
+                                Button(action: {
+                                    self.rideComplted = true
+                                    if rideModel.userId != MBUserDefaults.userIdStatic {
+                                        joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  MBUserDefaults.userIdStatic ?? "", inviteStatus: 4)
+                                    } else {
+                                        joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
+                                    }
+                                    
+                                    viewModel.endRide(rideId:rideModel.rideId)
+                                    viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
+                                    viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
+                                    stopTimer()
+                                }, label: {
+                                    Text(AppStrings.ConnectedRide.endRideButton)
+                                        .frame(maxWidth: .infinity,minHeight: 60)
+                                        .font(KlavikaFont.bold.font(size: 18))
+                                        .foregroundColor(AppColor.white)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(AppColor.red)
+                                        )
+                                })
+                                .padding([.leading,.trailing,.bottom],16)
+                                .buttonStyle(.plain)
+                            }
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.listGray)
+                            )
+                        }
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        
+                        if viewModel.groupRiders.count >= 1 {
+                            Section {
+                                VStack(spacing: 18) {
+                                    ConnectedRideHeaderView(title: "\(AppStrings.ConnectedRide.groupStatusTitle) (\(viewModel.groupRiders.count))", subtitle: "", image: AppIcon.ConnectedRide.groupStatus)
+                                    
+                                    ForEach(viewModel.groupRiders.indices, id: \.self) { index in
+                                        let rider = viewModel.groupRiders[index]
+                                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                            selectedRiderName = viewModel.groupRiders[index].name
+                                            viewModel.messageIndex = val
+                                        })
+                                    }
+                                }
+                                .padding(.bottom,16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppColor.listGray)
+                                )
+                            }
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                        }
+                        Section {
+                            VStack(spacing: 18) {
+                                ConnectedRideHeaderView(title: AppStrings.ConnectedRide.emergencyActionsTitle, subtitle: "", image: AppIcon.ConnectedRide.emergency)
+                                HStack(spacing: 16) {
+                                    Button(action: {
+                                        
+                                    }) {
+                                        HStack(alignment: .center,spacing: 5) {
+                                            AppIcon.ConnectedRide.sos
+                                            Text(AppStrings.ConnectedRide.emergencySOSButton)
+                                                .font(KlavikaFont.bold.font(size: 16))
+                                                .foregroundStyle(AppColor.black)
+                                        }
+                                        .padding()
+                                        .frame( height: 50)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(AppColor.white)
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(AppColor.darkGray, lineWidth: 2)
+                                        )
+                                    }
+                                    Button(action: {
+                                        
+                                    }) {
+                                        HStack(alignment: .center,spacing: 5) {
+                                            AppIcon.ConnectedRide.shareLocation
+                                            Text(AppStrings.ConnectedRide.shareLocationButton)
+                                                .font(KlavikaFont.bold.font(size: 16))
+                                                .foregroundStyle(AppColor.black)
+                                        }
+                                        .padding()
+                                        .frame( height: 50)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(AppColor.white)
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(AppColor.darkGray, lineWidth: 2)
+                                        )
+                                    }
+                                }
+                                .padding(.bottom)
+                            }
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.listGray)
+                            )
+                        }
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                    }.listStyle(.plain)
+                        .listRowSeparator(.hidden)
+                        .navigationBarBackButtonHidden()
+                        .navigationDestination(isPresented: $rideComplted, destination: {
+                            ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel, rideCompleteModel: viewModel.rideCompleteModel)
+                        })
+                        .onAppear() {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                showToast = false
+                            }
+                            if !rideModel.rideJoined {
+                                viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            } else {
+                                startOngoingRideTimer()
+                            }
+                            viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                                self.elapsedSeconds += 1
+                            }
+                        }
+                        .onChange(of: showMessageNotification) { isShowing in
+                            if isShowing {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        showMessageNotification = false
+                                    }
+                                }
+                            }
+                        }
+                        .onChange(of: viewModel.showRecieveMessagePopup) { isShowingMessage in
+                            if isShowingMessage {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        viewModel.showRecieveMessagePopup = false
+                                    }
+                                }
+                            }
+                        }
+                        .task {
+                            await viewModel.receiveMessage(rideId: rideModel.rideId)
+                        }
+                        .onChange(of: viewModel.ongoingRideId) { ride in
+                            if !ride.isEmpty {
+                                startOngoingRideTimer()
+                            }
+                        }
+                        .navigationDestination(isPresented: $showJoinRideView, destination: {
+                            JoinRideView()
+                        })
                 }
             }
-            .navigationDestination(isPresented: $showJoinRideView, destination: {
-                JoinRideView()
-            })
         }
+        .animation(.easeInOut, value: showMessageNotification)
     }
     
     func startOngoingRideTimer() {
@@ -541,8 +568,9 @@ struct GroupRiderView: View {
     let status:String
     let speed: String
     let subTitle:String
+    let index: Int
     @Binding var showMessagePopup: Bool
-    var onMessageTap: (() -> Void)?
+    var onMessageTap: (Int) -> Void
     var body: some View {
         HStack {
             HStack(spacing: 16) {
@@ -585,8 +613,8 @@ struct GroupRiderView: View {
                     })
                     .buttonStyle(.plain)
                     Button(action: {
-                        onMessageTap?()
                         showMessagePopup = true
+                        onMessageTap(index)
                     }, label: {
                         AppIcon.Home.message
                     })

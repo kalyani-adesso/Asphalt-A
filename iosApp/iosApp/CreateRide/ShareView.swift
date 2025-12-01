@@ -65,17 +65,17 @@ struct ShareView: View {
                 ButtonView( title: AppStrings.CreateRideButton.done.rawValue,
                             showShadow: false , onTap: {
                     isPresented = true
-                }
-                ).navigationDestination(isPresented: $isPresented, destination: {
-                    UpcomingRideView(showpopup: true)
-                        .environmentObject(UpcomingViewModel)
-                        .environmentObject(home)
-                    
                 })
                 
             }
             .padding()
         }
+        .navigationDestination(isPresented: $isPresented, destination: {
+            UpcomingRideView(showpopup: true, navigationDone: true)
+                .environmentObject(UpcomingViewModel)
+                .environmentObject(home)
+            
+        })
     }
     var stepIndicator: some View {
         HStack(spacing: 32) {

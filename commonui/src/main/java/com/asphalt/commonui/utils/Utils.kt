@@ -11,6 +11,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import kotlin.math.ln
+import kotlin.math.pow
 
 object Utils {
 
@@ -20,13 +22,30 @@ object Utils {
         return month to year
     }
 
-    fun getMonthAbbr(calendar: Calendar): String {
-        val shortMonthList = listOf(
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        )
+    fun Calendar.toFullMonthYear(): String {
+        val formatter = SimpleDateFormat("MMMM - yyyy", Locale.getDefault())
+        return formatter.format(this.time)
+    }
+    fun Int.toCompressedString(): String {
+        if (this < 1000) return this.toString()
 
-        return shortMonthList[calendar.get(Calendar.MONTH)]
+        val suffix = charArrayOf('K', 'M', 'B', 'T')
+
+        val level = (ln(this.toDouble()) / ln(1000.0)).toInt()
+
+        val divisor = 1000.0.pow(level.toDouble()).toLong()
+
+        val baseNumber = this / divisor
+
+        val remainder = this % divisor
+
+        val suffixChar = suffix[level - 1]
+
+        return if (remainder > 0) {
+            "$baseNumber$suffixChar+"
+        } else {
+            "$baseNumber$suffixChar"
+        }
     }
 
 
@@ -209,5 +228,20 @@ object Utils {
             return sdf.format(Date(millis))
         else
             return ""
+    }
+
+    fun getDateWithOutTime(millis: Long?): String {
+        val sdf = SimpleDateFormat("EEE, MMM dd", Locale.getDefault())
+        if (millis != null)
+            return sdf.format(Date(millis))
+        else
+            return ""
+    }
+
+    fun getTime(millis: Long?): String {
+        if (millis == null) return ""
+
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return sdf.format(Date(millis))
     }
 }

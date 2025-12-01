@@ -173,7 +173,7 @@ public struct AppStrings{
         case places = "Places Explored"
         case groups = "Ride Groups"
         case invites = "Ride Invites"
-        case title = "Adventure\nJourney"
+        case title = "Adventure Journey"
 
         var localized: String { NSLocalizedString(self.rawValue, comment: "") }
     }
@@ -335,6 +335,7 @@ public struct AppStrings{
         static let home = "Home"
         static let homeSubtitle = "Your riding dashboard"
         static let profile = "Profile"
+        static let message = "Messages"
         static let profileSubtitle = "Manage your info"
         static let rideHistory = "Your ride history"
         static let planAdventure = "Plan new adventure"
@@ -367,7 +368,6 @@ public struct AppStrings{
         static let yourRide = "Your Rides"
         static let share = "Share"
         static let viewPhotos = "View Photos"
-        static let addPhotos = "Add Photos"
         static let accept = "Accept"
     }
     
@@ -378,7 +378,12 @@ public struct AppStrings{
         static let joinaRideTitle = "Join a Ride"
         static let reJoinRideTitle = "ReJoin Ride"
         static let rideActive = "Ride Started! Navigation active."
-        
+        static let noActiveRidesFound = "No active rides found"
+        static let confirmEndCurrentRide = "Do you want to end your current ride and join this one?"
+        static let rideAlreadyActive = "Ride already active"
+        static let loading = "Loading..."
+        static let yes = "Yes"
+        static let no = "No"
     }
     
     enum ConnectedRide {

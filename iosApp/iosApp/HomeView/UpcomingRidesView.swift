@@ -1,3 +1,4 @@
+
 //
 //  UpcomingRides.swift
 //  iosApp
@@ -11,7 +12,7 @@ struct UpcomingRidesView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
-  
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
@@ -23,8 +24,8 @@ struct UpcomingRidesView: View {
                 }
                 .font(KlavikaFont.bold.font(size: 13))
             }
-            let invites = viewModel.upcomingInvitesRide
-            if invites.isEmpty {
+           
+            if viewModel.upcomingInvitesRide.isEmpty {
                 emptyStateView
             }
             else{
@@ -39,22 +40,25 @@ struct UpcomingRidesView: View {
         }
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
-            UpcomingRideView(startingTab: .invities)
+            UpcomingRideView(startingTab: .upcoming, navigationDone: true)
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })
         .task{
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
-            await viewModel.getInvites()
         }
     }
 }
 struct UpcomingRideCard: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
+    @State private var showRideDetails = false
     var hostName: String {
         viewModel.usersById[ride.createdBy] ?? "Unknown"
+    }
+    var isMyRide: Bool {
+        ride.createdBy == MBUserDefaults.userIdStatic
     }
     
     var body: some View {
@@ -69,7 +73,7 @@ struct UpcomingRideCard: View {
                     )
                     .overlay(Text(initials(from: hostName)).font(.headline))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Invite from  \(hostName)")
+                    Text(isMyRide ? ride.title : "Invite from  \(hostName)")
                         .font(KlavikaFont.bold.font(size: 16))
                     Text("\(ride.routeStart)")
                         .font(KlavikaFont.regular.font(size: 12))
@@ -122,24 +126,43 @@ struct UpcomingRideCard: View {
                 }
                 
             }
-            HStack {
-                ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, onTap :{
-                    Task {
-                        await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
-                    }
-                }, height: 50)
-                ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: LinearGradient(
-                    gradient: Gradient(colors: [AppColor.darkRed, AppColor.darkRed]),
-                    startPoint: .leading,
-                    endPoint: .trailing), onTap :{
+            if isMyRide {
+                HStack {
+                    ButtonView(title: "VIEW DETAILS", fontSize: 14, onTap :{
+                        Task {
+                            showRideDetails = true
+                        }
+                    }, height: 32)
+                    ButtonView(title: "CANCEL RIDE",  fontSize: 14,  background: AppColor.darkRed, onTap :{
+                        Task {
+                            await viewModel.deleteRide(rideId: ride.id)
+                        }
+                    },height: 32)
+                    
+                }
+                .padding(.vertical,10)
+            }
+            else{
+                HStack {
+                    ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, onTap :{
+                        Task {
+                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
+                        }
+                    }, height: 32)
+                    ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: AppColor.darkRed, onTap :{
                         Task {
                             await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
                         }
-                    },height: 50)
-                
+                    },height: 32)
+                    
+                }
+                .padding(.vertical,10)
             }
-            .padding(.vertical,10)
+            
         }
+        .navigationDestination(isPresented: $showRideDetails, destination: {
+            RideDetailsView(viewModel: viewModel, ride: $ride)
+        })
         .padding()
         .frame(width: 290)
         .background(AppColor.backgroundLight)
@@ -161,11 +184,11 @@ var emptyStateView: some View {
             AppIcon.UpcomingRide.message
                 .resizable()
                 .frame(width: 25, height: 25)
-
+            
             Text("No Upcoming Rides !!!")
                 .font(KlavikaFont.bold.font(size: 16))
                 .foregroundColor(AppColor.richBlack)
-
+            
         }
         Text("You’ll see your ride invites here once someone adds you.")
             .font(KlavikaFont.regular.font(size: 12))

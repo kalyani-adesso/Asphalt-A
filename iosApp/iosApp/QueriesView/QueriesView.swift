@@ -11,19 +11,37 @@ struct QueriesView: View {
     @StateObject private var viewModel = QueryViewModel()
     @State private var selectedStatus: String? = nil
     @State private var showAskPopup = false
-    
-    var onBackToHome: (() -> Void)? = nil
     var body: some View {
         NavigationStack {
-            CustomTopNavBar(
-                title: "Queries",
-                onBack: onBackToHome,
-                onAskTapped: {
-                    showAskPopup = true
-                }
-            )
             ZStack {
                 VStack(spacing: 0) {
+                    ReusableHeader {
+                        Text("Queries")
+                            .font(KlavikaFont.bold.font(size: 22))
+                            .foregroundColor(AppColor.black)
+                    } trailing: {
+                        Button {
+                            showAskPopup = true
+                        } label: {
+                            HStack {
+                                AppIcon.Queries.add
+                                    .resizable()
+                                    .frame(width:12,height: 12)
+                                Text("ASK QUESTION")
+                                    .font(KlavikaFont.regular.font(size: 12))
+                                    .foregroundStyle(AppColor.celticBlue)
+                            }
+                            .frame(width: 112, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.white)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(AppColor.celticBlue, lineWidth: 1)
+                            )
+                        }
+                    }
                     // Fixed top area (search + filters)
                     VStack(spacing: 20) {
                         FormFieldView(
@@ -119,58 +137,6 @@ struct QueriesView: View {
         
     }
 }
-// MARK: - Custom Navigation Bar Component
-struct CustomNavBar: View {
-    var title: String
-    var onBack: (() -> Void)?
-    
-    var body: some View {
-        ZStack {
-            HStack {
-                Button(action: { onBack?() }) {
-                    AppIcon.CreateRide.backButton
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .padding(.leading, 4)
-                }
-                Text(title)
-                    .font(KlavikaFont.bold.font(size: 19))
-                    .foregroundColor(AppColor.black)
-                Spacer()
-                Button {
-                    print("Menu tapped")
-                } label: {
-                    HStack {
-                        AppIcon.Queries.add
-                            .resizable()
-                            .frame(width:12,height: 12)
-                        Text("ASK QUESTION")
-                            .font(KlavikaFont.regular.font(size: 12))
-                            .foregroundStyle(AppColor.celticBlue)
-                    }
-                    .frame(width: 112, height: 30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.white)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(AppColor.celticBlue, lineWidth: 1)
-                    )
-                }
-                
-            }
-            
-            
-            
-        }
-        .padding(.horizontal)
-        .frame(height: 56)
-        .background(AppColor.white)
-        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-    }
-}
-
 
 // MARK: - SegmentButtonView
 struct QSegmentButtonView: View {
@@ -188,11 +154,7 @@ struct QSegmentButtonView: View {
                 .background(
                     Group {
                         if isSelected {
-                            LinearGradient(
-                                gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                            AppColor.celticBlue
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         } else {
                             RoundedRectangle(cornerRadius: 10)

@@ -11,6 +11,7 @@ struct CustomDatePicker: View {
 
     @Binding var selectedDate: Date
     var onDismiss: (() -> Void)?
+    let minimumDate: Date
 
     @State private var currentMonthOffset: Int = 0
 
@@ -30,7 +31,7 @@ struct CustomDatePicker: View {
             Divider()
                 .background(AppColor.celticBlue)
             
-            CalendarGrid(selectedDate: $selectedDate, monthOffset: currentMonthOffset)
+            CalendarGrid(selectedDate: $selectedDate, monthOffset: currentMonthOffset,  minimumDate: minimumDate)
 
             HStack(spacing: 30) {
                 Button("Cancel") { onDismiss?() }
@@ -59,6 +60,7 @@ struct CustomDatePicker: View {
 struct CalendarGrid: View {
     @Binding var selectedDate: Date
     var monthOffset: Int
+    let minimumDate: Date 
 
     @State private var calendar = Calendar.current
     @State private var currentMonth: Date = Date()
@@ -122,6 +124,7 @@ struct CalendarGrid: View {
                 ForEach(days, id: \.self) { day in
                     let isToday = calendar.isDateInToday(day)
                     let isSelected = calendar.isDate(day, inSameDayAs: selectedDate)
+                    let isDisabled = day < minimumDate 
 
                     Text(dayString(day))
                         .font(KlavikaFont.regular.font(size: 14))
@@ -135,7 +138,12 @@ struct CalendarGrid: View {
                                 .stroke(isToday ? AppColor.celticBlue : .clear, lineWidth: 1)
                         )
                         .foregroundColor(isSelected ? .white : .black)
-                        .onTapGesture { selectedDate = day }
+                        .opacity(isDisabled ? 0.3 : 1) 
+                        .onTapGesture {
+                            if !isDisabled {
+                                           selectedDate = day
+                                       }
+                        }
                 }
             }
             .padding(.horizontal)
@@ -194,7 +202,3 @@ struct CalendarGrid: View {
 }
 
 
-
-#Preview {
-    CustomDatePicker(selectedDate: .constant(Date()))
-}

@@ -17,9 +17,10 @@ enum RideAction: String {
 }
 
 enum RideViewAction: String {
-    case checkResponse = "Check Response"
     case viewDetails = "View Details"
-    case shareExperience = "Share Experience"
+    case viewPhotos = "View Photos"
+    case addPhotos = "Add Photos"
+    case share = "Share"
     case decline = "Decline"
 }
 
@@ -47,6 +48,9 @@ struct RideModel: Identifiable,Hashable {
     var hasPhotos: Bool = false
     let startDate: Date
     let participantAcceptedCount: Int
+    let startTime: String?
+    let endTime: String?
+    let ratings: Int?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -62,7 +66,7 @@ struct RideDetailsModel: Identifiable,Hashable {
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
     @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invities]
-    @Published var rideViewActions: [RideViewAction]  = [.checkResponse, .viewDetails, .shareExperience]
+    @Published var rideViewActions: [RideViewAction]  = [ .viewDetails, .share]
     @Published var upcomingRides: [RideModel] = []
     @Published var historyRides: [RideModel] = []
     @Published var inviteRides: [RideModel] = []
@@ -111,15 +115,31 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
-                if startDate.addingTimeInterval(60) < now { continue }
-                let dateString = formatDate(startDate)
+               
+                guard let EndEpoch = ride.endDate else { continue }
+                
+                let EndDate = Date(timeIntervalSince1970: Double(EndEpoch.int64Value) / 1000)
+                if EndDate.addingTimeInterval(60) < now { continue }
+                
+                let startText = formatDate(startDate)
+                let endText = formatDate(EndDate)
+                let startRideTime = formatTime(startDate)
+                let EndRideTime   = formatTime(EndDate)
+                
+                let dateString = "\(startText) - \(endText)"
+            
                 let participantsExcludingCreator = ride.participants.filter { $0.userId != ride.createdBy }
                 let participantCount = participantsExcludingCreator.count
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-                
-                
+                var myRating: Int? = nil
+                if let ratingsArray = ride.ratings as? [RatingsData] {
+                    if let match = ratingsArray.first(where: { $0.userId == currentUserID }) {
+                        myRating = Int(match.stars)
+                    }
+                }
+
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
@@ -132,21 +152,21 @@ class UpcomingRideViewModel: ObservableObject {
                     if ride.rideStatus == 3 {
                         rideAction = .upcoming
                         rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
-                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
+                        rideViewAction = .viewDetails
                     }
                     
                     // Creator ride status 4 = ended = history
                     else if ride.rideStatus == 4 {
                         rideAction = .history
                         rideStatus = .complete
-                        rideViewAction = .shareExperience
+                        rideViewAction = .addPhotos
                     }
                     
                     // Default creator: future ride
                     else {
                         rideAction = .upcoming
                         rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
-                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
+                        rideViewAction = .viewDetails
                     }
                 }
                 
@@ -162,7 +182,7 @@ class UpcomingRideViewModel: ObservableObject {
                     case 1, 3 :
                         rideAction = .upcoming
                         rideStatus = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
-                        rideViewAction = ride.participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .viewDetails : .checkResponse
+                        rideViewAction = .viewDetails
                         
                     case 2:
                         continue  // hide
@@ -170,7 +190,7 @@ class UpcomingRideViewModel: ObservableObject {
                     case 4:
                         rideAction = .history
                         rideStatus = .complete
-                        rideViewAction = .shareExperience
+                        rideViewAction = .addPhotos
                         
                     default:
                         continue
@@ -193,9 +213,11 @@ class UpcomingRideViewModel: ObservableObject {
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
                     startDate: startDate,
-                    participantAcceptedCount: participantAcceptedCount
+                    participantAcceptedCount: participantAcceptedCount,
+                    startTime: startRideTime,
+                    endTime: EndRideTime,
+                    ratings: myRating
                 )
-                
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
                 case .history: history.append(mapped)
@@ -205,10 +227,12 @@ class UpcomingRideViewModel: ObservableObject {
             
             upcoming.sort { $0.startDate < $1.startDate }
             upcomingRides = upcoming
-            history.sort { $0.startDate > $1.startDate }
+//            history.sort { $0.startDate > $1.startDate }
             historyRides = history
             invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites
+            
+            self.upcomingInvitesRide = upcomingRides + inviteRides
             
             self.rides = upcomingRides + historyRides + inviteRides
             
@@ -221,9 +245,16 @@ class UpcomingRideViewModel: ObservableObject {
     }
     
     
-    func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
-        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "E, MMM dd"
+        return formatter.string(from: date)
+    }
+    func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "hh:mm a"
         return formatter.string(from: date)
     }
     
@@ -293,6 +324,25 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
     
+    
+    @MainActor
+    func deleteRide(rideId: String)  async {
+        self.isRideLoading = true
+        do {
+            let result = try await rideRepository.deleteRide(
+                rideId: rideId
+            )
+          
+            if result is APIResultSuccess<GenericResponse> {
+                print(" deleted ride")
+                await self.fetchAllRides()
+            }
+        } catch {
+            print(" Exception: \(error.localizedDescription)")
+        }
+    }
+    
+    
     func getAllUsers(createdBy: String) async -> (String,String)? {
         
         await withCheckedContinuation { continuation in
@@ -343,9 +393,9 @@ class UpcomingRideViewModel: ObservableObject {
             }
 
             // Count statuses
-            let pendingCount = finalParticipants.filter { $0.inviteStatus == 0 }.count
-            let declinedCount = finalParticipants.filter { $0.inviteStatus == 2 }.count
-            let confirmedCount = finalParticipants.filter { [1,3].contains($0.inviteStatus) }.count
+            let pendingCount = finalParticipants.filter { $0.inviteStatus == 0 && $0.userId != currentUserId }.count
+            let declinedCount = finalParticipants.filter { $0.inviteStatus == 2 && $0.userId != currentUserId }.count
+            let confirmedCount = finalParticipants.filter { [1,3].contains($0.inviteStatus) && $0.userId != currentUserId }.count
 
             // Joined or not
             let rideJoinedStatus = finalParticipants.contains { $0.userId == currentUserId && $0.inviteStatus == 3 }
@@ -430,41 +480,6 @@ class UpcomingRideViewModel: ObservableObject {
         }
     }
 
-
-    @MainActor
-    func getInvites() async {
-        do {
-            let result = try await rideRepository.getRideInvites(userID: MBUserDefaults.userIdStatic ?? "")
-            if let success = result as? APIResultSuccess<AnyObject>,
-               let invites = success.data as? [RideInvitesDomain] {
-                let mapped: [RideModel] = invites.compactMap { domain in
-
-                    let millis = domain.startDateTime ?? 0
-                    let startDate = Date(timeIntervalSince1970: Double(truncating: millis) / 1000)
-
-                    guard startDate >= Date() else { return nil }
-
-                    return RideModel(
-                        id: domain.rideID,
-                        title: "Ride Invite",
-                        routeStart: domain.startLocation,
-                        routeEnd: domain.destination,
-                        status: .invite,
-                        rideViewAction: .decline,
-                        rideAction: .invities,
-                        date: formatDate(startDate),
-                        riderCount: domain.acceptedParticipants.count,
-                        createdBy: domain.inviter,
-                        startDate: startDate,
-                        participantAcceptedCount: domain.acceptedParticipants.count
-                    )
-                }
-                self.upcomingInvitesRide = mapped
-            }
-        } catch {
-            print("Error fetching users:", error)
-        }
-    }
 }
 
 // Extension to help with async mapping (if not already available)

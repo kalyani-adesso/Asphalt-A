@@ -14,8 +14,8 @@ struct HomeView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack{
-                    Color.clear.frame(height: 50)
+                VStack(spacing: 15){
+                    TopNavBar()
                     ActionButtonView()
                     DashboardView()
                     UpcomingRidesView()
@@ -26,8 +26,6 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            TopNavBar()
-                .ignoresSafeArea(edges: .top)
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
@@ -37,12 +35,11 @@ struct HomeView: View {
             
             async let rides = viewModel.fetchAllUsers()
             async let allRides = viewModel.fetchAllRides()
-            async let allInvites =  viewModel.getInvites()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             async let stats =  home.updateStatsFor(month: month, year: year)
             
-            _ = await (rides, allRides, allInvites, stats)
+            _ = await (rides, allRides, stats)
             
             viewModel.isRideLoading = false
         }

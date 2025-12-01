@@ -58,7 +58,10 @@ import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteViewModel = koinViewModel()) {
+fun DashboardRideInviteList(
+    viewRideDetails: (String) -> Unit,
+    dashboardRideInviteViewModel: DashboardRideInviteViewModel = koinViewModel()
+) {
     LaunchedEffect(Unit) {
         dashboardRideInviteViewModel.getDashboardRideInvites()
     }
@@ -75,6 +78,10 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
             items(rideInvites.value) {
                 DashboardRideInviteUI(it, { id, status ->
                     dashboardRideInviteViewModel.updateRideInviteStatus(id, status)
+                }, { rideId ->
+                    dashboardRideInviteViewModel.cancelRide(rideID = rideId)
+                }, { rideId ->
+                    viewRideDetails(rideId)
                 })
             }
 
@@ -85,7 +92,9 @@ fun DashboardRideInviteList(dashboardRideInviteViewModel: DashboardRideInviteVie
 @Composable
 fun DashboardRideInviteUI(
     dashboardRideInvite: DashboardRideInviteUIModel,
-    updateInviteStatus: (String, Int) -> Unit
+    updateInviteStatus: (String, Int) -> Unit,
+    cancelRide: (String) -> Unit,
+    viewDetails: (String) -> Unit
 ) {
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -130,7 +139,12 @@ fun DashboardRideInviteUI(
                     Spacer(Modifier.width(Dimensions.size10))
                     Column {
                         Text(
-                            stringResource(R.string.invite_from, dashboardRideInvite.inviterName),
+                            if (dashboardRideInvite.isOrganiser)
+                                dashboardRideInvite.rideTitle
+                            else stringResource(
+                                R.string.invite_from,
+                                dashboardRideInvite.inviterName
+                            ),
                             style = TypographyBold.titleMedium,
                             fontSize = Dimensions.textSize16,
                             maxLines = 1,
@@ -221,10 +235,16 @@ fun DashboardRideInviteUI(
                 GradientButton(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        updateInviteStatus(dashboardRideInvite.rideID, APIConstants.RIDE_ACCEPTED)
+                        if (dashboardRideInvite.isOrganiser)
+                            viewDetails(dashboardRideInvite.rideID)
+                        else
+                            updateInviteStatus(
+                                dashboardRideInvite.rideID,
+                                APIConstants.RIDE_ACCEPTED
+                            )
 
                     },
-                    buttonHeight = Dimensions.size50,
+                    buttonHeight = Dimensions.size32,
                     contentPadding = PaddingValues(Dimensions.size0)
                 ) {
                     Row(
@@ -232,7 +252,10 @@ fun DashboardRideInviteUI(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            stringResource(R.string.accept).uppercase(),
+                            if (dashboardRideInvite.isOrganiser)
+                                stringResource(R.string.view_details).uppercase()
+                            else
+                                stringResource(R.string.accept).uppercase(),
                             color = NeutralWhite,
                             style = TypographyBold.titleMedium,
                             fontSize = Dimensions.textSize14
@@ -241,16 +264,25 @@ fun DashboardRideInviteUI(
                 }
                 Button(
                     {
-                        updateInviteStatus(dashboardRideInvite.rideID, APIConstants.RIDE_DECLINED)
+                        if (dashboardRideInvite.isOrganiser)
+                            cancelRide(dashboardRideInvite.rideID)
+                        else
+                            updateInviteStatus(
+                                dashboardRideInvite.rideID,
+                                APIConstants.RIDE_DECLINED
+                            )
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                     modifier = Modifier
                         .weight(1f)
-                        .height(Dimensions.size50),
+                        .height(Dimensions.size32),
                     shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS)
                 ) {
                     Text(
-                        stringResource(R.string.decline).uppercase(),
+                        if (dashboardRideInvite.isOrganiser)
+                            stringResource(R.string.cancel_ride).uppercase()
+                        else
+                            stringResource(R.string.decline).uppercase(),
                         color = NeutralWhite,
                         style = TypographyBold.titleMedium,
                         fontSize = Dimensions.textSize14

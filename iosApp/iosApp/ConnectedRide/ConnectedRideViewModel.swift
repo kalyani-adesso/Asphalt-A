@@ -41,6 +41,17 @@ struct Rider: Identifiable {
     let contactNumber: String
     let currentLat:Double
     let currentLong:Double
+    let rideId:String
+    let receiverId:String
+}
+
+struct MessageUIModel: Identifiable {
+    let id: String
+    let senderId: String
+    let senderName: String
+    let message: String
+    let timestamp: String
+    let isCurrentUser: Bool
 }
 
 struct RideStop: Identifiable {
@@ -55,9 +66,16 @@ enum MapType: String, CaseIterable, Hashable {
     case imagery
 }
 
+struct ConnectedRideMessage: Identifiable {
+    let id = UUID()
+    let message: String
+    let senderName: String
+    let date: Date
+}
+
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0)]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -69,6 +87,16 @@ final class ConnectedRideViewModel: ObservableObject {
     private var previousRidersDict: [String: Rider] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
+    @Published var messageIndex:Int = 0
+    @Published var showRecieveMessagePopup = false
+    @Published var lastMessageId: String?
+    @Published var chatMessages: [MessageUIModel] = []
+    @Published var latestIncomingSenderName: String = ""
+    var rider: Rider? {
+        guard !groupRiders.isEmpty else { return nil }
+        guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
+        return groupRiders[messageIndex]
+    }
 
     var lastLat: Double?
     var lastLong: Double?
@@ -218,7 +246,7 @@ extension ConnectedRideViewModel {
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
-                                let status = self.getRideStatus()
+                                _ = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                 let rider = Rider(
@@ -228,7 +256,10 @@ extension ConnectedRideViewModel {
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: ongoingRide.currentLat,
-                                    currentLong: ongoingRide.currentLong
+                                    currentLong: ongoingRide.currentLong,
+                                    rideId: ongoingRide.rideID,
+                                    receiverId: ongoingRide.userID
+                                    
                                 )
                                 
                                 // Update or add to dictionary (ensures uniqueness by userID)
@@ -319,13 +350,23 @@ extension ConnectedRideViewModel {
     }
     
     func rateYourRide(ratings:Int,comments:String) {
-        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { [self] result, error in
             if let error = error {
                 print("Error while rating your ride \(error)")
             } else {
                 print("Sucesss!")
             }
         }
+    }
+    
+    func updateRating(stars:Int,rideId:String) {
+        rideRepository.updateRatings(rideID:rideId, userID: MBUserDefaults.userIdStatic ?? "", stars: Int32(stars), completionHandler: { result, error in
+            if let error = error {
+                print("Error while rating your ride \(error)")
+            } else {
+                print("Sucesss!")
+            }
+        })
     }
     
     func getAllUsers(createdBy: String) async  -> (String, String)? {
@@ -439,7 +480,8 @@ extension ConnectedRideViewModel {
     }
     
     func sendMessage(senderName:String,receiverName:String,senderId:String,receiverId:String,message:String,rideId:String) {
-        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId)
+        let dateTimeMillis = Int64(Date().timeIntervalSince1970 * 1000)
+        let messageRoot = MessageRoot(senderID: senderId, senderName: senderName, receiverID: receiverId, receiverName: receiverName, message: message, onGoingRideID: rideId, timeStamp: KotlinLong(value: dateTimeMillis), isRideOnGoing: KotlinBoolean(bool: true) )
         rideRepository.sendMessage(message:messageRoot , completionHandler: {result, error in
             if let error = error {
                 print("Error joining ride:", error.localizedDescription)
@@ -447,6 +489,50 @@ extension ConnectedRideViewModel {
                 print("Message sent successfully")
             }
         })
+    }
+
+    func receiveMessage(rideId: String) async {
+        do {
+            let flow = try await MessageImpl().receiveMessage(rideId: rideId)
+
+            try await flow.collect(
+                collector: ReceiveMessageCollector(
+                    onValue: { kmpMessages in
+                        Task { @MainActor in
+                            let filtered = kmpMessages
+                                        .filter { $0.receiverID == MBUserDefaults.userIdStatic && $0.isRideOnGoing == true }
+
+                                    let mapped = filtered.map { item in
+                                        MessageUIModel(
+                                            id: item.id,
+                                            senderId: item.senderID,
+                                            senderName: item.senderName,
+                                            message: item.message,
+                                            timestamp: self.formatTime(from: item.timeStamp),
+                                            isCurrentUser: item.senderID == MBUserDefaults.userIdStatic
+                                        )
+                                    }
+                            if let latest = mapped.last, latest.id != self.lastMessageId {
+                                self.lastMessageId = latest.id
+                                self.latestIncomingSenderName = latest.senderName
+                                
+                                if !self.chatMessages.isEmpty {
+                                    self.showRecieveMessagePopup = true
+                                }
+                            }
+
+                            self.chatMessages = mapped
+                        }
+                    },
+                    onError: { error in
+                        print("Receive Message Error:", error.localizedDescription)
+                    }
+                )
+            )
+
+        } catch {
+            print("Outer Receive Message Error:", error.localizedDescription)
+        }
     }
 }
 
@@ -463,6 +549,30 @@ class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {
         if let apiResult = value as? APIResultSuccess<AnyObject>,
            let rides = apiResult.data as? [ConnectedRideDTO] {
             onValue(rides)
+            completionHandler(nil)
+        } else if let apiError = value as? APIResultError {
+            onError(apiError.exception as! any Error)
+            completionHandler(nil)
+        } else {
+            onError(NSError(domain: "UnknownResult", code: 0, userInfo: nil))
+            completionHandler(nil)
+        }
+    }
+}
+
+class ReceiveMessageCollector: Kotlinx_coroutines_coreFlowCollector {
+    let onValue: ([MessageDTO]) -> Void
+    let onError: (Error) -> Void
+    
+    init(onValue: @escaping ([MessageDTO]) -> Void, onError: @escaping (Error) -> Void) {
+        self.onValue = onValue
+        self.onError = onError
+    }
+    
+    func emit(value: Any?, completionHandler: @escaping ((any Error)?) -> Void) {
+        if let apiResult = value as? APIResultSuccess<AnyObject>,
+           let messages = apiResult.data as? [MessageDTO] {
+            onValue(messages)
             completionHandler(nil)
         } else if let apiError = value as? APIResultError {
             onError(apiError.exception as! any Error)

@@ -32,6 +32,9 @@ class CreateRideRoot(
     @SerialName("participants")
     var participants: Map<String, UserInvites>? = null,
 
+    @SerialName("ratings")
+    var ratings: Map<String, Ratings>? = null,
+
     @SerialName("startLatitude")
     var startLatitude: Double = 0.0,
 
@@ -52,5 +55,17 @@ class CreateRideRoot(
 
     @SerialName("endDate")
     var endDate: Long? = null,
+
+    @SerialName("hasAssemblyPoint")
+    var hasAssemblyPoint: Boolean = false,
+
+    @SerialName("assemblyPoint")
+    var assemblyPoint: String? = null,
+
+    @SerialName("assemblyLat")
+    var assemblyLat: Double = 0.0,
+
+    @SerialName("assemblyLon")
+    var assemblyLon: Double = 0.0,
 
     )

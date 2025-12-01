@@ -17,62 +17,63 @@ struct JoinRideView: View {
     @State private var selectedRide: JoinRideModel? = nil
     @Environment(\.dismiss) private var dismiss
     var body: some View {
-        ZStack {
-            NavigationStack {
-                SimpleCustomNavBar(title: AppStrings.JoinRide.joinaRideTitle, onBackToHome: {showHomeView = true})
-                if #available(iOS 17.0, *) {
-                    VStack {
-                        searchBarView
-                            .font(KlavikaFont.regular.font(size: 14))
-                            .padding(.top)
-                        if viewModel.filteredRides.isEmpty {
-                            VStack(spacing: 12) {
-                                Text("No active rides found")
-                                    .font(KlavikaFont.bold.font(size: 18))
-                                    .foregroundColor(.gray)
+        AppToolBar{
+            ZStack {
+                NavigationStack {
+                    if #available(iOS 17.0, *) {
+                        VStack {
+                            searchBarView
+                                .font(KlavikaFont.regular.font(size: 14))
+                                .padding(.top)
+                            if viewModel.filteredRides.isEmpty {
+                                VStack(spacing: 12) {
+                                    Text(AppStrings.JoinRide.noActiveRidesFound)
+                                        .font(KlavikaFont.bold.font(size: 18))
+                                        .foregroundColor(.gray)
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 400)
+                            } else {
+                                List(viewModel.filteredRides.indices, id: \.self) { index in
+                                    let ride = viewModel.filteredRides[index]
+                                    
+                                    JoinRideRow(
+                                        ride: ride,
+                                        index: index,
+                                        viewModel: viewModel, selectedRide: $selectedRide
+                                    )
+                                    .listRowSeparator(.hidden)
+                                }
+                                .listStyle(.plain)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 400)
-                        } else {
-                            List(viewModel.filteredRides.indices, id: \.self) { index in
-                                let ride = viewModel.filteredRides[index]
-
-                                JoinRideRow(
-                                    ride: ride,
-                                    index: index,
-                                    viewModel: viewModel, selectedRide: $selectedRide
-                                )
-                                .listRowSeparator(.hidden)
-                            }
-                            .listStyle(.plain)
+                            Spacer()
                         }
-                        Spacer()
-                    }
-                    .navigationBarBackButtonHidden(true)
-                    .navigationDestination(isPresented: $showHomeView, destination: {
-                        BottomNavBar()
-                    })
-                    .navigationDestination(item: $selectedRide, destination: { ride in
-                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
-                    })
-                    .task {
-                        await viewModel.getRides()
-                    }
-                    .refreshable {
-                        Task {
+                        .navigationBarBackButtonHidden(true)
+                        .navigationDestination(isPresented: $showHomeView, destination: {
+                            BottomNavBar()
+                        })
+                        .navigationDestination(item: $selectedRide, destination: { ride in
+                            ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
+                        })
+                        .task {
                             await viewModel.getRides()
                         }
+                        .refreshable {
+                            Task {
+                                await viewModel.getRides()
+                            }
+                        }
+                    } else {
+                        // Fallback on earlier versions
                     }
-                } else {
-                    // Fallback on earlier versions
                 }
-            }
-            if viewModel.isRideLoading {
-                Color.black.opacity(0.5)
-                    .ignoresSafeArea()
-                ProgressView("Loading...")
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding(.top, 100)
-                    .foregroundColor(.white)
+                if viewModel.isRideLoading {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                    ProgressView(AppStrings.JoinRide.loading)
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .padding(.top, 100)
+                        .foregroundColor(.white)
+                }
             }
         }
         
@@ -196,21 +197,8 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title: (ride?.rideJoined ?? false) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: (ride?.rideJoined ?? false) ?  LinearGradient(
-                            gradient: Gradient(colors: [
-                                AppColor.vividGreen,
-                                AppColor.vividGreen,
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ) :  LinearGradient(
-                            gradient: Gradient(colors: [
-                                AppColor.royalBlue,
-                                AppColor.pursianBlue,
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ),onTap: {
+                        ButtonView(title: (ride?.rideJoined ?? false) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: (ride?.rideJoined ?? false) ? AppColor.vividGreen
+                                   :  AppColor.celticBlue ,onTap: {
                             viewModel.tappedIndex = index
                             Task {
                                 if let ride = ride,
@@ -230,10 +218,9 @@ struct JoinRideRow: View {
                     .fill(AppColor.listGray)
             )
             .contentShape(Rectangle())
-            .alert("Ride already active", isPresented: $viewModel.showRideAlreadyActivePopup) {
-                Button("No", role: .cancel) { }
-
-                Button("Yes") {
+            .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
+                Button(AppStrings.JoinRide.no, role: .cancel) { }
+                Button(AppStrings.JoinRide.yes) {
                     Task {
                         await viewModel.endActiveRide()
                         await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
@@ -241,7 +228,7 @@ struct JoinRideRow: View {
                     }
                 }
             } message: {
-                Text("Do you want to end your current ride and join this one?")
+                Text(AppStrings.JoinRide.confirmEndCurrentRide)
             }
     }
 }
@@ -249,3 +236,5 @@ struct JoinRideRow: View {
 #Preview {
     JoinRideView()
 }
+
+

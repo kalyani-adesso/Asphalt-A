@@ -12,6 +12,9 @@ struct BottomNavBar: View {
     @Namespace private var animation
     @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var upcomingRideViewModel = UpcomingRideViewModel()
+    @State var showNotification: Bool = false
+    @State var showSlideBar: Bool = false
+    
     
     var body: some View {
         NavigationStack {
@@ -23,13 +26,15 @@ struct BottomNavBar: View {
                             .environmentObject(homeViewModel)
                             .environmentObject(upcomingRideViewModel)
                     case 1:
-                        UpcomingRideView(onBackToHome: { selectedTab = 0 })
+                        UpcomingRideView(showpopup: false , navigationDone: false)
                             .environmentObject(upcomingRideViewModel)
                             .environmentObject(homeViewModel)
+                        
                     case 2:
-                        QueriesView(onBackToHome: { selectedTab = 0 })
+                        QueriesView()
                     case 3:
-                        ProfileScreen(onBackToHome: { selectedTab = 0 })
+                        ProfileScreen()
+                            .environmentObject(homeViewModel)
                     default:
                         HomeView()
                             .environmentObject(homeViewModel)
@@ -58,7 +63,49 @@ struct BottomNavBar: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
+            
+            .toolbar {
+    
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    if selectedTab != 0 {
+                        Button {
+                            selectedTab = 0
+                        } label: {
+                            AppIcon.CreateRide.backButton
+                        }
+                    }
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        self.showNotification = true
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell")
+                                .font(.system(size: 15))
+                                .foregroundColor(AppColor.celticBlue)
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                                .offset(x: -2, y: 1)
+                        }
+                    }
+                    Button(action: {
+                        self.showSlideBar = true
+                    }) {
+                        AppIcon.Home.navigation
+                    }
+                }
+            }
+            
+            .navigationDestination(isPresented: $showSlideBar, destination: {
+                NavigationSlideBar()
+            })
+            .navigationDestination(isPresented: $showNotification, destination: {
+                NotificationView()
+            })
+            .navigationBarBackButtonHidden(true)
         }
+        
     }
     
     // MARK: - Tab Item View

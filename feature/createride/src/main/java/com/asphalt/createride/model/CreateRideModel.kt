@@ -23,5 +23,9 @@ data class CreateRideModel(
     var endDateMils: Long? = null,
     var isEndAm: Boolean = false,
     var endDisplayTime: String? = null,
+    val assemblyLocation: String? = null,
+    val assemblyLat: Double? = null,
+    val assemblyLon: Double? = null,
+    val hasAssemblyPoint : Boolean =false
 
-)
+    )

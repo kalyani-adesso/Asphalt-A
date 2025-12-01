@@ -12,26 +12,25 @@ struct NavigationSlideBar: View {
     @Environment(\.dismiss) var dismiss
     @State var showHome: Bool = false
     var body: some View {
-        SimpleCustomNavBar(title: "adesso Rider's Club", onBackToHome: {
-            showHome = true
-        } )
-        VStack {
-            List(viewModel.sections, id: \.self) { item in
-                MenuItemRow(viewModel: viewModel, item: item)
-                    .padding(.vertical, 5)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(AppColor.listGray)
+        AppToolBar(showBack: false){
+            VStack {
+                List(viewModel.sections, id: \.self) { item in
+                    MenuItemRow(viewModel: viewModel, item: item)
+                        .padding(.vertical, 5)
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(AppColor.listGray)
+                }
+                .scrollContentBackground(.hidden)
+                .listStyle(.plain)
+                .cornerRadius(10)
+                .padding(16)
             }
-            .scrollContentBackground(.hidden)
-            .listStyle(.plain)
-            .cornerRadius(10)
-            .padding(16)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .navigationDestination(isPresented: $showHome, destination: {
+                BottomNavBar()
+            })
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .navigationDestination(isPresented: $showHome, destination: {
-            BottomNavBar()
-        })
     }
 }
 
@@ -43,7 +42,7 @@ struct MenuItemRow: View {
         HStack(spacing: 8) {
             item.icon
                 .resizable()
-                .frame(width: 30, height: 30)
+                .frame(width: 24, height: 24)
             Text(item.title)
                 .font(KlavikaFont.medium.font(size: 16))
                 .foregroundColor(item.iconColor)

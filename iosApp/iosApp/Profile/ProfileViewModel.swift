@@ -79,10 +79,14 @@ class ProfileViewModel: ObservableObject {
         ktorClient = KtorClient()
         profileAPIService = ProfileAPIServiceImpl(client: ktorClient)
         profileRepository = ProfileRepository(apiService: profileAPIService)
-        loadData()
     }
     
-    private func loadData() {
+    func loadData(homeVM: HomeViewModel) {
+        
+        
+        let totalRides = homeVM.stats.first(where: { $0.title == "Total Rides" })?.value ?? "0"
+           let locations = homeVM.stats.first(where: { $0.title == "Locations" })?.value ?? "0"
+
         sections = [
             ProfileSection(
                 section: 0, title: AppStrings.Profile.yourVehicles,
@@ -98,8 +102,8 @@ class ProfileViewModel: ObservableObject {
                 icon: Image(""),
                 
                 items: [
-                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "25 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
-                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "12 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "\(totalRides) Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "\(locations) Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
                 ]
             ),
             ProfileSection(
@@ -149,6 +153,7 @@ extension ProfileViewModel {
                             self.email = domain.email
                             self.phoneNumber = domain.phoneNumber
                             self.role = domain.isMechanic ? "Mechanic" : ""
+//                           ratingpicker
                             self.isLoading = false
                             continuation.resume()
                         }

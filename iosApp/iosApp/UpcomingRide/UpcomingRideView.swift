@@ -10,12 +10,14 @@ import SwiftUI
 struct UpcomingRideView: View {
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     var currentSelected: RideAction { viewModel.selectedTab }
-    var startingTab: RideAction = .upcoming 
+    var startingTab: RideAction = .upcoming
     @State private var showHomeView:Bool = false
     @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
+    @State var showBack: Bool = false
+    @Environment(\.dismiss) private var dismiss
     @State var showpopup: Bool = false
-    var onBackToHome: (() -> Void)? = nil
+    @State var navigationDone: Bool
     var hasPendingInvites: Bool {
         viewModel.rides.contains { $0.rideAction == .invities }
     }
@@ -23,53 +25,57 @@ struct UpcomingRideView: View {
     @State private var openGallery = false
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
-
+    @State private var showNotification = false
+    @State private var showSlideBar = false
+    
     var body: some View {
         ZStack{
-            NavigationStack {
-                SimpleCustomNavBar(title: "Your Rides", onBackToHome: {
-                    onBackToHome?()
-                    showHome = true
-                } )
+            VStack {
+                ReusableHeader {
+                    Text("Your Rides")
+                        .font(KlavikaFont.bold.font(size: 22))
+                        .foregroundColor(AppColor.black)
+                } trailing: {
+                    EmptyView()
+                }
                 
-                VStack {
-                    HStack(spacing: 12) {
-                        let rideStatuses = viewModel.rideStatus
-                        
-                        ForEach(rideStatuses, id: \.self) { status in
-                            let isSelected = viewModel.selectedTab == status
-                            let showDot = status == .invities && hasPendingInvites
-                            SegmentButtonView(
-                                rideStatus: status.rawValue,
-                                isSelected: isSelected,
-                                showNotificationDot: showDot
-                            ) {
-                                withAnimation {
-                                    viewModel.selectedTab = status
-                                }
+                HStack(spacing: 12) {
+                    let rideStatuses = viewModel.rideStatus
+                    
+                    ForEach(rideStatuses, id: \.self) { status in
+                        let isSelected = viewModel.selectedTab == status
+                        let showDot = status == .invities && hasPendingInvites
+                        SegmentButtonView(
+                            rideStatus: status.rawValue,
+                            isSelected: isSelected,
+                            showNotificationDot: showDot
+                        ) {
+                            withAnimation {
+                                viewModel.selectedTab = status
                             }
                         }
                     }
-                    
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .padding([.leading, .trailing])
-                    .contentShape(Rectangle())
-                    VStack {
-                        List {
-                            let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                }
+                
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(AppColor.listGray)
+                )
+                .padding([.leading, .trailing])
+                .contentShape(Rectangle())
+                VStack {
+                    List {
+                        let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                        
+                        if filtered.isEmpty {
+                            Text("No rides found")
+                                .font(KlavikaFont.bold.font(size: 16))
+                                .foregroundColor(AppColor.stoneGray)
+                        }
+                        else{
                             
-                            if filtered.isEmpty {
-                                Text("No rides found")
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .foregroundColor(AppColor.stoneGray)
-                            }
-                            else{
-                                
                             ForEach($viewModel.rides.indices.filter { index in
                                 viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
                             }, id: \.self) { index in
@@ -82,18 +88,17 @@ struct UpcomingRideView: View {
                                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                             }
                         }
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .onAppear {
-                    viewModel.selectedTab = .upcoming
-                    if showpopup {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            withAnimation(.easeInOut) {
-                                showpopup = false
-                            }
+            }
+            .onAppear {
+                viewModel.selectedTab = .upcoming
+                if showpopup {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation(.easeInOut) {
+                            showpopup = false
                         }
                     }
                 }
@@ -122,15 +127,9 @@ struct UpcomingRideView: View {
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",
-                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: LinearGradient(
-                            gradient: Gradient(colors: [
-                                AppColor.lightGreen,
-                                AppColor.lightGreen,
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ), foregroundColor: .spanishGreen
-                    
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: AppColor.lightGreen,
+                        foregroundColor: .spanishGreen
+                        
                     )
                     Spacer()
                 }
@@ -142,6 +141,7 @@ struct UpcomingRideView: View {
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading Rides...")
             }
+            
         }
         .overlay {
             if activePopup != nil {
@@ -162,6 +162,7 @@ struct UpcomingRideView: View {
                 withAnimation { activePopup = .previewSelected }
             }
         }) {
+            PhotoPicker(images: $selectedImages)
         }
         .zIndex(showpopup ? 2 : 0)
         .task{
@@ -172,6 +173,48 @@ struct UpcomingRideView: View {
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
         }
+        .toolbar {
+            if navigationDone{
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button {
+                        if showBack{
+                            dismiss()
+                        }
+                        showHome = true
+                    } label: {
+                        AppIcon.CreateRide.backButton
+                    }
+                    
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        showNotification = true
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell")
+                                .font(.system(size: 15))
+                                .foregroundColor(AppColor.celticBlue)
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                                .offset(x: -2, y: 1)
+                        }
+                    }
+                    
+                    Button {
+                        showSlideBar = true
+                    } label: {
+                        AppIcon.Home.navigation
+                    }
+                }
+            }
+        }
+        .navigationDestination(isPresented: $showSlideBar, destination: {
+            NavigationSlideBar()
+        })
+        .navigationDestination(isPresented: $showNotification, destination: {
+            NotificationView()
+        })
     }
     
     private func handleUpload() {
@@ -250,6 +293,7 @@ struct SegmentButtonView: View {
 
 struct UpComingView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
+    @ObservedObject var connectedViewModel = ConnectedRideViewModel()
     @Binding var ride:RideModel
     @State private var showUploadPopup = false
     @State private var showSelectedPopup = false
@@ -257,7 +301,7 @@ struct UpComingView: View {
     @State private var openGallery = false
     @State private var showRideDetails: Bool = false
     var onAddPhotos: ((String) -> Void)? = nil
-    
+    @State private var userRating: Int = 0
     var body: some View {
         ZStack{
             VStack(alignment: .leading, spacing: 22) {
@@ -288,77 +332,244 @@ struct UpComingView: View {
                         statusText
                     }
                 }
-                
-                HStack {
-                    HStack(spacing: 5) {
-                        AppIcon.UpcomingRide.calender
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text(ride.date)
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
-                    }
-                    Spacer()
-                    HStack(spacing: 5) {
-                        AppIcon.UpcomingRide.group
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text("\(ride.riderCount) rides")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
+                if ride.rideAction == .upcoming{
+                    VStack(alignment: .leading, spacing: 10){
+                        VStack (alignment: .leading, spacing: 5){
+                            HStack{
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text("Start: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.YourRides.time
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text(ride.startTime ?? "")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                            }
+                            HStack{
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text("End: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.last?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.YourRides.time
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text(ride.endTime ?? "")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        Spacer()
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
                     }
                 }
-                
-                HStack(spacing: 15) {
-                    if ride.rideAction == .history {
-                        Button(action: {
-                            if ride.hasPhotos {
-                                //open local manager
-                            } else {
-                                onAddPhotos?(ride.id)
-                            }
-                        }) {
-                            Text(ride.hasPhotos ? AppStrings.UpcomingRide.viewPhotos.uppercased() : AppStrings.UpcomingRide.addPhotos.uppercased())
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(AppColor.white)
-                                .foregroundStyle(AppColor.celticBlue)
-                                .font(KlavikaFont.bold.font(size: 14))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(AppColor.celticBlue, lineWidth: 1)
-                                )
+                else if ride.rideAction == .history{
+                    HStack{
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.calender
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                            Text("\(ride.date) ")
+                                .font(KlavikaFont.medium.font(size: 14))
+                                .foregroundStyle(AppColor.oldBurgundy)
                         }
-                        .padding(.bottom,20)
-                        .buttonStyle(.plain)
-                    } else {
-                        ButtonView(title: ride.rideAction == .invities ? AppStrings.UpcomingRide.accept.uppercased() : AppStrings.UpcomingRide.share.uppercased(), fontSize: 14,onTap: {
-                            Task {
-                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
-                            }
-                        })
-                        .modifier(ButtonWidth(rideAction: ride.rideAction))
-                        .padding(.bottom,20)
+                        Spacer()
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
                     }
-                    
-                    Button(action: {
-                        Task {
-//                            if ride.status == .upcoming {
-                                self.showRideDetails = true
-                                await viewModel.getSingleRide(rideId: ride.id)
-//                            } else {
-//                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
-//                            }
+                }
+                else{
+                    HStack{
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.calender
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                            Text("\(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "") - \(ride.startTime ?? "")")
+                                .font(KlavikaFont.medium.font(size: 14))
+                                .foregroundStyle(AppColor.oldBurgundy)
                         }
-                    }) {
-                        Text(ride.rideViewAction.rawValue.uppercased())
+                        Spacer()
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
+                        
+                    }
+                }
+                HStack(spacing: 15) {
+                    switch ride.rideAction {
+                    case .upcoming:
+                        Button(action: {
+                            self.showRideDetails = true
+                            Task { await viewModel.getSingleRide(rideId: ride.id) }
+                        }) {
+                            HStack{
+                                AppIcon.YourRides.view
+                                Text(ride.rideViewAction.rawValue.uppercased())
+                            }
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .modifier(ButtonBackground(rideAction: ride.rideAction))
+                            .background(AppColor.white)
+                            .foregroundColor(AppColor.celticBlue)
+                            .font(KlavikaFont.bold.font(size: 14))
+                            .overlay(RoundedRectangle(cornerRadius: 10)
+                                .stroke(AppColor.celticBlue, lineWidth: 1))
+                            
+                        }
+                        
+                        Button(action: {
+                            
+                        }) {
+                            HStack(spacing: 10){
+                                AppIcon.YourRides.share
+                                Text(AppStrings.UpcomingRide.share.uppercased())
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(AppColor.white)
+                            .foregroundColor(AppColor.celticBlue)
+                            .font(KlavikaFont.bold.font(size: 14))
+                            .overlay(RoundedRectangle(cornerRadius: 10)
+                                .stroke(AppColor.celticBlue, lineWidth: 1))
+                        }
+                    case .history:
+                        VStack(alignment: .leading, spacing: 20){
+                            if ride.hasPhotos {
+                                HStack{
+                                    Button(action: {
+                                        onAddPhotos?(ride.id)
+                                    }) {
+                                        HStack{
+                                            AppIcon.YourRides.photos
+                                            Text(ride.rideViewAction.rawValue.uppercased())
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(AppColor.white)
+                                        .foregroundColor(AppColor.celticBlue)
+                                        .font(KlavikaFont.bold.font(size: 14))
+                                        .overlay(RoundedRectangle(cornerRadius: 10)
+                                            .stroke(AppColor.celticBlue, lineWidth: 1))
+                                        
+                                    }
+                                    
+                                    
+                                    Button(action: {
+                                        // open viewer
+                                    }) {
+                                        HStack{
+                                            AppIcon.YourRides.view
+                                            Text(AppStrings.UpcomingRide.viewPhotos.uppercased())
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(AppColor.white)
+                                        .foregroundColor(AppColor.celticBlue)
+                                        .font(KlavikaFont.bold.font(size: 14))
+                                        .cornerRadius(10)
+                                        .overlay(RoundedRectangle(cornerRadius: 10)
+                                            .stroke(AppColor.celticBlue, lineWidth: 1))
+                                    }
+                                    
+                                }
+                                
+                            } else {
+                                Button(action: {
+                                    onAddPhotos?(ride.id)
+                                }) {
+                                    HStack{
+                                        AppIcon.YourRides.photos
+                                        Text(ride.rideViewAction.rawValue.uppercased())
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(AppColor.white)
+                                    .foregroundColor(AppColor.celticBlue)
+                                    .font(KlavikaFont.bold.font(size: 14))
+                                    .overlay(RoundedRectangle(cornerRadius: 10)
+                                        .stroke(AppColor.celticBlue, lineWidth: 1))
+                                }
+                            }
+                            HStack {
+                                Text("Your Rating:")
+                                    .font(KlavikaFont.regular.font(size: 16))
+                                    .foregroundStyle(AppColor.oldBurgundy)
+
+                                ForEach(1...5, id: \.self) { index in
+                                    let filled = index <= userRating
+                                    let icon = filled ? AppIcon.YourRides.ratingFilled : AppIcon.YourRides.rating
+
+                                    icon
+                                        .onTapGesture {
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                userRating = index
+                                            }
+                                            connectedViewModel.updateRating(stars: userRating, rideId: ride.id)
+                                        }
+                                }
+                            }
+                        }
+                    case .invities:
+                        Button(action: {
+                            Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true) }
+                        }) {
+                            Text(AppStrings.UpcomingRide.accept.uppercased())
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(AppColor.celticBlue)
+                                .foregroundColor(.white)
+                                .font(KlavikaFont.bold.font(size: 14))
+                                .cornerRadius(10)
+                        }
+                        
+                        Button(action: {
+                            Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false) }
+                        }) {
+                            Text(ride.rideViewAction.rawValue.uppercased())
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(AppColor.red)
+                                .foregroundColor(.white)
+                                .font(KlavikaFont.bold.font(size: 14))
+                                .cornerRadius(10)
+                        }
                     }
-                    .padding(.bottom,20)
-                    .buttonStyle(.plain)
                 }
+                .padding(.bottom, 20)
+                
             }
             .padding([.leading,.trailing,.top],16)
             .background(
@@ -368,6 +579,9 @@ struct UpComingView: View {
             .navigationDestination(isPresented: $showRideDetails, destination: {
                 RideDetailsView(viewModel: viewModel, ride: $ride)
             })
+            .onAppear {
+                userRating = ride.ratings ?? 0
+            }
             .contentShape(Rectangle())
             .refreshable {
                 await viewModel.getSingleRide(rideId: ride.id)
@@ -458,7 +672,7 @@ struct ButtonBackground: ViewModifier {
 }
 
 #Preview {
-    UpcomingRideView()
+    UpcomingRideView( navigationDone: true)
         .environmentObject(HomeViewModel())
         .environmentObject(UpcomingRideViewModel())
 }

@@ -102,6 +102,7 @@ object Dimensions {
     val size22 = 22.dp
     val size25 = 25.dp
     val size17 = 17.dp
+    val size16 = 16.dp
     val size30 = 30.dp
     val size32 = 32.dp
     val size35 = 35.dp
@@ -111,7 +112,9 @@ object Dimensions {
 
     val size73 = 73.dp
     val size81 = 81.dp
+    val size71 = 71.dp
     val size140=140.dp
+    val size128=128.dp
     val size220 = 220.dp
     val size200 = 200.dp
     val size210 = 210.dp
@@ -134,6 +137,7 @@ object Dimensions {
     val radius1 = 1.dp
     val radius2 = 2.dp
     val size60 = 60.dp
+    val size63 = 63.dp
     val size18 = 18.dp
     val size92 = 92.dp
     val textSize18 = 18.sp
@@ -141,6 +145,7 @@ object Dimensions {
     val textSize17 = 17.sp
     val textSize16 = 16.sp
     val textSize26 = 26.sp
+    val textSize24 = 24.sp
     val textSize28 = 28.sp
     val textSize30 = 30.sp
     val textSize14 = 14.sp

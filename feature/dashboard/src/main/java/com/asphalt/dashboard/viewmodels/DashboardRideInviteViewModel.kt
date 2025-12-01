@@ -47,6 +47,18 @@ class DashboardRideInviteViewModel(
             }
         }
     }
+    fun cancelRide(rideID: String){
+        viewModelScope.launch {
+            val apiResult = APIHelperUI.runWithLoader {
+                ridesRepository.deleteRide(rideID)
+
+            }
+            APIHelperUI.handleApiResult(apiResult,viewModelScope){
+                removeInviteFromList(rideID)
+            }
+        }
+
+    }
 
     fun updateRideInviteStatus(rideID: String, inviteStatus: Int) {
         viewModelScope.launch {

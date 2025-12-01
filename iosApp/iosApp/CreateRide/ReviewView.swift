@@ -16,10 +16,10 @@ struct ReviewView: View {
                 VStack(spacing: 20) {
                     stepIndicator
                     VStack(alignment: .leading, spacing: 20) {
-                        HStack {
+                  
                             Text(AppStrings.CreateRide.reviewSubTitle)
                                 .font(KlavikaFont.medium.font(size: 16))
-                        }
+                        
                         ReviewCard(
                             icon: AppIcon.Home.nearMe,
                             iconColor: AppColor.lightBlue,
@@ -42,7 +42,7 @@ struct ReviewView: View {
                             title: AppStrings.CreateRide.reviewParticipants,
                             subtitle:"\(viewModel.selectedParticipants.count) riders selected")
                     }
-                    .frame(width: 343, height: 430)
+                    .frame(width: 343)
                     .padding()
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
@@ -52,10 +52,7 @@ struct ReviewView: View {
 
                 HStack(spacing: 15) {
                     ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
-                                background: LinearGradient(
-                                    gradient: Gradient(colors: [.white, .white]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing),
+                                background: AppColor.white,
                                 foregroundColor: AppColor.celticBlue,
                                 showShadow: false ,
                                 borderColor: AppColor.celticBlue , onTap: {
@@ -112,4 +109,5 @@ struct ReviewView: View {
 
 #Preview {
     ReviewView()
+        .environmentObject(CreateRideViewModel())
 }

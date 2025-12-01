@@ -48,7 +48,7 @@ struct ParticipantsView: View {
                     }
                 }
             }
-            .frame(width: 343, height: 472)
+            .frame(width: 343, height: 448)
             .padding()
             .background(AppColor.backgroundLight)
             .cornerRadius(10)
@@ -56,10 +56,7 @@ struct ParticipantsView: View {
         Spacer()
         HStack(spacing: 15) {
             ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
-                        background: LinearGradient(
-                            gradient: Gradient(colors: [.white, .white]),
-                            startPoint: .leading,
-                            endPoint: .trailing),
+                        background: AppColor.white,
                         foregroundColor: AppColor.celticBlue,
                         showShadow: false ,
                         borderColor: AppColor.celticBlue) {
@@ -105,4 +102,5 @@ struct ParticipantsView: View {
 
 #Preview {
     ParticipantsView()
+        .environmentObject(CreateRideViewModel())
 }

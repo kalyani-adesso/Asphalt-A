@@ -33,7 +33,8 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
     ) {
         GradientButton(
             modifier = Modifier.weight(1f),
-            endColor = PrimaryDeepBlue,
+            buttonHeight = Dimensions.size50,
+//            endColor = PrimaryDeepBlue,
             onClick = { onCreateRideClick() },
             contentPadding = PaddingValues(
                 Dimensions.size0
@@ -56,6 +57,7 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
         BorderedButton(
             modifier = Modifier.weight(1f),
             onClick = { onJoinRideClick() },
+            buttonHeight = Dimensions.size50,
             contentPaddingValues = PaddingValues(
                 Dimensions.size0
             )

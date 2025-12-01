@@ -45,6 +45,7 @@ struct AppIcon {
         static let connectedRide = Image("icon-connectedRide")
         static let knowledgeCircle = Image("icon-knowledgeCircle")
         static let marketPlace = Image("icon-marketPlace")
+        static let message = Image("icon-message-outline")
         static let settings = Image("icon-settings")
         static let referFriend = Image("icon-referAFriend")
         static let logout = Image("icon-logout")
@@ -95,6 +96,7 @@ struct AppIcon {
         static let navigation = Image("navigation")
         static let pointer = Image("pointer")
         static let rides = Image("rides")
+        static let badge = Image("Badge")
     }
 
     struct CreateRide {
@@ -167,6 +169,15 @@ struct AppIcon {
         static let chat = Image("chat_bubble")
         static let add = Image("add")
         static let crisis_alert = Image("crisis_alert")
+    }
+    struct YourRides {
+        static let photos = Image("photos")
+        static let share = Image("share")
+        static let time = Image("time")
+        static let view = Image("view")
+        static let rating = Image("rating")
+        static let ratingFilled = Image("rating-filled")
+       
     }
 }
 

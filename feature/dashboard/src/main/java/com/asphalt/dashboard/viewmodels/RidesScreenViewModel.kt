@@ -10,6 +10,7 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.dashboard.constants.RideStatConstants
+import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
 import com.asphalt.dashboard.utils.RidesFilter
@@ -34,8 +35,14 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
     )
     val ridesListState: State<YourRideRoot> = _ridesListMutableState
 
+    private val _showInviteNotification = mutableStateOf(false)
+    val showInviteNotification: State<Boolean> = _showInviteNotification
+
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
+    }
+    fun updateInviteStatus(isShow:Boolean){
+        _showInviteNotification.value=isShow
     }
 
     fun getRides() {
@@ -47,7 +54,7 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
-                val sortedArray = response.sortedByDescending { it.createdDate }
+                val sortedArray = response.sortedBy{ it.startDate }
 
                 var upcoming =
                     RidesFilter.getUComingRides(sortedArray, user?.uid ?: "", androidUserVM)
@@ -60,15 +67,22 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
                 historyList.addAll(history)
-                if (upcomiList.isNotEmpty()) {
-                    upcomiList.removeAll{ride ->
-                        ride.startDate?.let { it < currentTime } ?: false}
+                if(inviteList.isNotEmpty()){
+                    updateInviteStatus(true)
+                }else{
+                    updateInviteStatus(false)
+                }
+               if (upcomiList.isNotEmpty()) {
+                    upcomiList.removeAll { ride ->
+                        ride.startDate?.let { it < currentTime } ?: false
+                    }
                 }
                 var ridesList =
                     YourRideRoot(
                         upcoming = upcomiList,
                         invite = inviteList,
-                    history = historyList)//history = hirtoryList, invite = inviteList
+                        history = historyList
+                    )//history = hirtoryList, invite = inviteList
                 _ridesListMutableState.value = ridesList
             }
             //response.mapApiResult { it }
@@ -92,6 +106,23 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
         }
 
 
+    }
+    fun updateImages(images: ArrayList<GalleryModel>,ridesID:String){
+        val currentState = _ridesListMutableState.value
+
+        // find particular ride in history
+        val updatedHistory = currentState.history.map { ride ->
+            if (ride.ridesId == ridesID) {
+                ride.copy(
+                    images = ArrayList(images) // replace images
+                )
+            } else ride
+        }.toCollection(ArrayList())
+
+        // update state with new root object
+        _ridesListMutableState.value = currentState.copy(
+            history = updatedHistory
+        )
     }
 
 
