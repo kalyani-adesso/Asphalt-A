@@ -215,9 +215,9 @@ struct MessagePopupView: View {
         
         switch status {
         case .connected, .stopped:
-            return "\(status?.rawValue) from \(time)"
+            return "\(status?.rawValue ?? "") from \(time ?? "")"
         case .delayed:
-            return "\(status?.rawValue) by \(time)"
+            return "\(status?.rawValue ?? "") by \(time ?? "")"
         default:
             return "Available"
         }
