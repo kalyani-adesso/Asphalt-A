@@ -12,7 +12,7 @@ struct TopNavBar: View {
     @State var showNotification: Bool = false
     var body: some View {
         HStack(alignment: .center , spacing: 20) {
-            AppImage.Profile.profile.resizable()
+            AppImage.Welcome.bg.resizable()
                 .frame(width: 63, height: 63)
                 .clipShape(Circle())
                 .overlay(

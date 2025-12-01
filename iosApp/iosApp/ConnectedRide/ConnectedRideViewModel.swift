@@ -512,12 +512,8 @@ extension ConnectedRideViewModel {
                                             isCurrentUser: item.senderID == MBUserDefaults.userIdStatic
                                         )
                                     }
-
-                                    // detect new message
                             if let latest = mapped.last, latest.id != self.lastMessageId {
                                 self.lastMessageId = latest.id
-                                
-                                // store sender name for popup
                                 self.latestIncomingSenderName = latest.senderName
                                 
                                 if !self.chatMessages.isEmpty {
