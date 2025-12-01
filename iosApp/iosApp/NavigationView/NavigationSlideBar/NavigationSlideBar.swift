@@ -42,7 +42,7 @@ struct MenuItemRow: View {
         HStack(spacing: 8) {
             item.icon
                 .resizable()
-                .frame(width: 30, height: 30)
+                .frame(width: 24, height: 24)
             Text(item.title)
                 .font(KlavikaFont.medium.font(size: 16))
                 .foregroundColor(item.iconColor)

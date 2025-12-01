@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct ProfileScreen: View {
-    @StateObject private var viewModel = ProfileViewModel()
+    @EnvironmentObject var homeVM: HomeViewModel
+    @StateObject var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
     @Environment(\.dismiss) var dismiss
@@ -74,6 +75,9 @@ struct ProfileScreen: View {
                 .task {
                     await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
                 }
+                .onAppear {
+                    viewModel.loadData(homeVM: homeVM)
+                    }
                 if viewModel.isLoading {
                     ProgressViewReusable(title: "Loading Profile...")
                 }
@@ -383,6 +387,3 @@ struct ProfileHeaderView: View {
     }
 }
 
-#Preview {
-    ProfileScreen()
-}
