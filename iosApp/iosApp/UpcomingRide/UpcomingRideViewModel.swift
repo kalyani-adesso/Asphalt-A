@@ -50,6 +50,7 @@ struct RideModel: Identifiable,Hashable {
     let participantAcceptedCount: Int
     let startTime: String?
     let endTime: String?
+    let ratings: Int?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -132,8 +133,13 @@ class UpcomingRideViewModel: ObservableObject {
                 let isParticipant = ride.participants.contains { $0.userId == currentUserID }
                 let participantAcceptedCount = ride.participants.filter { $0.inviteStatus == 1 }.count
                 let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
-                
-                
+                var myRating: Int? = nil
+                if let ratingsArray = ride.ratings as? [RatingsData] {
+                    if let match = ratingsArray.first(where: { $0.userId == currentUserID }) {
+                        myRating = Int(match.stars)
+                    }
+                }
+
                 var rideAction: RideAction
                 var rideViewAction: RideViewAction
                 var rideStatus: RideStatus
@@ -209,9 +215,9 @@ class UpcomingRideViewModel: ObservableObject {
                     startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
-                    endTime: EndRideTime
+                    endTime: EndRideTime,
+                    ratings: myRating
                 )
-                
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
                 case .history: history.append(mapped)

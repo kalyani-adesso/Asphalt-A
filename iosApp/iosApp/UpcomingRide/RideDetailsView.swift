@@ -10,8 +10,7 @@ import SwiftUI
 struct RideDetailsView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
-    @State private var startRide = false
-    @State private var showJoinRide: Bool = false
+    @State private var deleteRide = false
     var body: some View {
         AppToolBar(showBack: true){
         ZStack {
@@ -122,28 +121,29 @@ struct RideDetailsView: View {
                             )
                             .contentShape(Rectangle())
                         }
-                        
-                        ButtonView(
-                            title:"START RIDE",
-                            icon: AppIcon.JoinRide.nearMe,
-                            fontSize: 16 ,
-                            background: AppColor.dimGreen,
-                            foregroundColor: AppColor.white,
-                            showShadow: false,
-                            onTap: {
-                                startRide = true
+                        Button(action: {
+                            Task {
+                                                                await viewModel.deleteRide(rideId: ride.id)
+                                                                deleteRide = true
+                                                            }
+                        }) {
+                            HStack{
+                                Text("DELETE RIDE")
                             }
-                        )
-                        .padding([.top,.bottom],16)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(AppColor.white)
+                            .foregroundColor(AppColor.red)
+                            .font(KlavikaFont.bold.font(size: 16))
+                            .overlay(RoundedRectangle(cornerRadius: 10)
+                                .stroke(AppColor.red, lineWidth: 1))
+                        }
                         Spacer()
                     }
                     .padding(.all,16)
                     .navigationBarBackButtonHidden(true)
-                    .navigationDestination(isPresented: $showJoinRide, destination: {
+                    .navigationDestination(isPresented:$deleteRide,  destination: {
                         UpcomingRideView(navigationDone: true)
-                    })
-                    .navigationDestination(isPresented:$startRide,  destination: {
-                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])
                     })
                     .onAppear {
                         Task {

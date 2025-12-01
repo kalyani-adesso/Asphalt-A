@@ -20,6 +20,7 @@ struct ConnectedRideMapView: View {
     @State var showJoinRideView:Bool = false
     @State var showMapViewFullScreen:Bool = false
     @State var showMessagePopup:Bool = false
+    @State var showMessageNotification: Bool = false
     @State private var position: MapCameraPosition = .automatic
     @State private var elapsedSeconds = 0
     @State private var selectedRiderName: String = ""
@@ -32,12 +33,12 @@ struct ConnectedRideMapView: View {
         
         ZStack{
             if showMessagePopup{
-                MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup)
+                MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup, showMessageNotification: $showMessageNotification, riderName: $selectedRiderName)
                     .transition(.scale)
                     .zIndex(1)
             }
-            AppToolBar{
-                VStack {
+            AppToolBar {
+                VStack(spacing: 0) {
                     HStack {
                         HStack {
                             VStack(alignment: .leading, spacing: 5) {
@@ -97,6 +98,14 @@ struct ConnectedRideMapView: View {
                         }
                     }
                     .padding(EdgeInsets(top: 25, leading: 16, bottom: 20, trailing: 16))
+                    if showMessageNotification {
+                        showToast(title: "Message sent to \(selectedRiderName)")
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    if viewModel.showRecieveMessagePopup {
+                        showToast(title: "New Message from \(viewModel.latestIncomingSenderName)")
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                     List {
                         Section {
                             VStack {
@@ -178,6 +187,7 @@ struct ConnectedRideMapView: View {
                                     ForEach(viewModel.groupRiders.indices, id: \.self) { index in
                                         let rider = viewModel.groupRiders[index]
                                         GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                            selectedRiderName = viewModel.groupRiders[index].name
                                             viewModel.messageIndex = val
                                         })
                                     }
@@ -251,36 +261,53 @@ struct ConnectedRideMapView: View {
                         .navigationDestination(isPresented: $rideComplted, destination: {
                             ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel, rideCompleteModel: viewModel.rideCompleteModel)
                         })
-                    
+                        .onAppear() {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                showToast = false
+                            }
+                            if !rideModel.rideJoined {
+                                viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            } else {
+                                startOngoingRideTimer()
+                            }
+                            viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                                self.elapsedSeconds += 1
+                            }
+                        }
+                        .onChange(of: showMessageNotification) { isShowing in
+                            if isShowing {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        showMessageNotification = false
+                                    }
+                                }
+                            }
+                        }
+                        .onChange(of: viewModel.showRecieveMessagePopup) { isShowingMessage in
+                            if isShowingMessage {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        viewModel.showRecieveMessagePopup = false
+                                    }
+                                }
+                            }
+                        }
+                        .task {
+                            await viewModel.receiveMessage(rideId: rideModel.rideId)
+                        }
+                        .onChange(of: viewModel.ongoingRideId) { ride in
+                            if !ride.isEmpty {
+                                startOngoingRideTimer()
+                            }
+                        }
+                        .navigationDestination(isPresented: $showJoinRideView, destination: {
+                            JoinRideView()
+                        })
                 }
-                .onAppear() {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        showToast = false
-                    }
-                    if !rideModel.rideJoined {
-                        viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                    } else {
-                        startOngoingRideTimer()
-                    }
-                    viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                    timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                        self.elapsedSeconds += 1
-                    }
-                    
-                }
-                .task {
-                    await viewModel.receiveMessage(rideId: rideModel.rideId)
-                }
-                .onChange(of: viewModel.ongoingRideId) { ride in
-                    if !ride.isEmpty {
-                        startOngoingRideTimer()
-                    }
-                }
-                .navigationDestination(isPresented: $showJoinRideView, destination: {
-                    JoinRideView()
-                })
             }
         }
+        .animation(.easeInOut, value: showMessageNotification)
     }
     
     func startOngoingRideTimer() {

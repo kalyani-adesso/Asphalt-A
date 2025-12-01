@@ -293,6 +293,7 @@ struct SegmentButtonView: View {
 
 struct UpComingView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
+    @ObservedObject var connectedViewModel = ConnectedRideViewModel()
     @Binding var ride:RideModel
     @State private var showUploadPopup = false
     @State private var showSelectedPopup = false
@@ -300,7 +301,7 @@ struct UpComingView: View {
     @State private var openGallery = false
     @State private var showRideDetails: Bool = false
     var onAddPhotos: ((String) -> Void)? = nil
-    
+    @State private var userRating: Int = 0
     var body: some View {
         ZStack{
             VStack(alignment: .leading, spacing: 22) {
@@ -333,57 +334,57 @@ struct UpComingView: View {
                 }
                 if ride.rideAction == .upcoming{
                     VStack(alignment: .leading, spacing: 10){
-                    VStack (alignment: .leading, spacing: 5){
-                        HStack{
-                            HStack(spacing: 5) {
-                                AppIcon.UpcomingRide.calender
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                Text("Start: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
-                                    .font(KlavikaFont.medium.font(size: 14))
-                                    .foregroundStyle(AppColor.oldBurgundy)
+                        VStack (alignment: .leading, spacing: 5){
+                            HStack{
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text("Start: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.YourRides.time
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text(ride.startTime ?? "")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
                             }
-                            Spacer()
-                            HStack(spacing: 5) {
-                                AppIcon.YourRides.time
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                Text(ride.startTime ?? "")
-                                    .font(KlavikaFont.medium.font(size: 14))
-                                    .foregroundStyle(AppColor.oldBurgundy)
+                            HStack{
+                                HStack(spacing: 5) {
+                                    AppIcon.UpcomingRide.calender
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text("End: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.last?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
+                                Spacer()
+                                HStack(spacing: 5) {
+                                    AppIcon.YourRides.time
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    Text(ride.endTime ?? "")
+                                        .font(KlavikaFont.medium.font(size: 14))
+                                        .foregroundStyle(AppColor.oldBurgundy)
+                                }
                             }
                         }
-                        HStack{
-                            HStack(spacing: 5) {
-                                AppIcon.UpcomingRide.calender
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                Text("End: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.last?.trimmingCharacters(in: .whitespaces) ?? "")")
-                                    .font(KlavikaFont.medium.font(size: 14))
-                                    .foregroundStyle(AppColor.oldBurgundy)
-                            }
-                            Spacer()
-                            HStack(spacing: 5) {
-                                AppIcon.YourRides.time
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                Text(ride.endTime ?? "")
-                                    .font(KlavikaFont.medium.font(size: 14))
-                                    .foregroundStyle(AppColor.oldBurgundy)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 10)
+                        .padding(.horizontal, 10)
                         Spacer()
-                    HStack(spacing: 5) {
-                        AppIcon.UpcomingRide.group
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text("\(ride.riderCount) rides")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
                     }
-                }
                 }
                 else if ride.rideAction == .history{
                     HStack{
@@ -450,7 +451,7 @@ struct UpComingView: View {
                         }
                         
                         Button(action: {
-                            self.showRideDetails = false
+                            
                         }) {
                             HStack(spacing: 10){
                                 AppIcon.YourRides.share
@@ -522,12 +523,22 @@ struct UpComingView: View {
                                         .stroke(AppColor.celticBlue, lineWidth: 1))
                                 }
                             }
-                            HStack{
-                                Text("Your Rating: ")
+                            HStack {
+                                Text("Your Rating:")
                                     .font(KlavikaFont.regular.font(size: 16))
                                     .foregroundStyle(AppColor.oldBurgundy)
+
                                 ForEach(1...5, id: \.self) { index in
-                                    AppIcon.YourRides.rating
+                                    let filled = index <= userRating
+                                    let icon = filled ? AppIcon.YourRides.ratingFilled : AppIcon.YourRides.rating
+
+                                    icon
+                                        .onTapGesture {
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                userRating = index
+                                            }
+                                            connectedViewModel.updateRating(stars: userRating, rideId: ride.id)
+                                        }
                                 }
                             }
                         }
@@ -568,6 +579,9 @@ struct UpComingView: View {
             .navigationDestination(isPresented: $showRideDetails, destination: {
                 RideDetailsView(viewModel: viewModel, ride: $ride)
             })
+            .onAppear {
+                userRating = ride.ratings ?? 0
+            }
             .contentShape(Rectangle())
             .refreshable {
                 await viewModel.getSingleRide(rideId: ride.id)

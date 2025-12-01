@@ -176,6 +176,7 @@ struct AppIcon {
         static let time = Image("time")
         static let view = Image("view")
         static let rating = Image("rating")
+        static let ratingFilled = Image("rating-filled")
        
     }
 }
