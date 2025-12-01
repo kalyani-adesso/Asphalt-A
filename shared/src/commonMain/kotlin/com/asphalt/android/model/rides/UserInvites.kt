@@ -23,7 +23,9 @@ data class RideInvitesDomain(
     val startLocation: String,
     val destination: String,
     val startDateTime: Long?,
-    val acceptedParticipants: List<String>
+    val acceptedParticipants: List<String>,
+    val isOrganiser:Boolean,
+    val rideTitle:String
 )
 
 @Serializable

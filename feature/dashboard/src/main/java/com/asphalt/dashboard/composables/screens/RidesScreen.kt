@@ -109,7 +109,7 @@ fun RidesScreen(
                     ), contentPadding = PaddingValues(bottom = Dimensions.size30)
             ) {
                 item {
-                    Spacer(Modifier.height(Dimensions.size30))
+//                    Spacer(Modifier.height(Dimensions.size30))
                     ButtonTabs(ridesScreenViewModel)
                     Spacer(Modifier.height(Dimensions.padding16))
                 }

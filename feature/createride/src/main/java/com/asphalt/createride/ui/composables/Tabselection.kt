@@ -34,7 +34,7 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun TabSelection(viewModel: CreateRideScreenViewModel) {
-    Spacer(Modifier.height(Dimensions.size30))
+//    Spacer(Modifier.height(Dimensions.size30))
     Row(
         modifier = Modifier
             .fillMaxWidth()

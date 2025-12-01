@@ -69,7 +69,7 @@ fun CategorySelector(
         },
         buttonRadius = Dimensions.size10,
         startColor = if (isSelected) PrimaryDarkerLightB75 else NeutralWhite,
-        endColor = if (isSelected) PrimaryDarkerLightB50 else NeutralWhite,
+        endColor = if (isSelected) PrimaryDarkerLightB75 else NeutralWhite,
     ) {
         ComposeUtils.SectionTitle(
             categoryName,
