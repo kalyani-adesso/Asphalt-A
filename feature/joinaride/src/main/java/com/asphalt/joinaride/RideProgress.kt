@@ -56,11 +56,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RideProgress(
-    rideId: String,
-    rideJoinedId: String,
     androidUserVM: AndroidUserVM = koinViewModel(),
     viewmodel: JoinRideViewModel = koinViewModel(),
     onClickEndRide :() -> Unit,
+    ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
 
@@ -223,10 +222,10 @@ fun RideProgress(
             // end ride button
             RedButton(
                 onClick = {
-                    viewmodel.updateRideStatus(userId = rideId, rideId = rideJoinedId,
+                    viewmodel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
                         status = END_RIDE)
+                    viewmodel.endRide(rideId=ridesData.createdBy ?: "", rideJoinedId = ridesData.ridesID ?: "")
                     onClickEndRide.invoke()
-                    viewmodel.endRide(rideId=rideId, rideJoinedId = rideJoinedId)
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)

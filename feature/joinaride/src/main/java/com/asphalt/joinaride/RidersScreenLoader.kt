@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.AppLoader
 import com.asphalt.commonui.BannerType
@@ -31,6 +33,7 @@ fun RidersScreenLoader(
     setTopAppBarState: (AppBarState) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToMapScreen : () -> Unit,
+    ridesData: RidesData,
     rideViewModel: JoinRideViewModel = koinViewModel()
 ) {
 
@@ -39,9 +42,16 @@ fun RidersScreenLoader(
     val loadingDesc = "Initializing navigation and group cordination"
     val logoRes = R.drawable.ic_app_icon
 
-    var showBanner by remember {  mutableStateOf(false) }
+    val rideId = rideViewModel.getRideId()
 
-    //JoinRides(ridersList = ridersList, rideViewModel = rideViewModel)
+//    if (rideId != null) {
+//        val details = rideViewModel.joinRide(connectedRideRoot)
+//        Log.d("TAG", "RidersScreenLoader: $details")
+//    }
+
+    Log.d("TAG", "RidersScreenLoader: rideId $rideId ")
+
+    var showBanner by remember {  mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -80,20 +90,4 @@ fun RidersScreenLoader(
             )
         }
     }
-}
-
-@Composable
-fun JoinRides(ridersList: ConnectedRideRoot,
-                rideViewModel: JoinRideViewModel) {
-
-    val request = ConnectedRideRoot(
-        rideID = ridersList.rideID,
-        currentLat = ridersList.currentLat,
-        currentLong = ridersList.currentLong,
-        dateTime = ridersList.dateTime,
-        isRejoined = ridersList.isRejoined,
-        status = ridersList.status
-    )
-    rideViewModel.joinRide(joinRide = request)
-
 }

@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
+import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -69,6 +71,7 @@ fun JoinRideMainListScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     navigateToConnectedRide:() -> Unit,
+    ridesData: RidesData,
     navigateToEndRide : () -> Unit)
 {
     var toolbarTitle by remember { mutableStateOf("") }
@@ -83,7 +86,8 @@ fun JoinRideMainListScreen(
             )) {
             JoinRide(viewModel,
                 navigateToConnectedRide = {navigateToConnectedRide.invoke()},
-                navigateToEndRide = { navigateToEndRide.invoke()})
+                navigateToEndRide = { navigateToEndRide.invoke()},
+                ridesData)
         }
 }
 @Composable
@@ -91,6 +95,8 @@ fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: () -> Unit,
     navigateToEndRide: () -> Unit,
+    ridesData: RidesData,
+
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
@@ -146,10 +152,12 @@ fun RiderCard(
     navigateToConnectedRide: () -> Unit,
     navigateToEndRide: () -> Unit,
     ridersList : RidesData,
-    viewModel: JoinRideViewModel
-) {
+    viewModel: JoinRideViewModel) {
     viewModel.setCreatedBy(ride = ridersList)
     val createdBy by viewModel.createdBy.collectAsState()
+
+    var currentRideId by remember { mutableStateOf("") }
+    Log.d("TAG", "RiderCard: $currentRideId")
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -254,7 +262,7 @@ fun RiderCard(
                         val distance = ridersList.rideDistance
                         val smallDistance = String.format("%.2f", distance)
                         Text(
-                            text = smallDistance ?: "",
+                            text = (smallDistance ?: "") + "km",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12,
                             maxLines = 2
@@ -338,14 +346,16 @@ fun RiderCard(
                     // join/ rejoin ride button
                     if (ridersList.rideStatus == RIDE_JOINED) {
                         ElevatedButton (
-                            modifier = Modifier.weight(weight = 1f)
+                            modifier = Modifier
+                                .weight(weight = 1f)
                                 .height(height = Dimensions.size50),
                             shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
                             colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
                             onClick = {
-//
+//                                  rejoin api
 //                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
 //                                    status = RIDE_JOINED)
+
                                 navigateToConnectedRide.invoke()
                             },
                             contentPadding = PaddingValues(all = Dimensions.size0)
@@ -375,10 +385,15 @@ fun RiderCard(
                         GradientButton(
                             modifier = Modifier.weight(1f),
                             onClick = {
-                                ridersList.ridesID
+                                viewModel.setRideId(ridersList.ridesID ?: "")
+
                                 // if user trying to join another ride previous will end then new ride join logic pending
-                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
+                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "",
+                                    rideId = ridersList.ridesID ?: "",
                                     status = RIDE_JOINED) // status 3
+                                // post join ride
+                                viewModel.joinRide(joinRide = ridersList)
+
                                 navigateToConnectedRide.invoke()
                             },
                             buttonHeight = Dimensions.size50,

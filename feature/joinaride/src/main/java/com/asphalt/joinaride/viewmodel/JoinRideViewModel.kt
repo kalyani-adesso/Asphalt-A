@@ -15,6 +15,7 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.joinride.JoinRideRepository
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.joinaride.repository.IdRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 class JoinRideViewModel(
-    private val repository: JoinRideRepository
+    private val repository: JoinRideRepository,
+    private val idRepository: IdRepository
 ) : ViewModel(), KoinComponent {
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
     val ridesRepo: RidesRepository by inject()
@@ -38,9 +40,22 @@ class JoinRideViewModel(
     val searchQuery = _searchQuery.asStateFlow()
     val userRepoImpl: UserRepoImpl by inject()
 
+    private val _rideId = MutableStateFlow("")
+    val rideId = _rideId.asStateFlow()
+
+    fun setRideId(selectedId: String) {
+        _rideId.value = selectedId
+        idRepository.id = selectedId
+    }
+
+    fun getRideId() : String? = idRepository.id
+
     // join ride
     private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideDTO>?>(null)
     val joinRideResult: StateFlow<APIResult<ConnectedRideDTO>?> = _joinRideResult
+
+    private val _rideDetails = MutableStateFlow<ConnectedRideRoot?>(null)
+    val rideDetails : StateFlow<ConnectedRideRoot?> = _rideDetails
 
     private val currentUid = androidUserVM.userState.value?.uid
     private val _createdBy = MutableStateFlow("")
@@ -90,7 +105,6 @@ class JoinRideViewModel(
     fun getAllRiders() {
         viewModelScope.launch {
             var user = userRepoImpl.getUserDetails()
-
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
             }
@@ -122,32 +136,62 @@ class JoinRideViewModel(
             if (userId == currentUid) {
 
                 val result =
-                    ridesRepo.updateOrganizerStatus(rideId = rideId, rideStatus = RIDE_JOINED)
+                    ridesRepo.updateOrganizerStatus(rideId = rideId, rideStatus = status)
                 Log.d("TAG", "updateOrganizerStatus:$result")
             } else {
                 // participants status
-                val result = ridesRepo.changeRideInviteStatus(
+                val rideResult = ridesRepo.changeRideInviteStatus(
                     rideID = rideId,
                     currentUid = currentUid!!, inviteStatus = status
                 )
-                Log.d("TAG", "changeRideInviteStatus:$result")
+                Log.d("TAG", "changeRideInviteStatus:$rideResult")
             }
         }
     }
 
-    fun joinRide(joinRide: ConnectedRideRoot) {
+    fun joinRide(joinRide: RidesData) {
+
         viewModelScope.launch {
-            val result = ridesRepo.joinRide(joinRide = joinRide)
-            _joinRideResult.value = result
+
+            val request = ConnectedRideRoot(
+                rideID = joinRide.ridesID,
+                currentLat = joinRide.startLatitude,
+                currentLong = joinRide.startLongitude,
+                dateTime = joinRide.startDate,
+                isRejoined = false,
+                status = "connected",
+                userID = currentUid
+                // current lat, curret long, datetime
+            )
+
+            val result = ridesRepo.joinRide(joinRide = request)
+            //_joinRideResult.value = result
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
 
-    fun reJoinRide(reJoinRide: ConnectedRideRoot) {
+    fun reJoinRide(joinRide: RidesData) {
         viewModelScope.launch {
-            val res = ridesRepo.reJoinRide(rejoinRide = reJoinRide, ongoingRideId = reJoinRide.rideJoinedID ?: "")
-            Log.d("TAG", "JoinRideClick: $res")
 
+            val request = ConnectedRideRoot(
+                rideID = joinRide.ridesID,
+                currentLat = joinRide.startLatitude,
+                currentLong = joinRide.startLongitude,
+                dateTime = joinRide.startDate,
+                isRejoined = true,
+                status = "connected"
+                // current lat, curret long, datetime
+            )
+           // val res = ridesRepo.reJoinRide(rejoinRide = reJoinRide, ongoingRideId = reJoinRide.rideJoinedID ?: "")
+          //  Log.d("TAG", "JoinRideClick: $res")
+
+        }
+    }
+
+    fun getOnGoingRides(rideId:String) {
+        viewModelScope.launch {
+            val rideDetails = ridesRepo.getOngoingRides(rideId)
+            Log.d("TAG", "getJoinRides: $rideDetails")
         }
     }
 

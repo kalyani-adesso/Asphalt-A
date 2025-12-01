@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
@@ -48,11 +50,21 @@ fun ConnectedRideMapScreen(
     viewModel: RidersGroupViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
     onClick : () -> Unit,
-    locationProvider: LocationProvider
+    locationProvider: LocationProvider,
+    ridesData: RidesData,
+    rideViewModel: JoinRideViewModel = koinViewModel()
     ) {
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
+
+    val rideId = rideViewModel.getRideId()
+    Log.d("TAG", "ConnectedRideMapScreen: $rideId")
+
+    if (rideId != null) {
+        val details = rideViewModel.getOnGoingRides(rideId ?: "")
+        Log.d("TAG", "ConnectedRideMapScreen details: $details")
+    }
 
     setTopAppBarState(
         AppBarState(
@@ -128,27 +140,22 @@ fun ConnectedRideMapScreen(
             })
     )
 
-   // getJoinRide(ridersList = joinRide,rideViewModel)
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-
         ComposeUtils.DefaultColumnRoot(
             topPadding = Dimensions.padding,
             bottomPadding = Dimensions.padding,
             isScrollable = true
         ) {
-
             Column(
                 modifier = Modifier.height(400.dp)
             ) {
                 CurrentLocationMapScreen(locationProvider=locationProvider)
-
             }
             RideProgress(androidUserVM = androidUserVM,
-                onClickEndRide = onClick, rideId =  "",
-                rideJoinedId =  "")
+                onClickEndRide = onClick,
+                ridesData = ridesData)
             RidersGroupStatus(viewModel)
             EmergecyActions()
 
@@ -171,22 +178,6 @@ fun ConnectedRideMapScreen(
             }
         }
     }
-}
-
-@Composable
-fun getJoinRide(ridersList: ConnectedRideRoot,
-                rideViewModel: JoinRideViewModel) {
-
-    val request = ConnectedRideRoot(
-        rideID = ridersList.rideID,
-        currentLat = ridersList.currentLat,
-        currentLong = ridersList.currentLong,
-        dateTime = ridersList.dateTime,
-        isRejoined = ridersList.isRejoined,
-        status = ridersList.status
-    )
-    rideViewModel.joinRide(joinRide = request)
-
 }
 
 @Preview(showBackground = true)
