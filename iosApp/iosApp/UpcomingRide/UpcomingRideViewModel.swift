@@ -114,7 +114,6 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
-                if startDate.addingTimeInterval(60) < now { continue }
                
                 guard let EndEpoch = ride.endDate else { continue }
                 
@@ -222,7 +221,7 @@ class UpcomingRideViewModel: ObservableObject {
             
             upcoming.sort { $0.startDate < $1.startDate }
             upcomingRides = upcoming
-            history.sort { $0.startDate > $1.startDate }
+//            history.sort { $0.startDate > $1.startDate }
             historyRides = history
             invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites

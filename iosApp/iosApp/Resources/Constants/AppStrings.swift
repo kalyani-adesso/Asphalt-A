@@ -335,6 +335,7 @@ public struct AppStrings{
         static let home = "Home"
         static let homeSubtitle = "Your riding dashboard"
         static let profile = "Profile"
+        static let message = "Messages"
         static let profileSubtitle = "Manage your info"
         static let rideHistory = "Your ride history"
         static let planAdventure = "Plan new adventure"

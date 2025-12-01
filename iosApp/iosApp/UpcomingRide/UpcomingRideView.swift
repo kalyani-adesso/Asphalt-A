@@ -10,7 +10,7 @@ import SwiftUI
 struct UpcomingRideView: View {
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     var currentSelected: RideAction { viewModel.selectedTab }
-    var startingTab: RideAction = .upcoming 
+    var startingTab: RideAction = .upcoming
     @State private var showHomeView:Bool = false
     @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
@@ -27,195 +27,195 @@ struct UpcomingRideView: View {
     @State private var selectedRideId: String? = nil
     @State private var showNotification = false
     @State private var showSlideBar = false
-
+    
     var body: some View {
-            ZStack{
-                VStack {
-                    ReusableHeader {
-                        Text("Your Rides")
-                            .font(KlavikaFont.bold.font(size: 22))
-                            .foregroundColor(AppColor.black)
-                    } trailing: {
-                        EmptyView()
-                    }
-                    
-                    HStack(spacing: 12) {
-                        let rideStatuses = viewModel.rideStatus
-                        
-                        ForEach(rideStatuses, id: \.self) { status in
-                            let isSelected = viewModel.selectedTab == status
-                            let showDot = status == .invities && hasPendingInvites
-                            SegmentButtonView(
-                                rideStatus: status.rawValue,
-                                isSelected: isSelected,
-                                showNotificationDot: showDot
-                            ) {
-                                withAnimation {
-                                    viewModel.selectedTab = status
-                                }
-                            }
-                        }
-                    }
-                    
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .padding([.leading, .trailing])
-                    .contentShape(Rectangle())
-                    VStack {
-                        List {
-                            let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
-                            
-                            if filtered.isEmpty {
-                                Text("No rides found")
-                                    .font(KlavikaFont.bold.font(size: 16))
-                                    .foregroundColor(AppColor.stoneGray)
-                            }
-                            else{
-                                
-                                ForEach($viewModel.rides.indices.filter { index in
-                                    viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
-                                }, id: \.self) { index in
-                                    UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
-                                        selectedRideId = rideId
-                                        selectedImages = []
-                                        withAnimation(.easeInOut) { activePopup = .uploadOptions }
-                                    }
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                                }
-                            }
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
-                    }
-                }
-                .onAppear {
-                    viewModel.selectedTab = .upcoming
-                    if showpopup {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            withAnimation(.easeInOut) {
-                                showpopup = false
-                            }
-                        }
-                    }
-                }
-                .navigationBarBackButtonHidden(true)
-                .navigationDestination(isPresented: $showHome, destination: {
-                    BottomNavBar()
-                })
-                .onAppear {
-                    viewModel.selectedTab = startingTab
+        ZStack{
+            VStack {
+                ReusableHeader {
+                    Text("Your Rides")
+                        .font(KlavikaFont.bold.font(size: 22))
+                        .foregroundColor(AppColor.black)
+                } trailing: {
+                    EmptyView()
                 }
                 
-                // Popup overlay (always stays above)
-                if showpopup {
-                    // Dimmed background
-                    AppColor.backgroundLight.opacity(0.7)
-                        .ignoresSafeArea()
-                        .zIndex(1)
-                        .onTapGesture {
+                HStack(spacing: 12) {
+                    let rideStatuses = viewModel.rideStatus
+                    
+                    ForEach(rideStatuses, id: \.self) { status in
+                        let isSelected = viewModel.selectedTab == status
+                        let showDot = status == .invities && hasPendingInvites
+                        SegmentButtonView(
+                            rideStatus: status.rawValue,
+                            isSelected: isSelected,
+                            showNotificationDot: showDot
+                        ) {
                             withAnimation {
-                                showpopup = false
+                                viewModel.selectedTab = status
                             }
                         }
-                    
-                    // Popup content
-                    VStack {
-                        Snackbar(
-                            message: "Ride Created Successfully",
-                            subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: AppColor.lightGreen,
-                            foregroundColor: .spanishGreen
+                    }
+                }
+                
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(AppColor.listGray)
+                )
+                .padding([.leading, .trailing])
+                .contentShape(Rectangle())
+                VStack {
+                    List {
+                        let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
+                        
+                        if filtered.isEmpty {
+                            Text("No rides found")
+                                .font(KlavikaFont.bold.font(size: 16))
+                                .foregroundColor(AppColor.stoneGray)
+                        }
+                        else{
                             
-                        )
-                        Spacer()
-                    }
-                    .frame(width: 390, height: 620)
-                    .transition(.scale)
-                    .zIndex(2)
-                }
-                
-                if viewModel.isRideLoading {
-                    ProgressViewReusable(title: "Loading Rides...")
-                }
-                
-        }
-            .overlay {
-                if activePopup != nil {
-                    RidePopupView(
-                        activePopup: $activePopup,
-                        openGallery: $openGallery,
-                        selectedImages: $selectedImages,
-                        onUpload: {
-                            handleUpload()
+                            ForEach($viewModel.rides.indices.filter { index in
+                                viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
+                            }, id: \.self) { index in
+                                UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
+                                    selectedRideId = rideId
+                                    selectedImages = []
+                                    withAnimation(.easeInOut) { activePopup = .uploadOptions }
+                                }
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                            }
                         }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .onAppear {
+                viewModel.selectedTab = .upcoming
+                if showpopup {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation(.easeInOut) {
+                            showpopup = false
+                        }
+                    }
+                }
+            }
+            .navigationBarBackButtonHidden(true)
+            .navigationDestination(isPresented: $showHome, destination: {
+                BottomNavBar()
+            })
+            .onAppear {
+                viewModel.selectedTab = startingTab
+            }
+            
+            // Popup overlay (always stays above)
+            if showpopup {
+                // Dimmed background
+                AppColor.backgroundLight.opacity(0.7)
+                    .ignoresSafeArea()
+                    .zIndex(1)
+                    .onTapGesture {
+                        withAnimation {
+                            showpopup = false
+                        }
+                    }
+                
+                // Popup content
+                VStack {
+                    Snackbar(
+                        message: "Ride Created Successfully",
+                        subMessage: "Your ride has been created and is now live for other riders to join.", icon:  AppIcon.ConnectedRide.checkmark,background: AppColor.lightGreen,
+                        foregroundColor: .spanishGreen
+                        
                     )
-                    .transition(.opacity.combined(with: .scale))
-                    .zIndex(10)
+                    Spacer()
                 }
+                .frame(width: 390, height: 620)
+                .transition(.scale)
+                .zIndex(2)
             }
-            .sheet(isPresented: $openGallery, onDismiss: {
-                if !selectedImages.isEmpty {
-                    withAnimation { activePopup = .previewSelected }
-                }
-            }) {
-                PhotoPicker(images: $selectedImages)
+            
+            if viewModel.isRideLoading {
+                ProgressViewReusable(title: "Loading Rides...")
             }
-            .zIndex(showpopup ? 2 : 0)
-            .task{
-                await viewModel.fetchAllRides()
-                await viewModel.fetchAllUsers()
-            }
-            .refreshable {
-                await viewModel.fetchAllRides()
-                await viewModel.fetchAllUsers()
-            }
-            .toolbar {
-                if navigationDone{
-                    ToolbarItemGroup(placement: .navigationBarLeading) {
-                        Button {
-                            if showBack{
-                                dismiss()
-                            }
-                            showHome = true
-                        } label: {
-                            AppIcon.CreateRide.backButton
-                        }
-                        
-                    }
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        Button {
-                            showNotification = true
-                        } label: {
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: "bell")
-                                    .font(.system(size: 15))
-                                    .foregroundColor(AppColor.celticBlue)
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 8, height: 8)
-                                    .offset(x: -2, y: 1)
-                            }
-                        }
-                        
-                        Button {
-                            showSlideBar = true
-                        } label: {
-                            AppIcon.Home.navigation
-                        }
-                    }
-                }
-            }
-            .navigationDestination(isPresented: $showSlideBar, destination: {
-                NavigationSlideBar()
-            })
-            .navigationDestination(isPresented: $showNotification, destination: {
-                NotificationView()
-            })
+            
         }
+        .overlay {
+            if activePopup != nil {
+                RidePopupView(
+                    activePopup: $activePopup,
+                    openGallery: $openGallery,
+                    selectedImages: $selectedImages,
+                    onUpload: {
+                        handleUpload()
+                    }
+                )
+                .transition(.opacity.combined(with: .scale))
+                .zIndex(10)
+            }
+        }
+        .sheet(isPresented: $openGallery, onDismiss: {
+            if !selectedImages.isEmpty {
+                withAnimation { activePopup = .previewSelected }
+            }
+        }) {
+            PhotoPicker(images: $selectedImages)
+        }
+        .zIndex(showpopup ? 2 : 0)
+        .task{
+            await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+        }
+        .refreshable {
+            await viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+        }
+        .toolbar {
+            if navigationDone{
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button {
+                        if showBack{
+                            dismiss()
+                        }
+                        showHome = true
+                    } label: {
+                        AppIcon.CreateRide.backButton
+                    }
+                    
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        showNotification = true
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell")
+                                .font(.system(size: 15))
+                                .foregroundColor(AppColor.celticBlue)
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                                .offset(x: -2, y: 1)
+                        }
+                    }
+                    
+                    Button {
+                        showSlideBar = true
+                    } label: {
+                        AppIcon.Home.navigation
+                    }
+                }
+            }
+        }
+        .navigationDestination(isPresented: $showSlideBar, destination: {
+            NavigationSlideBar()
+        })
+        .navigationDestination(isPresented: $showNotification, destination: {
+            NotificationView()
+        })
+    }
     
     private func handleUpload() {
         guard let rideId = selectedRideId else { return }
@@ -332,7 +332,8 @@ struct UpComingView: View {
                     }
                 }
                 if ride.rideAction == .upcoming{
-                    VStack (alignment: .leading, spacing: 10){
+                    VStack(alignment: .leading, spacing: 10){
+                    VStack (alignment: .leading, spacing: 5){
                         HStack{
                             HStack(spacing: 5) {
                                 AppIcon.UpcomingRide.calender
@@ -372,37 +373,61 @@ struct UpComingView: View {
                             }
                         }
                     }
+                    .padding(.horizontal, 10)
+                        Spacer()
+                    HStack(spacing: 5) {
+                        AppIcon.UpcomingRide.group
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                        Text("\(ride.riderCount) rides")
+                            .font(KlavikaFont.regular.font(size: 16))
+                            .foregroundStyle(AppColor.richBlack)
+                    }
+                }
                 }
                 else if ride.rideAction == .history{
-                    HStack(spacing: 5) {
-                        AppIcon.UpcomingRide.calender
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                        Text(ride.date)
-                            .font(KlavikaFont.medium.font(size: 14))
-                            .foregroundStyle(AppColor.oldBurgundy)
+                    HStack{
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.calender
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                            Text("\(ride.date) ")
+                                .font(KlavikaFont.medium.font(size: 14))
+                                .foregroundStyle(AppColor.oldBurgundy)
+                        }
+                        Spacer()
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
                     }
                 }
                 else{
-                    HStack(spacing: 5) {
-                        AppIcon.UpcomingRide.calender
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                        Text("\(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
-                            .font(KlavikaFont.medium.font(size: 14))
-                            .foregroundStyle(AppColor.oldBurgundy)
+                    HStack{
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.calender
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                            Text("\(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "") - \(ride.startTime ?? "")")
+                                .font(KlavikaFont.medium.font(size: 14))
+                                .foregroundStyle(AppColor.oldBurgundy)
+                        }
+                        Spacer()
+                        HStack(spacing: 5) {
+                            AppIcon.UpcomingRide.group
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                            Text("\(ride.riderCount) rides")
+                                .font(KlavikaFont.regular.font(size: 16))
+                                .foregroundStyle(AppColor.richBlack)
+                        }
+                        
                     }
                 }
-                
-                HStack(spacing: 5) {
-                    AppIcon.UpcomingRide.group
-                        .resizable()
-                        .frame(width: 16, height: 16)
-                    Text("\(ride.riderCount) rides")
-                        .font(KlavikaFont.regular.font(size: 16))
-                        .foregroundStyle(AppColor.richBlack)
-                }
-                
                 HStack(spacing: 15) {
                     switch ride.rideAction {
                     case .upcoming:
@@ -420,12 +445,12 @@ struct UpComingView: View {
                             .foregroundColor(AppColor.celticBlue)
                             .font(KlavikaFont.bold.font(size: 14))
                             .overlay(RoundedRectangle(cornerRadius: 10)
-                                        .stroke(AppColor.celticBlue, lineWidth: 1))
-                           
-                        }
-
-                        Button(action: {
+                                .stroke(AppColor.celticBlue, lineWidth: 1))
                             
+                        }
+                        
+                        Button(action: {
+                            self.showRideDetails = false
                         }) {
                             HStack(spacing: 10){
                                 AppIcon.YourRides.share
@@ -437,7 +462,7 @@ struct UpComingView: View {
                             .foregroundColor(AppColor.celticBlue)
                             .font(KlavikaFont.bold.font(size: 14))
                             .overlay(RoundedRectangle(cornerRadius: 10)
-                                        .stroke(AppColor.celticBlue, lineWidth: 1))
+                                .stroke(AppColor.celticBlue, lineWidth: 1))
                         }
                     case .history:
                         VStack(alignment: .leading, spacing: 20){
@@ -503,7 +528,7 @@ struct UpComingView: View {
                                     .foregroundStyle(AppColor.oldBurgundy)
                                 ForEach(1...5, id: \.self) { index in
                                     AppIcon.YourRides.rating
-                                    }
+                                }
                             }
                         }
                     case .invities:
@@ -518,7 +543,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
-
+                        
                         Button(action: {
                             Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false) }
                         }) {
@@ -533,7 +558,7 @@ struct UpComingView: View {
                     }
                 }
                 .padding(.bottom, 20)
-
+                
             }
             .padding([.leading,.trailing,.top],16)
             .background(

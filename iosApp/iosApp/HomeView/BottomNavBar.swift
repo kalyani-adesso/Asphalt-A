@@ -34,6 +34,7 @@ struct BottomNavBar: View {
                         QueriesView()
                     case 3:
                         ProfileScreen()
+                            .environmentObject(homeViewModel)
                     default:
                         HomeView()
                             .environmentObject(homeViewModel)
