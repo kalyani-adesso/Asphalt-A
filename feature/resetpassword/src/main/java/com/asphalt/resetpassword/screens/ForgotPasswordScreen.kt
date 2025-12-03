@@ -211,7 +211,7 @@ fun ForgotPasswordScreen(
                     }
                     if (viewModel.isShowError.value) {
                         Text(
-                            text = stringResource(R.string.enter_valid_password),
+                            text = stringResource(R.string.enter_valid_email),
                             Modifier.padding(top = Dimensions.size4),
                             style = Typography.bodySmall,
                             color = NeutralRed
