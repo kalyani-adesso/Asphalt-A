@@ -752,7 +752,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 .then(
                     if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
                         Modifier.background(
-                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                             shape = RoundedCornerShape(Dimensions.size10)
                         )
                     } else {
@@ -786,7 +786,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 .then(
                     if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.HISTORY_RIDES) {
                         Modifier.background(
-                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                             shape = RoundedCornerShape(Dimensions.size10)
                         )
                     } else {
@@ -823,7 +823,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                     .then(
                         if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
                             Modifier.background(
-                                brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB50),
+                                brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                                 shape = RoundedCornerShape(Dimensions.size10)
                             )
                         } else {
