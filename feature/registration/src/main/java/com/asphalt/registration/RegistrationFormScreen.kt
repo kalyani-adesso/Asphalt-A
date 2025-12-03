@@ -409,7 +409,8 @@ fun RegistrationForm(
 
         GradientButton(
             startColor = PrimaryBrighterLightW75,
-            endColor = PrimaryDarkerLightB50,
+            endColor = PrimaryBrighterLightW75,
+            buttonHeight = Dimensions.size50,
             onClick = {
                 viewModel.onEvent(SignUpUiEvent.Submit)
             }
