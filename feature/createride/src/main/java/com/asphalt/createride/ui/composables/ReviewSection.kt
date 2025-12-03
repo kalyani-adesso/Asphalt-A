@@ -151,9 +151,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = (viewModel.rideDetailsState.value.dateString ?: "") +" - "+
-                            viewModel.rideDetailsState.value.displayTime +" - "+
-                                    (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
-                                    viewModel.rideDetailsState.value.endDisplayTime,
+                            viewModel.rideDetailsState.value.displayTime,
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey
                         )
@@ -161,7 +159,9 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
 
                 }
 
-
+              /*  +" - "+
+                        (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
+                        viewModel.rideDetailsState.value.endDisplayTime,*/
             }
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
