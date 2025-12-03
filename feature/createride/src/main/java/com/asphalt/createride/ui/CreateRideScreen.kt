@@ -34,6 +34,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryDeepBlue
+import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
@@ -62,10 +63,10 @@ fun CreateRideScreen(
             title = stringResource(R.string.create_a_ride),
             actions = {
                 Text(
-                    text = "${viewModel.tabSelectState.value}/5",
-                    style = TypographyMedium.bodyMedium
+                    text = "Step ${viewModel.tabSelectState.value}/5",
+                    style = Typography.bodyMedium
                 )
-                Spacer(Modifier.width(Dimensions.size4))
+                Spacer(Modifier.width(Dimensions.padding16))
             }
         ))
     AsphaltTheme {
