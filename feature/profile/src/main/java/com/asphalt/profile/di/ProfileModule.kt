@@ -15,7 +15,7 @@ val profileModule = module {
     single { TotalStatsRepo() }
     viewModel { ProfileSectionVM(get(),get()) }
     viewModel { YourVehiclesVM(get(), get()) }
-    viewModel { TotalStatsVM(get()) }
+    viewModel { TotalStatsVM(get(),get(),get()) }
     viewModel { AddBikesVM() }
     viewModel { EditProfileVM(get()) }
 }

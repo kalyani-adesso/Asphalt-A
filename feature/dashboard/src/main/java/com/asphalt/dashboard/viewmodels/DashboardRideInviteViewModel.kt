@@ -1,19 +1,16 @@
 package com.asphalt.dashboard.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
-import com.asphalt.android.model.UserDomain
 import com.asphalt.android.repository.rides.RidesRepository
-import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.dashboard.data.DashboardRideInviteUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mappers.toDashBoardInvites
+import com.asphalt.dashboard.mappers.toDashBoardInvites
 
 class DashboardRideInviteViewModel(
     val ridesRepository: RidesRepository,

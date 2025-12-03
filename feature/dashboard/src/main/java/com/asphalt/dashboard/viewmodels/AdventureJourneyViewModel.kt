@@ -8,7 +8,7 @@ import com.asphalt.dashboard.sealedclasses.AdventureJourneyTimeFrameChoices
 import com.asphalt.dashboard.sealedclasses.RideGraphLegend
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import mappers.toJourneyDataUIModel
+import com.asphalt.dashboard.mappers.toJourneyDataUIModel
 import java.util.Calendar
 
 class AdventureJourneyViewModel : ViewModel() {
