@@ -220,12 +220,12 @@ fun ForgotPasswordScreen(
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
-                        endColor = PrimaryDarkerLightB50, onClick = {
+                        endColor = PrimaryDarkerLightB75, onClick = {
                             if (viewModel.sendCode())
                                 viewModel.callRestPassword()
                             //onSendClick.invoke(viewModel.emailState.value)
                         }
-                    ) {
+                    , buttonHeight = Dimensions.size50) {
                         ComposeUtils.DefaultButtonContent(
 
                             stringResource(R.string.send_reset_code).uppercase()

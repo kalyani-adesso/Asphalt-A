@@ -146,7 +146,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                             viewModel.updateTab(1)
                     }
 
-                },
+                }, buttonHeight = Dimensions.size50,
             ) {
                 ComposeUtils.DefaultButtonContent(
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
@@ -176,7 +176,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     }, contentPaddingValues = PaddingValues(
                         Dimensions.size0
                     )
-                ) {
+                , buttonHeight = Dimensions.size50) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -189,7 +189,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 }
 
                 GradientButton(
-                    modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue,
+                    modifier = Modifier.weight(1f), endColor = PrimaryDarkerLightB75,
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
@@ -216,7 +216,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     }, contentPadding = PaddingValues(
                         Dimensions.size0
                     )
-                ) {
+                , buttonHeight = Dimensions.size50) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
