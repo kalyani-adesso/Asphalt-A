@@ -117,6 +117,7 @@ class QueriesVM(
                             if (answer.id == updatedAnswer.id) updatedAnswer else answer
                         }
                     } else {
+                        query.answerCount+=1
                         query.answers + updatedAnswer
                     }
 

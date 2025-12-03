@@ -23,11 +23,12 @@ fun BorderedButton(
     buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,
     borderStroke: Dp = Constants.DEFAULT_BORDER_STROKE,
     contentPaddingValues: PaddingValues = ButtonDefaults.ContentPadding,
+    containerColor: Color = Color.Transparent,
     content: @Composable RowScope.() -> Unit
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        colors = ButtonDefaults.buttonColors(containerColor = containerColor),
         modifier = modifier
             .height(buttonHeight)
             .border(

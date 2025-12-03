@@ -29,10 +29,9 @@ import androidx.compose.ui.res.stringResource
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PrimaryBrighterLightW75
-import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.getDpForScreenRatio
@@ -104,16 +103,19 @@ fun GetStartedScreen(
                         elevation = CardDefaults.cardElevation(Dimensions.padding1),
                         shape = RoundedCornerShape(Dimensions.radius15)
                     ) {
-                        GradientButton(
+                        BorderedButton (
                             modifier = Modifier.fillMaxWidth(),
-                            startColor = PrimaryBrighterLightW75,
-                            endColor = PrimaryDarkerLightB50,
+                            buttonHeight = Dimensions.size50,
+                            containerColor = PrimaryDarkerLightB75,
+                            borderColor = NeutralWhite,
+                            borderStroke = Dimensions.padding1,
+                            buttonRadius = Dimensions.radius15,
                             onClick = {
                                 scope.launch {
                                     welcomeViewModel.registerGetStarted()
                                     onNavigateToRegister()
                                 }
-                            }, contentPadding = PaddingValues(Dimensions.size0)
+                            }, contentPaddingValues = PaddingValues(Dimensions.size0)
 
                         ) {
                             val buttonText = stringResource(R.string.get_started).uppercase()

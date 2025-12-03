@@ -45,6 +45,7 @@ struct AppIcon {
         static let connectedRide = Image("icon-connectedRide")
         static let knowledgeCircle = Image("icon-knowledgeCircle")
         static let marketPlace = Image("icon-marketPlace")
+        static let message = Image("icon-message-outline")
         static let settings = Image("icon-settings")
         static let referFriend = Image("icon-referAFriend")
         static let logout = Image("icon-logout")
@@ -175,6 +176,7 @@ struct AppIcon {
         static let time = Image("time")
         static let view = Image("view")
         static let rating = Image("rating")
+        static let ratingFilled = Image("rating-filled")
        
     }
 }

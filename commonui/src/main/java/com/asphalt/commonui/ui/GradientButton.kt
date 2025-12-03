@@ -22,7 +22,7 @@ import com.asphalt.commonui.constants.Constants
 fun GradientButton(
     modifier: Modifier = Modifier,
     startColor: Color = PrimaryDarkerLightB75,
-    endColor: Color = PrimaryDarkerLightB50,
+    endColor: Color = PrimaryDarkerLightB75,
     onClick: () -> Unit,
     buttonHeight: Dp = Constants.DEFAULT_BUTTON_HEIGHT,
     buttonRadius: Dp = Constants.DEFAULT_CORNER_RADIUS,

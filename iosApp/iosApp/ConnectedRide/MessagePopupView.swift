@@ -14,6 +14,8 @@ struct MessagePopupView: View {
     @State private var message: String = ""
     @Environment(\.dismiss) var dismiss
     @FocusState private var isCustomFocused: Bool
+    @Binding var showMessageNotification: Bool
+    @Binding var riderName: String
 
     private let quickMessages = [
         "All good!",
@@ -187,6 +189,7 @@ struct MessagePopupView: View {
             
             Button("SEND") {
                 isPresented = false
+                showMessageNotification = true
                 viewModel.sendMessage(
                     senderName: MBUserDefaults.userNameStatic ?? "",
                     receiverName: viewModel.rider?.name ?? "",
@@ -212,9 +215,9 @@ struct MessagePopupView: View {
         
         switch status {
         case .connected, .stopped:
-            return "\(status?.rawValue) from \(time)"
+            return "\(status?.rawValue ?? "") from \(time ?? "")"
         case .delayed:
-            return "\(status?.rawValue) by \(time)"
+            return "\(status?.rawValue ?? "") by \(time ?? "")"
         default:
             return "Available"
         }

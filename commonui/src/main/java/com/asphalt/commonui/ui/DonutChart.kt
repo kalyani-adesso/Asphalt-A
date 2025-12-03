@@ -24,7 +24,7 @@ fun DonutChart(values: List<Float>, colors: List<Color>) {
     var startAngle = Constants.DONUT_START_ANGLE
     val strokeWidth: Float = getPxValue(DONUT_STROKE_WIDTH)
 
-    Canvas(modifier = Modifier.size(Dimensions.size185)) {
+    Canvas(modifier = Modifier.size(Dimensions.size128)) {
 
         val outerRadius = size.minDimension / 2 - strokeWidth / 2 - Constants.DONUT_RADIUS_OFFSET
         val innerRadius = outerRadius - strokeWidth

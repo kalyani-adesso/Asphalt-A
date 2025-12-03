@@ -10,8 +10,7 @@ import SwiftUI
 struct RideDetailsView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
-    @State private var startRide = false
-    @State private var showJoinRide: Bool = false
+    @State private var deleteRide = false
     var body: some View {
         AppToolBar(showBack: true){
         ZStack {
@@ -33,27 +32,67 @@ struct RideDetailsView: View {
                                         .foregroundColor(AppColor.stoneGray)
                                 }
                                 Spacer()
+                                Button(action: {
+                                    
+                                }) {
+                                    AppIcon.UpcomingRide.message
+                                        .resizable()
+                                        .frame(width:30, height:30)
+                                }
+                                .buttonStyle(.plain)
                             }
                             
-                            HStack {
-                                HStack(spacing: 5) {
-                                    AppIcon.UpcomingRide.calender
-                                        .resizable()
-                                        .frame(width: 16, height: 16)
-                                    Text(ride.date)
-                                        .font(KlavikaFont.regular.font(size: 16))
-                                        .foregroundStyle(AppColor.richBlack)
+                           
+                             VStack (alignment: .leading, spacing: 11){
+                                HStack{
+                                    HStack(spacing: 10) {
+                                        AppIcon.UpcomingRide.calender
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text("Start: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.first?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 10) {
+                                        AppIcon.YourRides.time
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text(ride.startTime ?? "")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
                                 }
-                                Spacer()
-                                HStack(spacing: 5) {
-                                    AppIcon.UpcomingRide.group
-                                        .resizable()
-                                        .frame(width: 16, height: 16)
-                                    Text("\(ride.riderCount) rides")
-                                        .font(KlavikaFont.regular.font(size: 16))
-                                        .foregroundStyle(AppColor.richBlack)
+                                HStack{
+                                    HStack(spacing: 10) {
+                                        AppIcon.UpcomingRide.calender
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text("End: \(ride.date.split { $0 == "-" || $0 == "–" || $0 == "—" }.last?.trimmingCharacters(in: .whitespaces) ?? "")")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 10) {
+                                        AppIcon.YourRides.time
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                        Text(ride.endTime ?? "")
+                                            .font(KlavikaFont.medium.font(size: 14))
+                                            .foregroundStyle(AppColor.oldBurgundy)
+                                    }
                                 }
-                            }
+                                 Spacer()
+                                 HStack(spacing: 5) {
+                                     AppIcon.UpcomingRide.group
+                                         .resizable()
+                                         .frame(width: 16, height: 16)
+                                     Text("\(ride.riderCount) rides")
+                                         .font(KlavikaFont.regular.font(size: 16))
+                                         .foregroundStyle(AppColor.richBlack)
+                                 }
+                           
+                        }
                         }
                         .padding([.leading,.trailing,.top,.bottom],16)
                         .background(
@@ -82,28 +121,29 @@ struct RideDetailsView: View {
                             )
                             .contentShape(Rectangle())
                         }
-                        
-                        ButtonView(
-                            title:"START RIDE",
-                            icon: AppIcon.JoinRide.nearMe,
-                            fontSize: 16 ,
-                            background: AppColor.dimGreen,
-                            foregroundColor: AppColor.white,
-                            showShadow: false,
-                            onTap: {
-                                startRide = true
+                        Button(action: {
+                            Task {
+                                                                await viewModel.deleteRide(rideId: ride.id)
+                                                                deleteRide = true
+                                                            }
+                        }) {
+                            HStack{
+                                Text("DELETE RIDE")
                             }
-                        )
-                        .padding([.top,.bottom],16)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(AppColor.white)
+                            .foregroundColor(AppColor.red)
+                            .font(KlavikaFont.bold.font(size: 16))
+                            .overlay(RoundedRectangle(cornerRadius: 10)
+                                .stroke(AppColor.red, lineWidth: 1))
+                        }
                         Spacer()
                     }
                     .padding(.all,16)
                     .navigationBarBackButtonHidden(true)
-                    .navigationDestination(isPresented: $showJoinRide, destination: {
+                    .navigationDestination(isPresented:$deleteRide,  destination: {
                         UpcomingRideView(navigationDone: true)
-                    })
-                    .navigationDestination(isPresented:$startRide,  destination: {
-                        ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: viewModel.joinRideModel, rideCompleteModel: [])
                     })
                     .onAppear {
                         Task {

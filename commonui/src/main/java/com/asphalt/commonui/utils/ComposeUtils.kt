@@ -1,6 +1,7 @@
 package com.asphalt.commonui.utils
 
 import android.annotation.SuppressLint
+import androidx.annotation.Px
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -68,6 +70,11 @@ object ComposeUtils {
         val windowInfo = LocalWindowInfo.current
         val screenWidth = windowInfo.containerSize.width
         return screenWidth
+    }
+    @Composable
+    fun Float.toDp(): Dp{
+        val density = LocalDensity.current.density
+        return  (this / density).dp
     }
 
     @Composable

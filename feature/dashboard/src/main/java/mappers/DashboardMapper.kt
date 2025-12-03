@@ -54,6 +54,8 @@ fun RideInvitesDomain.toDashBoardInviteUIModel(
                 profilePicUrl.orEmpty()
 
             },
+            rideTitle = rideTitle,
+            isOrganiser = isOrganiser
         )
     }
 }
@@ -87,8 +89,9 @@ fun DashboardSummaryUI?.toRideStatUiModel(): List<RideStatDataUIModel> {
             RideStatDataUIModel(
                 RideStatType.TotalRides, this?.totalRides ?: 0
             ),
+            RideStatDataUIModel(RideStatType.Locations, this?.uniqueEndLocations ?: 0),
+
             RideStatDataUIModel(RideStatType.TotalKms, this?.totalDistance?.toInt() ?: 0),
-            RideStatDataUIModel(RideStatType.Locations, this?.uniqueEndLocations ?: 0)
         )
     }
 }

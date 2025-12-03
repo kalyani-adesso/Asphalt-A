@@ -13,23 +13,33 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.theme.AzureBlue
+import com.asphalt.commonui.theme.LightGreen30
+import com.asphalt.commonui.theme.LightOrange
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
+import com.asphalt.commonui.theme.PrimaryBrighterLightW50
+import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividFlameOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: @Composable () -> Unit) {
-
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             ModalDrawerSheet(drawerContainerColor = NeutralWhite) {
                 Column(
                     modifier = Modifier
@@ -41,9 +51,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                     NavigationDrawerItem(
                         icon = {
                             Icon(
-                                painter = painterResource(R.drawable.ic_connected_rides),
+                                painter = painterResource(R.drawable.ic_group_blue),
                                 contentDescription = "error",
-                                tint = Color.Black
+                                tint = LightGreen30
                             )
                         },
                         badge = {
@@ -53,7 +63,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                                 tint = Color.Black
                             )
                         },
-                        label = { Text("Connected Rides") },
+                        label = { Text("Connected Ride", style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {}
                     )
@@ -81,9 +91,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                     NavigationDrawerItem(
                         icon = {
                             Icon(
-                                painter = painterResource(R.drawable.ic_market),
+                                painter = painterResource(R.drawable.ic_marketplace),
                                 contentDescription = "error",
-                                tint = Color.Black
+                                tint = VividFlameOrange
                             )
                         },
                         badge = {
@@ -93,7 +103,26 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                                 tint = Color.Black
                             )
                         },
-                        label = { Text("Marketplace") },
+                        label = { Text("Marketplace", style = TypographyMedium.bodyMedium) },
+                        selected = false,
+                        onClick = {}
+                    )
+                    NavigationDrawerItem(
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_messages),
+                                contentDescription = "error",
+                                tint = AzureBlue
+                            )
+                        },
+                        badge = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow),
+                                contentDescription = "",
+                                tint = Color.Black
+                            )
+                        },
+                        label = { Text("Messages", style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {}
                     )
@@ -102,7 +131,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                             Icon(
                                 painter = painterResource(R.drawable.ic_settings),
                                 contentDescription = "error",
-                                tint = Color.Black
+                                tint = LightOrange
                             )
                         },
                         badge = {
@@ -112,7 +141,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                                 tint = Color.Black
                             )
                         },
-                        label = { Text("Settings") },
+                        label = { Text("Settings", style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {}
                     )
@@ -121,7 +150,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                             Icon(
                                 painter = painterResource(R.drawable.ic_send),
                                 contentDescription = "error",
-                                tint = Color.Black
+                                tint = PrimaryBrighterLightW50
                             )
                         },
                         badge = {
@@ -131,7 +160,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                                 tint = Color.Black
                             )
                         },
-                        label = { Text("Refer a Friend") },
+                        label = { Text("Refer a Friend", style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {}
                     )
@@ -155,16 +184,18 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                                 tint = Color.Red
                             )
                         },
-                        label = { Text("Logout", color = Color.Red) },
+                        label = { Text("Logout", color = Color.Red, style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {
                             itemClick.invoke(Constants.LOGOUT_CLICK)
                         }
                     )
                 }
-            }
+            }}
         }
     ) {
-        content()
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            content()
+        }
     }
-}
+}}
