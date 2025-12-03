@@ -1,7 +1,6 @@
 package com.asphalt.commonui.utils
 
 import android.annotation.SuppressLint
-import androidx.annotation.Px
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -36,6 +35,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.constants.Constants
@@ -46,12 +46,9 @@ import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralGrey30
-import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
-import com.asphalt.commonui.theme.NeutralMidGrey
 import com.asphalt.commonui.theme.NeutralRed
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.NeutralWhite25
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
@@ -71,10 +68,11 @@ object ComposeUtils {
         val screenWidth = windowInfo.containerSize.width
         return screenWidth
     }
+
     @Composable
-    fun Float.toDp(): Dp{
+    fun Float.toDp(): Dp {
         val density = LocalDensity.current.density
-        return  (this / density).dp
+        return (this / density).dp
     }
 
     @Composable
@@ -223,7 +221,8 @@ object ComposeUtils {
         heightMin: Dp = Dimensions.size50,
         textStyle: TextStyle = Typography.bodySmall,
         placeHolderTextStyle: TextStyle = TypographyMedium.bodySmall,
-        readOnly: Boolean = false
+        readOnly: Boolean = false,
+        visualTransformation: VisualTransformation = VisualTransformation.None
 
     ) {
         RoundedBox(
@@ -264,6 +263,7 @@ object ComposeUtils {
                     disabledIndicatorColor = Color.Transparent,
                     errorIndicatorColor = Color.Transparent
                 ),
+                visualTransformation = visualTransformation
             )
         }
     }
@@ -309,6 +309,11 @@ object ComposeUtils {
         keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         isSingleLine: Boolean = true,
         readOnly: Boolean = false,
+        readOnlyColor: Color = LightGray28,
+        backColor: Color = NeutralWhite,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        visualTransformation: VisualTransformation = VisualTransformation.None
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing12)) {
             SectionTitle(title)
@@ -319,7 +324,10 @@ object ComposeUtils {
                 keyboardOptions = keyboardOptions,
                 isSingleLine = isSingleLine,
                 readOnly = readOnly,
-                backColor = if (readOnly) LightGray28 else NeutralWhite
+                backColor = if (readOnly) readOnlyColor else backColor,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                visualTransformation = visualTransformation
 
             )
             TexFieldError(
