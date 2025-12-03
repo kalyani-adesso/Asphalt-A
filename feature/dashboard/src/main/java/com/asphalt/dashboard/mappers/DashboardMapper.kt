@@ -1,4 +1,4 @@
-package mappers
+package com.asphalt.dashboard.mappers
 
 import com.asphalt.android.helpers.UserDataHelper
 import com.asphalt.android.model.UserDomain
