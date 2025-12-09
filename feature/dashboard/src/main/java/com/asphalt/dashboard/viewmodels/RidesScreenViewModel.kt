@@ -38,6 +38,8 @@ class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), Koin
     private val _showInviteNotification = mutableStateOf(false)
     val showInviteNotification: State<Boolean> = _showInviteNotification
 
+    val showChatDialog = mutableStateOf(false)
+
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
     }

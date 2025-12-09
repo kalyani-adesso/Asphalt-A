@@ -46,6 +46,7 @@ import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.screen.ChatDialog
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.ReadOnlyRatingBar
@@ -59,7 +60,6 @@ import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
@@ -584,6 +584,11 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 
 @Composable
 fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
+    if (ridesScreenViewModel.showChatDialog.value) {
+        ChatDialog() {
+            ridesScreenViewModel.showChatDialog.value = false
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -641,7 +646,7 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         painter = painterResource(R.drawable.ic_message),
                         null,
                         modifier = Modifier.clickable {
-                            //TODO:Click action for message
+                            ridesScreenViewModel.showChatDialog.value = true
                         })
                 }
             }
