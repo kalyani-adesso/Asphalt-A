@@ -1,8 +1,10 @@
 package com.asphalt.chat.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,12 +46,14 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryLight
 import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 
@@ -71,7 +77,7 @@ fun ChatDialog(
                     ChatMessage("Hello!", true),
                     ChatMessage("Hi! How are you?", false),
                     ChatMessage("I'm good, thanks!", true),
-                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
                     ChatMessage("Nice to hear 😊", false),
                     ChatMessage("Nice to hear 😊", false),
                     ChatMessage("Nice to hear 😊", false),
@@ -85,7 +91,7 @@ fun ChatDialog(
                             .height(72.dp)
                             .fillMaxWidth()
                             .background(
-                                PrimaryLight, RoundedCornerShape(
+                                BlueLite34, RoundedCornerShape(
                                     20.dp, 20.dp, 0.dp, 0.dp
                                 )
                             ),
@@ -103,17 +109,21 @@ fun ChatDialog(
                                     imageUrl = "" ?: ""
                                 )
                                 Column(modifier = Modifier.padding(start = Dimensions.size10)) {
-                                    Text("Hari", overflow = TextOverflow.Ellipsis)
+                                    Text("Hari", overflow = TextOverflow.Ellipsis, style = TypographyBold.bodyMedium, color = NeutralWhite)
+                                    Spacer(modifier = Modifier.height(Dimensions.size8))
                                     Text(
                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
                                         modifier = Modifier,
                                         maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = Typography.bodySmall, color = NeutralWhite
                                     )
                                 }
                             }
                             RoundedBox(
-                                modifier = Modifier.size(Dimensions.size30),
+                                modifier = Modifier.size(Dimensions.size30).clickable{
+                                    onDismiss.invoke()
+                                },
                                 cornerRadius = Dimensions.size10,
                                 backgroundColor = PrimaryDarkerLightB75
                             ) {
@@ -210,8 +220,11 @@ data class ChatMessage(
     val isSender: Boolean
 )
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ChatBubble(message: ChatMessage) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val bubbleWidth = screenWidth / 2
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -224,12 +237,14 @@ fun ChatBubble(message: ChatMessage) {
             modifier = Modifier
                 .shadow(12.dp, shape = RoundedCornerShape(12.dp))
                 .background(
-                    if (message.isSender) NeutralWhite else PrimaryLight,
+                    if (message.isSender) NeutralWhite else BlueLite34,
                     RoundedCornerShape(12.dp)
+                ).widthIn(
+                    max = bubbleWidth
                 )
                 .padding(10.dp)
         ) {
-            Text(message.text)
+            Text(message.text, style = Typography.bodySmall)
         }
     }
 }
