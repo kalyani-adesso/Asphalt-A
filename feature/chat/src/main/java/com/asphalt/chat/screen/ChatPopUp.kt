@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -137,46 +139,63 @@ fun ChatDialog(
                             }
                         }
                     }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .padding(start = 10.dp, end = 10.dp)
-                            .background(
-                                NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
-                            )
-                            .border(
-                                width = Dimensions.padding1,
-                                color = PrimaryDarkerLightB75,
-                                shape = RoundedCornerShape(Dimensions.padding10)
-                            ), verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextField(
-                            value = text,
-                            onValueChange = { text = it },
-                            placeholder = {
-                                Text(
-                                    text = stringResource(string.type_msg),
-                                    style = Typography.bodySmall,
-                                    color = NeutralDarkGrey
+                    Row(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .weight(1f)
+                                .background(
+                                    NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
                                 )
-                            },
-                            textStyle = Typography.bodySmall,
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.colors(
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedContainerColor = Color.Transparent,
-                                disabledContainerColor = Color.Transparent,
+                                .border(
+                                    width = Dimensions.padding1,
+                                    color = PrimaryDarkerLightB75,
+                                    shape = RoundedCornerShape(Dimensions.padding10)
+                                ), verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextField(
+                                value = text,
+                                onValueChange = { text = it },
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(string.type_msg),
+                                        style = Typography.bodySmall,
+                                        color = NeutralDarkGrey
+                                    )
+                                },
+                                textStyle = Typography.bodySmall,
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = TextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
 
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent,
-                                errorIndicatorColor = Color.Transparent
-                            ),
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                    errorIndicatorColor = Color.Transparent
+                                ),
 
+                                )
+
+
+                        }
+                        Spacer(modifier = Modifier.width(Dimensions.size10))
+                        RoundedBox(
+                            modifier = Modifier.size(Dimensions.size44),
+                            cornerRadius = Dimensions.size10,
+                            backgroundColor = PrimaryDarkerLightB75,
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_send_white),
+                                contentDescription = "",
                             )
+                        }
 
                     }
                     Spacer(Modifier.height(10.dp))
@@ -203,6 +222,7 @@ fun ChatBubble(message: ChatMessage) {
 
         Box(
             modifier = Modifier
+                .shadow(12.dp, shape = RoundedCornerShape(12.dp))
                 .background(
                     if (message.isSender) NeutralWhite else PrimaryLight,
                     RoundedCornerShape(12.dp)
