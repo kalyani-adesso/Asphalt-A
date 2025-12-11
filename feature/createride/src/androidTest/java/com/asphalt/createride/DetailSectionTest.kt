@@ -3,6 +3,7 @@ package com.asphalt.createride
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -140,7 +141,54 @@ class DetailSectionTest {
         composeTestRule.onNodeWithText("Solo Ride").assertIsDisplayed()
 
     }
-    
+
+    @Test
+    fun rideType_emptyValidation_isRedBorderDisplayed() {
+
+        val fakeViewModel = FakeCreateRideViewModel()
+
+        composeTestRule.setContent {
+            CreateRideScreen(fakeViewModel,{},{})
+        }
+
+        // Click the ride type box
+        composeTestRule.onNodeWithTag("Gradient_Btn_click").performClick()
+        composeTestRule.onNodeWithTag("Ride_Type_Error")
+            .assertExists()
+    }
+    @Test
+    fun check_notShowing_error_border_Ride_type() {
+
+        val fakeViewModel = FakeCreateRideViewModel()
+
+        composeTestRule.setContent {
+            CreateRideScreen(fakeViewModel,{},{})
+        }
+
+        // Update ViewModel state (this changes the Text)
+        composeTestRule.runOnIdle {
+            fakeViewModel.updateRiderType("Solo Ride")
+        }
+
+        // Click the ride type box
+        composeTestRule.onNodeWithTag("Gradient_Btn_click").performClick()
+        composeTestRule.onNodeWithTag("Ride_Type")
+            .assertExists()
+    }
+
+    @Test
+    fun chek_value_isDisplayed_in_rideTitle(){
+        val fakeViewModel = FakeCreateRideViewModel()
+
+        composeTestRule.setContent {
+            CreateRideScreen(fakeViewModel,{},{})
+        }
+        composeTestRule.runOnIdle {
+            fakeViewModel.updateRiderTitle("Ride to Chennai")
+        }
+        composeTestRule.onNodeWithTag("rideTitleInput").assertTextContains("Ride to Chennai")
+    }
+
 }
 
 

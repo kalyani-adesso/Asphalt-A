@@ -64,6 +64,8 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     val rideType = viewModel.getRideType(context)
     val am = stringResource(R.string.am)
     val pm = stringResource(R.string.pm)
+
+    val tagRideType = if (viewModel._showRideTypeError.value) "Ride_Type_Error" else "Ride_Type"
     //Start Date
     if (viewModel.show_timePicker.value) {
         CustomTimePickerDialog(onDismiss = {
@@ -150,7 +152,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimensions.padding50).testTag("Ride_Type")
+                    .height(Dimensions.padding50).testTag(tagRideType)
                     //.padding(start = Dimensions.padding16, end = Dimensions.padding16)
                     .background(
                         NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
