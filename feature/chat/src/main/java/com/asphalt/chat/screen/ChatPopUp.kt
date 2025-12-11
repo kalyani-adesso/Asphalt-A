@@ -66,10 +66,10 @@ fun ChatDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        Column(modifier = Modifier.padding(horizontal = Dimensions.padding20)) {
             Box(
                 modifier = Modifier
-                    .background(NeutralWhite, RoundedCornerShape(20.dp))
+                    .background(NeutralWhite, RoundedCornerShape(Dimensions.padding20))
                     .fillMaxWidth()
                     .fillMaxHeight(0.8f)
             ) {
@@ -88,11 +88,11 @@ fun ChatDialog(
                 Column(Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
-                            .height(72.dp)
+                            .height(Dimensions.size71)
                             .fillMaxWidth()
                             .background(
                                 BlueLite34, RoundedCornerShape(
-                                    20.dp, 20.dp, 0.dp, 0.dp
+                                    Dimensions.size20, Dimensions.size20, 0.dp, 0.dp
                                 )
                             ),
                         verticalArrangement = Arrangement.Center,
@@ -149,12 +149,12 @@ fun ChatDialog(
                             }
                         }
                     }
-                    Row(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
+                    Row(modifier = Modifier.padding(start = Dimensions.padding10, end = Dimensions.padding10)) {
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(Dimensions.size50)
                                 .weight(1f)
                                 .background(
                                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
@@ -208,7 +208,7 @@ fun ChatDialog(
                         }
 
                     }
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(Dimensions.size10))
                 }
             }
         }
@@ -228,21 +228,21 @@ fun ChatBubble(message: ChatMessage) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = Dimensions.size4),
         horizontalArrangement = if (message.isSender)
             Arrangement.End else Arrangement.Start
     ) {
 
         Box(
             modifier = Modifier
-                .shadow(12.dp, shape = RoundedCornerShape(12.dp))
+                .shadow(Dimensions.spacing12, shape = RoundedCornerShape(Dimensions.spacing12))
                 .background(
                     if (message.isSender) NeutralWhite else BlueLite34,
-                    RoundedCornerShape(12.dp)
+                    RoundedCornerShape(Dimensions.spacing12)
                 ).widthIn(
                     max = bubbleWidth
                 )
-                .padding(10.dp)
+                .padding(Dimensions.size10)
         ) {
             Text(message.text, style = Typography.bodySmall)
         }
