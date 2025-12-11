@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class CreateRideScreenViewModel : ViewModel(), KoinComponent {
+open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val userRepo: UserRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
     val ridesRepo: RidesRepository by inject()
