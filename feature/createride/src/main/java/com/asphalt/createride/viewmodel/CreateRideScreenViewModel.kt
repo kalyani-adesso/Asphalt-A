@@ -35,7 +35,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
 
     private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
-    val tabSelectState: State<Int> = _tabSelectMutableState
+    open val tabSelectState: State<Int> = _tabSelectMutableState
     val show_datePicker = mutableStateOf(false)
     val show_EndDatePicker = mutableStateOf(false)
 
@@ -47,7 +47,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     val selectedUserCount = mutableStateOf(0)
 
-    val _showRideTypeError = mutableStateOf(false)
+    open val _showRideTypeError = mutableStateOf(false)
     val _showRideTitleError = mutableStateOf(false)
     val _showRideDateError = mutableStateOf(false)
     val _showRideEndDateError = mutableStateOf(false)
@@ -256,7 +256,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun getRideType(context: Context): ArrayList<RideType> {
+    open fun getRideType(context: Context): ArrayList<RideType> {
         var type =
             arrayListOf(
                 RideType(Constants.SOLO_RIDE, context.getString(R.string.solo_ride)),
