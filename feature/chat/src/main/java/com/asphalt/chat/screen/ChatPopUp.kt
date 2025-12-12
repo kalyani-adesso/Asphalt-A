@@ -47,11 +47,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.BlueLite34
+import com.asphalt.commonui.theme.BlueLite36
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralDarkGrey
+import com.asphalt.commonui.theme.NeutralLightGrayishBlue50
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.theme.PrimaryLight
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
@@ -109,7 +110,12 @@ fun ChatDialog(
                                     imageUrl = "" ?: ""
                                 )
                                 Column(modifier = Modifier.padding(start = Dimensions.size10)) {
-                                    Text("Hari", overflow = TextOverflow.Ellipsis, style = TypographyBold.bodyMedium, color = NeutralWhite)
+                                    Text(
+                                        "Hari",
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = TypographyBold.bodyMedium,
+                                        color = NeutralWhite
+                                    )
                                     Spacer(modifier = Modifier.height(Dimensions.size8))
                                     Text(
                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
@@ -121,9 +127,11 @@ fun ChatDialog(
                                 }
                             }
                             RoundedBox(
-                                modifier = Modifier.size(Dimensions.size30).clickable{
-                                    onDismiss.invoke()
-                                },
+                                modifier = Modifier
+                                    .size(Dimensions.size30)
+                                    .clickable {
+                                        onDismiss.invoke()
+                                    },
                                 cornerRadius = Dimensions.size10,
                                 backgroundColor = PrimaryDarkerLightB75
                             ) {
@@ -136,7 +144,7 @@ fun ChatDialog(
                         }
 
                     }
-                    Box(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f).background(BlueLite36)) {
 
 
                         LazyColumn(
@@ -149,7 +157,14 @@ fun ChatDialog(
                             }
                         }
                     }
-                    Row(modifier = Modifier.padding(start = Dimensions.padding10, end = Dimensions.padding10)) {
+                    Spacer(modifier = Modifier.fillMaxWidth().height(Dimensions.padding1)
+                        .background(color = NeutralLightGrayishBlue50).shadow(elevation = Dimensions.padding15))
+                    Row(
+                        modifier = Modifier.padding(
+                            start = Dimensions.padding10, end = Dimensions.padding10,
+                            top = Dimensions.padding10
+                        )
+                    ) {
 
                         Row(
                             modifier = Modifier
@@ -239,7 +254,8 @@ fun ChatBubble(message: ChatMessage) {
                 .background(
                     if (message.isSender) NeutralWhite else BlueLite34,
                     RoundedCornerShape(Dimensions.spacing12)
-                ).widthIn(
+                )
+                .widthIn(
                     max = bubbleWidth
                 )
                 .padding(Dimensions.size10)
