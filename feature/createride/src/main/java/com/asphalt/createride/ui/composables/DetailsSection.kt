@@ -33,8 +33,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
@@ -62,6 +64,8 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     val rideType = viewModel.getRideType(context)
     val am = stringResource(R.string.am)
     val pm = stringResource(R.string.pm)
+
+    val tagRideType = if (viewModel._showRideTypeError.value) "Ride_Type_Error" else "Ride_Type"
     //Start Date
     if (viewModel.show_timePicker.value) {
         CustomTimePickerDialog(onDismiss = {
@@ -148,7 +152,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimensions.padding50)
+                    .height(Dimensions.padding50).testTag(tagRideType)
                     //.padding(start = Dimensions.padding16, end = Dimensions.padding16)
                     .background(
                         NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
@@ -185,7 +189,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                     },
                     style = Typography.bodyMedium,
                     color = if (!viewModel.rideDetailsState.value.rideType.isNullOrEmpty()) NeutralBlackGrey else NeutralDarkGrey,
-                    modifier = Modifier.padding(start = Dimensions.padding16)
+                    modifier = Modifier.padding(start = Dimensions.padding16).testTag("Ride_Type_Text")
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_dropdown_arrow),
@@ -268,7 +272,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxHeight().testTag("rideTitleInput"),
 
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,

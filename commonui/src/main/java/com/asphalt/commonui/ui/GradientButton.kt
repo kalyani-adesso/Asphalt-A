@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import com.asphalt.commonui.theme.PrimaryDarkerLightB50
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
@@ -45,7 +46,7 @@ fun GradientButton(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
-                .height(buttonHeight),
+                .height(buttonHeight).testTag("Gradient_Btn_click"),
             shape = RoundedCornerShape(buttonRadius),
             contentPadding = contentPadding,
             content = content
