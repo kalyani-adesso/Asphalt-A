@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.resetpassword.viewmodel.ForgotPasswordViewModel
@@ -61,5 +62,31 @@ class ForgotPasswordScreenTest {
         composeTestRule.onNodeWithTag("Gradient_Btn_click").performClick()
         composeTestRule.onNodeWithText("Enter a Valid Email").assertExists()
         //composeTestRule.onNodeWithText("SEND RESET LINK").assertExists()
+    }
+
+    @Test
+    fun enteringValidEmail_hidesErrorAndButtonClickable() {
+        val vm = createTestViewModel()
+        composeTestRule.setContent {
+            ForgotPasswordScreen(onSendClick = {}, viewModel = vm)
+        }
+
+        val emailField = composeTestRule.onNodeWithTag("emailTextField")
+        emailField.performTextInput("test@example.com")
+        composeTestRule.onNodeWithText("SEND RESET LINK").performClick()
+        composeTestRule.onNodeWithText("Enter a Valid Email").assertDoesNotExist()
+    }
+
+    @Test
+    fun enteringNonValidEmail_showErrorWhenButtonClick() {
+        val vm = createTestViewModel()
+        composeTestRule.setContent {
+            ForgotPasswordScreen(onSendClick = {}, viewModel = vm)
+        }
+
+        val emailField = composeTestRule.onNodeWithTag("emailTextField")
+        emailField.performTextInput("test")
+        composeTestRule.onNodeWithText("SEND RESET LINK").performClick()
+        composeTestRule.onNodeWithText("Enter a Valid Email").assertExists()
     }
 }
