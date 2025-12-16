@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
-import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
-import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.UserRepoImpl
@@ -47,23 +45,13 @@ class JoinRideViewModel(
         _rideId.value = selectedId
         idRepository.id = selectedId
     }
-
     fun getRideId() : String? = idRepository.id
-
-    // join ride
-    private val _joinRideResult = MutableStateFlow<APIResult<ConnectedRideDTO>?>(null)
-    val joinRideResult: StateFlow<APIResult<ConnectedRideDTO>?> = _joinRideResult
-
-    private val _rideDetails = MutableStateFlow<ConnectedRideRoot?>(null)
-    val rideDetails : StateFlow<ConnectedRideRoot?> = _rideDetails
-
     private val currentUid = androidUserVM.userState.value?.uid
     private val _createdBy = MutableStateFlow("")
     val createdBy = _createdBy.asStateFlow()
 
     val acceptedRides: StateFlow<List<RidesData>> =
         combine(rides, _searchQuery) { ridesData, query ->
-
 
             val q = query.trim().lowercase()
             // STEP 1 → Filter ACCEPTED rides
@@ -104,7 +92,6 @@ class JoinRideViewModel(
 
     fun getAllRiders() {
         viewModelScope.launch {
-            var user = userRepoImpl.getUserDetails()
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
             }
@@ -169,25 +156,6 @@ class JoinRideViewModel(
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
-
-    fun reJoinRide(joinRide: RidesData) {
-        viewModelScope.launch {
-
-            val request = ConnectedRideRoot(
-                rideID = joinRide.ridesID,
-                currentLat = joinRide.startLatitude,
-                currentLong = joinRide.startLongitude,
-                dateTime = joinRide.startDate,
-                isRejoined = true,
-                status = "connected"
-                // current lat, curret long, datetime
-            )
-           // val res = ridesRepo.reJoinRide(rejoinRide = reJoinRide, ongoingRideId = reJoinRide.rideJoinedID ?: "")
-          //  Log.d("TAG", "JoinRideClick: $res")
-
-        }
-    }
-
     fun getOnGoingRides(rideId:String) {
         viewModelScope.launch {
             val rideDetails = ridesRepo.getOngoingRides(rideId)
@@ -203,6 +171,14 @@ class JoinRideViewModel(
             val result = ridesRepo.endRide(rideId = rideId,rideJoinedId = rideJoinedId)
             _endRideResult.value = result
             Log.d("TAG", "endRide: $result")
+        }
+    }
+
+    fun removeEndRideList(joinRide: List<RidesData>) {
+        viewModelScope.launch {
+            // Remove items where status == 4
+            _rides.value = joinRide.filter { it.rideStatus != 4 }
+
         }
     }
 }

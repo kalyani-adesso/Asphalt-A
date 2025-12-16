@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,6 +105,10 @@ fun JoinRide(
 
     val sortedList = rides.sortedByDescending{ it .createdDate}
 
+    LaunchedEffect(Unit) {
+        viewModel.removeEndRideList(rides)
+    }
+
     Column {
         SearchView(
             query = searchQuery,
@@ -147,6 +153,7 @@ fun JoinRide(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun RiderCard(
     navigateToConnectedRide: () -> Unit,
@@ -207,7 +214,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.height(height = Dimensions.size3))
                         Text(
-                            text = ("By" + " " + createdBy),
+                            text = ("By $createdBy"),
                             style = Typography.titleMedium,
                             color = NeutralDarkGrey,
                             fontSize = Dimensions.textSize12,
@@ -247,7 +254,7 @@ fun RiderCard(
                         val startLocation = ridersList.startLocation
                         val endLocation = ridersList.endLocation
                         Text(
-                            text = startLocation + "-" + endLocation ?: "",
+                            text = ("$startLocation-$endLocation") ?: "",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12,
                             maxLines = 2
@@ -261,8 +268,9 @@ fun RiderCard(
                         Spacer(Modifier.width(Dimensions.size5))
                         val distance = ridersList.rideDistance
                         val smallDistance = String.format("%.2f", distance)
+                        // text = ("By $createdBy"),
                         Text(
-                            text = (smallDistance ?: "") + "km",
+                            text = ("$smallDistance km") ?: "",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12,
                             maxLines = 2

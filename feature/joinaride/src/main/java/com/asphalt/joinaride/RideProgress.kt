@@ -224,7 +224,7 @@ fun RideProgress(
                 onClick = {
                     viewmodel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
                         status = END_RIDE)
-                    viewmodel.endRide(rideId=ridesData.createdBy ?: "", rideJoinedId = ridesData.ridesID ?: "")
+                    viewmodel.endRide(rideId=ridesData.createdBy ?: "", rideJoinedId = ridesData.rideJoinedID ?: "")
                     onClickEndRide.invoke()
                 },
                 modifier = Modifier

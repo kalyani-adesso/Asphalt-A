@@ -58,6 +58,7 @@ fun ConnectedRideMapScreen(
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
 
+
     val rideId = rideViewModel.getRideId()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
 
@@ -151,7 +152,8 @@ fun ConnectedRideMapScreen(
             Column(
                 modifier = Modifier.height(400.dp)
             ) {
-                CurrentLocationMapScreen(locationProvider=locationProvider)
+                CurrentLocationMapScreen(locationProvider=locationProvider,
+                    ridesData)
             }
             RideProgress(androidUserVM = androidUserVM,
                 onClickEndRide = onClick,

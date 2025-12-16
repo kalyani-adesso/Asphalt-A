@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.LocationProvider
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.google.android.gms.maps.model.CameraPosition
@@ -36,14 +37,17 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 
 @Composable
-fun CurrentLocationMapScreen(locationProvider: LocationProvider) {
+fun CurrentLocationMapScreen(
+    locationProvider: LocationProvider,
+    ridesData: RidesData) {
 
 
     PermissionHandler(
         permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION),
         onAllGranted = {
-            MapWithCurrentLocation(locationProvider = locationProvider)
+            MapWithCurrentLocation(locationProvider = locationProvider,
+                ridesData)
         },
         onRequest = { request ->
             Column(
@@ -64,13 +68,15 @@ fun CurrentLocationMapScreen(locationProvider: LocationProvider) {
 }
 
 @Composable
-fun MapWithCurrentLocation(locationProvider: LocationProvider) {
+fun MapWithCurrentLocation(
+    locationProvider: LocationProvider,
+    ridesData: RidesData) {
 
     val locations = listOf(
-        LatLng(18.5204,73.8567), // pune
-        LatLng(19.0760,72.8777), // mumbai
-        LatLng(12.9716,77.5946), // banglore
-        LatLng(28.6139,77.2090) // delhi
+        LatLng(ridesData.currentLat,ridesData.currentLong), // pune
+        LatLng(ridesData.endLatitude,ridesData.endLongitude), // mumbai
+      //  LatLng(12.9716,77.5946), // banglore
+      //  LatLng(28.6139,77.2090) // delhi
     )
 
     val coroutineScope = rememberCoroutineScope()
@@ -98,7 +104,7 @@ fun MapWithCurrentLocation(locationProvider: LocationProvider) {
     if (userLocation != null) {
         cameraPositionState = rememberCameraPositionState {
           //  position = CameraPosition.fromLatLngZoom(userLocation!!,18f)
-            position = CameraPosition.fromLatLngZoom(locations.first(),5f)
+            position = CameraPosition.fromLatLngZoom(locations.first(), 10f)
         }
         try {
         }catch (t: Throwable) {

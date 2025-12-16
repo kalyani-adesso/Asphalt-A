@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class RidesData(
     var ridesID: String? = null,
+    val rideJoinedID: String? = null,
     var createdBy: String? = null,
     var rideType: String? = null,
     var rideTitle: String? = null,
@@ -20,7 +21,10 @@ class RidesData(
     var endLongitude: Double = 0.0,
     var rideDistance: Double = 0.0,
     var rideStatus: Int = 0,
+    var currentLat : Double = 0.0,
+    var currentLong : Double = 0.0,
     var endDate: Long? = null,
+
 
     var hasAssemblyPoint: Boolean = false,
     var assemblyPoint: String? = null,
