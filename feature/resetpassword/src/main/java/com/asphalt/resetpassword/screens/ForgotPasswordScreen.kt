@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -175,7 +176,7 @@ fun ForgotPasswordScreen(
                             textStyle = Typography.bodySmall,
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().testTag("emailTextField"),
                             colors = TextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.Transparent,
                                 focusedContainerColor = Color.Transparent,
@@ -211,7 +212,7 @@ fun ForgotPasswordScreen(
                     }
                     if (viewModel.isShowError.value) {
                         Text(
-                            text = stringResource(R.string.enter_valid_password),
+                            text = stringResource(R.string.enter_valid_email),
                             Modifier.padding(top = Dimensions.size4),
                             style = Typography.bodySmall,
                             color = NeutralRed
@@ -220,12 +221,12 @@ fun ForgotPasswordScreen(
                     Spacer(modifier = Modifier.height(Dimensions.spacing20))
                     GradientButton(
                         startColor = PrimaryDarkerLightB75,
-                        endColor = PrimaryDarkerLightB50, onClick = {
+                        endColor = PrimaryDarkerLightB75, onClick = {
                             if (viewModel.sendCode())
                                 viewModel.callRestPassword()
                             //onSendClick.invoke(viewModel.emailState.value)
                         }
-                    ) {
+                    , buttonHeight = Dimensions.size50) {
                         ComposeUtils.DefaultButtonContent(
 
                             stringResource(R.string.send_reset_code).uppercase()

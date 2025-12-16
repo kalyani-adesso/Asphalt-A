@@ -81,7 +81,8 @@ class RegistrationDetailsViewModel(private val authViewModel: AuthViewModel) : V
         updateLoader(true)
         // run validation once via the single function
         val validation = validateAllFields()
-        if (!validation.isValid) return
+        if (!validation.isValid) {updateLoader(false)
+            return}
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }

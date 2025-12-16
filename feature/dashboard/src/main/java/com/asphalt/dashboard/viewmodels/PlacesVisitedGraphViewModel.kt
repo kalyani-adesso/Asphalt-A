@@ -8,8 +8,8 @@ import com.asphalt.commonui.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mappers.fetchPlaceVisitedGraphData
-import mappers.toPlaceVisitedGraphUIModel
+import com.asphalt.dashboard.mappers.fetchPlaceVisitedGraphData
+import com.asphalt.dashboard.mappers.toPlaceVisitedGraphUIModel
 import java.util.Calendar
 
 class PlacesVisitedGraphViewModel : ViewModel() {

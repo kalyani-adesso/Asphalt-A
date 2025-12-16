@@ -103,7 +103,7 @@ fun LoginSuccessScreen(exploreClick: () -> Unit) {
 
                 ) {
                     GradientButton(
-                        PrimaryDarkerLightB75, PrimaryDarkerLightB50,
+                        startColor = PrimaryDarkerLightB75, endColor = PrimaryDarkerLightB75, buttonHeight = Dimensions.size50,
                         buttonText = stringResource(string.lets_explore).uppercase(),
                     ) {
                         scope.launch {

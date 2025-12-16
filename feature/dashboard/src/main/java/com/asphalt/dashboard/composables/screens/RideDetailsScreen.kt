@@ -99,7 +99,7 @@ fun RidesDetailsScreen(
                     .padding(start = Dimensions.padding16, end = Dimensions.padding16),
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
-                Spacer(Modifier.height(Dimensions.size30))
+                //Spacer(Modifier.height(Dimensions.size30))
                 HeaderSection(viewModel)
                 Spacer(Modifier.height(Dimensions.size20))
                 CountSection(viewModel)

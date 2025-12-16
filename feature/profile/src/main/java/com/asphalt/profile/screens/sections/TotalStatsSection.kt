@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,7 +29,11 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TotalStatisticsSection(statsVM: TotalStatsVM= koinViewModel()) {
+
     val stats = statsVM.stats.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        statsVM.getTotalStats()
+    }
     ComposeUtils.CommonContentBox(
         modifier = Modifier
             .fillMaxWidth()

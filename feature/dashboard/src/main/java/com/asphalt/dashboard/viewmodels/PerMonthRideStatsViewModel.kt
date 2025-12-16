@@ -10,8 +10,8 @@ import com.asphalt.dashboard.sealedclasses.RideStatType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mappers.toDashboardSummaryUI
-import mappers.toRideStatUiModel
+import com.asphalt.dashboard.mappers.toDashboardSummaryUI
+import com.asphalt.dashboard.mappers.toRideStatUiModel
 import java.util.Calendar
 
 class PerMonthRideStatsViewModel() : ViewModel() {

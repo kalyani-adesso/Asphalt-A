@@ -31,7 +31,7 @@ import com.asphalt.commonui.theme.TypographyBold
 fun GradientButton(
     startColor: Color,
     endColor: Color,
-    buttonHeight: Dp = Dimensions.size60,
+    buttonHeight: Dp = Dimensions.size50,
     buttonRadius: Dp = Dimensions.radius15,
     buttonText: String,
     showArrow: Boolean = false,

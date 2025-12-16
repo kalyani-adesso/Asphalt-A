@@ -34,6 +34,7 @@ import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.PrimaryDeepBlue
+import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
@@ -62,10 +63,10 @@ fun CreateRideScreen(
             title = stringResource(R.string.create_a_ride),
             actions = {
                 Text(
-                    text = "${viewModel.tabSelectState.value}/5",
-                    style = TypographyMedium.bodyMedium
+                    text = "Step ${viewModel.tabSelectState.value}/5",
+                    style = Typography.bodyMedium
                 )
-                Spacer(Modifier.width(Dimensions.size4))
+                Spacer(Modifier.width(Dimensions.padding16))
             }
         ))
     AsphaltTheme {
@@ -145,7 +146,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                             viewModel.updateTab(1)
                     }
 
-                },
+                }, buttonHeight = Dimensions.size50,
             ) {
                 ComposeUtils.DefaultButtonContent(
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
@@ -175,7 +176,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     }, contentPaddingValues = PaddingValues(
                         Dimensions.size0
                     )
-                ) {
+                , buttonHeight = Dimensions.size50) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -188,7 +189,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 }
 
                 GradientButton(
-                    modifier = Modifier.weight(1f), endColor = PrimaryDeepBlue,
+                    modifier = Modifier.weight(1f), endColor = PrimaryDarkerLightB75,
                     onClick = {
                         if (viewModel.tabSelectState.value < 5) {
                             if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
@@ -215,7 +216,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                     }, contentPadding = PaddingValues(
                         Dimensions.size0
                     )
-                ) {
+                , buttonHeight = Dimensions.size50) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,

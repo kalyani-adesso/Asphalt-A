@@ -394,7 +394,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(Dimensions.spacing27))
                 GradientButton(
                     PrimaryDarkerLightB75,
-                    PrimaryDarkerLightB50,
+                    PrimaryDarkerLightB75,
                     buttonText = stringResource(string.sign_in)
                 ) {
 
