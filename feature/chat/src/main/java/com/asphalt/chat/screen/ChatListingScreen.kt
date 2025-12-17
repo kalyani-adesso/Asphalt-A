@@ -151,16 +151,15 @@ fun ChatListingScreen(
                                         )
                                     }
                                 )
-                                .padding(all = Dimensions.padding15)
                                 .clickable {
                                     viewModel.updateTab(item.id)
-                                }, contentAlignment = Alignment.Center
+                                }.padding(all = Dimensions.padding15), contentAlignment = Alignment.Center
 
                             // Rounded corners here
 
                         ) {
                             Text(
-                                text = item.name,//stringResource(R.string.upcoming),
+                                text = stringResource(item.name),//stringResource(R.string.upcoming),
                                 style = TypographyMedium.titleMedium,
                                 color = if (viewModel.tabSelection.value == item.id) {
                                     NeutralWhite
