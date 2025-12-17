@@ -113,8 +113,9 @@ object Dimensions {
     val size73 = 73.dp
     val size81 = 81.dp
     val size71 = 71.dp
-    val size140=140.dp
-    val size128=128.dp
+    val size83 = 83.dp
+    val size140 = 140.dp
+    val size128 = 128.dp
     val size220 = 220.dp
     val size200 = 200.dp
     val size210 = 210.dp
@@ -156,5 +157,6 @@ object Dimensions {
     val lineSpacing30 = 30.sp
     val lineSpacing5 = 5.sp
     val lineSpacing1 = 1.sp
+
 
 }
