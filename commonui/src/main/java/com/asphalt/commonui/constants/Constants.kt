@@ -48,6 +48,7 @@ object Constants {
 
     // Drawer Menu click
     const val LOGOUT_CLICK = 1
+    const val MESSAGE_CLICK = 2
 
 
 

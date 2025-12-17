@@ -99,6 +99,7 @@ dependencies {
     implementation(projects.feature.resetpassword)
 
     implementation(projects.feature.joinaride)
+    implementation(projects.feature.chat)
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen
