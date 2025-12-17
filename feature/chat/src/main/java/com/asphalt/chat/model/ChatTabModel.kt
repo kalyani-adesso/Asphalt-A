@@ -1,4 +1,4 @@
-package com.asphalt.chat.screen.model
+package com.asphalt.chat.model
 
 import com.asphalt.chat.ChatConstants
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,11 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.asphalt.chat.screen.model.ChatTabModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.chat.model.ChatTabModel
+import com.asphalt.chat.viewmodel.ChatListViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
@@ -39,9 +43,13 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.util.GetGradient
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChatListingScreen(setTopAppBarState: (AppBarState) -> Unit) {
+fun ChatListingScreen(
+    setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: ChatListViewModel = koinViewModel()
+) {
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.messages),
@@ -122,34 +130,30 @@ fun ChatListingScreen(setTopAppBarState: (AppBarState) -> Unit) {
                         .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround,
-                    contentPadding = PaddingValues(horizontal = Dimensions.padding10)
+                    contentPadding = PaddingValues(start = Dimensions.padding10)
                 ) {
                     items(ChatTabModel.getChatTabs()) { item ->
                         Box(
                             modifier = Modifier
-                                .background(
-                                    brush = GetGradient(
-                                        PrimaryDarkerLightB75,
-                                        PrimaryDarkerLightB75
-                                    ),
-                                    shape = RoundedCornerShape(Dimensions.size10)
-                                )
-                                .padding(all = Dimensions.padding15)
-
-                                /*.then(
-                                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                                .then(
+                                    if (viewModel.tabSelection.value == item.id) {
                                         Modifier.background(
-                                            brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
+                                            brush = GetGradient(
+                                                PrimaryDarkerLightB75,
+                                                PrimaryDarkerLightB75
+                                            ),
                                             shape = RoundedCornerShape(Dimensions.size10)
                                         )
                                     } else {
                                         Modifier.background(
-                                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                                            color = NeutralWhite,
+                                            shape = RoundedCornerShape(Dimensions.size10)
                                         )
                                     }
-                                )*/
+                                )
+                                .padding(all = Dimensions.padding15)
                                 .clickable {
-                                    // ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
+                                    viewModel.updateTab(item.id)
                                 }, contentAlignment = Alignment.Center
 
                             // Rounded corners here
@@ -158,14 +162,14 @@ fun ChatListingScreen(setTopAppBarState: (AppBarState) -> Unit) {
                             Text(
                                 text = item.name,//stringResource(R.string.upcoming),
                                 style = TypographyMedium.titleMedium,
-                                color = NeutralWhite
-                                /*color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                                color = if (viewModel.tabSelection.value == item.id) {
                                     NeutralWhite
                                 } else {
                                     NeutralBlack
-                                }*/
+                                }
                             )
                         }
+                        Spacer(modifier = Modifier.width(Dimensions.padding10))
                     }
                 }
             }
@@ -177,5 +181,6 @@ fun ChatListingScreen(setTopAppBarState: (AppBarState) -> Unit) {
 @Preview
 @Composable
 fun ChatListPreview() {
-    ChatListingScreen({})
+    var videModel: ChatListViewModel = viewModel()
+    ChatListingScreen({}, videModel)
 }
