@@ -42,6 +42,7 @@ dependencies {
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.coil)
+    implementation(projects.feature.chat)
 
     // Compose
     implementation(libs.compose.ui)
