@@ -197,16 +197,30 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title: (ride?.rideJoined ?? false) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: (ride?.rideJoined ?? false) ? AppColor.vividGreen
-                                   :  AppColor.celticBlue ,onTap: {
+                        ButtonView(
+                            title: (ride?.rideJoined ?? false)
+                                ? AppStrings.JoinRide.reJoinRideTitle.uppercased()
+                                : AppStrings.JoinRide.joinRide.uppercased(),
+                            icon: AppIcon.JoinRide.movedLocation,
+                            background: (ride?.rideJoined ?? false)
+                                ? AppColor.vividGreen
+                                : AppColor.celticBlue
+                        ) {
+                            guard let ride = ride else { return }
+
                             viewModel.tappedIndex = index
+
                             Task {
-                                if let ride = ride,
-                                  let selected = await viewModel.handleJoin(for: ride) {
-                                        selectedRide = selected
-                                    }
+                                if ride.rideJoined {
+                                    selectedRide = ride
+                                    return
+                                }
+                                if let selected = await viewModel.handleJoin(for: ride) {
+                                    selectedRide = selected
+                                }
                             }
-                        })
+                        }
+
                         .frame(maxWidth: .infinity)
                         .padding(.bottom,20)
                     }

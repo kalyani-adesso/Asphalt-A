@@ -455,6 +455,10 @@ public struct AppStrings{
         static let cancel =  "CANCEL"
         static let addMore =  "ADD MORE"
     }
+    
+    enum Chat {
+        static let searchLabel = "Search riders, conversations..."
+    }
 }
 
 
