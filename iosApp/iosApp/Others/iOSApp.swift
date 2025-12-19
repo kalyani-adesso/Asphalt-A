@@ -26,7 +26,10 @@ struct iOSApp: App {
             } else {
                 if MBUserDefaults.hasSeenOnboardingStatic {
                     NavigationStack {
-                        SignInView()
+//                        SignInView()
+                        BottomNavBar()
+                            .environmentObject(homeViewModel)
+                            .environmentObject(upcomingVM)
                     }
                 } else {
                     WelcomeScreen()

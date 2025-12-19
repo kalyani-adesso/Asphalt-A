@@ -177,7 +177,9 @@ struct AppIcon {
         static let view = Image("view")
         static let rating = Image("rating")
         static let ratingFilled = Image("rating-filled")
-       
+    }
+    struct Chat {
+        static let send = Image("send")
     }
 }
 
