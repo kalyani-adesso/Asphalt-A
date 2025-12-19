@@ -5,6 +5,7 @@ import com.asphalt.android.di.androidSharedModule
 import com.asphalt.android.di.appModule
 import com.asphalt.android.di.sharedModule
 import com.asphalt.android.repository.AuthenticatorImpl
+import com.asphalt.chat.di.chatModule
 import com.asphalt.createride.di.createRideModule
 import com.asphalt.dashboard.di.dashboardModule
 import com.asphalt.joinaride.di.joinRideModule
@@ -32,7 +33,7 @@ class AsphaltApplication : Application() {
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
                         + sharedModule + dashboardModule + profileModule + androidSharedModule
-                        + queryModule + resetModule + joinRideModule + createRideModule,
+                        + queryModule + resetModule + joinRideModule + createRideModule + chatModule,
 
                 )
             module {

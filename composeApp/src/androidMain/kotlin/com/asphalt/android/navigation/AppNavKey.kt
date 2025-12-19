@@ -67,6 +67,9 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     data class RideDetails(val ridesID: String? = null) : AppNavKey
+
+    @Serializable
+    object ChatListNavaKey : AppNavKey
 }
 
 data class BottomNavItems(
