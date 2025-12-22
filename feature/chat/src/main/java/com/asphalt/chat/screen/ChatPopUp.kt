@@ -1,6 +1,5 @@
 package com.asphalt.chat.screen
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -35,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.asphalt.chat.model.ChatMessage
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.BlueLite34
@@ -144,7 +142,9 @@ fun ChatDialog(
                         }
 
                     }
-                    Box(modifier = Modifier.weight(1f).background(BlueLite36)) {
+                    Box(modifier = Modifier
+                        .weight(1f)
+                        .background(BlueLite36)) {
 
 
                         LazyColumn(
@@ -157,8 +157,13 @@ fun ChatDialog(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.fillMaxWidth().height(Dimensions.padding1)
-                        .background(color = NeutralLightGrayishBlue50).shadow(elevation = Dimensions.padding15))
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(Dimensions.padding1)
+                            .background(color = NeutralLightGrayishBlue50)
+                            .shadow(elevation = Dimensions.padding15)
+                    )
                     Row(
                         modifier = Modifier.padding(
                             start = Dimensions.padding10, end = Dimensions.padding10,
@@ -230,40 +235,6 @@ fun ChatDialog(
     }
 }
 
-data class ChatMessage(
-    val text: String,
-    val isSender: Boolean
-)
-
-@SuppressLint("ConfigurationScreenWidthHeight")
-@Composable
-fun ChatBubble(message: ChatMessage) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val bubbleWidth = screenWidth / 2
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Dimensions.size4),
-        horizontalArrangement = if (message.isSender)
-            Arrangement.End else Arrangement.Start
-    ) {
-
-        Box(
-            modifier = Modifier
-                .shadow(Dimensions.spacing12, shape = RoundedCornerShape(Dimensions.spacing12))
-                .background(
-                    if (message.isSender) NeutralWhite else BlueLite34,
-                    RoundedCornerShape(Dimensions.spacing12)
-                )
-                .widthIn(
-                    max = bubbleWidth
-                )
-                .padding(Dimensions.size10)
-        ) {
-            Text(message.text, style = Typography.bodySmall)
-        }
-    }
-}
 
 @Preview
 @Composable
