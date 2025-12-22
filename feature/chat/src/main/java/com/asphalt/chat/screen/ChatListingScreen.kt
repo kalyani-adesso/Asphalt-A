@@ -62,6 +62,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatListingScreen(
     setTopAppBarState: (AppBarState) -> Unit,
+    chatItemClick: () -> Unit,
     viewModel: ChatListViewModel = koinViewModel()
 ) {
     setTopAppBarState(
@@ -204,7 +205,7 @@ fun ChatListingScreen(
                     }
                     items(10) {
                         Column {
-                            ChatList()
+                            ChatList(chatItemClick)
                             Spacer(modifier = Modifier.height(Dimensions.size10))
 
                         }
@@ -218,12 +219,15 @@ fun ChatListingScreen(
 }
 
 @Composable
-fun ChatList() {
+fun ChatList(chatItemClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimensions.size83)
-            .padding(start = Dimensions.padding16, end = Dimensions.padding16),
+            .padding(start = Dimensions.padding16, end = Dimensions.padding16)
+            .clickable {
+                chatItemClick.invoke()
+            },
         colors = CardDefaults.cardColors(
             containerColor = Color.White // or use NeutralWhite
         ),
@@ -341,5 +345,5 @@ fun ChatList() {
 @Composable
 fun ChatListPreview() {
     var videModel: ChatListViewModel = viewModel()
-    ChatListingScreen({}, videModel)
+    ChatListingScreen({}, {},videModel)
 }

@@ -34,6 +34,7 @@ import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.screen.ChatListingScreen
+import com.asphalt.chat.screen.ChatScreen
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.R
@@ -139,6 +140,7 @@ fun NavigationRoot(
         is AppNavKey.QueriesKey,
         is AppNavKey.ProfileKey,
         is AppNavKey.RideDetails,
+        is AppNavKey.ChatScreenNavaKey,
         is AppNavKey.ChatListNavaKey -> true
 
         else -> false
@@ -157,6 +159,7 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
         is AppNavKey.RideDetails,
+        is AppNavKey.ChatScreenNavaKey,
         is AppNavKey.ChatListNavaKey -> true
 
         else -> false
@@ -477,7 +480,13 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.ChatListNavaKey> { key ->
-                        ChatListingScreen(setTopAppBarState = setTopAppBarState)
+                        ChatListingScreen(setTopAppBarState = setTopAppBarState, chatItemClick = {
+                            backStack.add(AppNavKey.ChatScreenNavaKey)
+                        })
+                    }
+
+                    entry<AppNavKey.ChatScreenNavaKey> { key ->
+                        ChatScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
