@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.asphalt.chat.model.ChatMessage
 import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.ui.CircularNetworkImage
@@ -41,7 +42,7 @@ fun ChatBubble(message: ChatMessage) {
             Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.Bottom
     ) {
-        if(!message.isSender) {
+        if (!message.isSender) {
             CircularNetworkImage(
                 modifier = Modifier.border(
                     width = Dimensions.size2pt5,
@@ -57,7 +58,7 @@ fun ChatBubble(message: ChatMessage) {
             modifier = Modifier
                 .shadow(Dimensions.spacing12, shape = RoundedCornerShape(Dimensions.spacing12))
                 .background(
-                    if (message.isSender) NeutralWhite else BlueLite34,
+                    if (message.isSender) BlueLite34 else NeutralWhite,
                     RoundedCornerShape(Dimensions.spacing12)
                 )
                 .widthIn(
@@ -65,7 +66,11 @@ fun ChatBubble(message: ChatMessage) {
                 )
                 .padding(Dimensions.size10)
         ) {
-            Text(message.text, style = Typography.bodySmall)
+            Text(
+                message.text,
+                style = Typography.bodySmall,
+                color = if (message.isSender) NeutralWhite else NeutralBlack
+            )
         }
 
 
@@ -74,6 +79,6 @@ fun ChatBubble(message: ChatMessage) {
 
 @Preview
 @Composable
-fun BubblePReview(){
-    ChatBubble(ChatMessage("Test",true))
+fun BubblePReview() {
+    ChatBubble(ChatMessage("Test", true))
 }
