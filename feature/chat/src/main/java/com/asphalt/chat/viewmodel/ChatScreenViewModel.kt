@@ -10,7 +10,11 @@ class ChatScreenViewModel : ViewModel() {
     val chatMessage: StateFlow<List<ChatMessage>> = _chatMessage
 
     fun updateChatMessage(message: ChatMessage) {
-       // _chatMessage.value = _chatMessage.value + message
+        // _chatMessage.value = _chatMessage.value + message
         _chatMessage.value = listOf(message) + _chatMessage.value
+    }
+
+    fun clearChat() {
+        _chatMessage.value = emptyList()
     }
 }

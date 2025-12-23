@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +43,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.chat.model.ChatMessage
+import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.BlueLite34
@@ -55,14 +59,21 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatDialog(
+    viewModel: ChatScreenViewModel = koinViewModel(),
     onDismiss: () -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    var msgText by remember { mutableStateOf("") }
+    val messages by viewModel.chatMessage.collectAsState()
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            viewModel.clearChat()
+            onDismiss
+        },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Column(modifier = Modifier.padding(horizontal = Dimensions.padding20)) {
@@ -72,18 +83,18 @@ fun ChatDialog(
                     .fillMaxWidth()
                     .fillMaxHeight(0.8f)
             ) {
-                val messages = listOf(
-                    ChatMessage("Hello!", true),
-                    ChatMessage("Hi! How are you?", false),
-                    ChatMessage("I'm good, thanks!", true),
-                    ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
-                    ChatMessage("Nice to hear 😊", false),
-                    ChatMessage("Nice to hear 😊", false),
-                    ChatMessage("Nice to hear 😊", false),
-                    ChatMessage("Nice to hear 😊", false),
-                    ChatMessage("Nice to hear 😊", false),
-                    ChatMessage("Nice to hear 😊", false),
-                )
+                /* val messages = listOf(
+                     ChatMessage("Hello!", true),
+                     ChatMessage("Hi! How are you?", false),
+                     ChatMessage("I'm good, thanks!", true),
+                     ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
+                     ChatMessage("Nice to hear 😊", false),
+                     ChatMessage("Nice to hear 😊", false),
+                     ChatMessage("Nice to hear 😊", false),
+                     ChatMessage("Nice to hear 😊", false),
+                     ChatMessage("Nice to hear 😊", false),
+                     ChatMessage("Nice to hear 😊", false),
+                 )*/
                 Column(Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
@@ -128,6 +139,7 @@ fun ChatDialog(
                                 modifier = Modifier
                                     .size(Dimensions.size30)
                                     .clickable {
+                                        viewModel.clearChat()
                                         onDismiss.invoke()
                                     },
                                 cornerRadius = Dimensions.size10,
@@ -142,15 +154,19 @@ fun ChatDialog(
                         }
 
                     }
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .background(BlueLite36)) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(BlueLite36)
+                    ) {
 
 
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(start = Dimensions.size10, end = Dimensions.size10)
+                                .padding(start = Dimensions.size10, end = Dimensions.size10),
+                            state = listState,
+                            reverseLayout = true
                         ) {
                             items(messages) { msg ->
                                 ChatBubble(msg)
@@ -186,8 +202,8 @@ fun ChatDialog(
                                 ), verticalAlignment = Alignment.CenterVertically
                         ) {
                             TextField(
-                                value = text,
-                                onValueChange = { text = it },
+                                value = msgText,
+                                onValueChange = { msgText = it },
                                 placeholder = {
                                     Text(
                                         text = stringResource(string.type_msg),
@@ -216,7 +232,30 @@ fun ChatDialog(
                         }
                         Spacer(modifier = Modifier.width(Dimensions.size10))
                         RoundedBox(
-                            modifier = Modifier.size(Dimensions.size44),
+                            modifier = Modifier
+                                .size(Dimensions.size44)
+                                .clickable {
+                                    if (msgText.isNotEmpty()) {
+                                        if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
+                                            viewModel.updateChatMessage(
+                                                ChatMessage(
+                                                    text = msgText,
+                                                    true
+                                                )
+                                            )
+                                        } else {
+                                            viewModel.updateChatMessage(
+                                                ChatMessage(
+                                                    text = msgText,
+                                                    false
+                                                )
+                                            )
+                                        }
+
+                                        msgText = ""
+                                    }
+
+                                },
                             cornerRadius = Dimensions.size10,
                             backgroundColor = PrimaryDarkerLightB75,
                             contentAlignment = Alignment.Center
@@ -239,5 +278,6 @@ fun ChatDialog(
 @Preview
 @Composable
 fun ChatPreview() {
-    ChatDialog({})
+    val viewModel: ChatScreenViewModel = viewModel()
+    ChatDialog(viewModel, {})
 }
