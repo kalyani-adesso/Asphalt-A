@@ -48,6 +48,7 @@ import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
 import com.asphalt.commonui.theme.AsphaltTheme
+import com.asphalt.commonui.theme.BlueLite25
 import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.BlueLite36
 import com.asphalt.commonui.theme.Dimensions
@@ -255,7 +256,7 @@ fun ChatScreen(
 
                                 },
                             cornerRadius = Dimensions.size10,
-                            backgroundColor = PrimaryDarkerLightB75,
+                            backgroundColor = if (msgText.isNotEmpty()) PrimaryDarkerLightB75 else BlueLite25,
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
