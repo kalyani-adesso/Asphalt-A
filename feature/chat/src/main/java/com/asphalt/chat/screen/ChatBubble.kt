@@ -5,9 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -25,8 +27,11 @@ import com.asphalt.chat.model.ChatMessage
 import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
+import com.asphalt.commonui.theme.NeutralDarkGrey
+import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
+import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 
 @SuppressLint("ConfigurationScreenWidthHeight")
@@ -66,11 +71,28 @@ fun ChatBubble(message: ChatMessage) {
                 )
                 .padding(Dimensions.size10)
         ) {
-            Text(
-                message.text,
-                style = Typography.bodySmall,
-                color = if (message.isSender) NeutralWhite else NeutralBlack
-            )
+            Column {
+                if (!message.isSender) {
+                    Text(
+                        text = "Sooraj",
+                        style = TypographyBold.bodySmall,
+                        color = if (message.isSender) NeutralWhite else BlueLite34
+                    )
+                    Spacer(modifier = Modifier.height(Dimensions.size4))
+                }
+                Text(
+                    message.text,
+                    style = Typography.bodySmall,
+                    color = if (message.isSender) NeutralWhite else NeutralBlack
+                )
+                Spacer(modifier = Modifier.height(Dimensions.size4))
+                Text(
+                    text = "10:30 AM",
+                    style = Typography.bodySmall,
+                    color = if (message.isSender) NeutralLightGrey else NeutralDarkGrey,
+                    fontSize = Dimensions.textsize10
+                )
+            }
         }
 
 
