@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +26,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -33,7 +41,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.chat.model.ChatMessage
+import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
@@ -49,15 +59,24 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
+fun ChatScreen(
+    setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: ChatScreenViewModel = koinViewModel()
+) {
     setTopAppBarState(
         AppBarState(
             //title = stringResource(R.string.messages),
         )
     )
+    val listState = rememberLazyListState()
+    var msgText by remember { mutableStateOf("") }
+    val messages by viewModel.chatMessage.collectAsState()
+
+
     AsphaltTheme {
         Column(modifier = Modifier) {
             Box(
@@ -65,7 +84,7 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
                     .background(NeutralWhite)
                     .fillMaxWidth()
             ) {
-                val messages = listOf(
+                /*val messages = listOf(
                     ChatMessage("Hello!", true),
                     ChatMessage("Hi! How are you?", false),
                     ChatMessage("I'm good, thanks!", true),
@@ -76,7 +95,7 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
                     ChatMessage("Nice to hear 😊", false),
                     ChatMessage("Nice to hear 😊", false),
                     ChatMessage("Nice to hear 😊", false),
-                )
+                )*/
                 Column(Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
@@ -115,33 +134,37 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
                                     )
                                 }
                             }
-                           /* RoundedBox(
-                                modifier = Modifier
-                                    .size(Dimensions.size30)
-                                    .clickable {
-                                        //onDismiss.invoke()
-                                    },
-                                cornerRadius = Dimensions.size10,
-                                backgroundColor = PrimaryDarkerLightB75
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.ic_close_white),
-                                    contentDescription = ""
-                                )
-                            }*/
+                            /* RoundedBox(
+                                 modifier = Modifier
+                                     .size(Dimensions.size30)
+                                     .clickable {
+                                         //onDismiss.invoke()
+                                     },
+                                 cornerRadius = Dimensions.size10,
+                                 backgroundColor = PrimaryDarkerLightB75
+                             ) {
+                                 Image(
+                                     painter = painterResource(R.drawable.ic_close_white),
+                                     contentDescription = ""
+                                 )
+                             }*/
 
                         }
 
                     }
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .background(BlueLite36)) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(BlueLite36)
+                    ) {
 
 
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(start = Dimensions.size10, end = Dimensions.size10)
+                                .padding(start = Dimensions.size10, end = Dimensions.size10),
+                            state = listState,
+                            reverseLayout = true
                         ) {
                             items(messages) { msg ->
                                 ChatBubble(msg)
@@ -177,8 +200,8 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
                                 ), verticalAlignment = Alignment.CenterVertically
                         ) {
                             TextField(
-                                value = "",
-                                onValueChange = { },
+                                value = msgText,
+                                onValueChange = { msgText = it },
                                 placeholder = {
                                     Text(
                                         text = stringResource(string.type_msg),
@@ -207,7 +230,30 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
                         }
                         Spacer(modifier = Modifier.width(Dimensions.size10))
                         RoundedBox(
-                            modifier = Modifier.size(Dimensions.size44),
+                            modifier = Modifier
+                                .size(Dimensions.size44)
+                                .clickable {
+                                    if (msgText.isNotEmpty()) {
+                                        if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
+                                            viewModel.updateChatMessage(
+                                                ChatMessage(
+                                                    text = msgText,
+                                                    true
+                                                )
+                                            )
+                                        }else{
+                                            viewModel.updateChatMessage(
+                                                ChatMessage(
+                                                    text = msgText,
+                                                    false
+                                                )
+                                            )
+                                        }
+
+                                        msgText = ""
+                                    }
+
+                                },
                             cornerRadius = Dimensions.size10,
                             backgroundColor = PrimaryDarkerLightB75,
                             contentAlignment = Alignment.Center
@@ -238,5 +284,6 @@ fun ChatScreen(setTopAppBarState: (AppBarState) -> Unit) {
 @Preview
 @Composable
 fun ChatScreenPreview() {
-    ChatScreen({})
+    val viewModel: ChatScreenViewModel = viewModel()
+    ChatScreen({}, viewModel)
 }
