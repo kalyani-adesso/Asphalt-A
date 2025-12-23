@@ -107,8 +107,8 @@ fun ChatScreen(
                             ),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10)) {
-                            Row(modifier = Modifier.weight(1f)) {
+                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10),) {
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                                 CircularNetworkImage(
                                     modifier = Modifier.border(
                                         width = Dimensions.size2pt5,
@@ -125,14 +125,14 @@ fun ChatScreen(
                                         style = TypographyBold.bodyMedium,
                                         color = NeutralWhite
                                     )
-                                    Spacer(modifier = Modifier.height(Dimensions.size8))
+                                   /* Spacer(modifier = Modifier.height(Dimensions.size8))
                                     Text(
                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
                                         modifier = Modifier,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         style = Typography.bodySmall, color = NeutralWhite
-                                    )
+                                    )*/
                                 }
                             }
                             /* RoundedBox(
