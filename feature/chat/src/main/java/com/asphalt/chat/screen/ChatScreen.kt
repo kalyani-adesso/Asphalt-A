@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,14 +41,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.chat.model.ChatMessage
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
+import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.BlueLite25
 import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.BlueLite36
@@ -62,54 +62,53 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
+
 @Composable
-fun ChatDialog(
-    viewModel: ChatScreenViewModel = koinViewModel(),
-    onDismiss: () -> Unit
+fun ChatScreen(
+    setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: ChatScreenViewModel = koinViewModel()
 ) {
+    setTopAppBarState(
+        AppBarState(
+            //title = stringResource(R.string.messages),
+        )
+    )
     val listState = rememberLazyListState()
     var msgText by remember { mutableStateOf("") }
     val messages by viewModel.chatMessage.collectAsState()
-    Dialog(
-        onDismissRequest = {
-            viewModel.clearChat()
-            onDismiss
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Column(modifier = Modifier.padding(horizontal = Dimensions.padding20)) {
+
+
+    AsphaltTheme {
+        Column(modifier = Modifier) {
             Box(
                 modifier = Modifier
-                    .background(NeutralWhite, RoundedCornerShape(Dimensions.padding20))
+                    .background(NeutralWhite)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.8f)
             ) {
-                /* val messages = listOf(
-                     ChatMessage("Hello!", true),
-                     ChatMessage("Hi! How are you?", false),
-                     ChatMessage("I'm good, thanks!", true),
-                     ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                 )*/
+                /*val messages = listOf(
+                    ChatMessage("Hello!", true),
+                    ChatMessage("Hi! How are you?", false),
+                    ChatMessage("I'm good, thanks!", true),
+                    ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
+                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊", false),
+                    ChatMessage("Nice to hear 😊", false),
+                )*/
                 Column(Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
                             .height(Dimensions.size71)
                             .fillMaxWidth()
                             .background(
-                                BlueLite34, RoundedCornerShape(
-                                    Dimensions.size20, Dimensions.size20, 0.dp, 0.dp
-                                )
+                                BlueLite34
                             ),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10)) {
-                            Row(modifier = Modifier.weight(1f)) {
+                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10),) {
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                                 CircularNetworkImage(
                                     modifier = Modifier.border(
                                         width = Dimensions.size2pt5,
@@ -126,31 +125,30 @@ fun ChatDialog(
                                         style = TypographyBold.bodyMedium,
                                         color = NeutralWhite
                                     )
-                                    Spacer(modifier = Modifier.height(Dimensions.size8))
+                                   /* Spacer(modifier = Modifier.height(Dimensions.size8))
                                     Text(
                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
                                         modifier = Modifier,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         style = Typography.bodySmall, color = NeutralWhite
-                                    )
+                                    )*/
                                 }
                             }
-                            RoundedBox(
-                                modifier = Modifier
-                                    .size(Dimensions.size30)
-                                    .clickable {
-                                        viewModel.clearChat()
-                                        onDismiss.invoke()
-                                    },
-                                cornerRadius = Dimensions.size10,
-                                backgroundColor = PrimaryDarkerLightB75
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.ic_close_white),
-                                    contentDescription = ""
-                                )
-                            }
+                            /* RoundedBox(
+                                 modifier = Modifier
+                                     .size(Dimensions.size30)
+                                     .clickable {
+                                         //onDismiss.invoke()
+                                     },
+                                 cornerRadius = Dimensions.size10,
+                                 backgroundColor = PrimaryDarkerLightB75
+                             ) {
+                                 Image(
+                                     painter = painterResource(R.drawable.ic_close_white),
+                                     contentDescription = ""
+                                 )
+                             }*/
 
                         }
 
@@ -237,14 +235,14 @@ fun ChatDialog(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
+                                        if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
                                             viewModel.updateChatMessage(
                                                 ChatMessage(
                                                     text = msgText,
                                                     true
                                                 )
                                             )
-                                        } else {
+                                        }else{
                                             viewModel.updateChatMessage(
                                                 ChatMessage(
                                                     text = msgText,
@@ -269,16 +267,24 @@ fun ChatDialog(
 
                     }
                     Spacer(Modifier.height(Dimensions.size10))
+                    /*Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(Dimensions.padding1)
+                            .background(color = NeutralLightGrayishBlue50)
+                            .shadow(elevation = Dimensions.padding15)
+                    )*/
                 }
             }
         }
-    }
-}
 
+    }
+
+}
 
 @Preview
 @Composable
-fun ChatPreview() {
+fun ChatScreenPreview() {
     val viewModel: ChatScreenViewModel = viewModel()
-    ChatDialog(viewModel, {})
+    ChatScreen({}, viewModel)
 }

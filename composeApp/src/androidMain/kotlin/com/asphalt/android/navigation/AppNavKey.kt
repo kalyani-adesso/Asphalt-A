@@ -70,6 +70,9 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     object ChatListNavaKey : AppNavKey
+
+    @Serializable
+    object ChatScreenNavaKey : AppNavKey
 }
 
 data class BottomNavItems(
