@@ -327,7 +327,10 @@ fun NavigationRoot(
                             onNavigateToLogin = { //password ->
                                 //  backStack.add(RegistrationDetailsNavKey(password))
                                 backStack.remove(SplashKey)
-                                backStack.add(AppNavKey.LoginScreenNavKey)
+                                backStack.remove(AppNavKey.LoginScreenNavKey)
+                                backStack.add(AppNavKey.LoginSuccessScreenNavKey)
+                                backStack.remove(RegistrationDetailsNavKey)
+                                //backStack.add(AppNavKey.LoginScreenNavKey)
                             },
                             onBackPressed = { onBackPressed() }
                         )
