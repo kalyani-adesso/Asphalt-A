@@ -12,6 +12,7 @@ struct UpcomingRidesView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
+    let onMessageTap: (String) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -32,7 +33,7 @@ struct UpcomingRidesView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 25) {
                         ForEach($viewModel.upcomingInvitesRide, id: \.id) { $ride in
-                            UpcomingRideCard(viewModel: viewModel, ride: $ride)
+                            UpcomingRideCard(viewModel: viewModel, ride: $ride,  onMessageTap: onMessageTap)
                         }
                     }
                 }
@@ -54,6 +55,7 @@ struct UpcomingRideCard: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
     @State private var showRideDetails = false
+    let onMessageTap: (String) -> Void
     var hostName: String {
         viewModel.usersById[ride.createdBy] ?? "Unknown"
     }
@@ -62,117 +64,127 @@ struct UpcomingRideCard: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                AppImage.Profile.profile.resizable()
-                    .frame(width: 29, height: 29)
-                    .clipShape(Circle())
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 32.5)
-                            .stroke(AppColor.celticBlue, lineWidth: 2.5)
-                    )
-                    .overlay(Text(initials(from: hostName)).font(.headline))
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(isMyRide ? ride.title : "Invite from  \(hostName)")
-                        .font(KlavikaFont.bold.font(size: 16))
-                    Text("\(ride.routeStart)")
-                        .font(KlavikaFont.regular.font(size: 12))
-                        .foregroundColor(AppColor.stoneGray)
+        ZStack {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    AppImage.Profile.profile.resizable()
+                        .frame(width: 29, height: 29)
+                        .clipShape(Circle())
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 32.5)
+                                .stroke(AppColor.celticBlue, lineWidth: 2.5)
+                        )
+                        .overlay(Text(initials(from: hostName)).font(.headline))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(isMyRide ? ride.title : "Invite from  \(hostName)")
+                            .font(KlavikaFont.bold.font(size: 16))
+                        Text("\(ride.routeStart)")
+                            .font(KlavikaFont.regular.font(size: 12))
+                            .foregroundColor(AppColor.stoneGray)
+                    }
+                    Spacer()
+                    Button {
+                        withAnimation(.easeInOut) {
+                               onMessageTap(hostName)
+                           }
+                    } label: {
+                        AppIcon.Home.message
+                    }
+                    .buttonStyle(.plain)
+                    
                 }
-                Spacer()
-                AppIcon.Home.message
-            }
-            HStack(spacing: 8) {
-                AppIcon.Home.calender
-                Text(ride.date)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundColor(AppColor.stoneGray)
-                Spacer()
-            }
-            HStack{
                 HStack(spacing: 8) {
-                    AppIcon.Home.group.resizable()
-                        .frame(width: 15, height: 15)
-                    Text("\(ride.participantAcceptedCount) people joined this ride")
+                    AppIcon.Home.calender
+                    Text(ride.date)
                         .font(KlavikaFont.regular.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
+                    Spacer()
                 }
-                Spacer()
                 HStack{
-                    let displayCount = min(ride.participantAcceptedCount, 3)
-                    ForEach(0..<displayCount, id: \.self) { index in
-                        AppImage.Profile.profile.resizable()
-                            .frame(width: 19, height: 19)
-                            .clipShape(Circle())
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 32.5)
-                                    .stroke(index == 0 ? AppColor.green : AppColor.grayishBlue, lineWidth: 1.5)
-                            )
+                    HStack(spacing: 8) {
+                        AppIcon.Home.group.resizable()
+                            .frame(width: 15, height: 15)
+                        Text("\(ride.participantAcceptedCount) people joined this ride")
+                            .font(KlavikaFont.regular.font(size: 12))
+                            .foregroundColor(AppColor.stoneGray)
                     }
+                    Spacer()
+                    HStack{
+                        let displayCount = min(ride.participantAcceptedCount, 3)
+                        ForEach(0..<displayCount, id: \.self) { index in
+                            AppImage.Profile.profile.resizable()
+                                .frame(width: 19, height: 19)
+                                .clipShape(Circle())
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 32.5)
+                                        .stroke(index == 0 ? AppColor.green : AppColor.grayishBlue, lineWidth: 1.5)
+                                )
+                        }
+                    }
+                    if ride.participantAcceptedCount > 3 {
+                        ZStack {
+                            Circle()
+                                .fill(AppColor.celticBlue)
+                                .frame(width: 19, height: 19)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 32.5)
+                                        .stroke(AppColor.grayishBlue, lineWidth: 1.5)
+                                )
+                            Text("+\(ride.participantAcceptedCount - 3)")
+                                .font(KlavikaFont.bold.font(size: 12))
+                                .foregroundColor(AppColor.white)
+                        }
+                    }
+                    
                 }
-                if ride.participantAcceptedCount > 3 {
-                    ZStack {
-                        Circle()
-                            .fill(AppColor.celticBlue)
-                            .frame(width: 19, height: 19)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 32.5)
-                                    .stroke(AppColor.grayishBlue, lineWidth: 1.5)
-                            )
-                        Text("+\(ride.participantAcceptedCount - 3)")
-                            .font(KlavikaFont.bold.font(size: 12))
-                            .foregroundColor(AppColor.white)
+                if isMyRide {
+                    HStack {
+                        ButtonView(title: "VIEW DETAILS", fontSize: 14, onTap :{
+                            Task {
+                                showRideDetails = true
+                            }
+                        }, height: 32)
+                        ButtonView(title: "CANCEL RIDE",  fontSize: 14,  background: AppColor.darkRed, onTap :{
+                            Task {
+                                await viewModel.deleteRide(rideId: ride.id)
+                            }
+                        },height: 32)
+                        
                     }
+                    .padding(.vertical,10)
+                }
+                else{
+                    HStack {
+                        ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, onTap :{
+                            Task {
+                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
+                            }
+                        }, height: 32)
+                        ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: AppColor.darkRed, onTap :{
+                            Task {
+                                await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
+                            }
+                        },height: 32)
+                        
+                    }
+                    .padding(.vertical,10)
                 }
                 
             }
-            if isMyRide {
-                HStack {
-                    ButtonView(title: "VIEW DETAILS", fontSize: 14, onTap :{
-                        Task {
-                            showRideDetails = true
-                        }
-                    }, height: 32)
-                    ButtonView(title: "CANCEL RIDE",  fontSize: 14,  background: AppColor.darkRed, onTap :{
-                        Task {
-                            await viewModel.deleteRide(rideId: ride.id)
-                        }
-                    },height: 32)
-                    
-                }
-                .padding(.vertical,10)
-            }
-            else{
-                HStack {
-                    ButtonView(title: AppStrings.HomeButton.accept.rawValue, fontSize: 14, onTap :{
-                        Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: true)
-                        }
-                    }, height: 32)
-                    ButtonView(title: AppStrings.HomeButton.decline.rawValue,  fontSize: 14,  background: AppColor.darkRed, onTap :{
-                        Task {
-                            await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false)
-                        }
-                    },height: 32)
-                    
-                }
-                .padding(.vertical,10)
-            }
-            
+            .navigationDestination(isPresented: $showRideDetails, destination: {
+                RideDetailsView(viewModel: viewModel, ride: $ride)
+            })
+            .padding()
+            .frame(width: 290)
+            .background(AppColor.backgroundLight)
+            .cornerRadius(14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(AppColor.darkGray, lineWidth: 2)
+            )
         }
-        .navigationDestination(isPresented: $showRideDetails, destination: {
-            RideDetailsView(viewModel: viewModel, ride: $ride)
-        })
-        .padding()
-        .frame(width: 290)
-        .background(AppColor.backgroundLight)
-        .cornerRadius(14)
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(AppColor.darkGray, lineWidth: 2)
-        )
     }
-    
+
     private func initials(from name: String) -> String {
         name.split(separator: " ").compactMap { $0.first }.map { String($0) }.joined()
     }
@@ -198,8 +210,4 @@ var emptyStateView: some View {
     .padding(.vertical, 30)
 }
 
-#Preview {
-    UpcomingRidesView()
-        .environmentObject(HomeViewModel())
-        .environmentObject(UpcomingRideViewModel())
-}
+

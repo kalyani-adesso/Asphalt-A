@@ -83,7 +83,7 @@ struct RatingSheetView: View {
             .cornerRadius(16)
             .shadow(radius: 10)
             .navigationDestination(isPresented: $showHome, destination: {
-                UpcomingRidesView()
+                UpcomingRidesView(onMessageTap: {_ in })
                     .environmentObject(home)
                     .environmentObject(viewModel)
             })

@@ -37,10 +37,6 @@ struct ChatRowView: View {
                     .font(KlavikaFont.bold.font(size: 14))
                     .foregroundColor(AppColor.black)
 
-                Text(chat.subtitle)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundColor(AppColor.celticBlue)
-
                 Text(chat.lastMessage)
                     .font(KlavikaFont.regular.font(size: 13))
                     .foregroundColor(AppColor.stoneGray)
@@ -77,7 +73,6 @@ struct ChatRowView: View {
 
 #Preview {
     ChatRowView(chat: Chat(name: "Sooraj",
-                           subtitle: "Weekend Coastal Ride",
                            lastMessage: "See you at the meeting point!",
                            time: "10:45 AM",
                            unreadCount: 2,
