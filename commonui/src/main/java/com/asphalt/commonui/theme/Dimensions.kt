@@ -157,6 +157,7 @@ object Dimensions {
     val lineSpacing30 = 30.sp
     val lineSpacing5 = 5.sp
     val lineSpacing1 = 1.sp
+    val textsize10 = 10.sp
 
 
 }
