@@ -10,7 +10,6 @@ import SwiftUI
 struct ChatDetailView: View {
 
     let chatName: String
-    let subtitle: String
     let isGroup: Bool
 
     @State private var messageText = ""
@@ -19,6 +18,7 @@ struct ChatDetailView: View {
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
+    let isOverlay: Bool
 
     let messages: [Message] = [
         Message(text: "Hey! Looking forward to the ride!", isMe: false, time: "10:30 AM", senderName: "Sooraj"),
@@ -28,7 +28,9 @@ struct ChatDetailView: View {
 
     var body: some View {
         VStack {
-            ChatHeaderView(chatName: chatName, subtitle: subtitle)
+            if !isOverlay {
+                    ChatHeaderView(chatName: chatName)
+                }
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(messages) { message in
@@ -70,48 +72,67 @@ struct ChatDetailView: View {
             .padding()
             .opacity(messageText.isEmpty ? 0.4 : 1)
         }
-        .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button {
+        .if (!isOverlay) { view in
+            view
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button {
                             dismiss()
+                            
+                        } label: {
+                            AppIcon.CreateRide.backButton
+                        }
                         
-                    } label: {
-                        AppIcon.CreateRide.backButton
                     }
-                    
-                }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button {
-                        showNotification = true
-                    } label: {
-                        ZStack(alignment: .topTrailing) {
-                            Image(systemName: "bell")
-                                .font(.system(size: 15))
-                                .foregroundColor(AppColor.celticBlue)
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                                .offset(x: -2, y: 1)
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button {
+                            showNotification = true
+                        } label: {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(AppColor.celticBlue)
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
+                        }
+                        
+                        Button {
+                            showSlideBar = true
+                        } label: {
+                            AppIcon.Home.navigation
                         }
                     }
                     
-                    Button {
-                        showSlideBar = true
-                    } label: {
-                        AppIcon.Home.navigation
-                    }
                 }
             
+                .navigationDestination(isPresented: $showSlideBar, destination: {
+                    NavigationSlideBar()
+                })
+                .navigationDestination(isPresented: $showNotification, destination: {
+                    NotificationView()
+                })
+                .navigationBarBackButtonHidden(true)
         }
-        .navigationDestination(isPresented: $showSlideBar, destination: {
-            NavigationSlideBar()
-        })
-        .navigationDestination(isPresented: $showNotification, destination: {
-            NotificationView()
-        })
-        .navigationBarBackButtonHidden(true)
     }
 }
+extension View {
+    @ViewBuilder
+    func `if`<Content: View>(
+        _ condition: Bool,
+        transform: (Self) -> Content
+    ) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}
+
+
 
 
 

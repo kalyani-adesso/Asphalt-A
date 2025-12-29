@@ -11,7 +11,6 @@ import Foundation
 struct Chat: Identifiable {
     let id = UUID()
     let name: String
-    let subtitle: String
     let lastMessage: String
     let time: String
     let unreadCount: Int
@@ -38,28 +37,24 @@ struct MessagesListView: View {
     
     let chats: [Chat] = [
         Chat(name: "Sooraj",
-             subtitle: "Weekend Coastal Ride",
              lastMessage: "See you at the meeting point!",
              time: "10:45 AM",
              unreadCount: 2,
              isGroup: false),
         
         Chat(name: "Abhishek",
-             subtitle: "Weekend Coastal Ride",
              lastMessage: "See you at the meeting point!",
              time: "10:45 AM",
              unreadCount: 2,
              isGroup: false),
         
         Chat(name: "Vyshnav",
-             subtitle: "Weekend Coastal Ride",
              lastMessage: "See you at the meeting point!",
              time: "10:45 AM",
              unreadCount: 2,
              isGroup: false),
         
         Chat(name: "Group Chat",
-             subtitle: "Mountain Trip",
              lastMessage: "See you at the meeting point!",
              time: "10:45 AM",
              unreadCount: 2,
@@ -121,7 +116,7 @@ struct MessagesListView: View {
                         VStack(spacing: 12) {
                             ForEach(chats) { chat in
                                 NavigationLink {
-                                    ChatDetailView(chatName: chat.name, subtitle: chat.subtitle, isGroup: chat.isGroup)
+                                    ChatDetailView(chatName: chat.name, isGroup: chat.isGroup,   isOverlay: false)
                                 } label: {
                                     ChatRowView(chat: chat)
                                 }
@@ -143,7 +138,7 @@ struct MessagesListView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarLeading) {
                 Button {
-                    dismiss()
+                    showHome = true
                     
                 } label: {
                     AppIcon.CreateRide.backButton
@@ -178,6 +173,9 @@ struct MessagesListView: View {
         })
         .navigationDestination(isPresented: $showNotification, destination: {
             NotificationView()
+        })
+        .navigationDestination(isPresented: $showHome, destination: {
+            BottomNavBar()
         })
     }
 }

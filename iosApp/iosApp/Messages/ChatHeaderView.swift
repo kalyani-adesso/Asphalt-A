@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ChatHeaderView: View {
     let chatName: String
-    let subtitle: String
     var body: some View {
         HStack(spacing: 12) {
             
@@ -37,10 +36,6 @@ struct ChatHeaderView: View {
                 Text(chatName)
                     .font(KlavikaFont.bold.font(size: 16))
                     .foregroundColor(AppColor.white)
-
-                Text(subtitle)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundColor(AppColor.white)
             }
 
             Spacer()
@@ -53,5 +48,5 @@ struct ChatHeaderView: View {
 
 
 #Preview {
-    ChatHeaderView(chatName: "Sooraj",  subtitle: "Weekend Coastal Ride")
+    ChatHeaderView(chatName: "Sooraj")
 }
