@@ -111,9 +111,7 @@ struct UpcomingRideView: View {
                 viewModel.selectedTab = startingTab
             }
             
-            // Popup overlay (always stays above)
             if showpopup {
-                // Dimmed background
                 AppColor.backgroundLight.opacity(0.7)
                     .ignoresSafeArea()
                     .zIndex(1)
@@ -123,7 +121,6 @@ struct UpcomingRideView: View {
                         }
                     }
                 
-                // Popup content
                 VStack {
                     Snackbar(
                         message: "Ride Created Successfully",

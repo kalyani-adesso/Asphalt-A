@@ -13,6 +13,7 @@ struct ConnectedRideView: View {
     let subTitle:String
     let model:JoinRideModel
     let rideCompleteModel:[RideCompleteModel]
+    @Environment(\.dismiss) var dismiss
     @State var showView = false
     var body: some View {
         VStack {
@@ -61,7 +62,7 @@ struct ConnectedRideView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
-               //    dismiss()
+                   dismiss()
                 }, label:{
                     AppIcon.CreateRide.backButton
                 })

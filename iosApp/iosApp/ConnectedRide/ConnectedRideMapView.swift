@@ -272,7 +272,9 @@ struct ConnectedRideMapView: View {
                             }
                             viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                                self.elapsedSeconds += 1
+                                DispatchQueue.main.async {
+                                    self.elapsedSeconds += 1
+                                }
                             }
                         }
                         .onChange(of: showMessageNotification) { isShowing in
@@ -315,7 +317,7 @@ struct ConnectedRideMapView: View {
         viewModel.ongoingRideTimer?.invalidate()
         // Schedule the timer to trigger every 2 min minutes (900 seconds)
         viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
-            Task {
+            Task { @MainActor in
                 await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 
             }
