@@ -81,5 +81,10 @@ class ReviewSectionTest {
         composeTestRule.onNodeWithTag("date_time").assertTextEquals("Dec 31,2025 - 9:51 AM")
 
     }
+    @Test
+    fun start_and_end_location_isDisplayed(){
+        composeTestRule.onNodeWithTag("route").assertTextEquals("Downtown - Beach")
+
+    }
 
 }

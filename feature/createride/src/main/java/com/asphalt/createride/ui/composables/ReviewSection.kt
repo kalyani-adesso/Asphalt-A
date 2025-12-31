@@ -199,7 +199,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         Text(
                             text = "${viewModel.rideDetailsState.value.startLocation ?: ""} - ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey
+                            color = NeutralDarkGrey, modifier = Modifier.testTag("route")
                         )
                     }
 
