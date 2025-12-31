@@ -71,4 +71,15 @@ class ReviewSectionTest {
         composeTestRule.onNodeWithTag("participant_count").assertTextEquals("2 riders selected")
     }
 
+    @Test
+    fun rideType_isCorrect(){
+        composeTestRule.onNodeWithTag("ride_type").assertTextEquals("Group Ride")
+    }
+
+    @Test
+    fun startDate_isDisplayed(){
+        composeTestRule.onNodeWithTag("date_time").assertTextEquals("Dec 31,2025 - 9:51 AM")
+
+    }
+
 }

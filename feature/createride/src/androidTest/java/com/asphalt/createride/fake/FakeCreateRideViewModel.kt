@@ -33,11 +33,11 @@ class FakeCreateRideViewModel : CreateRideScreenViewModel() {
     init {
         _rideDetailsMutableState.value = _rideDetailsMutableState.value.copy(
             rideTitle = "Sunday Morning Ride",
-            rideType = "Open",
+            rideType = "Group Ride",
             startLocation = "Downtown",
             endLocation = "Beach",
-            dateString = "12 Oct 2025",
-            displayTime = "06:00 AM"
+            dateString = "Dec 31,2025",
+            displayTime = "9:51 AM"
         )
 
         _ridersListMutable.value = arrayListOf(

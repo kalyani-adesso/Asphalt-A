@@ -114,7 +114,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         text = viewModel.rideDetailsState.value.rideType ?: "",
                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                         color = GreenLIGHT25,
-                        modifier = Modifier
+                        modifier = Modifier.testTag("ride_type")
                     )
                 }
 
@@ -154,7 +154,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             text = (viewModel.rideDetailsState.value.dateString ?: "") +" - "+
                             viewModel.rideDetailsState.value.displayTime,
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey
+                            color = NeutralDarkGrey,
+                            modifier = Modifier.testTag("date_time")
                         )
                     }
 
