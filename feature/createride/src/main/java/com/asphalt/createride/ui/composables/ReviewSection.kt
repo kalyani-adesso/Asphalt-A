@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,13 +84,13 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             text = viewModel.rideDetailsState.value.rideTitle ?: "",
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("ride_title")
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
                             text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation ?: ""}",
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey
+                            color = NeutralDarkGrey, modifier = Modifier.testTag("ride_destination")
                         )
                     }
 
@@ -242,7 +243,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                                 )
                             }",
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey
+                            color = NeutralDarkGrey, modifier = Modifier.testTag("participant_count")
                         )
                     }
 
