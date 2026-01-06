@@ -111,8 +111,17 @@ extension JoinRideViewModel {
                 let userInviteStatus = ride.participants.first { $0.userId == currentUserId }?.inviteStatus
                 let isCreator = ride.createdBy == currentUserId
                 let rideJoinedStatus = (userInviteStatus == 3) || (ride.rideStatus == 3 && isCreator)
+                guard
+                    let startEpoch = ride.startDate,
+                    let endEpoch = ride.endDate
+                else { continue }
 
-                if startDate >= Calendar.current.startOfDay(for: Date()) {
+                let endDate = Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000)
+                
+                guard endDate >= Date() else { continue }
+
+
+
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
@@ -134,7 +143,7 @@ extension JoinRideViewModel {
                         participants: participants
                     )
                     joinRideModels.append(model)
-                }
+                
             }
             
             await MainActor.run {
