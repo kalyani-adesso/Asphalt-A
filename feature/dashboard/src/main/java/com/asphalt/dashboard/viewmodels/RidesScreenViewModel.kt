@@ -20,7 +20,7 @@ import org.koin.core.component.inject
 import java.util.Calendar
 
 
-class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), KoinComponent {
+open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(), KoinComponent {
     private val currentUid = androidUserVM.userState.value?.uid
     val ridesRepo: RidesRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()

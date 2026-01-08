@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,7 +120,7 @@ fun RidesScreen(
                 when (ridesScreenViewModel.tabSelectFlow.value) {
                     RideStatConstants.UPCOMING_RIDE -> {
                         items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
-                            UpcomingRides(ridesScreenViewModel, upconing, upComingViewDetails)
+                            UpcomingRides(upconing, upComingViewDetails)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
 
@@ -149,7 +150,6 @@ fun RidesScreen(
 
 @Composable
 fun UpcomingRides(
-    ridesScreenViewModel: RidesScreenViewModel,
     upconing: YourRideDataModel,
     upComingViewDetails: (String) -> Unit
 ) {
@@ -181,7 +181,8 @@ fun UpcomingRides(
                         text = upconing.title ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag("rideTitle")
                     )
                     Spacer(Modifier.height(Dimensions.size3))
                     Text(
@@ -190,6 +191,7 @@ fun UpcomingRides(
                         color = NeutralDarkGrey,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
+                        , modifier = Modifier.testTag("ridePlace")
                     )
                 }
 
