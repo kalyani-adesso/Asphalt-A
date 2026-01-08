@@ -7,6 +7,7 @@ import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.UserDomain
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.UserRepoImpl
@@ -156,10 +157,36 @@ class JoinRideViewModel(
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
+
+    private val _joinedUsers =
+        MutableStateFlow<List<ConnectedRideDTO>>(emptyList())
+
+    val joinedUsers: StateFlow<List<ConnectedRideDTO>> = _joinedUsers
+
     fun getOnGoingRides(rideId:String) {
+
         viewModelScope.launch {
             val rideDetails = ridesRepo.getOngoingRides(rideId)
-            Log.d("TAG", "getJoinRides: $rideDetails")
+            APIHelperUI.handleApiResult(rideDetails, viewModelScope) { response ->
+                //    val sortedArray = response.sortedBy{ it.startDate }}
+                // find current user
+                val currentUser = response.find {
+                    it.userID == currentUid
+                }
+                Log.d("TAG", "getJoinRides currentuser: $currentUser")
+                // filter the other users
+                val otherUsers = response
+                    .filter { it.userID != currentUid }
+                Log.d("TAG", "getOnGoingRides otherUsers: ${otherUsers.size}")
+
+                val joinRidersList = buildList {
+                    currentUser?.let { add(it) }
+                    addAll(otherUsers)
+                }
+                _joinedUsers.value = joinRidersList
+                Log.d("TAG", "getJoinRides: $response")
+                Log.d("TAG", "getJoinRides joined finalList: $joinRidersList")
+            }
         }
     }
 

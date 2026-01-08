@@ -32,7 +32,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RidersScreenLoader(
     setTopAppBarState: (AppBarState) -> Unit,
     modifier: Modifier = Modifier,
-    onNavigateToMapScreen : () -> Unit,
+    onNavigateToMapScreen : (ridesData: RidesData) -> Unit,
     ridesData: RidesData,
     rideViewModel: JoinRideViewModel = koinViewModel()
 ) {
@@ -58,7 +58,7 @@ fun RidersScreenLoader(
         isLoading = false
         showBanner = true
         delay(1000)
-        onNavigateToMapScreen.invoke()
+        onNavigateToMapScreen.invoke(ridesData)
     }
 
     setTopAppBarState(

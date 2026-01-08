@@ -391,8 +391,8 @@ fun NavigationRoot(
                         JoinRideMainListScreen(
                             ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
-                            navigateToConnectedRide = {
-                                backStack.add(AppNavKey.ConnectedRideNavKey(key.ridesData))
+                            navigateToConnectedRide = { item ->
+                                backStack.add(AppNavKey.ConnectedRideNavKey(item))
                                 // backStack.add(AppNavKey.DashboardNavKey)
                             },
                             navigateToEndRide = {
@@ -437,9 +437,9 @@ fun NavigationRoot(
                         RidersScreenLoader(
                             ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
-                            onNavigateToMapScreen = {
-                                backStack.remove(AppNavKey.ConnectedRideNavKey(key.ridesData))
-                                backStack.add(AppNavKey.ConnectedRideMapNavKey(key.ridesData))
+                            onNavigateToMapScreen = { item ->
+                                backStack.remove(AppNavKey.ConnectedRideNavKey(item))
+                                backStack.add(AppNavKey.ConnectedRideMapNavKey(item))
 
                             }
                         )

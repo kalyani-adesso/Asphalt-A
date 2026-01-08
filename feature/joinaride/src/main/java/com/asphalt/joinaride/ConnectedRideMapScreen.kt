@@ -158,7 +158,7 @@ fun ConnectedRideMapScreen(
             RideProgress(androidUserVM = androidUserVM,
                 onClickEndRide = onClick,
                 ridesData = ridesData)
-            RidersGroupStatus(viewModel)
+            RidersGroupStatus(rideViewModel,androidUserVM,ridesData)
             EmergecyActions()
 
         }

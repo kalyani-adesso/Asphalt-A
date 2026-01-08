@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,8 +43,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.joinride.RidersGroupModel
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.DarkBrown
@@ -66,19 +71,33 @@ import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RidersGroupStatus(
-    viewModel: RidersGroupViewModel = koinViewModel(),
+    viewModel: JoinRideViewModel = koinViewModel(),
+    androidUserVM: AndroidUserVM = koinViewModel(),
+    ridesData: RidesData
+
 ) {
 
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
 
-    val groupRiders by viewModel.groupRiders.collectAsState()
+   // val groupRiders by viewModel.groupRiders.collectAsState()
 
-    val count = 3
+    val currentUser = androidUserVM.userState.collectAsState(null)
+
+
+    val users by viewModel.joinedUsers.collectAsState()
+
+
+    LaunchedEffect(currentUser) {
+        val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+
+        Log.d("TAG", "RidersGroupStatus userData: $userData")
+    }
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -89,8 +108,10 @@ fun RidersGroupStatus(
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = Dimensions.spacing19,
-                    horizontal = Dimensions.spacing16)
+                .padding(
+                    vertical = Dimensions.spacing19,
+                    horizontal = Dimensions.spacing16
+                )
                 .wrapContentHeight(unbounded = false)
         ) {
             Row(
@@ -101,7 +122,7 @@ fun RidersGroupStatus(
 
                 Spacer(Modifier.width(Dimensions.size10))
                 Text(
-                    text = ("Group Status   ($count Riders)"),
+                    text = ("Group Status   (${users.size} Riders)"),
                     style = TypographyBold.titleMedium,
                     fontSize = Dimensions.textSize16,
                     maxLines = 1,
@@ -121,9 +142,9 @@ fun RidersGroupStatus(
                     ), contentPadding = PaddingValues(bottom = Dimensions.padding10),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.padding6)
             ) {
-                items(groupRiders) { riders ->
+                items(users) { riders ->
                     Spacer(Modifier.height(Dimensions.padding10))
-                    GroupRidersCard(riders)
+                    GroupRidersCard(riders,ridesData,androidUserVM)
                 }
             }
         }
@@ -132,7 +153,13 @@ fun RidersGroupStatus(
 
 @Composable
 fun GroupRidersCard(
-    ridersList: RidersGroupModel) {
+    ridersList: ConnectedRideDTO,
+    ridesData: RidesData,
+    androidUserVM: AndroidUserVM = koinViewModel()) {
+
+    val currentUser = androidUserVM.userState.collectAsState(null)
+    val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+
 
     Card(
         modifier = Modifier
@@ -173,7 +200,7 @@ fun GroupRidersCard(
                     Spacer(Modifier.width(Dimensions.size5))
                     Column(modifier = Modifier) {
                         Row() {
-                            val originalText = ridersList.riderName
+                            val originalText = userData?.name ?: ""
                             val maxLength = 20
 
                             Text(
@@ -196,8 +223,8 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                        //                      top = Dimensions.size5,
-                        //                      bottom =  Dimensions.size2pt5
+                                                //                      top = Dimensions.size5,
+                                                //                      bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically) {
                                         Spacer(Modifier.width(Dimensions.size4))
@@ -219,8 +246,8 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                        //                                            top = Dimensions.size5,
-                        //                                             bottom =  Dimensions.size2pt5
+                                                //                                            top = Dimensions.size5,
+                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
@@ -245,8 +272,8 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                        //                                            top = Dimensions.size5,
-                        //                                             bottom =  Dimensions.size2pt5
+                                                //                                            top = Dimensions.size5,
+                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
@@ -273,7 +300,7 @@ fun GroupRidersCard(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = ridersList.distance,
+                                text = ridesData.createdBy ?: "",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
                                 modifier = Modifier)
@@ -328,5 +355,5 @@ fun GroupRidersCard(
 @Composable
 fun RidersGroupStatusPreview(modifier: Modifier = Modifier) {
 
-    RidersGroupStatus()
+    //RidersGroupStatus()
 }

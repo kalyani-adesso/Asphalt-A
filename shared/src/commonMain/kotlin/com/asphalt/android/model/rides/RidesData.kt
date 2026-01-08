@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class RidesData(
     var ridesID: String? = null,
-    val rideJoinedID: String? = null,
+    val rideJoinedID: String? = null, // not required
     var createdBy: String? = null,
     var rideType: String? = null,
     var rideTitle: String? = null,
