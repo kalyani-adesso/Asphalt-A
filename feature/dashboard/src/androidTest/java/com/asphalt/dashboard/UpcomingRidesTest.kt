@@ -6,6 +6,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.asphalt.dashboard.composables.screens.UpcomingRides
 import com.asphalt.dashboard.fake.FakeRidesScreenViewModel
@@ -55,5 +56,23 @@ class UpcomingRidesTest {
 
 
     }
+    @Test
+    fun rideItem_clickViewDetails_invokesCallback() {
+        var clickedRideId: String? = null
+        val ride = FakeRidesScreenViewModel().fakeUpcomingRide()
 
+        composeRule.setContent {
+            UpcomingRides(
+                upconing = ride,
+                upComingViewDetails = { rideId -> clickedRideId = rideId }
+            )
+        }
+
+        // Click the "View Details" button
+        composeRule.onNodeWithText("VIEW DETAILS")
+            .performClick()
+
+        // Assert callback invoked
+        assert(clickedRideId == "ride_123")
+    }
 }
