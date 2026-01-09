@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -110,6 +111,7 @@ fun GalleryDialog(
                     style = TypographyBold.bodyMedium,
                     color = NeutralBlackGrey,
                     fontSize = Dimensions.textSize18,
+                    modifier = Modifier.testTag("gallery_title")
 
                     )
             }
@@ -158,7 +160,7 @@ fun GalleryDialog(
                                         modifier = Modifier
                                             .height(Dimensions.size132)
                                             .width(Dimensions.size132)
-                                            .clip(RoundedCornerShape(Dimensions.size5)),
+                                            .clip(RoundedCornerShape(Dimensions.size5)).testTag("gallery_image"),
                                         contentDescription = "Selected Photo",
                                         contentScale = ContentScale.Crop
                                     )
@@ -167,7 +169,7 @@ fun GalleryDialog(
                                         contentDescription = "",
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .offset((6).dp, -5.dp)
+                                            .offset((6).dp, -5.dp).testTag("remove_image")
                                             .clickable {
                                                 selectedUris = selectedUris.toMutableList()
                                                     .also { it.remove(images) } as ArrayList<GalleryModel>
@@ -221,7 +223,7 @@ fun GalleryDialog(
                         modifier = Modifier
                             .height(Dimensions.size50)
                             .background(NeutralWhite)
-                            .weight(1f),
+                            .weight(1f).testTag("cancel_button"),
                         buttonRadius = Dimensions.size10,
                         contentPaddingValues = PaddingValues(0.dp),
                         borderColor = REDLIGHT
@@ -238,7 +240,7 @@ fun GalleryDialog(
                             modifier = Modifier
                                 .height(Dimensions.size50)
                                 .fillMaxWidth()
-                                .weight(1f)
+                                .weight(1f).testTag("upload_button")
                                 .background(
                                     color = PrimaryDarkerLightB75,
                                     shape = RoundedCornerShape(Dimensions.spacing12)
