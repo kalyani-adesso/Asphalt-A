@@ -159,8 +159,8 @@ fun RiderCard(
     navigateToEndRide: () -> Unit,
     ridesData : RidesData,
     viewModel: JoinRideViewModel) {
-    viewModel.setCreatedBy(ride = ridesData)
-    val createdBy by viewModel.createdBy.collectAsState()
+
+    val createdBy = viewModel.setCreatedBy(ridesData)
 
     var currentRideId by remember { mutableStateOf("") }
     Log.d("TAG", "RiderCard: $currentRideId")

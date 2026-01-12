@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +48,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ConnectedRideMapScreen(
     setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidersGroupViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
     onClick : () -> Unit,
     locationProvider: LocationProvider,
@@ -57,6 +57,7 @@ fun ConnectedRideMapScreen(
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
+
 
 
     val rideId = rideViewModel.getRideId()

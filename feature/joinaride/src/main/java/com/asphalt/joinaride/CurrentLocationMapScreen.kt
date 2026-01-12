@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,126 +25,148 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberUpdatedMarkerState
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CurrentLocationMapScreen(
     locationProvider: LocationProvider,
-    ridesData: RidesData) {
+    ridesData: RidesData,
+    rideViewModel: JoinRideViewModel = koinViewModel()
+) {
+    val rideId = rideViewModel.getRideId()
 
+    LaunchedEffect(rideId) {
+        rideId?.let {
+            rideViewModel.observeRideLocations(it)
+        }
+    }
 
     PermissionHandler(
-        permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION),
+        permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ),
         onAllGranted = {
-            MapWithCurrentLocation(locationProvider = locationProvider,
-                ridesData)
+            MapWithCurrentLocation(
+                locationProvider = locationProvider,
+                ridesData = ridesData,
+                rideViewModel = rideViewModel
+            )
         },
         onRequest = { request ->
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Location permission is required to show your curret location on th map")
+                Text("Location permission is required")
                 Spacer(modifier = Modifier.height(12.dp))
-                Button(onClick = {request()}) {
-                    Text(text = "Grant location permissions")
+                Button(onClick = request) {
+                    Text("Grant permission")
                 }
             }
         }
     )
 }
 
+
 @Composable
 fun MapWithCurrentLocation(
     locationProvider: LocationProvider,
-    ridesData: RidesData) {
+    ridesData: RidesData,
+    rideViewModel: JoinRideViewModel
+) {
+    val riders by rideViewModel.joinedUsers.collectAsState()
 
-    val locations = listOf(
-        LatLng(ridesData.currentLat,ridesData.currentLong), // pune
-        LatLng(ridesData.endLatitude,ridesData.endLongitude), // mumbai
-      //  LatLng(12.9716,77.5946), // banglore
-      //  LatLng(28.6139,77.2090) // delhi
-    )
+    var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
-    val coroutineScope = rememberCoroutineScope()
-    var cameraPositionState = rememberCameraPositionState()
+    val cameraPositionState = rememberCameraPositionState()
 
-    var userLocation  by remember { mutableStateOf<LatLng?>(null) }
-    var loading by remember { mutableStateOf(true) }
-
-    // calculate distance
-    val totalDistance = FloatArray(2)
-    Location.distanceBetween(
-        locations[0].latitude, locations[0].longitude,
-        locations[1].latitude, locations[1].longitude,
-        totalDistance
-    )
-
-    val distanceKm = totalDistance[0]/1000 // convert meters -> km
-
-
+    // Get current location
     LaunchedEffect(Unit) {
-        loading = true
         userLocation = locationProvider.getCurrentLocation()
+        userLocation?.let {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 14f)
+        }
+        isLoading = false
     }
 
-    if (userLocation != null) {
-        cameraPositionState = rememberCameraPositionState {
-          //  position = CameraPosition.fromLatLngZoom(userLocation!!,18f)
-            position = CameraPosition.fromLatLngZoom(locations.first(), 10f)
-        }
-        try {
-        }catch (t: Throwable) {
-            Log.d("TAG", "MapWithCurrentLocation: ${t.message}")
-            userLocation = null
-        }
-        finally {
-            loading = false
-        }
-    }
+    Box(modifier = Modifier.fillMaxSize()) {
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState) {
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = true),
+            uiSettings = MapUiSettings(zoomControlsEnabled = false)
+        ) {
 
-            locations.forEach { latlng ->
-                Marker(state = rememberUpdatedMarkerState(
-                    position = latlng), title = "You are here ${latlng.latitude},${latlng.longitude}",
-                    snippet = "Example location")
+            // 🔵 Current user marker
+            userLocation?.let {
+                Marker(
+                    state = MarkerState(position = it),
+                    title = "You",
+                    snippet = "Current location"
+                )
             }
 
-            Polyline(
-                points = locations,
-                color = PrimaryBrighterLightW75,
-                width = 8f
-            )
+            // 🟢 Joined riders markers
+            riders.forEach { rider ->
+                if (rider.currentLat != 0.0 && rider.currentLong != 0.0) {
 
-            Log.d("TAG", "MapWithCurrentLocation: distance $distanceKm")
-          //  Log.d("TAG", "MapWithCurrentLocation: ${userLocation!!.latitude},${userLocation!!.longitude}")
+                    Log.d(
+                        "MAP",
+                        "Marker: ${rider.userID} ${rider.currentLat}, ${rider.currentLong}"
+                    )
 
-            if (loading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    Text("Locading location...")
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(
+                                rider.currentLat,
+                                rider.currentLong
+                            )
+                        ),
+                        title = rider.userID
+                    )
                 }
             }
+
+            // 🔴 Route polyline (start → end)
+            val routePoints = listOf(
+                LatLng(ridesData.currentLat, ridesData.currentLong),
+                LatLng(ridesData.endLatitude, ridesData.endLongitude)
+            )
+
+            Polyline(
+                points = routePoints,
+                color = Color.Blue,
+                width = 8f
+            )
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
     }
 }

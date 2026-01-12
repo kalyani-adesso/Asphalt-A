@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,36 +23,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
-import com.asphalt.android.model.joinride.RidersGroupModel
 import com.asphalt.android.model.rides.RidesData
-import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.DarkBrown
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.GrayLight10
-import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.GreenLIGHT25
 import com.asphalt.commonui.theme.LightGreen
@@ -67,7 +57,6 @@ import com.asphalt.commonui.theme.NeutralPink
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
@@ -85,19 +74,24 @@ fun RidersGroupStatus(
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
 
+    val rideUsers by viewModel.rideUsers.collectAsState()
+
+    val riders by viewModel.joinedUsers.collectAsState()
+
+
+
    // val groupRiders by viewModel.groupRiders.collectAsState()
 
     val currentUser = androidUserVM.userState.collectAsState(null)
 
-
-    val users by viewModel.joinedUsers.collectAsState()
-
+    val joinedRiders by viewModel.joinedUsers.collectAsState()
 
     LaunchedEffect(currentUser) {
         val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
 
         Log.d("TAG", "RidersGroupStatus userData: $userData")
     }
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -122,7 +116,7 @@ fun RidersGroupStatus(
 
                 Spacer(Modifier.width(Dimensions.size10))
                 Text(
-                    text = ("Group Status   (${users.size} Riders)"),
+                    text = ("Group Status   (${joinedRiders.size} Riders)"),
                     style = TypographyBold.titleMedium,
                     fontSize = Dimensions.textSize16,
                     maxLines = 1,
@@ -142,9 +136,14 @@ fun RidersGroupStatus(
                     ), contentPadding = PaddingValues(bottom = Dimensions.padding10),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.padding6)
             ) {
-                items(users) { riders ->
+                items(items=riders,
+                    key = {it.rideJoinedID}) { riders ->
+                    val userData= rideUsers.firstOrNull { it.ridesID == riders.userID }
+
                     Spacer(Modifier.height(Dimensions.padding10))
-                    GroupRidersCard(riders,ridesData,androidUserVM)
+                    if (userData != null) {
+                        GroupRidersCard(riders,userData,viewModel,androidUserVM)
+                    }
                 }
             }
         }
@@ -154,12 +153,12 @@ fun RidersGroupStatus(
 @Composable
 fun GroupRidersCard(
     ridersList: ConnectedRideDTO,
-    ridesData: RidesData,
+    ridesData: RidesData?,
+    viewModel: JoinRideViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel()) {
 
     val currentUser = androidUserVM.userState.collectAsState(null)
     val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
-
 
     Card(
         modifier = Modifier
@@ -200,11 +199,10 @@ fun GroupRidersCard(
                     Spacer(Modifier.width(Dimensions.size5))
                     Column(modifier = Modifier) {
                         Row() {
-                            val originalText = userData?.name ?: ""
-                            val maxLength = 20
+                            val name = ridesData?.createdBy?.take(20)
 
                             Text(
-                                text = originalText?.take(maxLength) ?: "",
+                                text = name ?: "",
                                 style = TypographyBold.bodySmall,
                                 color = NeutralBlack,
                                 maxLines = 1,
@@ -300,7 +298,7 @@ fun GroupRidersCard(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = ridesData.createdBy ?: "",
+                                text = ridesData?.createdBy ?: "",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
                                 modifier = Modifier)

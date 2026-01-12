@@ -10,11 +10,13 @@ import com.asphalt.android.model.UserDomain
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
-import com.asphalt.android.repository.UserRepoImpl
-import com.asphalt.android.repository.joinride.JoinRideRepository
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.joinaride.repository.IdRepository
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 class JoinRideViewModel(
-    private val repository: JoinRideRepository,
     private val idRepository: IdRepository
 ) : ViewModel(), KoinComponent {
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
@@ -37,7 +38,6 @@ class JoinRideViewModel(
     val rides = _rides.asStateFlow()
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
-    val userRepoImpl: UserRepoImpl by inject()
 
     private val _rideId = MutableStateFlow("")
     val rideId = _rideId.asStateFlow()
@@ -48,16 +48,13 @@ class JoinRideViewModel(
     }
     fun getRideId() : String? = idRepository.id
     private val currentUid = androidUserVM.userState.value?.uid
-    private val _createdBy = MutableStateFlow("")
-    val createdBy = _createdBy.asStateFlow()
-
+    
     val acceptedRides: StateFlow<List<RidesData>> =
         combine(rides, _searchQuery) { ridesData, query ->
 
             val q = query.trim().lowercase()
             // STEP 1 → Filter ACCEPTED rides
             val accepted = ridesData.filter { ride ->
-
                 // current user
                 if (ride.createdBy == currentUid) {
                     true
@@ -102,15 +99,18 @@ class JoinRideViewModel(
         }
     }
 
-    fun setCreatedBy(ride: RidesData) {
+    fun setCreatedBy(ride: RidesData) : String {
         val userDomain: UserDomain? = androidUserVM.getUser(userID = ride.createdBy.toString())
 
         val rideStatus = ride.rideStatus
         Log.d("TAG", "setCreatedBy: $rideStatus")
-        if (androidUserVM.getCurrentUserUID() == ride.createdBy) {
-            _createdBy.value = "Me"
+       return if (androidUserVM.getCurrentUserUID() == ride.createdBy) {
+
+            "Me"
         } else {
-            _createdBy.value = userDomain?.name ?: ""
+
+            userDomain?.name ?: ""
+
         }
     }
     // Called from UI
@@ -163,32 +163,59 @@ class JoinRideViewModel(
 
     val joinedUsers: StateFlow<List<ConnectedRideDTO>> = _joinedUsers
 
+    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
+    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
     fun getOnGoingRides(rideId:String) {
 
         viewModelScope.launch {
+
             val rideDetails = ridesRepo.getOngoingRides(rideId)
+
             APIHelperUI.handleApiResult(rideDetails, viewModelScope) { response ->
                 //    val sortedArray = response.sortedBy{ it.startDate }}
-                // find current user
+                // Filter out current user from “other users
+                val filteredList = response
+                    .filter { it.userID != currentUid }
+
+                Log.d("TAG", "getOnGoingRides otherUsers: ${filteredList.size}")
+
+                // Find current user
                 val currentUser = response.find {
                     it.userID == currentUid
                 }
                 Log.d("TAG", "getJoinRides currentuser: $currentUser")
-                // filter the other users
-                val otherUsers = response
-                    .filter { it.userID != currentUid }
-                Log.d("TAG", "getOnGoingRides otherUsers: ${otherUsers.size}")
+
+                val user = ridesRepo.getSingeRide(rideId)
+                Log.d("TAG", "getOnGoingRides: user $user ")
+
 
                 val joinRidersList = buildList {
-                    currentUser?.let { add(it) }
-                    addAll(otherUsers)
+                    addAll(filteredList.filter { it.userID != currentUid })
+
                 }
+                //Update basic ride list (optional, if you need)
                 _joinedUsers.value = joinRidersList
-                Log.d("TAG", "getJoinRides: $response")
+
+                val rideUsers = joinRidersList.mapNotNull { ride ->
+
+                    val userDomain = androidUserVM.getUser(ride.userID)
+
+                    userDomain?.let { user ->
+                        RidesData(
+                            ridesID = user.uid,
+                            createdBy = user.name
+                        )
+                    }
+                }
+
+                _rideUsers.value = rideUsers
                 Log.d("TAG", "getJoinRides joined finalList: $joinRidersList")
+                Log.d("TAG", "All rides: $response")
+                Log.d("TAG", "Ride users for UI: ${rideUsers.size}")
             }
         }
     }
+
 
     private val _endRideResult = MutableStateFlow<APIResult<Unit>?>(null)
     val endRideResult = _endRideResult
@@ -207,5 +234,28 @@ class JoinRideViewModel(
             _rides.value = joinRide.filter { it.rideStatus != 4 }
 
         }
+    }
+
+    private var rideListener: ValueEventListener? = null
+    fun observeRideLocations(rideId: String) {
+
+        val ref = FirebaseDatabase.getInstance()
+            .getReference("rides")
+            .child(rideId)
+            .child("ongoing_ride")
+
+        rideListener?.let { ref.removeEventListener(it) }
+
+        rideListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val users = snapshot.children.mapNotNull {
+                    it.getValue(ConnectedRideDTO::class.java)
+                }
+                _joinedUsers.value = users
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        ref.addValueEventListener(rideListener!!)
     }
 }

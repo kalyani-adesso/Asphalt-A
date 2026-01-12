@@ -13,7 +13,7 @@ import org.koin.core.module.dsl.viewModel
 val joinRideModule = module {
 
     single { IdRepository() }
-    viewModel { JoinRideViewModel(get(),get()) }
+    viewModel { JoinRideViewModel(get()) }
     viewModel { RatingViewModel(get()) }
     viewModel { RidesDifficultyViewModel() }
     viewModel { JoinRideMapViewModel(get()) }
