@@ -86,13 +86,20 @@ fun RidesScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     upComingViewDetails: (String) -> Unit
 ) {
-
+    var selectedInvite by remember { mutableStateOf<YourRideDataModel?>(null) }
+    selectedInvite?.let { invite ->
+        ChatDialog(
+            receiverID = invite.createdBy ?: "",
+            onDismiss = { selectedInvite = null }
+        )
+    }
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
         //ridesScreenViewModel.getRides()
+        ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
+        ridesScreenViewModel.getRides()
     }
-    ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
-    ridesScreenViewModel.getRides()
+
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -135,7 +142,9 @@ fun RidesScreen(
 
                     RideStatConstants.INVITES_RIDES -> {
                         items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
-                            Invites(ridesScreenViewModel, invites)
+                            Invites(ridesScreenViewModel, invites) { chatModel ->
+                                selectedInvite = chatModel
+                            }
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
                     }
@@ -584,12 +593,17 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 }
 
 @Composable
-fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
-    if (ridesScreenViewModel.showChatDialog.value) {
-        ChatDialog(receiverID = invites.createdBy ?: "") {
-            ridesScreenViewModel.showChatDialog.value = false
-        }
-    }
+fun Invites(
+    ridesScreenViewModel: RidesScreenViewModel,
+    invites: YourRideDataModel,
+    onChatClick: (YourRideDataModel) -> Unit
+) {
+    /*if (ridesScreenViewModel.showChatDialog.value) {
+         Log.e("id",invites.createdBy+"")
+         ChatDialog(receiverID = invites.createdBy ?: "") {
+             ridesScreenViewModel.showChatDialog.value = false
+         }
+     }*/
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -647,7 +661,8 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         painter = painterResource(R.drawable.ic_message),
                         null,
                         modifier = Modifier.clickable {
-                            ridesScreenViewModel.showChatDialog.value = true
+                            onChatClick.invoke(invites)
+                            //ridesScreenViewModel.showChatDialog.value = true
                         })
                 }
             }
