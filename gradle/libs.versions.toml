@@ -45,6 +45,8 @@ datastore = "1.1.7"
 mp-chart = "v3.1.0"
 playServicesLocation = "21.3.0"
 kotlinDateTime = "0.7.1"
+mockito = "5.21.0"
+mockito-kotlin = "6.1.0"
 
 [libraries]
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
@@ -80,6 +82,15 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 mpchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mp-chart" }
+
+#mockito-mock test
+# For JVM unit tests
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
+
+# For Android instrumented tests (works on Dalvik/ART)
+mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockito" }
+
 
 # MAPS
 maps = { module = "com.google.android.gms:play-services-maps", version.ref = "maps"}
