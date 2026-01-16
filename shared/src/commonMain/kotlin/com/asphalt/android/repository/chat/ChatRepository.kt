@@ -2,9 +2,11 @@ package com.asphalt.android.repository.chat
 
 import com.asphalt.android.DataSnapshot
 import com.asphalt.android.FirebaseServerValue
+import com.asphalt.android.Logger
 import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.TransactionResult
 import com.asphalt.android.model.chat.Message
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -26,9 +28,12 @@ class ChatRepository {
                     "type" to "private",
                     "members" to mapOf(userAId to true, userBId to true)
                 )
+                Logger.d("IF_Success","Success" + currentSnapshot.getValue())
                 return@runTransaction TransactionResult.success(newChatData)
             } else {
-                return@runTransaction TransactionResult.success(currentSnapshot)
+                Logger.d("IF_Fail","Fail"+currentSnapshot.getValue())
+                val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
+                return@runTransaction TransactionResult.success(existingData)
             }
         }
     }

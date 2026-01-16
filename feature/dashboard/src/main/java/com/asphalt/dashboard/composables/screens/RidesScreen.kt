@@ -190,8 +190,7 @@ fun UpcomingRides(
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                        , modifier = Modifier.testTag("ridePlace")
+                        overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("ridePlace")
                     )
                 }
 
@@ -587,7 +586,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 @Composable
 fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
     if (ridesScreenViewModel.showChatDialog.value) {
-        ChatDialog() {
+        ChatDialog(invites.createdBy ?: "") {
             ridesScreenViewModel.showChatDialog.value = false
         }
     }

@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.model.chat.Message
 import com.asphalt.chat.model.ChatMessage
 import com.asphalt.commonui.theme.BlueLite34
 import com.asphalt.commonui.theme.Dimensions
@@ -33,6 +34,7 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
+import com.asphalt.commonui.utils.Utils
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -74,7 +76,7 @@ fun ChatBubble(message: ChatMessage) {
             Column {
                 if (!message.isSender) {
                     Text(
-                        text = "Sooraj",
+                        text = message.name,
                         style = TypographyBold.bodySmall,
                         color = if (message.isSender) NeutralWhite else BlueLite34
                     )
@@ -87,7 +89,7 @@ fun ChatBubble(message: ChatMessage) {
                 )
                 Spacer(modifier = Modifier.height(Dimensions.size4))
                 Text(
-                    text = "10:30 AM",
+                    text = Utils.getTime(message.timeStamp),
                     style = Typography.bodySmall,
                     color = if (message.isSender) NeutralLightGrey else NeutralDarkGrey,
                     fontSize = Dimensions.textsize10
@@ -102,5 +104,5 @@ fun ChatBubble(message: ChatMessage) {
 @Preview
 @Composable
 fun BubblePReview() {
-    ChatBubble(ChatMessage("Test", true))
+    ChatBubble(ChatMessage("Test", "",0L,true))
 }

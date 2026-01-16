@@ -1,5 +1,6 @@
 package com.asphalt.chat.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,10 +64,11 @@ import com.asphalt.commonui.ui.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChatDialog(
+fun ChatDialog(receiverID :String,
     viewModel: ChatScreenViewModel = koinViewModel(),
     onDismiss: () -> Unit
 ) {
+    viewModel.initialise1V1Chat(receiverID)
     val listState = rememberLazyListState()
     var msgText by remember { mutableStateOf("") }
     val messages by viewModel.chatMessage.collectAsState()
@@ -237,7 +239,8 @@ fun ChatDialog(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
+                                        viewModel.send1V1Chat(receiverID,msgText)
+                                       /* if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
                                             viewModel.updateChatMessage(
                                                 ChatMessage(
                                                     text = msgText,
@@ -251,7 +254,7 @@ fun ChatDialog(
                                                     false
                                                 )
                                             )
-                                        }
+                                        }*/
 
                                         msgText = ""
                                     }
@@ -280,5 +283,5 @@ fun ChatDialog(
 @Composable
 fun ChatPreview() {
     val viewModel: ChatScreenViewModel = viewModel()
-    ChatDialog(viewModel, {})
+    ChatDialog("",viewModel, {})
 }

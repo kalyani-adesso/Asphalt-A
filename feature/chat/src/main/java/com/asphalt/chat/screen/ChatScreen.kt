@@ -235,7 +235,7 @@ fun ChatScreen(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
+                                        /*if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
                                             viewModel.updateChatMessage(
                                                 ChatMessage(
                                                     text = msgText,
@@ -249,7 +249,7 @@ fun ChatScreen(
                                                     false
                                                 )
                                             )
-                                        }
+                                        }*/
 
                                         msgText = ""
                                     }

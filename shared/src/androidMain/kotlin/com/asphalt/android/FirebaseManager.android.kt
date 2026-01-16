@@ -1,6 +1,7 @@
 package com.asphalt.android
 
 
+import android.util.Log
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
@@ -35,7 +36,7 @@ class AndroidDatabaseReference(
             override fun doTransaction(mutableData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
 
                 val commonSnapshot = DataSnapshot(mutableData.value, mutableData.key)
-
+                //Log.e("Value","${mutableData.value} "+mutableData.key)
                 val commonResult = updateFunction(commonSnapshot)
 
                 return if (commonResult.isSuccess) {
