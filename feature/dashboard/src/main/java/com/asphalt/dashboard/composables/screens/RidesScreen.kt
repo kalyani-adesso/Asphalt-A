@@ -586,7 +586,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 @Composable
 fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
     if (ridesScreenViewModel.showChatDialog.value) {
-        ChatDialog(invites.createdBy ?: "") {
+        ChatDialog(receiverID = invites.createdBy ?: "") {
             ridesScreenViewModel.showChatDialog.value = false
         }
     }

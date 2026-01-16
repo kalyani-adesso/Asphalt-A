@@ -1,6 +1,6 @@
 package com.asphalt.chat.screen
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,8 +45,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.asphalt.chat.model.ChatMessage
+import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
+import com.asphalt.android.repository.AuthenticatorImpl
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.chat.ChatRepository
+import com.asphalt.android.repository.user.UserRepository
+import com.asphalt.android.viewmodel.AuthViewModel
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
@@ -64,11 +72,14 @@ import com.asphalt.commonui.ui.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChatDialog(receiverID :String,
+fun ChatDialog(initaliseChat: Boolean = true,
+    receiverID: String,
     viewModel: ChatScreenViewModel = koinViewModel(),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
-    viewModel.initialise1V1Chat(receiverID)
+    if (initaliseChat) {
+        viewModel.initialise1V1Chat(receiverID)
+    }
     val listState = rememberLazyListState()
     var msgText by remember { mutableStateOf("") }
     val messages by viewModel.chatMessage.collectAsState()
@@ -110,8 +121,9 @@ fun ChatDialog(receiverID :String,
                             ),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10)) {
-                            Row(modifier = Modifier.weight(1f)) {
+                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10),
+                           ) {
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                                 CircularNetworkImage(
                                     modifier = Modifier.border(
                                         width = Dimensions.size2pt5,
@@ -121,21 +133,26 @@ fun ChatDialog(receiverID :String,
                                     size = Dimensions.padding40,
                                     imageUrl = "" ?: ""
                                 )
-                                Column(modifier = Modifier.padding(start = Dimensions.size10)) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(start = Dimensions.size10), // take remaining horizontal space
+                                    verticalArrangement = Arrangement.Center, // center vertically relative to image
+                                    horizontalAlignment = Alignment.Start // align text to start horizontally
+                                ) {
                                     Text(
-                                        "Hari",
+                                        text = viewModel.getName(receiverID),
                                         overflow = TextOverflow.Ellipsis,
                                         style = TypographyBold.bodyMedium,
-                                        color = NeutralWhite
+                                        color = NeutralWhite, maxLines = 1
                                     )
-                                    Spacer(modifier = Modifier.height(Dimensions.size8))
+                                    /*Spacer(modifier = Modifier.height(Dimensions.size8))
                                     Text(
                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
                                         modifier = Modifier,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         style = Typography.bodySmall, color = NeutralWhite
-                                    )
+                                    )*/
                                 }
                             }
                             RoundedBox(
@@ -239,22 +256,22 @@ fun ChatDialog(receiverID :String,
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        viewModel.send1V1Chat(receiverID,msgText)
-                                       /* if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
-                                            viewModel.updateChatMessage(
-                                                ChatMessage(
-                                                    text = msgText,
-                                                    true
-                                                )
-                                            )
-                                        } else {
-                                            viewModel.updateChatMessage(
-                                                ChatMessage(
-                                                    text = msgText,
-                                                    false
-                                                )
-                                            )
-                                        }*/
+                                        viewModel.send1V1Chat(receiverID, msgText)
+                                        /* if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
+                                             viewModel.updateChatMessage(
+                                                 ChatMessage(
+                                                     text = msgText,
+                                                     true
+                                                 )
+                                             )
+                                         } else {
+                                             viewModel.updateChatMessage(
+                                                 ChatMessage(
+                                                     text = msgText,
+                                                     false
+                                                 )
+                                             )
+                                         }*/
 
                                         msgText = ""
                                     }
@@ -279,9 +296,19 @@ fun ChatDialog(receiverID :String,
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun ChatPreview() {
-    val viewModel: ChatScreenViewModel = viewModel()
-    ChatDialog("",viewModel, {})
+
+    var dataStoreManager = DataStoreManager(LocalContext.current)
+    var androidVM = AndroidUserVM(
+        UserRepoImpl(), dataStoreManager, UserRepository(
+            UserAPIServiceImpl(
+                KtorClient()
+            )
+        )
+    )
+    val viewModel: ChatScreenViewModel = ChatScreenViewModel(androidVM, ChatRepository())
+    ChatDialog(false,"", viewModel, {},)
 }

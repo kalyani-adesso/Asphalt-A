@@ -1,5 +1,6 @@
 package com.asphalt.chat.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,12 +37,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.chat.ChatRepository
+import com.asphalt.android.repository.user.UserRepository
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.model.ChatMessage
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.AppBarState
@@ -282,9 +291,18 @@ fun ChatScreen(
 
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun ChatScreenPreview() {
-    val viewModel: ChatScreenViewModel = viewModel()
+    var dataStoreManager = DataStoreManager(LocalContext.current)
+    var androidVM = AndroidUserVM(
+        UserRepoImpl(), dataStoreManager, UserRepository(
+            UserAPIServiceImpl(
+                KtorClient()
+            )
+        )
+    )
+    val viewModel: ChatScreenViewModel = ChatScreenViewModel(androidVM, ChatRepository())
     ChatScreen({}, viewModel)
 }

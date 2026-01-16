@@ -24,7 +24,9 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
     fun clearChat() {
         _chatMessage.value = emptyList()
     }
-
+    fun getName(id:String) : String{
+        return androidUserVM.getUser(id)?.name ?: ""
+    }
     fun initialise1V1Chat(receiverID: String) {
         chatRepository.createOrGet1v1Chat(currentUid ?: "", receiverID)
         viewModelScope.launch {
