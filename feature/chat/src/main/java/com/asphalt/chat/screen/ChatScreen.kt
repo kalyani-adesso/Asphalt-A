@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.network.KtorClient
 import com.asphalt.android.network.user.UserAPIServiceImpl
@@ -51,7 +48,6 @@ import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
-import com.asphalt.chat.model.ChatMessage
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -75,6 +71,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatScreen(
     setTopAppBarState: (AppBarState) -> Unit,
+    ids: List<String>?, initaliseChat: Boolean = true,
     viewModel: ChatScreenViewModel = koinViewModel()
 ) {
     setTopAppBarState(
@@ -86,7 +83,12 @@ fun ChatScreen(
     var msgText by remember { mutableStateOf("") }
     val messages by viewModel.chatMessage.collectAsState()
 
+    if (initaliseChat) {
+        if (ids != null && ids.size > 0) {
+            viewModel.initialise1V1Chat(ids.get(0))
+        }
 
+    }
     AsphaltTheme {
         Column(modifier = Modifier) {
             Box(
@@ -116,8 +118,11 @@ fun ChatScreen(
                             ),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10),) {
-                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10)) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 CircularNetworkImage(
                                     modifier = Modifier.border(
                                         width = Dimensions.size2pt5,
@@ -134,14 +139,14 @@ fun ChatScreen(
                                         style = TypographyBold.bodyMedium,
                                         color = NeutralWhite
                                     )
-                                   /* Spacer(modifier = Modifier.height(Dimensions.size8))
-                                    Text(
-                                        "Weekend Ride - Kochi to Kanyakumari rrrrr",
-                                        modifier = Modifier,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        style = Typography.bodySmall, color = NeutralWhite
-                                    )*/
+                                    /* Spacer(modifier = Modifier.height(Dimensions.size8))
+                                     Text(
+                                         "Weekend Ride - Kochi to Kanyakumari rrrrr",
+                                         modifier = Modifier,
+                                         maxLines = 1,
+                                         overflow = TextOverflow.Ellipsis,
+                                         style = Typography.bodySmall, color = NeutralWhite
+                                     )*/
                                 }
                             }
                             /* RoundedBox(
@@ -244,6 +249,7 @@ fun ChatScreen(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
+                                        viewModel.send1V1Chat(ids?.get(0) ?: "", msgText)
                                         /*if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
                                             viewModel.updateChatMessage(
                                                 ChatMessage(
@@ -304,5 +310,5 @@ fun ChatScreenPreview() {
         )
     )
     val viewModel: ChatScreenViewModel = ChatScreenViewModel(androidVM, ChatRepository())
-    ChatScreen({}, viewModel)
+    ChatScreen({}, listOf(), false, viewModel)
 }

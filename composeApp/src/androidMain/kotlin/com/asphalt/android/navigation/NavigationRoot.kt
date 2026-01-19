@@ -483,13 +483,15 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.ChatListNavaKey> { key ->
-                        ChatListingScreen(setTopAppBarState = setTopAppBarState, chatItemClick = {
-                            backStack.add(AppNavKey.ChatScreenNavaKey)
-                        })
+                        ChatListingScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            chatItemClick = { ids ->
+                                backStack.add(AppNavKey.ChatScreenNavaKey(ids))
+                            })
                     }
 
                     entry<AppNavKey.ChatScreenNavaKey> { key ->
-                        ChatScreen(setTopAppBarState = setTopAppBarState)
+                        ChatScreen(setTopAppBarState = setTopAppBarState, ids = key.ids)
                     }
                 }
 
