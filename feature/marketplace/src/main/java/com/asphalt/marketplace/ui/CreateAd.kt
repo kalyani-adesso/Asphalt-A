@@ -4,22 +4,32 @@ package com.asphalt.marketplace.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -30,15 +40,25 @@ import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.NeutralBlack
+import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightGrey
+import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.marketplace.ui.composable.Buttons
+import com.asphalt.marketplace.ui.composable.InputAndDropDown
+import com.asphalt.marketplace.ui.composable.TextFieldWithTitle
+import com.asphalt.marketplace.ui.composable.TwoDropDownWithTitle
 
 @Composable
 fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
+    val scrollState = rememberScrollState()
     setTopAppBarState(
         AppBarState(
             title = "Add Post"
@@ -50,7 +70,12 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
                 .fillMaxSize()
                 .background(color = NeutralWhite)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(bottom = Dimensions.padding100).imePadding()
+            ) {
                 Box(
                     modifier = Modifier
                         .height(Dimensions.size175)
@@ -104,15 +129,46 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 
                 }
-
+                CreateAdForm()
             }
-            Button(onClick = {}, modifier = Modifier.align(Alignment.BottomCenter)) { }
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .background(color = NeutralWhite).padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16).imePadding()
+            ) {
+                Buttons("Cancel", "Publish")
+            }
+
+            //Button(onClick = {}, modifier = Modifier.align(Alignment.BottomCenter)) { }
 
         }
     }
 
 
 }
+
+@Composable
+fun CreateAdForm() {
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TextFieldWithTitle("Title*", 1)
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TwoDropDownWithTitle("Category*", "Condition*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TwoDropDownWithTitle("Year*", "Kilometer*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TwoDropDownWithTitle("Engine*", "Type*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    InputAndDropDown("Color*", "Owner*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    InputAndDropDown("Fuel Type*", "Insurance*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TextFieldWithTitle("Price*")
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TextFieldWithTitle("Location", 1)
+    Spacer(modifier = Modifier.height(Dimensions.size16))
+    TextFieldWithTitle("Description*", 3)
+}
+
 
 @Preview
 @Composable
