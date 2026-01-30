@@ -73,6 +73,9 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     data class ChatScreenNavaKey(val ids: List<String>? = null) : AppNavKey
+
+    @Serializable
+    object CreateAd : AppNavKey
 }
 
 data class BottomNavItems(

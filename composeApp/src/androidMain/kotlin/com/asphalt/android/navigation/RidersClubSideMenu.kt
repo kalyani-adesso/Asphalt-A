@@ -105,7 +105,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                         },
                         label = { Text("Marketplace", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = { itemClick.invoke(Constants.MARKET_PLACE_CLICK) }
                     )
                     NavigationDrawerItem(
                         icon = {

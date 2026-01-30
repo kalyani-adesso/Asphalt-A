@@ -58,6 +58,7 @@ import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
+import com.asphalt.marketplace.ui.CreateAd
 import com.asphalt.profile.screens.ProfileScreen
 import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -160,7 +161,8 @@ fun NavigationRoot(
         is AppNavKey.EndRideLoaderNavKey,
         is AppNavKey.RideDetails,
         is AppNavKey.ChatScreenNavaKey,
-        is AppNavKey.ChatListNavaKey -> true
+        is AppNavKey.ChatListNavaKey,
+        is AppNavKey.CreateAd -> true
 
         else -> false
     }
@@ -493,6 +495,10 @@ fun NavigationRoot(
                     entry<AppNavKey.ChatScreenNavaKey> { key ->
                         ChatScreen(setTopAppBarState = setTopAppBarState, ids = key.ids)
                     }
+
+                    entry<AppNavKey.CreateAd> { key ->
+                        CreateAd(setTopAppBarState = setTopAppBarState)
+                    }
                 }
 
             )
@@ -520,6 +526,13 @@ fun NavigationRoot(
                 Constants.MESSAGE_CLICK -> {
                     scope.launch {
                         backStack.add(AppNavKey.ChatListNavaKey)
+                        drawerState.close()
+                    }
+                }
+
+                Constants.MARKET_PLACE_CLICK -> {
+                    scope.launch {
+                        backStack.add(AppNavKey.CreateAd)
                         drawerState.close()
                     }
                 }

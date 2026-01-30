@@ -100,6 +100,7 @@ dependencies {
 
     implementation(projects.feature.joinaride)
     implementation(projects.feature.chat)
+    implementation(projects.feature.marketplace)
 
     //dependencies
     implementation(libs.androidx.core.splashscreen) // Splash Screen
