@@ -16,6 +16,7 @@ data class Message(
 @Serializable
 data class ChatRoom(
     val id: String = "",
+    val name: String? = null,
     val lastMessage: String = "",
     val lastTimestamp: Long = 0L,
     val type: String = "private",

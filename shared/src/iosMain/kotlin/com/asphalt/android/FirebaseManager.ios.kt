@@ -74,4 +74,8 @@ actual class PlatformDatabase : IFirebaseDatabase {
 actual object FirebaseServerValue {
     actual val TIMESTAMP: Any
         get() = TODO("Not yet implemented")
+
+    actual fun increment(value: Int): Any {
+        TODO("Not yet implemented")
+    }
 }

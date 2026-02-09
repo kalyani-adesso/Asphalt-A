@@ -120,4 +120,7 @@ actual class TransactionResult(
 
 actual object FirebaseServerValue {
     actual val TIMESTAMP: Any = ServerValue.TIMESTAMP
+    actual fun increment(value: Int): Any {
+        return ServerValue.increment(value.toLong())
+    }
 }

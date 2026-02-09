@@ -54,7 +54,7 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
             chatRepository.getCanonicalChatId(
                 currentUid ?: "",
                 receiverID
-            ), currentUid ?: "", msg
+            ), currentUid ?: "",receiverID, msg
         )
     }
 

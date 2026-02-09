@@ -7,6 +7,8 @@ interface IFirebaseDatabase {
 }
 expect object FirebaseServerValue {
     val TIMESTAMP: Any
+    fun increment(value: Int): Any
+
 }
 
 interface IDatabaseReference {

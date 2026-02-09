@@ -5,6 +5,7 @@ import com.asphalt.android.FirebaseServerValue
 import com.asphalt.android.Logger
 import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.TransactionResult
+import com.asphalt.android.model.chat.ChatRoom
 import com.asphalt.android.model.chat.Message
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
@@ -38,7 +39,7 @@ class ChatRepository {
         }
     }
 
-    fun sendMessage(chatRoomId: String, senderId: String, text: String) {
+    fun sendMessage(chatRoomId: String, senderId: String,recipientId:String, text: String) {
         val messagesRef = database.getReference("chats/$chatRoomId/messages").push()
         val messageId = messagesRef.key ?: return
 
@@ -55,7 +56,8 @@ class ChatRepository {
         val updates = mapOf(
             "chats/$chatRoomId/messages/$messageId" to messageData,
             "chats/$chatRoomId/lastMessage" to text,
-            "chats/$chatRoomId/lastTimestamp" to timestamp
+            "chats/$chatRoomId/lastTimestamp" to timestamp,
+            "chats/$chatRoomId/unreadCounts/$recipientId" to FirebaseServerValue.increment(1)
         )
 
         database.getReference(null).updateChildren(updates)
@@ -81,5 +83,32 @@ class ChatRepository {
                 mapSnapshotToMessages(snapshot)
 
             }
+    }
+
+    fun getRecentChats(myUserId: String): Flow<List<ChatRoom>> {
+        return database.getReference("chats")
+            .observeValue().map { snapshot ->
+                snapshot.children.mapNotNull { child ->
+                    val map = child.getValue() as? Map<String, Any?> ?: return@mapNotNull null
+                    val members = map["members"] as? Map<String, Boolean> ?: emptyMap()
+
+                    if (members.containsKey(myUserId)) {
+                        ChatRoom(
+                            id = child.key ?: "",
+                            lastMessage = map["lastMessage"] as? String ?: "",
+                            lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
+                            unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap()
+                        )
+                    } else null
+                }.sortedByDescending { it.lastTimestamp }
+            }
+    }
+
+    fun markAsRead(chatRoomId: String, myUserId: String) {
+        val updates = mapOf(
+            "chats/$chatRoomId/unreadCounts/$myUserId" to 0
+        )
+
+        database.getReference(null).updateChildren(updates)
     }
 }
