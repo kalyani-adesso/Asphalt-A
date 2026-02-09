@@ -21,7 +21,7 @@ import com.asphalt.commonui.ui.GradientButton
 import kotlinx.coroutines.launch
 
 @Composable
-fun Buttons(label1: String, label2: String) {
+fun Buttons(label1: String, label2: String, click1: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
             Dimensions.spacing20
@@ -47,7 +47,7 @@ fun Buttons(label1: String, label2: String) {
         GradientButton(
             modifier = Modifier.weight(1f), endColor = PrimaryDarkerLightB75,
             onClick = {
-
+                click1.invoke()
 
             }, contentPadding = PaddingValues(
                 Dimensions.size0
@@ -70,6 +70,6 @@ fun Buttons(label1: String, label2: String) {
 
 @Preview
 @Composable
-fun PreviewButtons(){
-    Buttons("CANCEL","PUBLISH")
+fun PreviewButtons() {
+    Buttons("CANCEL", "PUBLISH",{})
 }

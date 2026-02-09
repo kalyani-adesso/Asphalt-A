@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -126,7 +128,9 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
                     .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
                     .imePadding()
             ) {
-                Buttons("Cancel", "Publish")
+                Buttons("Cancel", "Publish") {
+                    viewModel.validations()
+                }
             }
 
             //Button(onClick = {}, modifier = Modifier.align(Alignment.BottomCenter)) { }
@@ -139,8 +143,14 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 @Composable
 fun CreateAdForm(viewModel: CreateAdViewModel) {
+    var title: String = ""
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    TextFieldWithTitle("Title*", 1,viewModel.createAd_model.value.isShowTitleError)
+    TextFieldWithTitle(
+        "Title*", 1, viewModel.createAd_model.value.isShowTitleError,
+        viewModel.createAd_model.value.tile
+    ) { tit ->
+        viewModel.setTitle(tit)
+    }
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TwoDropDownWithTitle("Category*", "Condition*")
     Spacer(modifier = Modifier.height(Dimensions.size16))
@@ -152,11 +162,11 @@ fun CreateAdForm(viewModel: CreateAdViewModel) {
     Spacer(modifier = Modifier.height(Dimensions.size16))
     InputAndDropDown("Fuel Type*", "Insurance*")
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    TextFieldWithTitle("Price*")
+    // TextFieldWithTitle("Price*", tile = viewModel.createAd_model.value.tile)
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    TextFieldWithTitle("Location", 1)
+    //TextFieldWithTitle("Location", tile = viewModel.createAd_model.value.tile)
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    TextFieldWithTitle("Description*", 3)
+    //TextFieldWithTitle("Description*", 3, tile = viewModel.createAd_model.value.tile)
 }
 
 

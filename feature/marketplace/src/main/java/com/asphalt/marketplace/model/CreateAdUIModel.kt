@@ -2,7 +2,7 @@ package com.asphalt.marketplace.model
 
 import android.service.quicksettings.Tile
 
-class CreateAdUIModel(
+data class CreateAdUIModel(
     var isShowTitleError: Boolean = false,
     var isShowColorError: Boolean = false,
     var isShowFuelError: Boolean = false,

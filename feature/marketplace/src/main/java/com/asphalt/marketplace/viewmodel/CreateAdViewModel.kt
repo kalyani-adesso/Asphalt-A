@@ -11,10 +11,11 @@ class CreateAdViewModel : ViewModel() {
 
     fun validations(): Boolean {
         if (_createAd_model.value.tile.isEmpty()) {
-            _createAd_model.value.isShowTitleError = true
+            _createAd_model.value = _createAd_model.value.copy(isShowTitleError = true)
+
             return false
         } else {
-            _createAd_model.value.isShowTitleError = false
+            _createAd_model.value = _createAd_model.value.copy(isShowTitleError = false)
         }
         if (_createAd_model.value.color.isEmpty()) {
             _createAd_model.value.isShowColorError = true
@@ -23,6 +24,10 @@ class CreateAdViewModel : ViewModel() {
             _createAd_model.value.isShowColorError = false
         }
         return true
+    }
+
+    fun setTitle(value: String) {
+        _createAd_model.value = _createAd_model.value.copy(tile = value)
     }
 
 }

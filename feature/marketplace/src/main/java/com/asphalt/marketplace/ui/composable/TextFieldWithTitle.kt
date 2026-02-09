@@ -31,7 +31,13 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 
 @Composable
-fun TextFieldWithTitle(title: String, maxLines: Int = 1, showError: Boolean = false) {
+fun TextFieldWithTitle(
+    title: String,
+    maxLines: Int = 1,
+    showError: Boolean = false,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
     Column() {
         Text(
             text = title, //stringResource(R.string.ride_title),
@@ -53,27 +59,29 @@ fun TextFieldWithTitle(title: String, maxLines: Int = 1, showError: Boolean = fa
                 .padding(start = Dimensions.padding16, end = Dimensions.padding16)
                 .background(
                     NeutralLightPaper, shape = RoundedCornerShape(Dimensions.padding10)
-                ).then(if(showError){
-                    Modifier.border(
-                        width = Dimensions.padding1,
-                        color = VividRed,
-                        shape = RoundedCornerShape(Dimensions.padding10)
-                    )
-                }else{
-                    Modifier.border(
-                        width = Dimensions.padding1,
-                        color = NeutralWhite,
-                        shape = RoundedCornerShape(Dimensions.padding10)
-                    )
-                })
-               ,
+                )
+                .then(
+                    if (showError) {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = VividRed,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    } else {
+                        Modifier.border(
+                            width = Dimensions.padding1,
+                            color = NeutralWhite,
+                            shape = RoundedCornerShape(Dimensions.padding10)
+                        )
+                    }
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextField(
-                value = "",
+                value = value,
                 onValueChange = {
-
+                    onValueChange.invoke(it)
                 },
                 placeholder = {
                     Text(
@@ -111,5 +119,6 @@ fun TextFieldWithTitle(title: String, maxLines: Int = 1, showError: Boolean = fa
 @Preview
 @Composable
 fun TextFieldWithTitlePreview() {
-    TextFieldWithTitle("title")
+
+    TextFieldWithTitle("title",1 ,false,value = "",{})
 }
