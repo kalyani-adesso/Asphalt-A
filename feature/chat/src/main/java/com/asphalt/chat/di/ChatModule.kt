@@ -7,6 +7,6 @@ import org.koin.dsl.module
 
 val chatModule = module {
 
-    viewModel { ChatListViewModel() }
+    viewModel { ChatListViewModel(get(),get()) }
     viewModel { ChatScreenViewModel(get(),get()) }
 }

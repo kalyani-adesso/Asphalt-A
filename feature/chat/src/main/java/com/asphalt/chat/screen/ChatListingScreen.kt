@@ -29,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +40,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.model.chat.ChatRoom
+import com.asphalt.android.model.chat.getOtherUserId
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.model.ChatTabModel
 import com.asphalt.chat.viewmodel.ChatListViewModel
 import com.asphalt.commonui.AppBarState
@@ -57,14 +63,21 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.util.GetGradient
+import com.asphalt.commonui.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatListingScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     chatItemClick: (List<String>) -> Unit,
-    viewModel: ChatListViewModel = koinViewModel()
+    viewModel: ChatListViewModel = koinViewModel(),
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
+    val chatList by viewModel.chatModel.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        viewModel.getChatList()
+    }
+
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.messages),
@@ -203,9 +216,9 @@ fun ChatListingScreen(
                     item {
                         Spacer(modifier = Modifier.height(Dimensions.padding16))
                     }
-                    items(10) {
+                    items(chatList) { chatRoom ->
                         Column {
-                            ChatList(chatItemClick)
+                            ChatList(chatItemClick, chatRoom, viewModel, androidUserVM)
                             Spacer(modifier = Modifier.height(Dimensions.size10))
 
                         }
@@ -219,14 +232,23 @@ fun ChatListingScreen(
 }
 
 @Composable
-fun ChatList(chatItemClick: (List<String>) -> Unit) {
+fun ChatList(
+    chatItemClick: (List<String>) -> Unit,
+    chatRoom: ChatRoom,
+    viewModel: ChatListViewModel,
+    androidUserVM: AndroidUserVM
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimensions.size83)
             .padding(start = Dimensions.padding16, end = Dimensions.padding16)
             .clickable {
-                chatItemClick.invoke(listOf("94HYXGNIixcaYeajbYq3ZVskgBn1"))
+                chatItemClick.invoke(
+                    listOf(
+                        chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID()) ?: ""
+                    )
+                )
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White // or use NeutralWhite
@@ -276,7 +298,9 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
-                                text = "Sooraj",
+                                text = androidUserVM.getUser(
+                                    chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID()) ?: ""
+                                )?.name ?: "",
                                 modifier = Modifier.weight(1f),
                                 style = TypographyBold.bodySmall,
                                 color = NeutralBlack,
@@ -284,7 +308,7 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
-                                text = "10:45 am",
+                                text = Utils.getTime(chatRoom.lastTimestamp),
                                 style = Typography.bodySmall,
                                 color = NeutralDarkGrey,
                                 maxLines = 1,
@@ -295,7 +319,7 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
 
                         Spacer(Modifier.height(Dimensions.size5))
                         Text(
-                            text = "Weekend Cost Ride",
+                            text = "",
                             style = Typography.bodySmall,
                             color = PrimaryDarkerLightB75,
                             maxLines = 1,
@@ -308,7 +332,7 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "See you at the meeting point!",
+                                text = chatRoom.lastMessage,
                                 modifier = Modifier.weight(1f),
                                 style = Typography.bodySmall,
                                 color = NeutralDarkGrey,
@@ -324,7 +348,7 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
                                     .background(VividRed)
                             ) {
                                 Text(
-                                    text = "10",
+                                    text = "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}",
                                     style = TypographyBold.bodySmall,
                                     color = NeutralWhite,
                                     maxLines = 1,
@@ -345,5 +369,5 @@ fun ChatList(chatItemClick: (List<String>) -> Unit) {
 @Composable
 fun ChatListPreview() {
     var videModel: ChatListViewModel = viewModel()
-    ChatListingScreen({}, {},videModel)
+    ChatListingScreen({}, {}, videModel)
 }

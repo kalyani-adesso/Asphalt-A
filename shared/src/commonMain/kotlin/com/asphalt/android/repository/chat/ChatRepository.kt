@@ -97,7 +97,8 @@ class ChatRepository {
                             id = child.key ?: "",
                             lastMessage = map["lastMessage"] as? String ?: "",
                             lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
-                            unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap()
+                            unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap(),
+                            members=members
                         )
                     } else null
                 }.sortedByDescending { it.lastTimestamp }

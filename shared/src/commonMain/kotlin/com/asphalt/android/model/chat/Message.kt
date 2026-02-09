@@ -23,3 +23,7 @@ data class ChatRoom(
     val members: Map<String, Boolean> = emptyMap(),
     val unreadCounts: Map<String, Int> = emptyMap()
 )
+
+fun ChatRoom.getOtherUserId(currentUserId: String): String? {
+    return members.keys.firstOrNull { it != currentUserId }
+}
