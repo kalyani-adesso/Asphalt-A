@@ -11,3 +11,14 @@ data class Message(
     val isRead: Boolean = false,
 
 )
+
+
+@Serializable
+data class ChatRoom(
+    val id: String = "",
+    val lastMessage: String = "",
+    val lastTimestamp: Long = 0L,
+    val type: String = "private",
+    val members: Map<String, Boolean> = emptyMap(),
+    val unreadCounts: Map<String, Int> = emptyMap()
+)
