@@ -4,61 +4,48 @@ package com.asphalt.marketplace.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.NeutralBlack
-import com.asphalt.commonui.theme.NeutralBlackGrey
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightGrey
-import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-import com.asphalt.commonui.theme.TypographyMedium
-import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.marketplace.ui.composable.Buttons
 import com.asphalt.marketplace.ui.composable.InputAndDropDown
 import com.asphalt.marketplace.ui.composable.TextFieldWithTitle
 import com.asphalt.marketplace.ui.composable.TwoDropDownWithTitle
+import com.asphalt.marketplace.viewmodel.CreateAdViewModel
 
 @Composable
 fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
     val scrollState = rememberScrollState()
+    val viewModel: CreateAdViewModel = viewModel()
     setTopAppBarState(
         AppBarState(
             title = "Add Post"
@@ -74,7 +61,8 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(bottom = Dimensions.padding100).imePadding()
+                    .padding(bottom = Dimensions.padding100)
+                    .imePadding()
             ) {
                 Box(
                     modifier = Modifier
@@ -129,12 +117,14 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 
                 }
-                CreateAdForm()
+                CreateAdForm(viewModel)
             }
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .background(color = NeutralWhite).padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16).imePadding()
+                    .background(color = NeutralWhite)
+                    .padding(horizontal = Dimensions.padding16, vertical = Dimensions.padding16)
+                    .imePadding()
             ) {
                 Buttons("Cancel", "Publish")
             }
@@ -148,9 +138,9 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 }
 
 @Composable
-fun CreateAdForm() {
+fun CreateAdForm(viewModel: CreateAdViewModel) {
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    TextFieldWithTitle("Title*", 1)
+    TextFieldWithTitle("Title*", 1,viewModel.createAd_model.value.isShowTitleError)
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TwoDropDownWithTitle("Category*", "Condition*")
     Spacer(modifier = Modifier.height(Dimensions.size16))
