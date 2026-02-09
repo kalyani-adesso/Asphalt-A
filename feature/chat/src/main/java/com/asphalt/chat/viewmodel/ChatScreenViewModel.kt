@@ -24,19 +24,23 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
     fun clearChat() {
         _chatMessage.value = emptyList()
     }
-    fun getName(id:String) : String{
+
+    fun getName(id: String): String {
         return androidUserVM.getUser(id)?.name ?: ""
     }
+
     fun initialise1V1Chat(receiverID: String) {
+        var chatRoomID = chatRepository.getCanonicalChatId(
+            currentUid ?: "",
+            receiverID
+        )
         chatRepository.createOrGet1v1Chat(currentUid ?: "", receiverID)
         viewModelScope.launch {
             chatRepository.getMessages(
-                chatRepository.getCanonicalChatId(
-                    currentUid ?: "",
-                    receiverID
-                )
+                chatRoomID
             ).collect { it ->
                 _chatMessage.value = it.map {
+                    chatRepository.markAsRead(chatRoomID, currentUid ?: "")
                     ChatMessage(
                         it.text,
                         androidUserVM.getUser(it.senderId)?.name ?: "",
@@ -54,7 +58,7 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
             chatRepository.getCanonicalChatId(
                 currentUid ?: "",
                 receiverID
-            ), currentUid ?: "",receiverID, msg
+            ), currentUid ?: "", receiverID, msg
         )
     }
 
