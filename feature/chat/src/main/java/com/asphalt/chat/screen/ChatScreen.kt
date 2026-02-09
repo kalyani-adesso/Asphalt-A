@@ -72,7 +72,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ChatScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     ids: List<String>?, initaliseChat: Boolean = true,
-    viewModel: ChatScreenViewModel = koinViewModel()
+    viewModel: ChatScreenViewModel = koinViewModel(),
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     setTopAppBarState(
         AppBarState(
@@ -134,7 +135,11 @@ fun ChatScreen(
                                 )
                                 Column(modifier = Modifier.padding(start = Dimensions.size10)) {
                                     Text(
-                                        "Hari",
+                                        if (ids != null && ids.size > 0) {
+                                            androidUserVM.getUser(ids.get(0))?.name ?: ""
+                                        } else {
+                                            ""
+                                        },
                                         overflow = TextOverflow.Ellipsis,
                                         style = TypographyBold.bodyMedium,
                                         color = NeutralWhite
@@ -310,5 +315,5 @@ fun ChatScreenPreview() {
         )
     )
     val viewModel: ChatScreenViewModel = ChatScreenViewModel(androidVM, ChatRepository())
-    ChatScreen({}, listOf(), false, viewModel)
+    ChatScreen({}, listOf(), false, viewModel, androidVM)
 }

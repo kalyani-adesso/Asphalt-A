@@ -1,5 +1,6 @@
 package com.asphalt.chat.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,8 +44,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.model.chat.ChatRoom
 import com.asphalt.android.model.chat.getOtherUserId
+import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.user.UserAPIServiceImpl
+import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.chat.ChatRepository
+import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.model.ChatTabModel
 import com.asphalt.chat.viewmodel.ChatListViewModel
@@ -241,7 +249,7 @@ fun ChatList(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Dimensions.size83)
+            .height(Dimensions.size71)// size83
             .padding(start = Dimensions.padding16, end = Dimensions.padding16)
             .clickable {
                 chatItemClick.invoke(
@@ -316,15 +324,17 @@ fun ChatList(
                                 fontSize = Dimensions.textSize12
                             )
                         }
+                        if(false) {
+                            Spacer(Modifier.height(Dimensions.size5))
+                            Text(
+                                text = "",
+                                style = Typography.bodySmall,
+                                color = PrimaryDarkerLightB75,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis, fontSize = Dimensions.textSize12
+                            )
 
-                        Spacer(Modifier.height(Dimensions.size5))
-                        Text(
-                            text = "",
-                            style = Typography.bodySmall,
-                            color = PrimaryDarkerLightB75,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis, fontSize = Dimensions.textSize12
-                        )
+                        }
                         Spacer(Modifier.height(Dimensions.size3))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -365,9 +375,18 @@ fun ChatList(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun ChatListPreview() {
-    var videModel: ChatListViewModel = viewModel()
-    ChatListingScreen({}, {}, videModel)
+    var dataStoreManager = DataStoreManager(LocalContext.current)
+    var androidVM = AndroidUserVM(
+        UserRepoImpl(), dataStoreManager, UserRepository(
+            UserAPIServiceImpl(
+                KtorClient()
+            )
+        )
+    )
+    var videModel: ChatListViewModel = ChatListViewModel(ChatRepository(),androidVM)
+    ChatListingScreen({}, {}, videModel,androidVM)
 }
