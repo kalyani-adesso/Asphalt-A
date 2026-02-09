@@ -43,7 +43,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val show_EndTimePicker = mutableStateOf(false)
 
     private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
-    val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
+    open val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
 
     val selectedUserCount = mutableStateOf(0)
 
@@ -63,7 +63,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     private val _fullList = mutableStateOf(ArrayList<RidersList>())
     private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
         mutableStateOf(arrayListOf())
-    val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
+    open val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
 
     /* init {
          _fullList.value = getUsers()

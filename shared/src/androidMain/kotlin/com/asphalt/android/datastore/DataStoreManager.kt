@@ -9,7 +9,7 @@ import com.asphalt.commonui.constants.Constants
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-class DataStoreManager(private val context: Context) {
+open class DataStoreManager(private val context: Context) {
     private val Context.dataStore by preferencesDataStore(name = Constants.DATA_STORE_NAME)
 
     suspend fun saveValue(key: String, value: String) {
