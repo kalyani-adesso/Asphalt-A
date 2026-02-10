@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.0"
+agp = "8.13.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -17,21 +17,22 @@ firebaseFirestore = "2.3.0"
 firebaseFirestoreKtx = "25.1.4"
 firebaseIos = "1.9.1"
 junit = "4.13.2"
-kotlin = "2.2.10"
-ktor = "3.3.1"
+kotlin = "2.3.0"
+ktor = "3.4.0"
 coroutines = "1.10.2"
 ksp = "2.2.20-2.0.3"
 kotlinxSerialization = "1.9.0"
 koinCore = "4.1.1"
-maps-compose = "6.12.1"
-maps ="19.2.0"
+maps-compose = "8.0.0"
+maps ="20.0.0"
+mapsUtilsKtx = "6.0.0"
 materialIconsExtendedAndroid = "1.7.8"
 splashscreen = "1.2.0"
-compose = "1.9.4"
+compose = "1.10.2"
 compose-material3 = "1.4.0"
 lifecycleViewmodelNavigation3 = "1.0.0-alpha04"
 lifecycleRuntimeKtx = "2.9.4"
-kotlinxSerializationJson = "3.3.1"
+kotlinxSerializationJson = "3.4.0"
 material = "1.13.0"
 coil = "2.7.0"
 navigation3Runtime = "1.0.0-alpha06"
@@ -45,6 +46,7 @@ datastore = "1.1.7"
 mp-chart = "v3.1.0"
 playServicesLocation = "21.3.0"
 kotlinDateTime = "0.7.1"
+mapbox-offline = "11.4.0"
 
 [libraries]
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
@@ -79,12 +81,14 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+maps-utils-ktx = { module = "com.google.maps.android:maps-utils-ktx", version.ref = "mapsUtilsKtx" }
 mpchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mp-chart" }
 
 # MAPS
 maps = { module = "com.google.android.gms:play-services-maps", version.ref = "maps"}
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+offline-maps = { module = "com.mapbox.maps:android", version.ref = "mapbox-offline"}
 
 #Ktor
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
@@ -131,3 +135,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+#offline
+#offlineMapsPlugin = { id = "com.mapbox.maps:plugin-locationcomponent", version.ref = "mapbox-offline"}

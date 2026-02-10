@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+   // alias(libs.plugins.offlineMapsPlugin)
 }
 
 android {
@@ -79,5 +80,11 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
 
     implementation(libs.datastore)
+
+    // offline maps
+    //implementation(libs.offline.maps)
+    implementation(libs.maps.utils.ktx)
+
+
 
 }

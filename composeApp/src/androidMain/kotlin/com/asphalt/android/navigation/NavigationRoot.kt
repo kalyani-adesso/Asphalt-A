@@ -31,7 +31,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SinglePaneSceneStrategy
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.location.AndroidLocationProvider
-import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -51,7 +50,7 @@ import com.asphalt.dashboard.composables.screens.NotificationScreen
 import com.asphalt.dashboard.composables.screens.RidesDetailsScreen
 import com.asphalt.dashboard.composables.screens.RidesScreen
 import com.asphalt.joinaride.ConnectedRideEnd
-import com.asphalt.joinaride.ConnectedRideMapScreen
+import com.asphalt.joinaride.ConnectedRideGoogleMapScreen
 import com.asphalt.joinaride.EndRidersScreenLoader
 import com.asphalt.joinaride.JoinRideMainListScreen
 import com.asphalt.joinaride.RatingThisRide
@@ -396,7 +395,7 @@ fun NavigationRoot(
                                 // backStack.add(AppNavKey.DashboardNavKey)
                             },
                             navigateToEndRide = {
-                                backStack.add(AppNavKey.ConnectedRideEndNavKey)
+                                backStack.add(AppNavKey.ConnectedRideEndNavKey(key.ridesData))
                             })
                     }
                     entry<AppNavKey.ForgotPasswordNav> { key ->
@@ -420,7 +419,7 @@ fun NavigationRoot(
                         })
                     }
                     entry<AppNavKey.ConnectedRideMapNavKey> { key ->
-                        ConnectedRideMapScreen(
+                        ConnectedRideGoogleMapScreen(
                             setTopAppBarState = setTopAppBarState,
 //                            onNavigateToMapScreen = {
 //                                backStack.add(AppNavKey.ConnectedRideMapNavKey),
@@ -429,7 +428,7 @@ fun NavigationRoot(
                             onClick = {
                                 backStack.add(AppNavKey.ConnectedRideMapNavKey(key.ridesData))
                                // backStack.remove(AppNavKey.ConnectedRideMapNavKey)
-                                backStack.add(AppNavKey.EndRideLoaderNavKey)
+                                backStack.add(AppNavKey.EndRideLoaderNavKey(key.ridesData))
                             }
                         )
                     }
@@ -454,20 +453,22 @@ fun NavigationRoot(
                            // backStack.add(AppNavKey.ConnectedRideNavKey)
                         })
                     }
-                    entry(AppNavKey.EndRideLoaderNavKey) { key ->
+                    entry<AppNavKey.EndRideLoaderNavKey> { key ->
                         EndRidersScreenLoader(
+                            ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
                             onNavigateToSummaryEndRide = {
-                                backStack.remove(AppNavKey.EndRideLoaderNavKey)
-                                backStack.add(AppNavKey.ConnectedRideEndNavKey)
+                                backStack.remove(AppNavKey.EndRideLoaderNavKey(ridesData = key.ridesData))
+                                backStack.add(AppNavKey.ConnectedRideEndNavKey(ridesData = key.ridesData))
                             }
                         )
                     }
-                    entry(AppNavKey.ConnectedRideEndNavKey) { key ->
+                    entry<AppNavKey.ConnectedRideEndNavKey> { key ->
                         ConnectedRideEnd(
+                            ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
                             onNavigateToDashboard = {
-                                backStack.remove(AppNavKey.ConnectedRideEndNavKey)
+                                backStack.remove(AppNavKey.ConnectedRideEndNavKey(ridesData = key.ridesData))
                                 backStack.add(AppNavKey.DashboardNavKey)
                             }
                         )

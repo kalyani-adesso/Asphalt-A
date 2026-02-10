@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -70,7 +72,6 @@ fun RidersGroupStatus(
     ridesData: RidesData
 
 ) {
-
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
 
@@ -78,20 +79,15 @@ fun RidersGroupStatus(
 
     val riders by viewModel.joinedUsers.collectAsState()
 
-
-
-   // val groupRiders by viewModel.groupRiders.collectAsState()
-
     val currentUser = androidUserVM.userState.collectAsState(null)
 
     val joinedRiders by viewModel.joinedUsers.collectAsState()
 
     LaunchedEffect(currentUser) {
         val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
-
+        viewModel.observeRideLocations(ridesData.createdBy.toString())
         Log.d("TAG", "RidersGroupStatus userData: $userData")
     }
-
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -129,7 +125,7 @@ fun RidersGroupStatus(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .heightIn(max = 300.dp)
                     .background(
                         color = NeutralLightPaper,
                         shape = RoundedCornerShape(Dimensions.size10)

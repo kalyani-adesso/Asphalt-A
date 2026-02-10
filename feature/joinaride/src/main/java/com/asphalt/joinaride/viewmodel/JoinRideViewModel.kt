@@ -15,8 +15,11 @@ import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.joinaride.repository.IdRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +31,7 @@ import kotlin.collections.emptyList
 import kotlin.getValue
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 
 class JoinRideViewModel(
     private val idRepository: IdRepository
@@ -237,6 +241,9 @@ class JoinRideViewModel(
     }
 
     private var rideListener: ValueEventListener? = null
+    private var rideRef: DatabaseReference? = null
+
+    private var startedAt: Long? = null
     fun observeRideLocations(rideId: String) {
 
         val ref = FirebaseDatabase.getInstance()
@@ -249,13 +256,57 @@ class JoinRideViewModel(
         rideListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val users = snapshot.children.mapNotNull {
+                    startedAt = snapshot.child("dateTime").getValue(Long::class.java)
                     it.getValue(ConnectedRideDTO::class.java)
                 }
+                // Always emit NEW list instance
                 _joinedUsers.value = users
             }
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                rideListener?.let {
+                    FirebaseDatabase.getInstance().reference.removeEventListener(it)
+                }
+            }
         }
         ref.addValueEventListener(rideListener!!)
+        startRideTimer()
+    }
+
+    private val _isRideStarted = MutableStateFlow(false)
+    val isRideStarted = _isRideStarted.asStateFlow()
+
+    private val _elapsedTime = MutableStateFlow(0L)
+    val elapsedTime = _elapsedTime.asStateFlow()
+    private var timerJob: Job? = null
+
+    fun startRideTimer() {
+        if (_isRideStarted.value) return
+
+        _isRideStarted.value = true
+
+        timerJob = viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
+            while (isActive) {
+                _elapsedTime.value =
+                    (System.currentTimeMillis() - startTime) / 1000
+                delay(1000)
+                Log.d("TIMER", "Elapsed = ${_elapsedTime.value}")
+            }
+        }
+    }
+
+    fun stopRide() {
+        _isRideStarted.value = false
+        timerJob?.cancel()
+        timerJob = null
+    }
+
+    override fun onCleared() {
+        //timerJob?.cancel()
+        rideListener?.let { listener ->
+            rideRef?.removeEventListener(listener)
+        }
+        super.onCleared()
     }
 }

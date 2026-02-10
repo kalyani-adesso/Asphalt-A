@@ -32,8 +32,10 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -49,7 +51,10 @@ fun CurrentLocationMapScreen(
     ridesData: RidesData,
     rideViewModel: JoinRideViewModel = koinViewModel()
 ) {
+    //val rideId = rideViewModel.getRideId()
+
     val rideId = rideViewModel.getRideId()
+    Log.d("TAG", "ConnectedRideMapScreen: $rideId")
 
     LaunchedEffect(rideId) {
         rideId?.let {
@@ -75,10 +80,10 @@ fun CurrentLocationMapScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Location permission is required")
-                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = "Location permission is required")
+                Spacer(modifier = Modifier.height(height = 12.dp))
                 Button(onClick = request) {
-                    Text("Grant permission")
+                    Text(text = "Grant permission")
                 }
             }
         }
@@ -96,16 +101,66 @@ fun MapWithCurrentLocation(
 
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var mapLoaded by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState()
+
+    LaunchedEffect(riders) {
+        if (riders.isEmpty()) return@LaunchedEffect
+
+        val bounds = LatLngBounds.Builder()
+
+        riders.forEach {
+            bounds.include(LatLng(it.currentLat, it.currentLong))
+        }
+
+        userLocation?.let { bounds.include(it) }
+
+        cameraPositionState.animate(
+            CameraUpdateFactory.newLatLngBounds(bounds.build(), 120)
+        )
+    }
 
     // Get current location
     LaunchedEffect(Unit) {
         userLocation = locationProvider.getCurrentLocation()
-        userLocation?.let {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 14f)
-        }
         isLoading = false
+    }
+
+    val start = remember(ridesData) {
+        if (ridesData.startLatitude != 0.0 && ridesData.startLongitude != 0.0)
+            LatLng(ridesData.startLatitude, ridesData.startLongitude)
+        else null
+    }
+
+    val end = remember(ridesData) {
+        if (ridesData.endLatitude != 0.0 && ridesData.endLongitude != 0.0)
+            LatLng(ridesData.endLatitude, ridesData.endLongitude)
+        else null
+    }
+
+    // Move camera when map + data ready
+    LaunchedEffect(mapLoaded, start, end, userLocation) {
+        if (!mapLoaded) return@LaunchedEffect
+
+        when {
+            start != null && end != null -> {
+                val bounds = LatLngBounds.Builder()
+                    .include(start)
+                    .include(end)
+                    .build()
+
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngBounds(bounds, 150)
+                )
+            }
+
+            userLocation != null -> {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(userLocation!!, 14f)
+                )
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -113,51 +168,51 @@ fun MapWithCurrentLocation(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            onMapLoaded = { mapLoaded = true },
             properties = MapProperties(isMyLocationEnabled = true),
             uiSettings = MapUiSettings(zoomControlsEnabled = false)
         ) {
 
-            // 🔵 Current user marker
+            // User marker
             userLocation?.let {
                 Marker(
-                    state = MarkerState(position = it),
-                    title = "You",
-                    snippet = "Current location"
+                    state = MarkerState(it),
+                    title = "You"
                 )
             }
 
-            // 🟢 Joined riders markers
+            // Joined riders
             riders.forEach { rider ->
                 if (rider.currentLat != 0.0 && rider.currentLong != 0.0) {
-
-                    Log.d(
-                        "MAP",
-                        "Marker: ${rider.userID} ${rider.currentLat}, ${rider.currentLong}"
-                    )
-
                     Marker(
                         state = MarkerState(
-                            position = LatLng(
-                                rider.currentLat,
-                                rider.currentLong
-                            )
+                            LatLng(rider.currentLat, rider.currentLong)
                         ),
                         title = rider.userID
                     )
                 }
             }
-
-            // 🔴 Route polyline (start → end)
-            val routePoints = listOf(
-                LatLng(ridesData.currentLat, ridesData.currentLong),
-                LatLng(ridesData.endLatitude, ridesData.endLongitude)
-            )
-
-            Polyline(
-                points = routePoints,
-                color = Color.Blue,
-                width = 8f
-            )
+            // Start & End markers
+            start?.let {
+                Marker(
+                    state = MarkerState(it),
+                    title = ridesData.startLocation
+                )
+            }
+            end?.let {
+                Marker(
+                    state = MarkerState(it),
+                    title = ridesData.endLocation
+                )
+            }
+            // Polyline
+            if (start != null && end != null) {
+                Polyline(
+                    points = listOf(start, end),
+                    color = Color.Blue,
+                    width = 8f
+                )
+            }
         }
 
         if (isLoading) {

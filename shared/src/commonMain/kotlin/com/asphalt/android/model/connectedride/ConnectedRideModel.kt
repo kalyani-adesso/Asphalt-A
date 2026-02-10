@@ -34,12 +34,13 @@ data class ConnectedRideRoot(
         val rideJoinedID : String? = null,
 )
 
+@Serializable
 data class ConnectedRideDTO(
         val rideJoinedID: String,
         val rideID: String,
         val userID: String,
-        val currentLat: Double,
-        val currentLong: Double,
+        val currentLat: Double = 0.0,
+        val currentLong: Double = 0.0,
         val speedInKph: Double,
         val status: String,
         val dateTime: Long,

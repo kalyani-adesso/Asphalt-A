@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodel.joinridevm.RidesDifficultyViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -76,7 +77,8 @@ fun ConnectedRideEnd(
     modifier: Modifier = Modifier,
     setTopAppBarState: (AppBarState) -> Unit,
     viewModel: RidesDifficultyViewModel = koinViewModel(),
-    onNavigateToDashboard: () -> Unit
+    onNavigateToDashboard: () -> Unit,
+    ridesData: RidesData
     ) {
 
     val stats = viewModel.stats.collectAsStateWithLifecycle()
@@ -117,12 +119,12 @@ fun ConnectedRideEnd(
                     )
                 Spacer(Modifier.height(Dimensions.padding20))
                 Text(
-                    text = stringResource(id = R.string.ride_created),
+                    text = (ridesData.rideTitle ?: ""),
                     style = TypographyBold.bodyMedium
                 )
                 Spacer(Modifier.height(Dimensions.padding16))
                 Text(
-                    text = stringResource(R.string.share_with_friends),
+                    text = stringResource(R.string.ride_created),
                     style = Typography.bodySmall,
                     color = NeutralDarkGrey
                 )
@@ -143,7 +145,7 @@ fun ConnectedRideEnd(
                 ),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.padding16)
             ) {
-                ComposeUtils.SectionTitle(stringResource(R.string.ride_difficulty))
+                //ComposeUtils.SectionTitle(stringResource(R.string.ride_difficulty))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.size20),
                     modifier = Modifier.fillMaxWidth()
@@ -168,7 +170,7 @@ fun ConnectedRideEnd(
         Spacer(modifier=Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.spacedBy(
-                Dimensions.padding20, Alignment.CenterHorizontally
+                space = Dimensions.padding20, Alignment.CenterHorizontally
             ),
             modifier = Modifier.fillMaxWidth()
                 .padding(Dimensions.padding20)
@@ -181,9 +183,9 @@ fun ConnectedRideEnd(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                 modifier = Modifier
-                    .weight(1f)
-                    .height(Dimensions.size60)
-                    .border(1.dp, color = PrimaryBrighterLightW75,
+                    .weight(weight = 1f)
+                    .height(height = Dimensions.size60)
+                    .border(width = 1.dp, color = PrimaryBrighterLightW75,
                         shape = RoundedCornerShape(size = Dimensions.size10)),
             ) {
                 Text(

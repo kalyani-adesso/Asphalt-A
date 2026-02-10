@@ -104,9 +104,10 @@ fun JoinRide(
 
     val sortedList = rides.sortedByDescending{ it .createdDate}
 
-    LaunchedEffect(Unit) {
-        viewModel.removeEndRideList(rides)
-    }
+    // ride removed from list once completed
+//    LaunchedEffect(Unit) {
+//        viewModel.removeEndRideList(rides)
+//    }
 
     Column {
         SearchView(
@@ -129,7 +130,7 @@ fun JoinRide(
             },
             placeholder = "Search rides by location.."
         )
-        Spacer(modifier = Modifier.height(Dimensions.padding20))
+        Spacer(modifier = Modifier.height(height = Dimensions.padding20))
 
         if (rides.isEmpty()) {
             Box(
@@ -267,9 +268,8 @@ fun RiderCard(
                         Spacer(Modifier.width(Dimensions.size5))
                         val distance = ridesData.rideDistance
                         val smallDistance = String.format("%.2f", distance)
-                        // text = ("By $createdBy"),
                         Text(
-                            text = ("$smallDistance km") ?: "",
+                            text = ("$smallDistance km"),
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12,
                             maxLines = 2

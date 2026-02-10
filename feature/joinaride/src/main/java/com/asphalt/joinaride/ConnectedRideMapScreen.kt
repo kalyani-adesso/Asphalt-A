@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.location.LocationProvider
-import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
-import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.BannerType
@@ -46,7 +46,7 @@ import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ConnectedRideMapScreen(
+fun ConnectedRideGoogleMapScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     androidUserVM: AndroidUserVM = koinViewModel(),
     onClick : () -> Unit,
@@ -58,7 +58,8 @@ fun ConnectedRideMapScreen(
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
 
-
+    val isRideStarted by rideViewModel.isRideStarted.collectAsState()
+    val elapsedTime by rideViewModel.elapsedTime.collectAsState()
 
     val rideId = rideViewModel.getRideId()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
@@ -66,6 +67,20 @@ fun ConnectedRideMapScreen(
     if (rideId != null) {
         val details = rideViewModel.getOnGoingRides(rideId ?: "")
         Log.d("TAG", "ConnectedRideMapScreen details: $details")
+    }
+
+
+
+//    LaunchedEffect(rideId) {
+//        if (!isRideStarted) {
+//            rideViewModel.startRide()
+//        }
+//    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            rideViewModel.stopRide()
+        }
     }
 
     setTopAppBarState(
@@ -84,7 +99,7 @@ fun ConnectedRideMapScreen(
 //                            showQueryPopup = true
 //                        }
                 ) {
-                        //live
+                        //live icon
                         Row(
                             modifier = Modifier
                                 .padding(horizontal = 10.dp)
@@ -99,13 +114,14 @@ fun ConnectedRideMapScreen(
                             )
                             Spacer(Modifier.width(Dimensions.spacing5))
                             Text(
-                                stringResource(R.string.live).uppercase(),
+                                "Live",
                                 color = GreenDark,
                                 fontSize = Dimensions.textSize12,
                                 style = TypographyBold.titleMedium
                             )
                         }
                 }
+                // timer
                 RoundedBox(
                     borderColor = PrimaryDarkerLightB75,
                     borderStroke = Dimensions.padding1,
@@ -132,7 +148,7 @@ fun ConnectedRideMapScreen(
                         )
                         Spacer(Modifier.width(Dimensions.spacing5))
                         Text(
-                            stringResource(R.string.timer).uppercase(),
+                            formatTime(elapsedTime),
                             color = PrimaryDarkerLightB75,
                             fontSize = Dimensions.textSize12,
                             style = TypographyBold.titleMedium
@@ -181,6 +197,15 @@ fun ConnectedRideMapScreen(
             }
         }
     }
+}
+
+fun formatTime(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+
+    return "%02d:%02d:%02d".format(hours, minutes, seconds)
 }
 
 @Preview(showBackground = true)
