@@ -12,30 +12,30 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct iOSApp: App {
-    @AppStorage(AppStrings.userdefaultKeys.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var homeViewModel: HomeViewModel = .init()
-    @StateObject var upcomingVM: UpcomingRideViewModel = .init()
+
+    @AppStorage("rememberMeDataStatic") private var isLoggedIn: Bool = false
+    @AppStorage("hasSeenOnboardingStatic") private var hasSeenOnboarding: Bool = false
+
+    @StateObject private var homeViewModel = HomeViewModel()
+    @StateObject private var upcomingVM = UpcomingRideViewModel()
+
     var body: some Scene {
         WindowGroup {
-            if MBUserDefaults.rememberMeDataStatic == true  {
-                BottomNavBar()
-                    .environmentObject(homeViewModel)
-                    .environmentObject(upcomingVM)
-                
-            } else {
-                if MBUserDefaults.hasSeenOnboardingStatic {
-                    NavigationStack {
-//                        SignInView()
-                        BottomNavBar()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingVM)
-                    }
+            NavigationStack {
+                if isLoggedIn {
+                    BottomNavBar()
+                        .environmentObject(homeViewModel)
+                        .environmentObject(upcomingVM)
+
+                } else if hasSeenOnboarding {
+                    SignInView()
+
                 } else {
                     WelcomeScreen()
                 }
             }
-            
         }
     }
 }

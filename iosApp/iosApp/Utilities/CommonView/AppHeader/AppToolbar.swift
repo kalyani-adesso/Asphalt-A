@@ -13,6 +13,7 @@ struct AppToolBar<Content: View>: View {
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
+    @EnvironmentObject var homeViewModel: HomeViewModel
     
     let content: Content
     

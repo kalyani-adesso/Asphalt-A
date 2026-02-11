@@ -20,6 +20,8 @@ class HomeViewModel: ObservableObject {
     @Published  var currentSlices: [JourneySlice] = []
     @Published var journeySlices: [JourneySlice] = []
     @Published var stats: [RideStat] = []
+    @Published var userName: String = ""
+    
  
     // MARK: - Bar chart
     @Published var selectedMonth: PlacesMonth? = nil
@@ -52,9 +54,8 @@ class HomeViewModel: ObservableObject {
         Task {
             do {
                 if let currentUser = try await userRepo.getUserDetails() {
-                    DispatchQueue.main.async {
-                        MBUserDefaults.userNameStatic = currentUser.name!
-                    }
+                    self.userName = currentUser.name ?? ""
+                    MBUserDefaults.userNameStatic = currentUser.name ?? ""
                 }
             } catch {
                 print("Error fetching user: \(error)")

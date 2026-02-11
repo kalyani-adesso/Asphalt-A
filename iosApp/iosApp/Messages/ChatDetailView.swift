@@ -18,6 +18,7 @@ struct ChatDetailView: View {
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var homeViewModel: HomeViewModel
     let isOverlay: Bool
 
     let messages: [Message] = [
