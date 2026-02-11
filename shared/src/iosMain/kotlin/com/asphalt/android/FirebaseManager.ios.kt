@@ -2,6 +2,7 @@ package com.asphalt.android
 
 import kotlinx.coroutines.flow.Flow
 import cocoapods.FirebaseDatabase.FIRDatabase
+import kotlinx.cinterop.ExperimentalForeignApi
 
 
 class IosDatabaseReference(
@@ -35,18 +36,7 @@ class IosDatabaseReference(
     }
 }
 
-actual class DataSnapshot {
-    actual fun getValue(): Any? {
-        TODO("Not yet implemented")
-    }
 
-    actual fun exists(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    actual val key: String?
-        get() = TODO("Not yet implemented")
-}
 
 actual class TransactionResult {
     actual companion object {
@@ -61,13 +51,14 @@ actual class TransactionResult {
 }
 
 actual class PlatformDatabase : IFirebaseDatabase {
+    @OptIn(ExperimentalForeignApi::class)
     actual override fun getReference(path: String?): IDatabaseReference {
         val nativeRef = if (path == null) {
             FIRDatabase.database().reference()
         } else {
             FIRDatabase.database().referenceWithPath(path)
         }
-        return IosDatabaseReference(nativeRef)
+        return IosDatabaseReference(nativeRef as IDatabaseReference)
     }
 }
 
@@ -78,4 +69,15 @@ actual object FirebaseServerValue {
     actual fun increment(value: Int): Any {
         TODO("Not yet implemented")
     }
+}
+
+actual class DataSnapshot {
+    actual fun getValue(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    actual val key: String?
+        get() = TODO("Not yet implemented")
+    actual val children: List<DataSnapshot>
+        get() = TODO("Not yet implemented")
 }
