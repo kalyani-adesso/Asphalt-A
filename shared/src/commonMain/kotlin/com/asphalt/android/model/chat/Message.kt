@@ -27,3 +27,7 @@ data class ChatRoom(
 fun ChatRoom.getOtherUserId(currentUserId: String): String? {
     return members.keys.firstOrNull { it != currentUserId }
 }
+
+fun ChatRoom.memberIds(): List<String> {
+    return members.keys.toList()
+}

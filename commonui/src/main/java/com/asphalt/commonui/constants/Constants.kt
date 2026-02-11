@@ -51,5 +51,8 @@ object Constants {
     const val MESSAGE_CLICK = 2
     const val MARKET_PLACE_CLICK = 3
 
+    const val GROUP_CHAT = "group"
+    const val PRIVATE_CHAT ="private"
+
 
 }

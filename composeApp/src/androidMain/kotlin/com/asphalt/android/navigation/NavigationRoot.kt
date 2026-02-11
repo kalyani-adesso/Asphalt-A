@@ -495,7 +495,14 @@ fun NavigationRoot(
                         ChatListingScreen(
                             setTopAppBarState = setTopAppBarState,
                             chatItemClick = { ids ->
-                                backStack.add(AppNavKey.ChatScreenNavaKey(ids))
+                                backStack.add(AppNavKey.ChatScreenNavaKey(ids, isGroupChat = false))
+                            }, groupChatClick = { chatParams ->
+                                backStack.add(
+                                    AppNavKey.ChatScreenNavaKey(
+                                        ridesData = chatParams,
+                                        isGroupChat = true
+                                    )
+                                )
                             })
                     }
 

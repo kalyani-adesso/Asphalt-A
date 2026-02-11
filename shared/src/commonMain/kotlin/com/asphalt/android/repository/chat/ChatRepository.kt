@@ -127,6 +127,8 @@ class ChatRepository {
                     if (members.containsKey(myUserId)) {
                         ChatRoom(
                             id = child.key ?: "",
+                            name = map["name"]as? String ?: "" ,
+                            type = map["type"]as? String ?: "" ,
                             lastMessage = map["lastMessage"] as? String ?: "",
                             lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
                             unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap(),

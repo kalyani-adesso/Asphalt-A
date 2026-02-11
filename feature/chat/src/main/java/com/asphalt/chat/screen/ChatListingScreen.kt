@@ -43,20 +43,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.model.chat.ChatRoom
 import com.asphalt.android.model.chat.getOtherUserId
+import com.asphalt.android.model.chat.memberIds
 import com.asphalt.android.network.KtorClient
 import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.model.ChatParamsModel
 import com.asphalt.chat.model.ChatTabModel
 import com.asphalt.chat.viewmodel.ChatListViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT
@@ -77,7 +79,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatListingScreen(
     setTopAppBarState: (AppBarState) -> Unit,
-    chatItemClick: (List<String>) -> Unit,
+    chatItemClick: (List<String>) -> Unit, groupChatClick: (ChatParamsModel) -> Unit,
     viewModel: ChatListViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel()
 ) {
@@ -226,7 +228,13 @@ fun ChatListingScreen(
                     }
                     items(chatList) { chatRoom ->
                         Column {
-                            ChatList(chatItemClick, chatRoom, viewModel, androidUserVM)
+                            ChatList(
+                                chatItemClick,
+                                chatRoom,
+                                viewModel,
+                                androidUserVM,
+                                groupChatClick
+                            )
                             Spacer(modifier = Modifier.height(Dimensions.size10))
 
                         }
@@ -244,7 +252,8 @@ fun ChatList(
     chatItemClick: (List<String>) -> Unit,
     chatRoom: ChatRoom,
     viewModel: ChatListViewModel,
-    androidUserVM: AndroidUserVM
+    androidUserVM: AndroidUserVM,
+    groupChatClick: (ChatParamsModel) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -252,11 +261,22 @@ fun ChatList(
             .height(Dimensions.size71)// size83
             .padding(start = Dimensions.padding16, end = Dimensions.padding16)
             .clickable {
-                chatItemClick.invoke(
-                    listOf(
-                        chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID()) ?: ""
+                if (chatRoom.type == Constants.GROUP_CHAT) {
+                    groupChatClick.invoke(
+                        ChatParamsModel(
+                            chatRoom.id,
+                            chatRoom.memberIds(),
+                            chatRoom.name ?: ""
+                        )
                     )
-                )
+                } else {
+                    chatItemClick.invoke(
+                        listOf(
+                            chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID()) ?: ""
+                        )
+                    )
+                }
+
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White // or use NeutralWhite
@@ -306,9 +326,14 @@ fun ChatList(
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
-                                text = androidUserVM.getUser(
-                                    chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID()) ?: ""
-                                )?.name ?: "",
+                                text = if (chatRoom.type.equals(Constants.GROUP_CHAT)) {
+                                    chatRoom.name ?: ""
+                                } else {
+                                    androidUserVM.getUser(
+                                        chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID())
+                                            ?: ""
+                                    )?.name ?: ""
+                                },
                                 modifier = Modifier.weight(1f),
                                 style = TypographyBold.bodySmall,
                                 color = NeutralBlack,
@@ -324,7 +349,7 @@ fun ChatList(
                                 fontSize = Dimensions.textSize12
                             )
                         }
-                        if(false) {
+                        if (false) {
                             Spacer(Modifier.height(Dimensions.size5))
                             Text(
                                 text = "",
@@ -387,6 +412,6 @@ fun ChatListPreview() {
             )
         )
     )
-    var videModel: ChatListViewModel = ChatListViewModel(ChatRepository(),androidVM)
-    ChatListingScreen({}, {}, videModel,androidVM)
+    var videModel: ChatListViewModel = ChatListViewModel(ChatRepository(), androidVM)
+    ChatListingScreen({}, {}, {}, videModel, androidVM)
 }
