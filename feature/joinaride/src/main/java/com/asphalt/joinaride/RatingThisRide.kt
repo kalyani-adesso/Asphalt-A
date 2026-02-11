@@ -47,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -66,11 +67,12 @@ fun RatingThisRide(
     viewModel: RatingViewModel = koinViewModel(),
     onDismiss : () -> Unit,
     onSubmit : () -> Unit,
-    rideId:String?, userId: String?
+    ridesData: RidesData
 ) {
     val rating by viewModel.rating.collectAsState()
     val isSubmitted by viewModel.isSumitted.collectAsState()
     var feedbackText by remember { mutableStateOf("") }
+
 
     val comments by viewModel.comments.collectAsState()
     val apiState by viewModel.ratingState.collectAsState()
@@ -180,9 +182,10 @@ fun RatingThisRide(
                     GradientButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            viewModel.submitFeedback(rideId = rideId ?: "",
-                                userId = userId ?: "")
+                            viewModel.submitRating(rideId = ridesData.ridesID ?: "", userId = ridesData.createdBy?:"")
                             onSubmit.invoke()
+                            viewModel.updateRateStatus(rideId = ridesData.ridesID ?: "",rating)
+
                             onDismiss.invoke()
 
                         },
@@ -317,6 +320,6 @@ fun RatingStar(
 @Composable
 fun RatingThisRidePreview() {
 
-    RatingThisRide(onDismiss = {}, onSubmit = {}, rideId = "", userId = "")
+   // RatingThisRide(onDismiss = {}, onSubmit = {}, rideId = "", userId = "")
     
 }

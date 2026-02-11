@@ -13,6 +13,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -473,12 +474,13 @@ fun NavigationRoot(
                             }
                         )
                     }
-                    entry<AppNavKey.RatingRide> { key ->
+                    entry<AppNavKey.RatingRideNavKey> { key ->
                         RatingThisRide(
-                            rideId = key.ridesID,
-                            userId = key.userId,
+                            ridesData = key.ridesData,
                             onDismiss = {},
-                            onSubmit = {}
+                            onSubmit = {
+                                backStack.add(AppNavKey.RatingRideNavKey(ridesData = key.ridesData))
+                            }
                         )
                     }
 

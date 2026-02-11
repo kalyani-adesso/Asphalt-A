@@ -164,7 +164,7 @@ fun ConnectedRideEnd(
                 }
             }, onSubmit = {
 
-            }, rideId = "", userId = "")
+            }, ridesData = ridesData)
         }
 
         Spacer(modifier=Modifier.weight(1f))
