@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NotificationView: View {
     @StateObject var viewModel = NotificationViewModel()
-    @StateObject var homeViewModel = HomeViewModel()
     @State var showHome: Bool = false
     @State var showNotification: Bool = false
     @State var showSlideBar: Bool = false
@@ -51,9 +50,6 @@ struct NotificationView: View {
                 viewModel.fetchNotifications()
             }
             .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHome, destination: {
-                BottomNavBar()
-            })
             
         }
     }

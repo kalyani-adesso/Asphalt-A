@@ -25,7 +25,7 @@ struct TopNavBar: View {
                     .font(KlavikaFont.light.font(size: 16))
                     .foregroundColor(AppColor.black)
                 
-                Text(MBUserDefaults.userNameStatic ?? "Balagopalakrishnan")
+                Text(MBUserDefaults.userNameStatic ?? home.userName)
                     .font(KlavikaFont.medium.font(size: 28))
                     .foregroundColor(AppColor.black)
                 
