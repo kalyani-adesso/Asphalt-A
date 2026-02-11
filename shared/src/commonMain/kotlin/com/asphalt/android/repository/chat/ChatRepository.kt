@@ -2,13 +2,10 @@ package com.asphalt.android.repository.chat
 
 import com.asphalt.android.DataSnapshot
 import com.asphalt.android.FirebaseServerValue
-import com.asphalt.android.Logger
 import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.TransactionResult
 import com.asphalt.android.model.chat.ChatRoom
 import com.asphalt.android.model.chat.Message
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.http.ContentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -29,10 +26,25 @@ class ChatRepository {
                     "type" to "private",
                     "members" to mapOf(userAId to true, userBId to true)
                 )
-                Logger.d("IF_Success","Success" + currentSnapshot.getValue())
                 return@runTransaction TransactionResult.success(newChatData)
             } else {
-                Logger.d("IF_Fail","Fail"+currentSnapshot.getValue())
+                val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
+                return@runTransaction TransactionResult.success(existingData)
+            }
+        }
+    }
+    fun createOrGetGroupChat(memberList:List<String>,rideID: String,rideTitle:String) {
+        val chatRef = database.getReference("chats").child(rideID)
+        val membersMap = memberList.associateWith { true }
+        chatRef.runTransaction { currentSnapshot ->
+            if (currentSnapshot.getValue() == null) {
+                val newChatData = mapOf(
+                    "name" to rideTitle,
+                    "type" to "private",
+                    "members" to membersMap
+                )
+                return@runTransaction TransactionResult.success(newChatData)
+            } else {
                 val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
                 return@runTransaction TransactionResult.success(existingData)
             }
@@ -59,6 +71,26 @@ class ChatRepository {
             "chats/$chatRoomId/lastTimestamp" to timestamp,
             "chats/$chatRoomId/unreadCounts/$recipientId" to FirebaseServerValue.increment(1)
         )
+
+        database.getReference(null).updateChildren(updates)
+    }
+    fun sendGroupMessage(rideId: String, senderId: String, text: String, allMemberIds: List<String>) {
+        val messageId = database.getReference("chats/$rideId/messages").push().key ?: return
+        val timestamp = FirebaseServerValue.TIMESTAMP
+
+        val updates = mutableMapOf<String, Any?>(
+            "chats/$rideId/messages/$messageId" to mapOf(
+                "senderId" to senderId,
+                "text" to text,
+                "timestamp" to timestamp
+            ),
+            "chats/$rideId/lastMessage" to text,
+            "chats/$rideId/lastTimestamp" to timestamp
+        )
+
+        allMemberIds.filter { it != senderId }.forEach { memberId ->
+            updates["chats/$rideId/unreadCounts/$memberId"] = FirebaseServerValue.increment(1)
+        }
 
         database.getReference(null).updateChildren(updates)
     }
