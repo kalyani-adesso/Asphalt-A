@@ -42,12 +42,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.network.KtorClient
 import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.model.ChatParamsModel
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
@@ -73,7 +75,8 @@ fun ChatScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     ids: List<String>?, initaliseChat: Boolean = true,
     viewModel: ChatScreenViewModel = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel()
+    androidUserVM: AndroidUserVM = koinViewModel(), isGroupChat: Boolean = false,
+    ridesData: ChatParamsModel? = null
 ) {
     setTopAppBarState(
         AppBarState(
@@ -85,9 +88,14 @@ fun ChatScreen(
     val messages by viewModel.chatMessage.collectAsState()
 
     if (initaliseChat) {
-        if (ids != null && ids.size > 0) {
-            viewModel.initialise1V1Chat(ids.get(0))
+        if (isGroupChat) {
+            ridesData?.let { viewModel.initializeGroupChat(it) }
+        } else {
+            if (ids != null && ids.size > 0) {
+                viewModel.initialise1V1Chat(ids.get(0))
+            }
         }
+
 
     }
     AsphaltTheme {
@@ -135,10 +143,14 @@ fun ChatScreen(
                                 )
                                 Column(modifier = Modifier.padding(start = Dimensions.size10)) {
                                     Text(
-                                        if (ids != null && ids.size > 0) {
-                                            androidUserVM.getUser(ids.get(0))?.name ?: ""
+                                        if (isGroupChat) {
+                                            ridesData?.title ?: ""
                                         } else {
-                                            ""
+                                            if (ids != null && ids.size > 0) {
+                                                androidUserVM.getUser(ids.get(0))?.name ?: ""
+                                            } else {
+                                                ""
+                                            }
                                         },
                                         overflow = TextOverflow.Ellipsis,
                                         style = TypographyBold.bodyMedium,
@@ -254,7 +266,17 @@ fun ChatScreen(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        viewModel.send1V1Chat(ids?.get(0) ?: "", msgText)
+                                        if (isGroupChat) {
+                                            ridesData?.let {
+                                                viewModel.sendGroupChatMessage(
+                                                    it,
+                                                    msgText
+                                                )
+                                            }
+                                        } else {
+                                            viewModel.send1V1Chat(ids?.get(0) ?: "", msgText)
+                                        }
+
                                         /*if(viewModel.chatMessage.value.size>0&&viewModel.chatMessage.value.size%2==0){
                                             viewModel.updateChatMessage(
                                                 ChatMessage(

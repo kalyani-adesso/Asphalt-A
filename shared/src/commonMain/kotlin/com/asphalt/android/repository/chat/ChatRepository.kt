@@ -40,7 +40,7 @@ class ChatRepository {
             if (currentSnapshot.getValue() == null) {
                 val newChatData = mapOf(
                     "name" to rideTitle,
-                    "type" to "private",
+                    "type" to "group",
                     "members" to membersMap
                 )
                 return@runTransaction TransactionResult.success(newChatData)

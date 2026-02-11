@@ -481,7 +481,14 @@ fun NavigationRoot(
                         RidesDetailsScreen(
                             rideId = key.ridesID,
                             setTopAppBarState = setTopAppBarState, onBack = ::onBackPressed
-                        )
+                        ) { ridesData ->
+                            backStack.add(
+                                AppNavKey.ChatScreenNavaKey(
+                                    ridesData = ridesData,
+                                    isGroupChat = true
+                                )
+                            )
+                        }
                     }
 
                     entry<AppNavKey.ChatListNavaKey> { key ->
@@ -493,7 +500,12 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.ChatScreenNavaKey> { key ->
-                        ChatScreen(setTopAppBarState = setTopAppBarState, ids = key.ids)
+                        ChatScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            ids = key.ids,
+                            isGroupChat = key.isGroupChat,
+                            ridesData = key.ridesData
+                        )
                     }
 
                     entry<AppNavKey.CreateAd> { key ->

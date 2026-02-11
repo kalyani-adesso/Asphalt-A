@@ -112,4 +112,13 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
         }
 
     }
+
+    fun getAllMembers(): List<String> {
+        val userIds = ridesData.value?.let { ride ->
+            (ride.participants.map { it.userId } +
+                    listOfNotNull(ride.createdBy))
+                .distinct()
+        } ?: emptyList()
+        return userIds
+    }
 }

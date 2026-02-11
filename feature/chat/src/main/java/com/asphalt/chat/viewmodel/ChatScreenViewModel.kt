@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.model.ChatMessage
+import com.asphalt.chat.model.ChatParamsModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -62,12 +63,33 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
         )
     }
 
-    fun initializeGroupChat(){
-
+    fun initializeGroupChat(chatParams: ChatParamsModel) {
+        chatRepository.createOrGetGroupChat(chatParams.members, chatParams.rideId, chatParams.title)
+        viewModelScope.launch {
+            chatRepository.getMessages(
+                chatParams.rideId
+            ).collect { it ->
+                _chatMessage.value = it.map {
+                    chatRepository.markAsRead(chatParams.rideId, currentUid ?: "")
+                    ChatMessage(
+                        it.text,
+                        androidUserVM.getUser(it.senderId)?.name ?: "",
+                        it.timestamp,
+                        it.senderId == currentUid
+                    )
+                }.reversed()
+            }
+        }
     }
 
-    fun sendGroupChatMessage(){
+    fun sendGroupChatMessage(chatParams: ChatParamsModel, message: String) {
 
+        chatRepository.sendGroupMessage(
+            chatParams.rideId,
+            currentUid ?: "",
+            message,
+            chatParams.members
+        )
     }
 
 }

@@ -1,7 +1,9 @@
 package com.asphalt.android.model.rides
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class RidesData(
     var ridesID: String? = null,
     var createdBy: String? = null,
