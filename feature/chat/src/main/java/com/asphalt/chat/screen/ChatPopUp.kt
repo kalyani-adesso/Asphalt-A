@@ -54,6 +54,7 @@ import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.model.ChatParamsModel
 import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
@@ -75,12 +76,14 @@ import org.koin.androidx.compose.koinViewModel
 fun ChatDialog(
     initaliseChat: Boolean = true,
     receiverID: String,
-    viewModel: ChatScreenViewModel = koinViewModel(), isGroupChat: Boolean = false,
+    viewModel: ChatScreenViewModel = koinViewModel(),
+    isGroupChat: Boolean = false,
     onDismiss: () -> Unit,
+    chatParams: ChatParamsModel? = null
 ) {
     if (initaliseChat) {
         if (isGroupChat) {
-        // do group chat initialisation
+            chatParams?.let { viewModel.initializeGroupChat(it) }
         } else {
             viewModel.initialise1V1Chat(receiverID)
         }
@@ -150,7 +153,11 @@ fun ChatDialog(
                                     horizontalAlignment = Alignment.Start // align text to start horizontally
                                 ) {
                                     Text(
-                                        text = viewModel.getName(receiverID),
+                                        text = if (isGroupChat) {
+                                            chatParams?.title ?: ""
+                                        } else {
+                                            viewModel.getName(receiverID)
+                                        },
                                         overflow = TextOverflow.Ellipsis,
                                         style = TypographyBold.bodyMedium,
                                         color = NeutralWhite, maxLines = 1
@@ -266,7 +273,17 @@ fun ChatDialog(
                                 .size(Dimensions.size44)
                                 .clickable {
                                     if (msgText.isNotEmpty()) {
-                                        viewModel.send1V1Chat(receiverID, msgText)
+                                        if (isGroupChat) {
+                                            chatParams?.let {
+                                                viewModel.sendGroupChatMessage(
+                                                    it,
+                                                    msgText
+                                                )
+                                            }
+                                        } else {
+                                            viewModel.send1V1Chat(receiverID, msgText)
+                                        }
+
                                         /* if (viewModel.chatMessage.value.size > 0 && viewModel.chatMessage.value.size % 2 == 0) {
                                              viewModel.updateChatMessage(
                                                  ChatMessage(

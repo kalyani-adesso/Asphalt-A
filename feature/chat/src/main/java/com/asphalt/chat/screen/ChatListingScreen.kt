@@ -383,7 +383,11 @@ fun ChatList(
                                     .background(VividRed)
                             ) {
                                 Text(
-                                    text = "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}",
+                                    text = if (chatRoom.unreadCounts.isNotEmpty()) {
+                                        "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}"
+                                    } else {
+                                        "0"
+                                    },
                                     style = TypographyBold.bodySmall,
                                     color = NeutralWhite,
                                     maxLines = 1,
