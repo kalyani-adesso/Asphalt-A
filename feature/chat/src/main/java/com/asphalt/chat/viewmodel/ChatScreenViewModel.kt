@@ -62,5 +62,12 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
         )
     }
 
+    fun initializeGroupChat(){
+
+    }
+
+    fun sendGroupChatMessage(){
+
+    }
 
 }

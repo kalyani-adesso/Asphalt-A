@@ -72,13 +72,19 @@ import com.asphalt.commonui.ui.RoundedBox
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChatDialog(initaliseChat: Boolean = true,
+fun ChatDialog(
+    initaliseChat: Boolean = true,
     receiverID: String,
-    viewModel: ChatScreenViewModel = koinViewModel(),
+    viewModel: ChatScreenViewModel = koinViewModel(), isGroupChat: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     if (initaliseChat) {
-        viewModel.initialise1V1Chat(receiverID)
+        if (isGroupChat) {
+        // do group chat initialisation
+        } else {
+            viewModel.initialise1V1Chat(receiverID)
+        }
+
     }
     val listState = rememberLazyListState()
     var msgText by remember { mutableStateOf("") }
@@ -121,9 +127,13 @@ fun ChatDialog(initaliseChat: Boolean = true,
                             ),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        Row(modifier = Modifier.padding(horizontal = Dimensions.size10),
-                           ) {
-                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = Dimensions.size10),
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 CircularNetworkImage(
                                     modifier = Modifier.border(
                                         width = Dimensions.size2pt5,
@@ -310,5 +320,5 @@ fun ChatPreview() {
         )
     )
     val viewModel: ChatScreenViewModel = ChatScreenViewModel(androidVM, ChatRepository())
-    ChatDialog(false,"", viewModel, {},)
+    ChatDialog(false, "", viewModel, false, {})
 }
