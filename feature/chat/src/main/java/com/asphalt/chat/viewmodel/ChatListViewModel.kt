@@ -4,9 +4,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.model.chat.ChatRoom
+import com.asphalt.android.model.chat.getOtherUserId
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.ChatConstants
+import com.asphalt.commonui.constants.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,15 +23,24 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
     private val _chatListModelTemp = MutableStateFlow<List<ChatRoom>>(emptyList())
     val chatModel: StateFlow<List<ChatRoom>> = _chatListModelTemp
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     fun updateTab(tab: Int) {
         tabSelection.value = tab
         applyTabFilter()
     }
 
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        applyTabFilter()
+    }
+
     fun applyTabFilter() {
         val fullList = _chatListModel.value
+        val query = _searchQuery.value.lowercase()
 
-        _chatListModelTemp.value = when (tabSelection.value) {
+        val tabFiltered = when (tabSelection.value) {
 
             ChatConstants.TAB_ALL -> {
                 fullList
@@ -55,6 +66,27 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
 
             else -> fullList
         }
+
+        // Step 2: Apply search filter
+        // 🔍 Search filter
+        _chatListModelTemp.value =
+            if (query.isBlank()) {
+                tabFiltered
+            } else {
+                tabFiltered.filter { chatRoom ->
+
+                    val displayName = if (chatRoom.type == Constants.GROUP_CHAT) {
+                        chatRoom.name ?: ""
+                    } else {
+                        androidUserVM.getUser(
+                            chatRoom.getOtherUserId(currentUid) ?: ""
+                        )?.name ?: ""
+                    }
+
+                    displayName.contains(query, ignoreCase = true) ||
+                            chatRoom.lastMessage.contains(query, ignoreCase = true)
+                }
+            }
     }
 
 
