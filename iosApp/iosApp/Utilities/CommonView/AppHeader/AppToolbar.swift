@@ -68,7 +68,7 @@ struct AppToolBar<Content: View>: View {
                 NotificationView()
             })
             .navigationDestination(isPresented: $showHome, destination: {
-                BottomNavBar()
+                BottomNavBar(showHome:showHome)
             })
     }
 }
