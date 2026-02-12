@@ -18,16 +18,51 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
         get() = androidUserVM.getCurrentUserUID()
 
     private val _chatListModel = MutableStateFlow<List<ChatRoom>>(emptyList())
-    val chatModel: StateFlow<List<ChatRoom>> = _chatListModel
+    private val _chatListModelTemp = MutableStateFlow<List<ChatRoom>>(emptyList())
+    val chatModel: StateFlow<List<ChatRoom>> = _chatListModelTemp
 
     fun updateTab(tab: Int) {
         tabSelection.value = tab
+        applyTabFilter()
     }
+
+    fun applyTabFilter() {
+        val fullList = _chatListModel.value
+
+        _chatListModelTemp.value = when (tabSelection.value) {
+
+            ChatConstants.TAB_ALL -> {
+                fullList
+            }
+
+            ChatConstants.TAB_GROUPS -> {
+                fullList.filter { it.type == "group" }
+            }
+
+            ChatConstants.TAB_UNREAD -> {
+                fullList.filter {
+                    (it.unreadCounts[currentUid]?.toInt() ?: 0) > 0
+                }
+            }
+
+            ChatConstants.TAB_FAVORITIES -> {
+                // Example: if you mark favorites via members map
+                /*fullList.filter {
+                    it.members[currentUid] == true
+                }*/
+                fullList
+            }
+
+            else -> fullList
+        }
+    }
+
 
     fun getChatList() {
         viewModelScope.launch {
             chatRepository.getRecentChats(currentUid).collect { it ->
                 _chatListModel.value = it
+                applyTabFilter()
             }
         }
 
