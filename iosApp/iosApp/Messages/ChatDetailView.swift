@@ -9,22 +9,17 @@ import SwiftUI
 
 struct ChatDetailView: View {
 
-    let chatName: String
-    let isGroup: Bool
-
+    @ObservedObject var viewModel: MessagesViewModel
+       let chatName: String
+       let isGroup: Bool
+       let isOverlay: Bool
+    
     @State private var messageText = ""
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
-    let isOverlay: Bool
-
-    let messages: [Message] = [
-        Message(text: "Hey! Looking forward to the ride!", isMe: false, time: "10:30 AM", senderName: "Sooraj"),
-        Message(text: "Same here! It's going to be amazing!", isMe: true, time: "10:32 AM", senderName: nil),
-        Message(text: "Will catch you there.", isMe: false, time: "10:38 AM", senderName: "Vyshnav")
-    ]
 
     var body: some View {
         VStack {
@@ -33,7 +28,7 @@ struct ChatDetailView: View {
                 }
             ScrollView {
                 VStack(spacing: 12) {
-                    ForEach(messages) { message in
+                    ForEach(viewModel.messages) { message in
                         MessageBubbleView(message: message,isGroup: isGroup)
                     }
                 }
@@ -43,7 +38,7 @@ struct ChatDetailView: View {
             Divider()
 
             HStack {
-                TextField("Type a message...", text: $messageText)
+                TextField("Type a message...", text:  $viewModel.messageText)
                     .padding(15)
                     .background(AppColor.white)
                     .font(KlavikaFont.regular.font(size: 14))
@@ -61,7 +56,7 @@ struct ChatDetailView: View {
                     .frame(width: 292, height: 45)
 
                 Button {
-                    messageText = ""
+                    viewModel.sendMessage()
                 } label: {
                     AppIcon.Chat.send
                         .padding(12)
@@ -107,7 +102,6 @@ struct ChatDetailView: View {
                     }
                     
                 }
-            
                 .navigationDestination(isPresented: $showSlideBar, destination: {
                     NavigationSlideBar()
                 })

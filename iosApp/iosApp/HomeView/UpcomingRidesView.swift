@@ -85,7 +85,7 @@ struct UpcomingRideCard: View {
                     Spacer()
                     Button {
                         withAnimation(.easeInOut) {
-                               onMessageTap(hostName)
+                               onMessageTap(ride.createdBy)
                            }
                     } label: {
                         AppIcon.Home.message

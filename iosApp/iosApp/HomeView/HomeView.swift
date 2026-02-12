@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+struct ActiveChatUser {
+    let id: String
+    let name: String
+}
 struct HomeView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @EnvironmentObject var message : MessagesViewModel
     @State private var currentDate = Date()
-    @State private var activeChatHostName: String? = nil
+    @State private var activeChatUser: ActiveChatUser? = nil
+    @StateObject private var messagesVM = MessagesViewModel(recipientId: "")
+
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
@@ -19,9 +26,11 @@ struct HomeView: View {
                     TopNavBar()
                     ActionButtonView()
                     DashboardView()
-                    UpcomingRidesView{ hostName in
-                        withAnimation(.easeInOut) {
-                            activeChatHostName = hostName
+                    UpcomingRidesView { hostId in
+                        if let hostName = viewModel.usersById[hostId] {
+                            withAnimation(.easeInOut) {
+                                activeChatUser = ActiveChatUser(id: hostId, name: hostName)
+                            }
                         }
                     }
                         .environmentObject(home)
@@ -34,8 +43,8 @@ struct HomeView: View {
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
-            if let hostName = activeChatHostName {
-                chatOverlay(hostName: hostName)
+            if let user = activeChatUser {
+                chatOverlay(user: user)
             }
         }
         .task {
@@ -56,13 +65,14 @@ struct HomeView: View {
             await viewModel.fetchAllUsers()
         }
     }
-    private func chatOverlay(hostName: String) -> some View {
-        ZStack {
+    private func chatOverlay(user: ActiveChatUser) -> some View {
+       
+          ZStack {
             Color.black.opacity(0.45)
                 .ignoresSafeArea()
                 .onTapGesture {
                     withAnimation(.easeInOut) {
-                        activeChatHostName = nil
+                        activeChatUser = nil
                     }
                 }
 
@@ -90,7 +100,7 @@ struct HomeView: View {
 
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(hostName)
+                        Text(user.name)
                             .font(KlavikaFont.bold.font(size: 16))
                             .foregroundColor(AppColor.white)
                     }
@@ -98,7 +108,7 @@ struct HomeView: View {
                     Spacer()
                     Button {
                                 withAnimation(.easeInOut) {
-                                    activeChatHostName = nil
+                                    activeChatUser = nil
                                 }
                             } label: {
                                 Image(systemName: "xmark")
@@ -110,7 +120,8 @@ struct HomeView: View {
                    .padding(.vertical, 12)
                    .background(AppColor.celticBlue)
                 ChatDetailView(
-                    chatName: hostName,
+                    viewModel:MessagesViewModel(recipientId: user.id),
+                    chatName: user.name,
                     isGroup: false,
                     isOverlay: true
                 )
@@ -132,4 +143,5 @@ struct HomeView: View {
     HomeView()
         .environmentObject(HomeViewModel())
         .environmentObject(UpcomingRideViewModel())
+        .environmentObject(MessagesViewModel(recipientId: ""))
 }

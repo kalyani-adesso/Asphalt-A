@@ -28,7 +28,7 @@ struct Message: Identifiable {
 
 struct MessagesListView: View {
     
-    @StateObject private var viewModel = MessagesViewModel()
+    @StateObject private var viewModel = MessagesViewModel(recipientId: "")
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
@@ -116,7 +116,7 @@ struct MessagesListView: View {
                     VStack(spacing: 12) {
                         ForEach(chats) { chat in
                             NavigationLink {
-                                ChatDetailView(chatName: chat.name, isGroup: chat.isGroup,   isOverlay: false)
+                                ChatDetailView(viewModel: viewModel, chatName: chat.name, isGroup: chat.isGroup,   isOverlay: false)
                             } label: {
                                 ChatRowView(chat: chat)
                             }
