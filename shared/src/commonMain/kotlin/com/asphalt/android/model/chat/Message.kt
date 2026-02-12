@@ -21,7 +21,7 @@ data class ChatRoom(
     val lastTimestamp: Long = 0L,
     val type: String = "private",
     val members: Map<String, Boolean> = emptyMap(),
-    val unreadCounts: Map<String, Int> = emptyMap()
+    val unreadCounts: Map<String, Long> = emptyMap()
 )
 
 fun ChatRoom.getOtherUserId(currentUserId: String): String? {

@@ -131,7 +131,7 @@ class ChatRepository {
                             type = map["type"]as? String ?: "" ,
                             lastMessage = map["lastMessage"] as? String ?: "",
                             lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
-                            unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap(),
+                            unreadCounts = map["unreadCounts"] as? Map<String, Long> ?: emptyMap(),
                             members=members
                         )
                     } else null
