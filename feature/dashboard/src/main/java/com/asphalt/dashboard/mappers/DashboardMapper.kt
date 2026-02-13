@@ -8,6 +8,7 @@ import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.data.AggregatedRideMetrics
+import com.asphalt.dashboard.data.DashboardChatModel
 import com.asphalt.dashboard.data.DashboardRideInviteUIModel
 import com.asphalt.dashboard.data.DashboardSummaryUI
 import com.asphalt.dashboard.data.JourneyDataUIModel
@@ -26,6 +27,30 @@ fun List<RideInvitesDomain>.toDashBoardInvites(
         map { data ->
             data.toDashBoardInviteUIModel(userList)
         }
+    }
+}
+
+fun List<RideInvitesDomain>.toDashBoardChats(
+    currentUser: String,
+    userList: List<UserDomain>,
+): List<DashboardChatModel> {
+    return with(this) {
+        map { data ->
+            data.toDashboardChat(userList)
+        }
+    }
+}
+
+fun RideInvitesDomain.toDashboardChat(userList: List<UserDomain>): DashboardChatModel {
+    return with(this) {
+        DashboardChatModel(
+            rideID = rideID,
+            title = rideTitle,
+            isGroup = isOrganiser,
+            organiserID = inviter,
+            members =
+                allParticipants
+        )
     }
 }
 
