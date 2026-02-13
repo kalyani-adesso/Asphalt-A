@@ -203,22 +203,26 @@ fun DashboardRideInviteUI(
                         )
                     }
                 }
-                RoundedBox(
-                    modifier = Modifier
-                        .size(Dimensions.size30)
-                        .clickable {
-                            showChatPopup = true
-                        },
-                    cornerRadius = Dimensions.size10,
-                    backgroundColor = PrimaryDarkerLightB75
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_message),
-                            null,
-                        )
+                if (dashboardChatModel?.isSoloRide == false)
+                    RoundedBox(
+                        modifier = Modifier
+                            .size(Dimensions.size30)
+                            .clickable {
+                                showChatPopup = true
+                            },
+                        cornerRadius = Dimensions.size10,
+                        backgroundColor = PrimaryDarkerLightB75
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_message),
+                                null,
+                            )
+                        }
                     }
-                }
 
             }
             Spacer(Modifier.height(Dimensions.size17))

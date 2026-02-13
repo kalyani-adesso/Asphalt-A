@@ -49,7 +49,8 @@ fun RideInvitesDomain.toDashboardChat(userList: List<UserDomain>): DashboardChat
             isGroup = isOrganiser,
             organiserID = inviter,
             members =
-                allParticipants
+                allParticipants,
+            isSoloRide = rideType== Constants.SOLO
         )
     }
 }
