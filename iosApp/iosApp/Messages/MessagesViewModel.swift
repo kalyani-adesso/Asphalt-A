@@ -17,10 +17,11 @@ class MessagesViewModel: ObservableObject {
     var messageStatus: [MessageCategory] = MessageCategory.allCases
     @Published  var searchText = ""
     @Published var selectedCategory: String? = MessageCategory.All.rawValue
-    @Published var messages: [Message] = []
+    @Published var messages: [LocalMessage] = []
     @Published var messageText: String = ""
 
     private let chatRepository = ChatRepository()
+    private var messageJob: Kotlinx_coroutines_coreJob?
 
     let currentUserId: String
     var recipientId: String
@@ -54,6 +55,10 @@ class MessagesViewModel: ObservableObject {
                     self.sendViaKMP(chatRoomId: chatRoomId)
                 }
             }
+            
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.receiveMessageFromKMP(chatRoomId: chatRoomId)
         }
     }
 
@@ -69,4 +74,103 @@ class MessagesViewModel: ObservableObject {
         messageText = ""
     }
 
+    func receiveMessageFromKMP(chatRoomId:String) {
+        var localChatRoomId:String = ""
+        print("Current userId:\(currentUserId), \(recipientId)")
+        if chatRoomId.isEmpty{
+            localChatRoomId = chatRepository
+                .getCanonicalChatId(uid1: currentUserId, uid2: recipientId)
+            
+        } else {
+            localChatRoomId = chatRoomId
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            Task { [weak self] in
+                guard let self = self else { return }
+                
+                do {
+                    let flow = chatRepository.getMessages(chatRoomId: localChatRoomId)
+                    
+                    try await flow.collect(
+                        collector: ChatMessageCollector(
+                            onValue: { [weak self] messages in
+                                guard let self = self else { return }
+                                
+                                // Convert KMP → Local model
+                                let mappedMessages: [LocalMessage] = messages.map { message in
+                                    LocalMessage(
+                                        text: message.text,
+                                        isMe: message.senderId == self.currentUserId,
+                                        time: self.formatTime(from: message.timestamp),
+                                        senderName: message.senderId
+                                    )
+                                }
+                                
+                                // Update UI on MainActor
+                                Task { @MainActor in
+                                    self.messages = mappedMessages.reversed()
+                                }
+                            },
+                            onError: { error in
+                                print("Chat Flow Error:", error.localizedDescription)
+                            }
+                        )
+                    )
+                    
+                } catch {
+                    print("Outer Flow Error:", error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func stopReceivingMessages() {
+        messageJob?.cancel(cause_: nil)
+        messageJob = nil
+    }
+    
+    func formatTime(from timestamp: Int64) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
+        let diff = Int(Date().timeIntervalSince(date))
+        
+        if diff < 60 {
+            return "\(diff)s ago"
+        } else if diff < 3600 {
+            return "\(diff / 60)m ago"
+        } else {
+            return "\(diff / 3600)h ago"
+        }
+    }
 }
+
+class ChatMessageCollector: Kotlinx_coroutines_coreFlowCollector {
+
+    let onValue: ([Message]) -> Void
+    let onError: (Error) -> Void
+
+    init(onValue: @escaping ([Message]) -> Void,
+         onError: @escaping (Error) -> Void) {
+        self.onValue = onValue
+        self.onError = onError
+    }
+    
+    func emit(value: Any?, completionHandler: @escaping ((any Error)?) -> Void) {
+        guard let unwrapped = value else {
+            completionHandler(nil)
+            return
+        }
+        
+        if let array = unwrapped as? [Any] {
+            let messages = array.compactMap { $0 as? Message }
+            onValue(messages)
+            completionHandler(nil)
+            return
+        }
+
+        print("Still invalid type:", type(of: unwrapped))
+        completionHandler(nil)
+    }
+
+}
+

@@ -56,6 +56,8 @@ struct ChatDetailView: View {
                     .frame(width: 292, height: 45)
 
                 Button {
+                    //TODO: Decide weather it is single message or group message.
+                    
                     viewModel.sendMessage()
                 } label: {
                     AppIcon.Chat.send
@@ -66,6 +68,9 @@ struct ChatDetailView: View {
             }
             .padding()
             .opacity(messageText.isEmpty ? 0.4 : 1)
+        }
+        .task {
+            self.viewModel.receiveMessageFromKMP(chatRoomId: "")
         }
         .if (!isOverlay) { view in
             view

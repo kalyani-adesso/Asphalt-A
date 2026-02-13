@@ -17,7 +17,7 @@ struct Chat: Identifiable {
     let isGroup: Bool
 }
 
-struct Message: Identifiable {
+struct LocalMessage: Identifiable {
     let id = UUID()
     let text: String
     let isMe: Bool
