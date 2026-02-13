@@ -11,9 +11,9 @@ struct ActionButtonView: View {
     @State private var isPresented: Bool = false
     @State private var showJoinRide: Bool = false
     @StateObject var viewModel = CreateRideViewModel()
+    @State private var showConnectedRide: Bool = false
     var body: some View {
         HStack(spacing: 12) {
-            
             ButtonView( title: AppStrings.HomeLabel.createRide.rawValue,
                         icon: AppIcon.Home.createRide,
                         fontSize: 16, showShadow: false,  onTap: {
@@ -26,7 +26,16 @@ struct ActionButtonView: View {
                         foregroundColor: AppColor.celticBlue,
                         showShadow: false,
                         borderColor: AppColor.celticBlue,onTap: {
-               showJoinRide = true
+                Task {
+                    await viewModel.getActiveJoinedRide()
+                    await MainActor.run {
+                        if viewModel.activeRide?.rideJoined == true {
+                            showConnectedRide = true
+                        } else {
+                            showJoinRide = true
+                        }
+                    }
+                }
             })
         }
         .padding(.vertical,10)
@@ -36,6 +45,17 @@ struct ActionButtonView: View {
         })
         .navigationDestination(isPresented: $showJoinRide, destination: {
             JoinRideView()
+        })
+        .navigationDestination(isPresented: $showConnectedRide, destination: {
+            if let ride = viewModel.activeRide {
+                ConnectedRideView(
+                    notificationTitle: AppStrings.JoinRide.rideActive,
+                    title: AppStrings.ConnectedRide.startRideTitle,
+                    subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                    model: ride,
+                    rideCompleteModel: []
+                )
+            }
         })
     }
 }

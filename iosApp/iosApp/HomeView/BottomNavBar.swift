@@ -14,17 +14,31 @@ struct BottomNavBar: View {
     @StateObject private var upcomingRideViewModel = UpcomingRideViewModel()
     @State var showNotification: Bool = false
     @State var showSlideBar: Bool = false
-    
-    
+    @StateObject var createRideVM = CreateRideViewModel()
+    @State private var rideJoined : Bool = false
+    @State var showHome : Bool = false
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 ZStack {
                     switch selectedTab {
                     case 0:
-                        HomeView()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingRideViewModel)
+                        if rideJoined && showHome == false {
+                            if let ride = createRideVM.activeRide {
+                                ConnectedRideView(
+                                    notificationTitle: AppStrings.JoinRide.rideActive,
+                                    title: AppStrings.ConnectedRide.startRideTitle,
+                                    subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                                    model: ride,
+                                    rideCompleteModel: []
+                                )
+                            }
+                        } else {
+                            HomeView()
+                                .environmentObject(homeViewModel)
+                                .environmentObject(upcomingRideViewModel)
+                        }
+                       
                     case 1:
                         UpcomingRideView(showpopup: false , navigationDone: false)
                             .environmentObject(upcomingRideViewModel)
@@ -105,7 +119,16 @@ struct BottomNavBar: View {
             })
             .navigationBarBackButtonHidden(true)
         }
-        
+        .task {
+            await createRideVM.getActiveJoinedRide()
+            await MainActor.run {
+                if (createRideVM.activeRide?.rideJoined ?? false) {
+                    rideJoined = true
+                } else {
+                    rideJoined = false
+                }
+            }
+        }
     }
     
     // MARK: - Tab Item View
