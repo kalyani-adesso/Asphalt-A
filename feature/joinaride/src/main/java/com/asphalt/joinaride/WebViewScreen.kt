@@ -3,6 +3,8 @@ package com.asphalt.joinaride
 import android.content.Intent
 import android.net.Uri
 import android.view.ViewGroup
+import android.webkit.GeolocationPermissions
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,15 +23,60 @@ import com.google.android.gms.common.wrappers.Wrappers.packageManager
 fun WebViewMap(
     setTopAppBarState: (AppBarState) -> Unit,
     destinationLat: Double =10.1484083,
-    destinationLng: Double = 76.2249185
+    destinationLng: Double = 76.2249185,
+    startLat: Double=9.802147, startLng: Double=76.601734,
+    //mapurl:String = "https://www.google.com/maps/@40.7128,-74.0060,14z"
 ) {
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.messages),
         )
     )
+    //var mapurl:String ="https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLng&destination=$destinationLat,$destinationLng&travelmode=driving"
+    val coordinatesString = "$destinationLat,$destinationLng"
+    val coordinatesStringCurent = "$startLat,$startLng"
     val context = LocalContext.current
-    val gmmIntentUri = Uri.parse(
+    //var mapurl:String ="https://www.google.com/maps?saddr=$origin&daddr=$destination&directionsmode=$mode"
+    //var mapurl:String ="https://www.google.com/maps?daddr=$coordinatesString&directionsmode=d"
+    //var mapurl:String ="https://www.google.com/maps?saddr=$coordinatesStringCurent&daddr=$coordinatesString&directionsmode=d"
+    //var mapurl:String ="https://www.google.com/maps?saddr=$coordinatesStringCurent&daddr=$coordinatesString&directionsmode=d"
+    val mapurl:String = "https://www.google.com/maps/dir/?api=1&origin=$coordinatesStringCurent&destination=$coordinatesString&travelmode=driving"
+
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                // Crucial: Maps requires JavaScript
+                settings.javaScriptEnabled = true
+                settings.loadWithOverviewMode = true
+                settings.useWideViewPort = true
+                settings.setGeolocationEnabled(true)
+                webViewClient = WebViewClient()
+                webChromeClient = object : WebChromeClient() {
+                    override fun onGeolocationPermissionsShowPrompt(
+                        origin: String,
+                        callback: GeolocationPermissions.Callback
+                    ) {
+                        // This tells the WebView to allow location access
+                        callback.invoke(origin, true, false)
+                    }
+                }
+
+                loadUrl(mapurl)
+            }
+        },
+        update = { webView ->
+            webView.loadUrl(mapurl)
+        }
+    )
+
+
+
+   /* val gmmIntentUri = Uri.parse(
         "https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=$destinationLat,$destinationLng&travelmode=driving"
     )
     //val gmmIntentUri = Uri.parse("google.navigation:q=$destinationLat,$destinationLng&mode=d")
@@ -45,7 +92,7 @@ fun WebViewMap(
             Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$destinationLat,$destinationLng&travelmode=driving")
         )
         context.startActivity(browserIntent)
-    }
+    }*/
 
     // Using the official Google Maps Directions URL
    /* val url = remember(destinationLat, destinationLng) {
