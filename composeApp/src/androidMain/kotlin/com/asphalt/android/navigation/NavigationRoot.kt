@@ -56,6 +56,7 @@ import com.asphalt.joinaride.EndRidersScreenLoader
 import com.asphalt.joinaride.JoinRideScreen
 import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
+import com.asphalt.joinaride.WebViewMap
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.marketplace.ui.CreateAd
@@ -516,7 +517,8 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.CreateAd> { key ->
-                        CreateAd(setTopAppBarState = setTopAppBarState)
+                        //CreateAd(setTopAppBarState = setTopAppBarState)
+                        WebViewMap(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
