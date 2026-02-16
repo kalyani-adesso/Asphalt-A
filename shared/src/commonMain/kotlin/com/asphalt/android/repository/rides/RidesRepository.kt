@@ -85,7 +85,8 @@ class RidesRepository(val apiService: RidesApIService) {
                 assemblyLon = rowData.assemblyLon,
                 ratings = rowData.ratings?.map { (id, data) ->
                     RatingsData(stars = data.stars,userId = id)
-                } ?: emptyList()
+                } ?: emptyList(),
+                rideType = rowData.rideType
 
             )
         } ?: emptyList()

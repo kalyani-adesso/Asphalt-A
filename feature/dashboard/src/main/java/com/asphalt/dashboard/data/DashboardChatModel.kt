@@ -5,5 +5,6 @@ data class DashboardChatModel(
     val isGroup: Boolean,
     val organiserID: String,
     val title: String = "",
-    val members: List<String>
+    val members: List<String>,
+    val isSoloRide: Boolean = false
 )
