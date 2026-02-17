@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -121,15 +122,19 @@ fun RideProgress(
             Spacer(modifier = Modifier.height(Dimensions.padding))
 
             Card(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = Dimensions.padding10, vertical = Dimensions.padding10),
                 shape = RoundedCornerShape(Dimensions.size10),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp),
             ) {
-                Row(modifier = Modifier.fillMaxWidth()
-                    .padding(vertical = Dimensions.padding8,
-                        horizontal = Dimensions.padding16),
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = Dimensions.padding8,
+                        horizontal = Dimensions.padding16
+                    ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
 
@@ -200,7 +205,8 @@ fun RideProgress(
                                // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
                                 onClickEndRide.invoke()
                             },
-                            modifier = Modifier.widthIn(min = 130.dp, max = 130.dp)
+                            modifier = Modifier
+                                .widthIn(min = 130.dp, max = 130.dp)
                                 .height(28.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = VividRed),
                             shape = RoundedCornerShape(30.dp),
@@ -224,6 +230,10 @@ fun RideProgress(
                 onClick = {
                     viewmodel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
                         status = END_RIDE)
+                       val finalDuration =  viewmodel.stopRide()
+                    val duration = viewmodel.finalDuration.value
+                    Log.d("TAG", "RideProgress: timeformat  ${formatTime(duration)}")
+                    Log.d("TAG", "RideProgress: finalDuration  ${formatTime(finalDuration)}")
 
                     viewmodel.endRide(rideId=ridesData.ridesID ?: "", rideJoinedId = ridesData.rideJoinedID ?: "")
                     onClickEndRide.invoke()

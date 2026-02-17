@@ -44,6 +44,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.absoluteValue
 
 @Composable
 fun ConnectedRideGoogleMapScreen(
@@ -58,8 +59,11 @@ fun ConnectedRideGoogleMapScreen(
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
 
-    val isRideStarted by rideViewModel.isRideStarted.collectAsState()
     val elapsedTime by rideViewModel.elapsedTime.collectAsState()
+
+    LaunchedEffect(Unit) {
+        rideViewModel.startRideTimer()
+    }
 
     val rideId = rideViewModel.getRideId()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
@@ -69,19 +73,11 @@ fun ConnectedRideGoogleMapScreen(
         Log.d("TAG", "ConnectedRideMapScreen details: $details")
     }
 
-
-
-//    LaunchedEffect(rideId) {
-//        if (!isRideStarted) {
-//            rideViewModel.startRide()
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            rideViewModel.stopRide()
 //        }
 //    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            rideViewModel.stopRide()
-        }
-    }
 
     setTopAppBarState(
         AppBarState(
@@ -132,7 +128,6 @@ fun ConnectedRideGoogleMapScreen(
 //                            showQueryPopup = true
 //                        }
                 ) {
-
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
@@ -140,7 +135,6 @@ fun ConnectedRideGoogleMapScreen(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
                         Icon(
                             painter = painterResource(R.drawable.ic_clock),
                             tint = PrimaryDarkerLightB75,
@@ -148,7 +142,7 @@ fun ConnectedRideGoogleMapScreen(
                         )
                         Spacer(Modifier.width(Dimensions.spacing5))
                         Text(
-                            formatTime(elapsedTime),
+                            formatTime(elapsedTime.absoluteValue),
                             color = PrimaryDarkerLightB75,
                             fontSize = Dimensions.textSize12,
                             style = TypographyBold.titleMedium
@@ -157,7 +151,6 @@ fun ConnectedRideGoogleMapScreen(
                 }
             })
     )
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -199,13 +192,12 @@ fun ConnectedRideGoogleMapScreen(
     }
 }
 
-fun formatTime(ms: Long): String {
-    val totalSeconds = ms / 1000
+fun formatTime(totalSeconds: Long): String {
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     val seconds = totalSeconds % 60
 
-    return "%02d:%02d:%02d".format(hours, minutes, seconds)
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
 @Preview(showBackground = true)

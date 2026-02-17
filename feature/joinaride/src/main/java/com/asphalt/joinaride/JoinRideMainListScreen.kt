@@ -351,43 +351,43 @@ fun RiderCard(
                         )
                     }
                    //  join/ rejoin ride button
-//                    if (ridesData.rideStatus == RIDE_JOINED) {
-//                        ElevatedButton (
-//                            modifier = Modifier
-//                                .weight(weight = 1f)
-//                                .height(height = Dimensions.size50),
-//                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
-//                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
-//                            onClick = {
-////                                  rejoin api
-////                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
-////                                    status = RIDE_JOINED)
-//
-//                                navigateToConnectedRide.invoke(ridesData)
-//                            },
-//                            contentPadding = PaddingValues(all = Dimensions.size0)
-//                        ) {
-//                            Row(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .padding(start = Dimensions.padding10),
-//                                horizontalArrangement = Arrangement.Center
-//                            ) {
-//                                Icon(
-//                                    painter = painterResource(
-//                                        id = R.drawable.moved_location),
-//                                    contentDescription = "Riders icon",
-//                                    tint = NeutralWhite)
-//                                Text(
-//                                    stringResource(R.string.rejoinRide).uppercase(),
-//                                    color = NeutralWhite,
-//                                    style = TypographyBold.titleMedium,
-//                                    fontSize = Dimensions.textSize14,
-//                                    modifier = Modifier.padding(start = 8.dp)
-//                                )
-//                            }
-//                        }
-//                    } else {
+                    if (ridesData.rideStatus == RIDE_JOINED) {
+                        ElevatedButton (
+                            modifier = Modifier
+                                .weight(weight = 1f)
+                                .height(height = Dimensions.size50),
+                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
+                            onClick = {
+//                                  rejoin api
+//                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
+//                                    status = RIDE_JOINED)
+                                viewModel.joinRide(joinRide = ridesData)
+                                navigateToConnectedRide.invoke(ridesData)
+                            },
+                            contentPadding = PaddingValues(all = Dimensions.size0)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = Dimensions.padding10),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.moved_location),
+                                    contentDescription = "Riders icon",
+                                    tint = NeutralWhite)
+                                Text(
+                                    stringResource(R.string.rejoinRide).uppercase(),
+                                    color = NeutralWhite,
+                                    style = TypographyBold.titleMedium,
+                                    fontSize = Dimensions.textSize14,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                        }
+                    } else {
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
@@ -425,7 +425,7 @@ fun RiderCard(
                                 )
                             }
                         }
-                    //}
+                    }
                 }
             }
         }

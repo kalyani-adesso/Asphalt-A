@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +69,7 @@ import com.asphalt.commonui.ui.CommonStatType
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -76,24 +79,32 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ConnectedRideEnd(
     modifier: Modifier = Modifier,
     setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidesDifficultyViewModel = koinViewModel(),
+    viewModel: JoinRideViewModel = koinViewModel(),
     onNavigateToDashboard: () -> Unit,
     ridesData: RidesData
     ) {
 
-    val stats = viewModel.stats.collectAsStateWithLifecycle()
+   // val stats = viewModel.stats.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(value = false) }
     val scope = rememberCoroutineScope()
 
     setTopAppBarState(AppBarState(title = stringResource(R.string.connected_ride)))
 
+
+    val finalDuration by viewModel.finalDuration.collectAsState()
+
     LaunchedEffect(Unit) {
         delay(2000)
         showDialog = true
+
+        Log.d("TAG", "ConnectedRideEnd: ${formatTime(finalDuration)}")
+
     }
 
+
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(top = Dimensions.size30),
     ) {
         Card(
@@ -150,9 +161,9 @@ fun ConnectedRideEnd(
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.size20),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    StatView(statType = CommonStatType.TimeStatType, stats.value.rideCount)
-                    StatView(statType = CommonStatType.DistanceStatType, stats.value.rideCount)
-                    StatView(statType = CommonStatType.RidesStatType, stats.value.rideCount)
+                    StatView(statType = CommonStatType.TimeStatType, finalDuration)
+                    StatView(statType = CommonStatType.DistanceStatType, ridesData.rideDistance.toLong())
+                    StatView(statType = CommonStatType.RidesStatType, 5)
                 }
             }
         }
@@ -172,7 +183,8 @@ fun ConnectedRideEnd(
             horizontalArrangement = Arrangement.spacedBy(
                 space = Dimensions.padding20, Alignment.CenterHorizontally
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(Dimensions.padding20)
                 .align(Alignment.CenterHorizontally),
         ) {
@@ -185,8 +197,10 @@ fun ConnectedRideEnd(
                 modifier = Modifier
                     .weight(weight = 1f)
                     .height(height = Dimensions.size60)
-                    .border(width = 1.dp, color = PrimaryBrighterLightW75,
-                        shape = RoundedCornerShape(size = Dimensions.size10)),
+                    .border(
+                        width = 1.dp, color = PrimaryBrighterLightW75,
+                        shape = RoundedCornerShape(size = Dimensions.size10)
+                    ),
             ) {
                 Text(
                     stringResource(R.string.share).uppercase(),
@@ -221,8 +235,9 @@ fun ConnectedRideEnd(
         }
     }
 }
+
 @Composable
-fun RowScope.StatView(statType: CommonStatType,count: Int) {
+fun RowScope.StatView(statType: CommonStatType,count: Long) {
     RoundedBox(
         modifier = Modifier.weight(1f),
         borderColor = NeutralLightGrey,
@@ -251,6 +266,7 @@ fun RowScope.StatView(statType: CommonStatType,count: Int) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

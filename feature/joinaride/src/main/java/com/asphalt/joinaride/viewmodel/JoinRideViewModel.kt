@@ -246,19 +246,33 @@ class JoinRideViewModel(
     private var startedAt: Long? = null
     fun observeRideLocations(rideId: String) {
 
+        // Remove old listener safely
+        rideListener?.let { listener ->
+            rideRef?.removeEventListener(listener)
+        }
+
         val ref = FirebaseDatabase.getInstance()
             .getReference("rides")
             .child(rideId)
             .child("ongoing_ride")
 
-        rideListener?.let { ref.removeEventListener(it) }
-
         rideListener = object : ValueEventListener {
+
             override fun onDataChange(snapshot: DataSnapshot) {
-                val users = snapshot.children.mapNotNull {
-                    startedAt = snapshot.child("dateTime").getValue(Long::class.java)
-                    it.getValue(ConnectedRideDTO::class.java)
+
+                if (!snapshot.exists()) {
+                    _joinedUsers.value = emptyList()
+                    return
                 }
+
+                startedAt = snapshot.child("dateTime")
+                    .getValue(Long::class.java)
+
+                val users = snapshot.children
+                    .filter { it.key != "dateTime" }
+                    .mapNotNull { userSnap ->
+                        userSnap.getValue(ConnectedRideDTO::class.java)
+                    }
                 // Always emit NEW list instance
                 _joinedUsers.value = users
             }
@@ -270,7 +284,6 @@ class JoinRideViewModel(
             }
         }
         ref.addValueEventListener(rideListener!!)
-        startRideTimer()
     }
 
     private val _isRideStarted = MutableStateFlow(false)
@@ -279,27 +292,53 @@ class JoinRideViewModel(
     private val _elapsedTime = MutableStateFlow(0L)
     val elapsedTime = _elapsedTime.asStateFlow()
     private var timerJob: Job? = null
+    private var rideStartTime: Long? = null
+
+    private val _finalDuration = MutableStateFlow(0L)
+    val finalDuration = _finalDuration.asStateFlow()
+
+    fun setEndTime(finalTime: Long){
+        _finalDuration.value = finalTime
+    }
 
     fun startRideTimer() {
-        if (_isRideStarted.value) return
+        if (timerJob != null) return
+        //if (_isRideStarted.value) return
 
-        _isRideStarted.value = true
+       // _isRideStarted.value = true
+        rideStartTime = System.currentTimeMillis() // save start time
+        Log.d("TIMER", "Ride started at $rideStartTime")
 
         timerJob = viewModelScope.launch {
-            val startTime = System.currentTimeMillis()
             while (isActive) {
-                _elapsedTime.value =
-                    (System.currentTimeMillis() - startTime) / 1000
-                delay(1000)
+                val start = rideStartTime ?: break
+                val elapsed =
+                    (System.currentTimeMillis() - rideStartTime!!) / 1000
+                //  Update locally
+                _elapsedTime.value = elapsed
+
                 Log.d("TIMER", "Elapsed = ${_elapsedTime.value}")
+                //  Update Firebase
+                rideRef?.child("dateTime")
+                    ?.setValue(elapsed)
+                delay(2000)
+
             }
         }
     }
 
-    fun stopRide() {
+    fun stopRide() : Long {
         _isRideStarted.value = false
         timerJob?.cancel()
         timerJob = null
+
+        val start = rideStartTime ?: return 0L  // if null, exit
+        val finalSeconds = (System.currentTimeMillis() - start) / 1000
+        Log.d("TIMER", "Ride stopped. Duration = $finalSeconds")
+
+        rideStartTime = null
+        _finalDuration.value = finalSeconds
+        return finalSeconds
     }
 
     override fun onCleared() {
