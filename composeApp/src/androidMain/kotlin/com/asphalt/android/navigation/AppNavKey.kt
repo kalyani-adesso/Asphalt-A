@@ -3,7 +3,6 @@ package com.asphalt.android.navigation
 import androidx.navigation3.runtime.NavKey
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
-import com.asphalt.android.model.rides.RidesData
 import com.asphalt.chat.model.ChatParamsModel
 import kotlinx.serialization.Serializable
 

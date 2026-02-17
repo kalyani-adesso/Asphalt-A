@@ -2,7 +2,6 @@ package com.asphalt.android.model.rides
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 @Serializable
 class RidesData(
