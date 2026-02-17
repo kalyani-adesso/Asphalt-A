@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class AndroidUserVM(
+open class AndroidUserVM(
     userRepoImpl: UserRepoImpl,
     val dataStoreManager: DataStoreManager,
     val userAPIRepository: UserRepository

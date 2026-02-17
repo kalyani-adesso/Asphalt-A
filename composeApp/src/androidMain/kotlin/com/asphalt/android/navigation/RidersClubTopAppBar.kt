@@ -75,9 +75,9 @@ fun RidersClubTopAppBar(
             modifier = Modifier
                 .background(NeutralWhite)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(
+           /* verticalArrangement = Arrangement.spacedBy(
                 Dimensions.size20
-            )
+            )*/
         ) {
 
             TopAppBar(
@@ -134,7 +134,7 @@ fun RidersClubTopAppBar(
                     .fillMaxWidth()
                     .padding(
                         start = Constants.DEFAULT_SCREEN_HORIZONTAL_PADDING,
-                        bottom = Dimensions.size20
+                        bottom = if(topAppBarState.title.isNotEmpty()) Dimensions.size20 else Dimensions.size0
                     ) else Modifier.fillMaxWidth().padding(bottom = Dimensions.size25),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
@@ -181,18 +181,19 @@ fun CreateHeader(isDashboard: Boolean, topAppBarState: AppBarState) {
 
 
     Column(
-//        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
+        /*verticalArrangement = Arrangement.spacedBy(
             Dimensions.padding2
-        )
+        )*/
     ) {
-        Text(
-            topAppBarState.title,
-            style = TypographyBold.bodyMedium,
-            fontSize = Dimensions.textSize19,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if(topAppBarState.title.isNotEmpty()) {
+            Text(
+                topAppBarState.title,
+                style = TypographyBold.bodyMedium,
+                fontSize = Dimensions.textSize19,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         if (topAppBarState.subtitle.isNotEmpty())
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -227,12 +227,15 @@ class UpcomingRideViewModel: ObservableObject {
             
             upcoming.sort { $0.startDate < $1.startDate }
             upcomingRides = upcoming
-//            history.sort { $0.startDate > $1.startDate }
             historyRides = history
             invites.sort { $0.startDate < $1.startDate }
             inviteRides = invites
             
-            self.upcomingInvitesRide = upcomingRides + inviteRides
+            let myUpcomingCreatedRides = upcomingRides.filter {
+                $0.createdBy == currentUserID
+            }
+            
+            self.upcomingInvitesRide = myUpcomingCreatedRides + inviteRides
             
             self.rides = upcomingRides + historyRides + inviteRides
             
@@ -293,7 +296,7 @@ class UpcomingRideViewModel: ObservableObject {
             
             Task {
                 try? await Task.sleep(nanoseconds: 700_000_000)
-                await fetchAllRides()
+                await self.fetchAllRides()
             }
             
             

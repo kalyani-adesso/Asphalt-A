@@ -19,15 +19,15 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class RidesDetailsViewModel() : ViewModel(), KoinComponent {
+open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
     val ridesRepo: RidesRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
     val androidUserVM: AndroidUserVM by inject()
     private val ridesDetails = mutableStateOf<RidesData?>(null)
-    val ridesData: State<RidesData?> = ridesDetails
+    open val ridesData: State<RidesData?> = ridesDetails
 
     private val _ridersList = mutableStateOf<List<RidersList>>(emptyList())
-    val ridersList: State<List<RidersList>> = _ridersList
+    open val ridersList: State<List<RidersList>> = _ridersList
     val showDeleteButton = mutableStateOf(false)
 
     fun getSingleRide(ridesId: String) {
@@ -111,5 +111,14 @@ class RidesDetailsViewModel() : ViewModel(), KoinComponent {
             }
         }
 
+    }
+// Function for return members user ids
+    fun getAllMembers(): List<String> {
+        val userIds = ridesData.value?.let { ride ->
+            (ride.participants.map { it.userId } +
+                    listOfNotNull(ride.createdBy))
+                .distinct()
+        } ?: emptyList()
+        return userIds
     }
 }

@@ -35,6 +35,8 @@ import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.navigation.AppNavKey.SplashKey
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.screen.ChatListingScreen
+import com.asphalt.chat.screen.ChatScreen
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.R
@@ -59,6 +61,7 @@ import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
+import com.asphalt.marketplace.ui.CreateAd
 import com.asphalt.profile.screens.ProfileScreen
 import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -140,7 +143,9 @@ fun NavigationRoot(
         is AppNavKey.RidesScreenNav,
         is AppNavKey.QueriesKey,
         is AppNavKey.ProfileKey,
-        is AppNavKey.RideDetails -> true
+        is AppNavKey.RideDetails,
+        is AppNavKey.ChatScreenNavaKey,
+        is AppNavKey.ChatListNavaKey -> true
 
         else -> false
     }
@@ -158,6 +163,11 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
         is AppNavKey.RideDetails -> true
+        is AppNavKey.RideDetails,
+        is AppNavKey.ChatScreenNavaKey,
+        is AppNavKey.ChatListNavaKey,
+        is AppNavKey.CreateAd -> true
+
         else -> false
     }
 
@@ -323,7 +333,10 @@ fun NavigationRoot(
                             onNavigateToLogin = { //password ->
                                 //  backStack.add(RegistrationDetailsNavKey(password))
                                 backStack.remove(SplashKey)
-                                backStack.add(AppNavKey.LoginScreenNavKey)
+                                backStack.remove(AppNavKey.LoginScreenNavKey)
+                                backStack.add(AppNavKey.LoginSuccessScreenNavKey)
+                                backStack.remove(RegistrationDetailsNavKey)
+                                //backStack.add(AppNavKey.LoginScreenNavKey)
                             },
                             onBackPressed = { onBackPressed() }
                         )
@@ -488,7 +501,42 @@ fun NavigationRoot(
                         RidesDetailsScreen(
                             rideId = key.ridesID,
                             setTopAppBarState = setTopAppBarState, onBack = ::onBackPressed
+                        ) { ridesData ->
+                            backStack.add(
+                                AppNavKey.ChatScreenNavaKey(
+                                    ridesData = ridesData,
+                                    isGroupChat = true
+                                )
+                            )
+                        }
+                    }
+
+                    entry<AppNavKey.ChatListNavaKey> { key ->
+                        ChatListingScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            chatItemClick = { ids ->
+                                backStack.add(AppNavKey.ChatScreenNavaKey(ids, isGroupChat = false))
+                            }, groupChatClick = { chatParams ->
+                                backStack.add(
+                                    AppNavKey.ChatScreenNavaKey(
+                                        ridesData = chatParams,
+                                        isGroupChat = true
+                                    )
+                                )
+                            })
+                    }
+
+                    entry<AppNavKey.ChatScreenNavaKey> { key ->
+                        ChatScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            ids = key.ids,
+                            isGroupChat = key.isGroupChat,
+                            ridesData = key.ridesData
                         )
+                    }
+
+                    entry<AppNavKey.CreateAd> { key ->
+                        CreateAd(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
@@ -513,7 +561,22 @@ fun NavigationRoot(
                         drawerState.close()
                     }
                 }
+
+                Constants.MESSAGE_CLICK -> {
+                    scope.launch {
+                        backStack.add(AppNavKey.ChatListNavaKey)
+                        drawerState.close()
+                    }
+                }
+
+                Constants.MARKET_PLACE_CLICK -> {
+                    scope.launch {
+                        backStack.add(AppNavKey.CreateAd)
+                        drawerState.close()
+                    }
+                }
             }
+
         }) {
             AppContent()
         }

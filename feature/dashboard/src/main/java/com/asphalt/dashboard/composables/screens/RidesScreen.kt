@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -85,13 +86,20 @@ fun RidesScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     upComingViewDetails: (String) -> Unit
 ) {
-
+    var selectedInvite by remember { mutableStateOf<YourRideDataModel?>(null) }
+    selectedInvite?.let { invite ->
+        ChatDialog(
+            receiverID = invite.createdBy ?: "",
+            onDismiss = { selectedInvite = null }
+        )
+    }
     setTopAppBarState(AppBarState(title = stringResource(R.string.your_rides)))
     LaunchedEffect(Unit) {
         //ridesScreenViewModel.getRides()
+        ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
+        ridesScreenViewModel.getRides()
     }
-    ridesScreenViewModel.updateTab(RideStatConstants.UPCOMING_RIDE)
-    ridesScreenViewModel.getRides()
+
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -119,7 +127,7 @@ fun RidesScreen(
                 when (ridesScreenViewModel.tabSelectFlow.value) {
                     RideStatConstants.UPCOMING_RIDE -> {
                         items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
-                            UpcomingRides(ridesScreenViewModel, upconing, upComingViewDetails)
+                            UpcomingRides(upconing, upComingViewDetails)
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
 
@@ -134,7 +142,9 @@ fun RidesScreen(
 
                     RideStatConstants.INVITES_RIDES -> {
                         items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
-                            Invites(ridesScreenViewModel, invites)
+                            Invites(ridesScreenViewModel, invites) { chatModel ->
+                                selectedInvite = chatModel
+                            }
                             Spacer(Modifier.height(Dimensions.padding16))
                         }
                     }
@@ -149,7 +159,6 @@ fun RidesScreen(
 
 @Composable
 fun UpcomingRides(
-    ridesScreenViewModel: RidesScreenViewModel,
     upconing: YourRideDataModel,
     upComingViewDetails: (String) -> Unit
 ) {
@@ -181,7 +190,8 @@ fun UpcomingRides(
                         text = upconing.title ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag("rideTitle")
                     )
                     Spacer(Modifier.height(Dimensions.size3))
                     Text(
@@ -189,7 +199,7 @@ fun UpcomingRides(
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("ridePlace")
                     )
                 }
 
@@ -583,12 +593,17 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
 }
 
 @Composable
-fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataModel) {
-    if (ridesScreenViewModel.showChatDialog.value) {
-        ChatDialog() {
-            ridesScreenViewModel.showChatDialog.value = false
-        }
-    }
+fun Invites(
+    ridesScreenViewModel: RidesScreenViewModel,
+    invites: YourRideDataModel,
+    onChatClick: (YourRideDataModel) -> Unit
+) {
+    /*if (ridesScreenViewModel.showChatDialog.value) {
+         Log.e("id",invites.createdBy+"")
+         ChatDialog(receiverID = invites.createdBy ?: "") {
+             ridesScreenViewModel.showChatDialog.value = false
+         }
+     }*/
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -646,7 +661,8 @@ fun Invites(ridesScreenViewModel: RidesScreenViewModel, invites: YourRideDataMod
                         painter = painterResource(R.drawable.ic_message),
                         null,
                         modifier = Modifier.clickable {
-                            ridesScreenViewModel.showChatDialog.value = true
+                            onChatClick.invoke(invites)
+                            //ridesScreenViewModel.showChatDialog.value = true
                         })
                 }
             }

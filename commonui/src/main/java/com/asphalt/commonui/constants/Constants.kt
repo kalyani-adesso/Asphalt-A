@@ -48,7 +48,12 @@ object Constants {
 
     // Drawer Menu click
     const val LOGOUT_CLICK = 1
+    const val MESSAGE_CLICK = 2
+    const val MARKET_PLACE_CLICK = 3
 
+    const val GROUP_CHAT = "group"
+    const val PRIVATE_CHAT ="private"
+    const val SOLO ="Solo Ride"
 
 
 }

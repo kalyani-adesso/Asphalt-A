@@ -16,6 +16,7 @@ import com.asphalt.android.network.user.UserAPIService
 import com.asphalt.android.network.user.UserAPIServiceImpl
 import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.repository.UserRepoImpl
+import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.places.PlacesRepository
 import com.asphalt.android.repository.joinride.JoinRideRepository
 import com.asphalt.android.repository.profile.ProfileRepository
@@ -42,6 +43,7 @@ val sharedModule: Module = module {
     single { ProfileRepository(get()) }
     single<PlacesService> { PlacesServiceImpl(get()) }
     single { PlacesRepository(get()) }
+    single { ChatRepository() }
     single { JoinRideRepository(get()) }
     single<JoinRidesApiService> { JoinRidesApiServiceImpl(get()) }
 

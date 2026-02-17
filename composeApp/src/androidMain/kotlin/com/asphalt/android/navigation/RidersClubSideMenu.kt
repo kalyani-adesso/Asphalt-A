@@ -105,7 +105,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                         },
                         label = { Text("Marketplace", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = { itemClick.invoke(Constants.MARKET_PLACE_CLICK) }
                     )
                     NavigationDrawerItem(
                         icon = {
@@ -124,7 +124,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: 
                         },
                         label = { Text("Messages", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = { itemClick.invoke(Constants.MESSAGE_CLICK)}
                     )
                     NavigationDrawerItem(
                         icon = {

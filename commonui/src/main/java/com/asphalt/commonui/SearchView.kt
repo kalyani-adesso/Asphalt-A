@@ -13,6 +13,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.Dimensions
 
@@ -27,7 +28,7 @@ fun SearchView(
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().testTag("SEARCH_TEXT_FIELD"),
         placeholder = { Text(placeholder) },
         leadingIcon = {
             Icon(
@@ -37,7 +38,7 @@ fun SearchView(
         },
         trailingIcon = {
             if (query.isNotEmpty()) {
-                IconButton(onClick = onClearClick) {
+                IconButton(onClick = onClearClick, modifier = Modifier.testTag("CLEAR_ICON"),) {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "Clear Icon"

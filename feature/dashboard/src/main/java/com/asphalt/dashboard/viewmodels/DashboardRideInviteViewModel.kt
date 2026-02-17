@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.dashboard.data.DashboardChatModel
 import com.asphalt.dashboard.data.DashboardRideInviteUIModel
+import com.asphalt.dashboard.mappers.toDashBoardChats
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -22,10 +24,13 @@ class DashboardRideInviteViewModel(
         get() = androidUserVM.getCurrentUserUID()
     private val _dashboardRideInvites =
         MutableStateFlow<List<DashboardRideInviteUIModel>>(emptyList())
+    private val _dashboardRideInvitesChat =
+        MutableStateFlow<List<DashboardChatModel>>(emptyList())
     private val userList
         get() = androidUserVM.userList
 
     val dashboardRideInviteList: StateFlow<List<DashboardRideInviteUIModel>> = _dashboardRideInvites
+    val dashboardRideInviteChat: StateFlow<List<DashboardChatModel>> = _dashboardRideInvitesChat
 
     private fun removeInviteFromList(rideID: String) {
         _dashboardRideInvites.update { currentList ->
@@ -40,17 +45,19 @@ class DashboardRideInviteViewModel(
                     uid
                 )
             }, viewModelScope) {
+                _dashboardRideInvitesChat.value = it.toDashBoardChats(uid, userList.value)
                 _dashboardRideInvites.value = it.toDashBoardInvites(userList.value)
             }
         }
     }
-    fun cancelRide(rideID: String){
+
+    fun cancelRide(rideID: String) {
         viewModelScope.launch {
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepository.deleteRide(rideID)
 
             }
-            APIHelperUI.handleApiResult(apiResult,viewModelScope){
+            APIHelperUI.handleApiResult(apiResult, viewModelScope) {
                 removeInviteFromList(rideID)
             }
         }

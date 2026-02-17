@@ -13,6 +13,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -24,13 +25,16 @@ fun NavigationBar(
     title: String = "",
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("NavigationBar")
     ) {
         TopAppBar(
             title = {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.testTag("NavigationTitle")
 
                 )
             },
@@ -39,14 +43,18 @@ fun NavigationBar(
                 titleContentColor = MaterialTheme.colorScheme.onPrimary
             ),
             navigationIcon = {
-                IconButton(onClick = onBackPressed) {
+                IconButton(
+                    onClick = onBackPressed,
+                    modifier = Modifier.testTag("BackButton")
+                ) {
                     Icon(
                         active = false,
                         activeContent = {},
                         inactiveContent = {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_back_arrow),
-                                contentDescription = "")
+                                contentDescription = "Back"
+                            )
                         }
                     )
                 }
@@ -59,7 +67,7 @@ fun NavigationBar(
 @Composable
 private fun NavigationBarPreview() {
     MaterialTheme {
-       NavigationBar(
+        NavigationBar(
             title = "Dashboard",
             onBackPressed = {}
         )

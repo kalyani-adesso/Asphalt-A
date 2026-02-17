@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -32,7 +33,7 @@ fun AppLoader(
 )
 {
 
-    Box(modifier = Modifier.fillMaxSize(),
+    Box(modifier = Modifier.fillMaxSize().testTag("AppLoaderRoot"),
         contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,7 +42,8 @@ fun AppLoader(
         ) {
             Icon(painter = painterResource(id = logoRes),
                 contentDescription = "App Logo",
-                tint = Color.Unspecified
+                tint = Color.Unspecified,
+                modifier = Modifier.testTag("AppLogo")
             )
 
             Spacer(modifier = Modifier.height(Dimensions.size17))
@@ -52,6 +54,7 @@ fun AppLoader(
                 fontWeight = FontWeight.Bold,
                 color = NeutralBlack,
                 style = TypographyBold.bodyLarge,
+                modifier = Modifier.testTag("AppLoaderTitle"),
             )
             Spacer(modifier = Modifier.height(Dimensions.size10))
             //description
@@ -59,13 +62,14 @@ fun AppLoader(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 color = GrayDark,
-                style = Typography.titleMedium
+                style = Typography.titleMedium,
+                modifier = Modifier.testTag("AppLoaderDescription")
             )
             Spacer(modifier = Modifier.height(Dimensions.size20))
 
             //Circular progress indicator
             if (showProgress) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.testTag("AppLoaderProgress"))
             }
         }
     }

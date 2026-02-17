@@ -37,10 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.RidersList
+import com.asphalt.android.model.rides.RidesData
+import com.asphalt.chat.model.ChatParamsModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
-import com.asphalt.commonui.UIState
-import com.asphalt.commonui.UIStateHandler
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
@@ -71,8 +72,11 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RidesDetailsScreen(
-    rideId: String?, setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidesDetailsViewModel = koinViewModel(), onBack: () -> Unit
+    rideId: String?,
+    setTopAppBarState: (AppBarState) -> Unit,
+    viewModel: RidesDetailsViewModel = koinViewModel(),
+    onBack: () -> Unit,
+    onChatClick: (ChatParamsModel?) -> Unit
 ) {
     //val ridesData by viewModel.ridesData
     //viewModel.getUserList()
@@ -100,7 +104,7 @@ fun RidesDetailsScreen(
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
                 //Spacer(Modifier.height(Dimensions.size30))
-                HeaderSection(viewModel)
+                HeaderSection(viewModel, onChatClick)
                 Spacer(Modifier.height(Dimensions.size20))
                 CountSection(viewModel)
                 Spacer(Modifier.height(Dimensions.size20))
@@ -142,10 +146,10 @@ fun RidesDetailsScreen(
                  }
                  Spacer(Modifier.height(Dimensions.size20))*/
                 if (viewModel.showDeleteButton.value) {
-                    val message =stringResource(R.string.delete_ride_success)
+                    val message = stringResource(R.string.delete_ride_success)
                     BorderedButton(
                         onClick = {
-                            viewModel.deleteRide(rideId ?: "",message) {
+                            viewModel.deleteRide(rideId ?: "", message) {
                                 onBack.invoke()
                             }
                         },
@@ -414,7 +418,7 @@ fun RowScope.CountRow(textColor: Color, count: Int, label: String) {
 }
 
 @Composable
-fun HeaderSection(viewModel: RidesDetailsViewModel) {
+fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsModel?) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -460,18 +464,25 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
                 }
 
             }
-            RoundedBox(
-                modifier = Modifier.size(Dimensions.size30),
-                cornerRadius = Dimensions.size10,
-                backgroundColor = PrimaryDarkerLightB75
-            ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_message),
-                        null,
-                        modifier = Modifier.clickable {
-                            //TODO:Click action for message
-                        })
+            if (viewModel.ridesData.value?.rideType != Constants.SOLO) {
+                RoundedBox(
+                    modifier = Modifier.size(Dimensions.size30),
+                    cornerRadius = Dimensions.size10,
+                    backgroundColor = PrimaryDarkerLightB75
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_message),
+                            null,
+                            modifier = Modifier.clickable {
+                                var params = ChatParamsModel(
+                                    viewModel.ridesData.value?.ridesID ?: "",
+                                    viewModel.getAllMembers(),
+                                    viewModel.ridesData.value?.rideTitle ?: ""
+                                )
+                                onChatClick.invoke(params)
+                            })
+                    }
                 }
             }
         }
@@ -645,7 +656,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel) {
 @Composable
 fun RideDetailsPreview() {
     val viewModel = RidesDetailsViewModel()
-    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel){
+    RidesDetailsScreen(null, setTopAppBarState = {}, viewModel, {}) {
 
     }
 }

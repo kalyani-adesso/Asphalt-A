@@ -197,16 +197,26 @@ struct JoinRideRow: View {
                     .buttonStyle(.plain)
                     
                     if #available(iOS 17.0, *) {
-                        ButtonView(title: (ride?.rideJoined ?? false) ? AppStrings.JoinRide.reJoinRideTitle.uppercased() : AppStrings.JoinRide.joinRide.uppercased(),icon: AppIcon.JoinRide.movedLocation, background: (ride?.rideJoined ?? false) ? AppColor.vividGreen
-                                   :  AppColor.celticBlue ,onTap: {
+                        ButtonView(
+                            title: AppStrings.JoinRide.joinRide.uppercased(),
+                            icon: AppIcon.JoinRide.movedLocation,
+                            background: AppColor.celticBlue
+                        ) {
+                            guard let ride = ride else { return }
+
                             viewModel.tappedIndex = index
+
                             Task {
-                                if let ride = ride,
-                                  let selected = await viewModel.handleJoin(for: ride) {
-                                        selectedRide = selected
-                                    }
+                                if ride.rideJoined {
+                                    selectedRide = ride
+                                    return
+                                }
+                                if let selected = await viewModel.handleJoin(for: ride) {
+                                    selectedRide = selected
+                                }
                             }
-                        })
+                        }
+
                         .frame(maxWidth: .infinity)
                         .padding(.bottom,20)
                     }
@@ -218,23 +228,24 @@ struct JoinRideRow: View {
                     .fill(AppColor.listGray)
             )
             .contentShape(Rectangle())
-            .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
-                Button(AppStrings.JoinRide.no, role: .cancel) { }
-                Button(AppStrings.JoinRide.yes) {
-                    Task {
-                        await viewModel.endActiveRide()
-                        await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
-                        selectedRide = viewModel.filteredRides[viewModel.tappedIndex ?? 0]
-                    }
-                }
-            } message: {
-                Text(AppStrings.JoinRide.confirmEndCurrentRide)
-            }
+//                .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
+//                Button(AppStrings.JoinRide.no, role: .cancel) { }
+//                Button(AppStrings.JoinRide.yes) {
+//                    Task {
+//                        await viewModel.endActiveRide()
+//                        await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
+//                        selectedRide = viewModel.filteredRides[viewModel.tappedIndex ?? 0]
+//                    }
+//                }
+//            } message: {
+//                Text(AppStrings.JoinRide.confirmEndCurrentRide)
+//            }
     }
 }
 
 #Preview {
     JoinRideView()
 }
+
 
 

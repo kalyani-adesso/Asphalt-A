@@ -3,6 +3,8 @@ package com.asphalt.android.navigation
 import androidx.navigation3.runtime.NavKey
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.model.rides.RidesData
+import com.asphalt.chat.model.ChatParamsModel
 import kotlinx.serialization.Serializable
 
 sealed interface AppNavKey : NavKey {
@@ -79,6 +81,20 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     data class RideDetails(val ridesID: String? = null) : AppNavKey
+
+    @Serializable
+    object ChatListNavaKey : AppNavKey
+
+    @Serializable
+    data class ChatScreenNavaKey(
+        val ids: List<String>? = null,
+        val ridesData: ChatParamsModel? = null,
+        val isGroupChat: Boolean = false
+    ) :
+        AppNavKey
+
+    @Serializable
+    object CreateAd : AppNavKey
 }
 
 data class BottomNavItems(

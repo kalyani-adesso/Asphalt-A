@@ -27,9 +27,6 @@ struct NavigationSlideBar: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showHome, destination: {
-                BottomNavBar()
-            })
         }
     }
 }
@@ -38,6 +35,7 @@ struct MenuItemRow: View {
     let viewModel:NavigationSliderViewModel
     let item: MenuItemModel
     @State var itemIsSelected: Bool = false
+    @AppStorage("rememberMeDataStatic") private var isLoggedIn: Bool = false
     var body: some View {
         HStack(spacing: 8) {
             item.icon
@@ -58,10 +56,11 @@ struct MenuItemRow: View {
         .onTapGesture {
             //TODO: Show Logout toast
             viewModel.logout {
+                isLoggedIn = false
                 itemIsSelected = true
-                MBUserDefaults.rememberMeDataStatic = false
-                MBUserDefaults.userIdStatic = ""
-                MBUserDefaults.userNameStatic = ""
+//                MBUserDefaults.rememberMeDataStatic = false
+//                MBUserDefaults.userIdStatic = ""
+//                MBUserDefaults.userNameStatic = ""
             }
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {

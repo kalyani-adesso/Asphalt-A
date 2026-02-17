@@ -72,6 +72,7 @@ struct ShareView: View {
         }
         .navigationDestination(isPresented: $isPresented, destination: {
             UpcomingRideView(showpopup: true, navigationDone: true)
+                .environmentObject(viewModel)
                 .environmentObject(UpcomingViewModel)
                 .environmentObject(home)
             
