@@ -20,12 +20,15 @@ class EditProfileVM(val profileRepository: ProfileRepository) : ViewModel() {
     private val _editMechanic = MutableStateFlow(false)
     private val _editEmergencyNo =
         MutableStateFlow("")
+    private val _editProfilePic =
+        MutableStateFlow("")
     val editFullName: StateFlow<String> = _editFullName.asStateFlow()
     val editEmail: StateFlow<String> = _editEmail.asStateFlow()
     val editPhoneNumber: StateFlow<String> = _editPhoneNumber.asStateFlow()
     val editLicense: StateFlow<String> = _editLicense.asStateFlow()
     val editMechanic: StateFlow<Boolean> = _editMechanic.asStateFlow()
     val editEmergencyNo: StateFlow<String> = _editEmergencyNo.asStateFlow()
+    val editProfilePic: StateFlow<String> = _editProfilePic.asStateFlow()
 
     // Full Name Error
     private val _fullNameError = MutableStateFlow(false)
@@ -129,6 +132,7 @@ class EditProfileVM(val profileRepository: ProfileRepository) : ViewModel() {
         _editEmergencyNo.value = profileUIModel?.emergencyContactNumber ?: ""
         _editPhoneNumber.value = profileUIModel?.phoneNumber ?: ""
         _editFullName.value = profileUIModel?.username ?: ""
+        _editProfilePic.value = profileUIModel?.profilePicUrl ?: ""
     }
 
 }

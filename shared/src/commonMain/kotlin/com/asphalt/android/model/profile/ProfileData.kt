@@ -34,6 +34,8 @@ data class EditProfileRequestDTO(
     val drivingLicense: String,
     @SerialName("is_mechanic")
     val isMechanic: Boolean,
+    @SerialName("profile_image_url")
+    val profileImage: String,
 )
 
 @Serializable
