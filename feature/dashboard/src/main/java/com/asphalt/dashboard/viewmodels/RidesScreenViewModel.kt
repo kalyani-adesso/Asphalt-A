@@ -137,7 +137,7 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                     ridesRepo.uploadImage(rideID, image)
                 }, viewModelScope
             ) {
-                //getRides()
+                getRides()
             }
         }
     }
