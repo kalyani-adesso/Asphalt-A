@@ -68,4 +68,7 @@ class CreateRideRoot(
     @SerialName("assemblyLon")
     var assemblyLon: Double = 0.0,
 
+    @SerialName("images")
+    var images: Map<String, Images>? = null,
+
     )

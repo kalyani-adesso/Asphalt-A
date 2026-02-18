@@ -12,6 +12,8 @@ import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.dashboard.DashboardDomain
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.ImageData
+import com.asphalt.android.model.rides.Images
 import com.asphalt.android.model.rides.ParticipantData
 import com.asphalt.android.model.rides.Ratings
 import com.asphalt.android.model.rides.RatingsData
@@ -84,9 +86,12 @@ class RidesRepository(val apiService: RidesApIService) {
                 assemblyLat = rowData.assemblyLat,
                 assemblyLon = rowData.assemblyLon,
                 ratings = rowData.ratings?.map { (id, data) ->
-                    RatingsData(stars = data.stars,userId = id)
+                    RatingsData(stars = data.stars, userId = id)
                 } ?: emptyList(),
-                rideType = rowData.rideType
+                rideType = rowData.rideType,
+                images = rowData.images?.map { (id, data) ->
+                    ImageData(url = data.url, imageID = id)
+                } ?: emptyList()
 
             )
         } ?: emptyList()
@@ -231,7 +236,7 @@ class RidesRepository(val apiService: RidesApIService) {
         )
     }
 
-    suspend fun uploadImage(rideId: String,images:List<String>): APIResult<Unit> {
-        return apiService.uploadImages(rideId,images)
+    suspend fun uploadImage(rideId: String, images: List<String>): APIResult<Unit> {
+        return apiService.uploadImages(rideId, images)
     }
 }
