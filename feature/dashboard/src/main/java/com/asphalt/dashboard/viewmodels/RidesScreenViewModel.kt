@@ -129,12 +129,12 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
         )
     }
 
-    fun uploadImages(rideID: String) {
-        var list = listOf("1234", "123456", "12345678", "123456789", "1234567890", "11114444")
+    fun uploadImages(rideID: String,image:List<String>) {
+       // var list = listOf("1234", "123456", "12345678", "123456789", "1234567890", "11114444")
         viewModelScope.launch {
             APIHelperUI.handleApiResult(
                 APIHelperUI.runWithLoader {
-                    ridesRepo.uploadImage(rideID, list)
+                    ridesRepo.uploadImage(rideID, image)
                 }, viewModelScope
             ) {
                 //getRides()

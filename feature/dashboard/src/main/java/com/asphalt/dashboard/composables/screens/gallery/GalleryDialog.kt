@@ -58,6 +58,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.BorderedButton
+import com.asphalt.commonui.utils.ImageUtils
 import com.asphalt.commonui.utils.rememberImagePicker
 import com.asphalt.dashboard.data.GalleryModel
 
@@ -77,8 +78,8 @@ fun GalleryDialog(
     val (selectedImageUris, openGallery) = rememberImagePicker(10)
     LaunchedEffect(selectedImageUris) {
         val newImages =
-            selectedImageUris.map { uri -> GalleryModel(uri = uri.toString(), isFromLocal = true) }
-        selectedUris = (selectedUris + newImages).distinctBy { it.uri } as ArrayList<GalleryModel>
+            selectedImageUris.map { uri -> GalleryModel(uri = uri, isFromLocal = true) }
+        selectedUris = (selectedUris + newImages) as ArrayList<GalleryModel>
     }
 
 
@@ -113,7 +114,7 @@ fun GalleryDialog(
                     fontSize = Dimensions.textSize18,
                     modifier = Modifier.testTag("gallery_title")
 
-                    )
+                )
             }
 
             Column(
@@ -156,11 +157,14 @@ fun GalleryDialog(
 
                                 ) {
                                     AsyncImage( // Use AsyncImage for URIs
-                                        model = images.uri,
+                                        model = if (images.isFromLocal) images.uri else ImageUtils.decodeBase64ToBitmap(
+                                            images.imageString ?: ""
+                                        ),
                                         modifier = Modifier
                                             .height(Dimensions.size132)
                                             .width(Dimensions.size132)
-                                            .clip(RoundedCornerShape(Dimensions.size5)).testTag("gallery_image"),
+                                            .clip(RoundedCornerShape(Dimensions.size5))
+                                            .testTag("gallery_image"),
                                         contentDescription = "Selected Photo",
                                         contentScale = ContentScale.Crop
                                     )
@@ -169,13 +173,15 @@ fun GalleryDialog(
                                         contentDescription = "",
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .offset((6).dp, -5.dp).testTag("remove_image")
+                                            .offset((6).dp, -5.dp)
+                                            .testTag("remove_image")
                                             .clickable {
                                                 selectedUris = selectedUris.toMutableList()
                                                     .also { it.remove(images) } as ArrayList<GalleryModel>
                                             }
                                     )
                                 }
+
 
                             }
                         }
@@ -223,7 +229,8 @@ fun GalleryDialog(
                         modifier = Modifier
                             .height(Dimensions.size50)
                             .background(NeutralWhite)
-                            .weight(1f).testTag("cancel_button"),
+                            .weight(1f)
+                            .testTag("cancel_button"),
                         buttonRadius = Dimensions.size10,
                         contentPaddingValues = PaddingValues(0.dp),
                         borderColor = REDLIGHT
@@ -240,7 +247,8 @@ fun GalleryDialog(
                             modifier = Modifier
                                 .height(Dimensions.size50)
                                 .fillMaxWidth()
-                                .weight(1f).testTag("upload_button")
+                                .weight(1f)
+                                .testTag("upload_button")
                                 .background(
                                     color = PrimaryDarkerLightB75,
                                     shape = RoundedCornerShape(Dimensions.spacing12)
@@ -258,7 +266,7 @@ fun GalleryDialog(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = if(selectedUris.isNullOrEmpty())
+                                text = if (selectedUris.isNullOrEmpty())
                                     stringResource(R.string.select_photos).uppercase()
                                 else
                                     "Upload".uppercase(),

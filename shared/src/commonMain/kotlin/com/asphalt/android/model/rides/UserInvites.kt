@@ -40,4 +40,8 @@ data class RatingsData(
 data class Images(@SerialName("url") var url: String)
 
 @Serializable
-data class ImageData(@SerialName("url") var url: String, @SerialName("imageID") var imageID: String)
+data class ImageData(
+    @SerialName("url") var url: String,
+    @SerialName("imageID") var imageID: String,
+    var isServerImg: Boolean = true
+)

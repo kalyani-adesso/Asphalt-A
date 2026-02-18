@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.core.net.toUri
 import com.asphalt.dashboard.composables.screens.gallery.GalleryDialog
 import com.asphalt.dashboard.data.GalleryModel
 import org.junit.Rule
@@ -78,7 +79,7 @@ class GalleryDialogTest {
     @Test
     fun upload_button_text_changes_when_images_exist() {
         val images = arrayListOf(
-            GalleryModel(uri = "file://image1", isFromLocal = true)
+            GalleryModel(uri = "file://image1".toUri(), isFromLocal = true)
         )
 
         setContent(images = images)
@@ -91,8 +92,8 @@ class GalleryDialogTest {
     @Test
     fun images_are_rendered_in_grid() {
         val images = arrayListOf(
-            GalleryModel(uri = "file://image1", isFromLocal = true),
-            GalleryModel(uri = "file://image2", isFromLocal = true)
+            GalleryModel(uri = "file://image1".toUri(), isFromLocal = true),
+            GalleryModel(uri = "file://image2".toUri(), isFromLocal = true)
         )
 
         setContent(images = images)
@@ -105,7 +106,7 @@ class GalleryDialogTest {
     @Test
     fun remove_image_removes_item_from_grid() {
         val images = arrayListOf(
-            GalleryModel(uri = "file://image1", isFromLocal = true)
+            GalleryModel(uri = "file://image1".toUri(), isFromLocal = true)
         )
 
         setContent(images = images)
@@ -122,7 +123,7 @@ class GalleryDialogTest {
     @Test
     fun upload_returns_selected_images() {
         val images = arrayListOf(
-            GalleryModel(uri = "file://image1", isFromLocal = true)
+            GalleryModel(uri = "file://image1".toUri(), isFromLocal = true)
         )
 
         var uploadedImages: ArrayList<GalleryModel>? = null
@@ -137,6 +138,6 @@ class GalleryDialogTest {
             .performClick()
 
         assert(uploadedImages?.size == 1)
-        assert(uploadedImages?.first()?.uri == "file://image1")
+        assert(uploadedImages?.first()?.uri == "file://image1".toUri())
     }
 }
