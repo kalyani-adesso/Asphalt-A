@@ -42,7 +42,8 @@ class ProfileSectionVM(val profileRepository: ProfileRepository, val androidUser
         contact: String,
         emergencyNumber: String,
         licenseNo: String,
-        isMechanic: Boolean
+        isMechanic: Boolean,
+        profileImage: String
     ) {
         viewModelScope.launch {
             userUID.run {
@@ -53,7 +54,7 @@ class ProfileSectionVM(val profileRepository: ProfileRepository, val androidUser
                             email, contact,
                             emergencyNumber,
                             licenseNo,
-                            isMechanic
+                            isMechanic,profileImage
                         )
                     }, viewModelScope
                 ) {

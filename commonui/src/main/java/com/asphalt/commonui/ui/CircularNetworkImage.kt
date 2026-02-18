@@ -20,6 +20,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.utils.ImageUtils
+import kotlin.text.orEmpty
 
 @Composable
 fun CircularNetworkImage(
@@ -31,7 +33,7 @@ fun CircularNetworkImage(
     borderColor: Color = Color.Transparent,
     placeholderPainter: Painter? = painterResource(R.drawable.profile_placeholder),
     contentScale: ContentScale = ContentScale.Crop,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     val ctx = LocalContext.current
     Surface(
@@ -48,7 +50,9 @@ fun CircularNetworkImage(
                 .border(BorderStroke(borderWidth, borderColor), CircleShape)
         ) {
             AsyncImage(
-                model = ImageRequest.Builder(ctx).data(imageUrl).crossfade(true).build(),
+                model = ImageRequest.Builder(ctx).data(
+                    ImageUtils.decodeBase64ToBitmap(imageUrl)
+                ).crossfade(true).build(),
                 placeholder = placeholderPainter,
                 error = placeholderPainter,
                 contentDescription = contentDescription,
