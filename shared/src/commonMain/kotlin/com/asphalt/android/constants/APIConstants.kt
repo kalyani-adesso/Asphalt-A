@@ -22,6 +22,8 @@ object APIConstants {
 
     const val MESSAGES = "/messages"
 
+    const val RIDES_IMAGES_URL = "/rides_images"
+
     //Ride Invite Status
     const val RIDE_INVITED = 0
     const val RIDE_ACCEPTED = 1

@@ -428,7 +428,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
         }, onUpload = { images ->
             showViewPhotos = true
             addPhotos = false
-            ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+            ridesScreenViewModel.uploadImages(history.ridesId ?: "")
+            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
 
         })
     }

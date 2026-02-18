@@ -230,4 +230,8 @@ class RidesRepository(val apiService: RidesApIService) {
             assemblyLon = this.assemblyLon
         )
     }
+
+    suspend fun uploadImage(rideId: String,images:List<String>): APIResult<Unit> {
+        return apiService.uploadImages(rideId,images)
+    }
 }

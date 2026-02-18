@@ -43,8 +43,9 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
     }
-    fun updateInviteStatus(isShow:Boolean){
-        _showInviteNotification.value=isShow
+
+    fun updateInviteStatus(isShow: Boolean) {
+        _showInviteNotification.value = isShow
     }
 
     fun getRides() {
@@ -56,7 +57,7 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                 ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
-                val sortedArray = response.sortedBy{ it.startDate }
+                val sortedArray = response.sortedBy { it.startDate }
 
                 var upcoming =
                     RidesFilter.getUComingRides(sortedArray, user?.uid ?: "", androidUserVM)
@@ -69,12 +70,12 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
                 historyList.addAll(history)
-                if(inviteList.isNotEmpty()){
+                if (inviteList.isNotEmpty()) {
                     updateInviteStatus(true)
-                }else{
+                } else {
                     updateInviteStatus(false)
                 }
-               if (upcomiList.isNotEmpty()) {
+                if (upcomiList.isNotEmpty()) {
                     upcomiList.removeAll { ride ->
                         ride.startDate?.let { it < currentTime } ?: false
                     }
@@ -109,7 +110,8 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
 
 
     }
-    fun updateImages(images: ArrayList<GalleryModel>,ridesID:String){
+
+    fun updateImages(images: ArrayList<GalleryModel>, ridesID: String) {
         val currentState = _ridesListMutableState.value
 
         // find particular ride in history
@@ -127,6 +129,18 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
         )
     }
 
+    fun uploadImages(rideID: String) {
+        var list = listOf("1234", "123456", "12345678", "123456789", "1234567890", "11114444")
+        viewModelScope.launch {
+            APIHelperUI.handleApiResult(
+                APIHelperUI.runWithLoader {
+                    ridesRepo.uploadImage(rideID, list)
+                }, viewModelScope
+            ) {
+                //getRides()
+            }
+        }
+    }
 
 //    fun getRides() {
 //        var upcoming = YourRideDataModel(

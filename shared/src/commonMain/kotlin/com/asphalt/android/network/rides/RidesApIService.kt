@@ -42,4 +42,8 @@ interface RidesApIService {
 
     suspend fun deleteRide(rideId:String) : APIResult<Unit>
 
+    suspend fun uploadImages(ridesID:String,
+        images:List<String>
+    ): APIResult<Unit>
+
 }
