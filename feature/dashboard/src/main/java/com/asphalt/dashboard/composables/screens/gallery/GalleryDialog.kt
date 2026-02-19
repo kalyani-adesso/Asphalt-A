@@ -66,7 +66,7 @@ import com.asphalt.dashboard.data.GalleryModel
 fun GalleryDialog(
     images: ArrayList<GalleryModel> = arrayListOf(),
     isShowUpload: Boolean = true,
-    onDismiss: (Boolean) -> Unit,
+    onDismiss: (Boolean,Int) -> Unit,
     onUpload: (ArrayList<GalleryModel>) -> Unit,
     onDelete: (String) -> Unit
 ) {
@@ -86,7 +86,7 @@ fun GalleryDialog(
 
 
     Dialog(
-        onDismissRequest = { onDismiss(needRefresh) },
+        onDismissRequest = { onDismiss(needRefresh,selectedUris.size) },
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
@@ -231,7 +231,7 @@ fun GalleryDialog(
                 ) {
                     BorderedButton(
                         onClick = {
-                            onDismiss(needRefresh)
+                            onDismiss(needRefresh,selectedUris.size)
                             // showGalleryDialog = true
                         },
                         modifier = Modifier
@@ -315,5 +315,5 @@ fun GalleryDialog(
 @Preview
 @Composable
 fun GalleryDialogPreview() {
-    GalleryDialog(isShowUpload = true, onDismiss = {}, onUpload = {}, onDelete = {})
+    GalleryDialog(isShowUpload = true, onDismiss = {a,b->}, onUpload = {}, onDelete = {})
 }
