@@ -13,6 +13,7 @@ import Combine
 struct ConnectedRideMapView: View {
     @StateObject private var viewModel = ConnectedRideViewModel()
     @StateObject private var joinRideVM = JoinRideViewModel()
+    @StateObject private var navigationSliderVM = NavigationSliderViewModel()
     @StateObject var locationManager = LocationManager()
     @State private var rideComplted: Bool = false
     @State private var startTrack: Bool = false
@@ -303,6 +304,9 @@ struct ConnectedRideMapView: View {
                                 startOngoingRideTimer()
                             }
                         }
+                        .onDisappear {
+                            
+                        }
                         .navigationDestination(isPresented: $showJoinRideView, destination: {
                             JoinRideView()
                         })
@@ -316,10 +320,13 @@ struct ConnectedRideMapView: View {
         // Invalidate any existing timer
         viewModel.ongoingRideTimer?.invalidate()
         // Schedule the timer to trigger every 2 min minutes (900 seconds)
-        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) {  _ in
             Task { @MainActor in
                 await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 
+                if MBUserDefaults.userIdStatic?.isEmpty ?? true {
+                    stopTimer()
+                }
             }
         }
     }
