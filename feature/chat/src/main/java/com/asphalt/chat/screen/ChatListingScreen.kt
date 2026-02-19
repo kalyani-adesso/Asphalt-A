@@ -307,7 +307,14 @@ fun ChatList(
                             shape = CircleShape
                         ),
                         size = Dimensions.padding40,
-                        imageUrl = "" ?: ""
+                        imageUrl =  if (chatRoom.type.equals(Constants.GROUP_CHAT)) {
+                             ""
+                        } else {
+                            androidUserVM.getUser(
+                                chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID())
+                                    ?: ""
+                            )?.profilePic ?: ""
+                        }
                     )
                     Image(
                         painter = painterResource(R.drawable.ic_online_icon),

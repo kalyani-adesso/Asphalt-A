@@ -106,18 +106,6 @@ fun ChatDialog(
                     .fillMaxWidth()
                     .fillMaxHeight(0.8f)
             ) {
-                /* val messages = listOf(
-                     ChatMessage("Hello!", true),
-                     ChatMessage("Hi! How are you?", false),
-                     ChatMessage("I'm good, thanks!", true),
-                     ChatMessage("Nice to hear 😊 gggggg ggggggggg ggggggg", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                     ChatMessage("Nice to hear 😊", false),
-                 )*/
                 Column(Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
@@ -144,7 +132,11 @@ fun ChatDialog(
                                         shape = CircleShape
                                     ),
                                     size = Dimensions.padding40,
-                                    imageUrl = "" ?: ""
+                                    imageUrl =if (isGroupChat) {
+                                        ""
+                                    } else {
+                                        viewModel.getProfileImg(receiverID)
+                                    }
                                 )
                                 Column(
                                     modifier = Modifier
