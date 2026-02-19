@@ -39,6 +39,4 @@ struct AppImage {
     struct Profile {
         static let profile = Image("profile")
     }
-    
-    
 }

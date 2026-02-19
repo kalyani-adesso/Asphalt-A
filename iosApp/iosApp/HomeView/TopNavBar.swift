@@ -10,9 +10,10 @@ import SwiftUI
 struct TopNavBar: View {
     @EnvironmentObject var home: HomeViewModel
     @State var showNotification: Bool = false
+    @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
         HStack(alignment: .center , spacing: 20) {
-            AppImage.Welcome.bg.resizable()
+            viewModel.profileImage.resizable()
                 .frame(width: 63, height: 63)
                 .clipShape(Circle())
                 .overlay(
@@ -44,8 +45,4 @@ struct TopNavBar: View {
             home.loadUserName()
         }
     }
-}
-
-#Preview {
-    TopNavBar()
 }

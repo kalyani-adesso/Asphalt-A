@@ -482,8 +482,46 @@ class UpcomingRideViewModel: ObservableObject {
             }
         }
     }
-
 }
+
+extension UpcomingRideViewModel {
+    
+    @MainActor
+    func uploadImages(images:[UIImage], rideId:String) async throws -> String {
+        print("Images Count:\(images.count)")
+        var encoadedImages:[String] = [""]
+        for eachImage in images {
+            if let encodedImage = encodeImageToBase64(image: eachImage) {
+                encoadedImages.append(encodedImage)
+            }
+        }
+        
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            rideRepository.uploadImage(rideId: rideId, images: encoadedImages, completionHandler: { result, error in
+                if let error = error {
+                    print("Error uploading image: \(error)")
+                    continuation.resume(throwing: error)
+                } else {
+                    print("Image uploaded successfully:\(images.count)")
+                    // If the result contains a message or URL, adapt here. For now, return a generic success string.
+                    continuation.resume(returning: "success")
+                }
+            })
+        }
+    }
+    
+    func encodeImageToBase64(image: UIImage) -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.1) else { return nil}
+        let data = NSData(data: imageData)
+        return data.base64EncodedString()
+    }
+    
+    func decodeBase64ToImage(base64: String) -> UIImage? {
+        guard let data = Data(base64Encoded: base64) else { return nil }
+        return UIImage(data: data)
+    }
+}
+
 
 // Extension to help with async mapping (if not already available)
 extension Sequence {
@@ -500,3 +538,4 @@ extension Date {
         Calendar.current.startOfDay(for: self)
     }
 }
+

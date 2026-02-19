@@ -10,13 +10,14 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @StateObject var profileVM = ProfileViewModel()
     @State private var currentDate = Date()
     @State private var activeChatHostName: String? = nil
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
                 VStack(spacing: 15){
-                    TopNavBar()
+                    TopNavBar(viewModel: profileVM)
                     ActionButtonView()
                     DashboardView()
                     UpcomingRidesView{ hostName in
@@ -51,6 +52,9 @@ struct HomeView: View {
             
             viewModel.isRideLoading = false
         }
+        .task {
+            await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+        }
         .refreshable {
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
@@ -68,9 +72,8 @@ struct HomeView: View {
 
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
-                    
                     ZStack(alignment: .bottomTrailing) {
-                        AppImage.Profile.profile.resizable()
+                        profileVM.profileImage
                             .frame(width: 37, height: 37)
                             .clipShape(Circle())
                             .overlay(

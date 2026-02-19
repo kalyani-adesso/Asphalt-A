@@ -147,7 +147,9 @@ struct UpcomingRideView: View {
                     openGallery: $openGallery,
                     selectedImages: $selectedImages,
                     onUpload: {
-                        handleUpload()
+                      
+                           handleUpload(selectedImages: selectedImages)
+                        
                     }
                 )
                 .transition(.opacity.combined(with: .scale))
@@ -214,18 +216,22 @@ struct UpcomingRideView: View {
         })
     }
     
-    private func handleUpload() {
+    private func handleUpload(selectedImages:[UIImage]) {
         guard let rideId = selectedRideId else { return }
         
         if let index = viewModel.rides.firstIndex(where: { $0.id == rideId }) {
             var ride = viewModel.rides[index]
             ride.hasPhotos = true
             viewModel.rides[index] = ride
+            Task {
+                try await viewModel.uploadImages(images: selectedImages, rideId: rideId)
+            }
         }
         
         withAnimation {
             selectedRideId = nil
         }
+        
     }
 }
 
