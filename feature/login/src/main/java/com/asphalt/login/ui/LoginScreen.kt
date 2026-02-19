@@ -75,6 +75,7 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import org.koin.compose.currentKoinScope
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -85,7 +86,7 @@ fun LoginScreen(
     onSignUpClick: () -> Unit,
     onDashboardNav: () -> Unit,
     onForgotClick: () -> Unit,
-    dataStoreManager: DataStoreManager = currentKoinScope().get(),
+    dataStoreManager: DataStoreManager =  koinInject(),
 ) {
     val context = LocalContext.current
     //var checked by remember { mutableStateOf(false) }

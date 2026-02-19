@@ -427,7 +427,7 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
     var showViewPhotos by remember { mutableStateOf(history.images_server.size > 0) }
     val context = LocalContext.current
     if (addPhotos) {
-        GalleryDialog(isShowUpload = true, onDismiss = {
+        GalleryDialog(isShowUpload = true, onDismiss = { isRefresh, imgcount ->
             addPhotos = false
         }, onUpload = { images ->
             showViewPhotos = true
@@ -438,6 +438,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             ridesScreenViewModel.uploadImages(history.ridesId ?: "", imageList)
             //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
 
+        }, onDelete = { imageId ->
+
         })
     }
     if (showGalleryDialog) {
@@ -446,13 +448,18 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             GalleryModel(
                 "".toUri(),
                 isFromLocal = false,
-                it.url
+                it.url, it.imageID
             )
         })
-        GalleryDialog(images = images, isShowUpload = false, onDismiss = {
+        GalleryDialog(images = images, isShowUpload = false, onDismiss = { isRefresh, imgCount ->
             showGalleryDialog = false
+            showViewPhotos = imgCount > 0
+            if (isRefresh) {
+                ridesScreenViewModel.getRides()
+            }
         }, onUpload = { images ->
-            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+        }, onDelete = { imageId ->
+            ridesScreenViewModel.deleteImage(history.ridesId ?: "", imageId)
         })
     }
     Column(
