@@ -142,6 +142,18 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
         }
     }
 
+    fun deleteImage(ridesID:String,imageID:String){
+        viewModelScope.launch {
+            APIHelperUI.handleApiResult(
+                APIHelperUI.runWithLoader {
+                    ridesRepo.deleteImage(ridesID, imageID)
+                }, viewModelScope
+            ) {
+                //getRides()
+            }
+        }
+    }
+
 //    fun getRides() {
 //        var upcoming = YourRideDataModel(
 //            title = "Kanyakumari Trip",

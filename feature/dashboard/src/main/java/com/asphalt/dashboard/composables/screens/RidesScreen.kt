@@ -438,6 +438,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             ridesScreenViewModel.uploadImages(history.ridesId ?: "", imageList)
             //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
 
+        }, onDelete = { imageId ->
+
         })
     }
     if (showGalleryDialog) {
@@ -446,13 +448,17 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             GalleryModel(
                 "".toUri(),
                 isFromLocal = false,
-                it.url
+                it.url, it.imageID
             )
         })
-        GalleryDialog(images = images, isShowUpload = false, onDismiss = {
+        GalleryDialog(images = images, isShowUpload = false, onDismiss = { isRefresh ->
             showGalleryDialog = false
+            if (isRefresh) {
+                ridesScreenViewModel.getRides()
+            }
         }, onUpload = { images ->
-            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+        }, onDelete = { imageId ->
+            ridesScreenViewModel.deleteImage(history.ridesId ?: "", imageId)
         })
     }
     Column(

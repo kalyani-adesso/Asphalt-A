@@ -66,12 +66,14 @@ import com.asphalt.dashboard.data.GalleryModel
 fun GalleryDialog(
     images: ArrayList<GalleryModel> = arrayListOf(),
     isShowUpload: Boolean = true,
-    onDismiss: () -> Unit,
-    onUpload: (ArrayList<GalleryModel>) -> Unit
+    onDismiss: (Boolean) -> Unit,
+    onUpload: (ArrayList<GalleryModel>) -> Unit,
+    onDelete: (String) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     var showGallery by remember { mutableStateOf(false) }
+    var needRefresh by remember { mutableStateOf(false) }
     var selectedUris by remember { mutableStateOf<ArrayList<GalleryModel>>(images) }
 
     val context = LocalContext.current
@@ -84,7 +86,7 @@ fun GalleryDialog(
 
 
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(needRefresh) },
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
@@ -178,6 +180,12 @@ fun GalleryDialog(
                                             .clickable {
                                                 selectedUris = selectedUris.toMutableList()
                                                     .also { it.remove(images) } as ArrayList<GalleryModel>
+                                                if (!images.isFromLocal) {
+                                                    needRefresh = true
+                                                    images.imageID?.let {
+                                                        onDelete.invoke(it)
+                                                    }
+                                                }
                                             }
                                     )
                                 }
@@ -223,7 +231,7 @@ fun GalleryDialog(
                 ) {
                     BorderedButton(
                         onClick = {
-                            onDismiss()
+                            onDismiss(needRefresh)
                             // showGalleryDialog = true
                         },
                         modifier = Modifier
@@ -307,5 +315,5 @@ fun GalleryDialog(
 @Preview
 @Composable
 fun GalleryDialogPreview() {
-    GalleryDialog(isShowUpload = true, onDismiss = {}, onUpload = {})
+    GalleryDialog(isShowUpload = true, onDismiss = {}, onUpload = {}, onDelete = {})
 }

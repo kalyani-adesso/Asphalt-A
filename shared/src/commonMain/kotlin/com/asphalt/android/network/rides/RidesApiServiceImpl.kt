@@ -1,6 +1,7 @@
 package com.asphalt.android.network.rides
 
 import com.asphalt.android.constants.APIConstants.END_RIDE_SUMMARY_URL
+import com.asphalt.android.constants.APIConstants.IMAGES
 import com.asphalt.android.constants.APIConstants.MESSAGES
 import com.asphalt.android.constants.APIConstants.ONGOING_RIDE_URL
 import com.asphalt.android.constants.APIConstants.PARTICIPANTS_URL
@@ -153,7 +154,16 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             key to UrlNode(image)
         }
         return safeApiCall {
-            patch(imagesMap, "$RIDES_URL/$ridesId/images").body()
+            patch(imagesMap, "$RIDES_URL/$ridesId$IMAGES").body()
+        }
+    }
+
+    override suspend fun deleteImage(
+        ridesID: String,
+        imageID: String
+    ): APIResult<Unit> {
+        return safeApiCall {
+            delete("$RIDES_URL/$ridesID$IMAGES/$imageID").body()
         }
     }
 
