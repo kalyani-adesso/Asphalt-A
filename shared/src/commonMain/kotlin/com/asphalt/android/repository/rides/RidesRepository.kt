@@ -239,4 +239,8 @@ class RidesRepository(val apiService: RidesApIService) {
     suspend fun uploadImage(rideId: String, images: List<String>): APIResult<Unit> {
         return apiService.uploadImages(rideId, images)
     }
+
+    suspend fun deleteImage(rideId: String,imageId:String): APIResult<Unit> {
+        return apiService.deleteImage(rideId,imageId)
+    }
 }

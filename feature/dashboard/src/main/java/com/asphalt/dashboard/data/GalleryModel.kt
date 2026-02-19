@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 data class GalleryModel(
     @Contextual var uri: Uri,
     var isFromLocal: Boolean = false,
-    var imageString: String? = null
+    var imageString: String? = null,
+    var imageID: String? = null
 )

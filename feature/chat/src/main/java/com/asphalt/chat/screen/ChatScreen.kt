@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.android.datastore.DataStoreManager
+import com.asphalt.android.model.chat.getOtherUserId
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.network.KtorClient
 import com.asphalt.android.network.user.UserAPIServiceImpl
@@ -54,6 +55,7 @@ import com.asphalt.chat.viewmodel.ChatScreenViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.R.string
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.BlueLite25
 import com.asphalt.commonui.theme.BlueLite34
@@ -139,7 +141,16 @@ fun ChatScreen(
                                         shape = CircleShape
                                     ),
                                     size = Dimensions.padding40,
-                                    imageUrl = "" ?: ""
+                                    imageUrl = if (isGroupChat) {
+                                        ""
+                                    } else {
+                                        if (ids != null && ids.size > 0) {
+                                            androidUserVM.getUser(ids.get(0))?.profilePic ?: ""
+                                        } else {
+                                            ""
+                                        }
+
+                                    }
                                 )
                                 Column(modifier = Modifier.padding(start = Dimensions.size10)) {
                                     Text(

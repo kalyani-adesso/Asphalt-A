@@ -21,6 +21,7 @@ object APIConstants {
     const val END_RIDE_SUMMARY_URL = "/endRide_summary"
 
     const val MESSAGES = "/messages"
+    const val IMAGES = "/images"
 
     const val RIDES_IMAGES_URL = "/rides_images"
 
