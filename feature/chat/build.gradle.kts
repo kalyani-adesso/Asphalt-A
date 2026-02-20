@@ -70,4 +70,13 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+
+//firebase
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.firebase.firestore.ktx)
+
 }

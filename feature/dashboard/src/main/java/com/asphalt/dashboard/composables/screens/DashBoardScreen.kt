@@ -1,6 +1,7 @@
 package com.asphalt.dashboard.composables.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,8 +30,10 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.chat.servises.ChatService
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
@@ -40,7 +43,8 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.RequestLocationPermission
+
+import com.asphalt.commonui.utils.RequestPermissions
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
 import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
@@ -69,27 +73,27 @@ fun DashBoardScreen(
     var locationStatus by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    RequestLocationPermission(
-        onPermissionGranted = {
+    RequestPermissions(
+        context = context,
+        onPermissionsGranted = {
+            val serviceIntent = Intent(context, ChatService::class.java)
+            startForegroundService(context, serviceIntent)
             scope.launch {
-                locationStatus = ""
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
                 fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
+                    .addOnSuccessListener { location ->
                         if (location != null) {
-                            val lat = location.latitude
-                            val lon = location.longitude
-
-                            locationStatus = Utils.getLocationRegion(context, lat, lon)
+                            locationStatus = Utils.getLocationRegion(context, location.latitude, location.longitude)
                         } else {
                             locationStatus = ""
                         }
                     }
             }
         },
-        onPermissionDenied = {
+        onPermissionsDenied = { denied ->
             locationStatus = ""
-        }, context
+            println("Permissions denied: $denied")
+        }
     )
     val currentUser = androidUserVM.userState.collectAsState(null)
 
