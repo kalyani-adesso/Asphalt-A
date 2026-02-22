@@ -159,6 +159,7 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
 //MARK: - Create Ride API
 extension CreateRideViewModel {
     func getAllUsers() {
+        isRideLoading = true
         userRepository.getAllUsers { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
@@ -180,12 +181,15 @@ extension CreateRideViewModel {
                 
                 DispatchQueue.main.async {
                     self.participants = filteredParticpants
+                    self.isRideLoading = false
                 }
                 
             } else if let error = error {
                 print("Error fetching users: \(error)")
+                self.isRideLoading = false
             } else {
                 print("Unexpected data format")
+                self.isRideLoading = false
             }
         }
     }
