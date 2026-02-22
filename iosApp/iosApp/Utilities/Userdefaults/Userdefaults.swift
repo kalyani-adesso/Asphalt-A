@@ -71,6 +71,10 @@ struct MBUserDefaults {
     }
     
     static var removeAllUserDefaults: Void {
-        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            print("Warning: Bundle identifier is nil, cannot remove UserDefaults")
+            return
+        }
+        UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
     }
 }

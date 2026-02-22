@@ -10,8 +10,9 @@ import SwiftUI
 
 struct ConnectedRideCompleteView: View {
     var viewModel: JoinRideModel
-    @StateObject var connectedRideViewModel = ConnectedRideViewModel()
-    @StateObject private var homeViewModel = HomeViewModel()
+    @EnvironmentObject var connectedRideViewModel: ConnectedRideViewModel
+    @ObservedObject var homeViewModel: HomeViewModel
+    @ObservedObject var upcomingRideViewModel: UpcomingRideViewModel
     @State var rating: Int = 0
     @State var showHome: Bool = false
     @State var showPopup: Bool = false
@@ -30,7 +31,10 @@ struct ConnectedRideCompleteView: View {
             .padding(.horizontal,16)
             
             if showPopup {
-                RatingSheetView(isPresented: $showPopup,rideModel:viewModel)
+                RatingSheetView( isPresented: $showPopup, home: homeViewModel, viewModel: upcomingRideViewModel, rideModel: viewModel)
+//                    .environmentObject(homeViewModel)
+//                    .environmentObject(upcomingRideViewModel)
+//                    .environmentObject(connectedRideViewModel)
                     .transition(.scale)
                     .zIndex(1)
             }

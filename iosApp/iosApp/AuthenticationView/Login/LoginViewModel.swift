@@ -16,9 +16,10 @@ class LoginViewModel: ObservableObject {
         if isValidEmailAndPassword(email:email, password:password) {
             AuthenticatorImpl().signIn(email: email, password: password, completionHandler: { result,error in
                 if let result = result {
-                    if let _ = result.uid {
-                        MBUserDefaults.rememberMeDataStatic = result.isSuccess
-                        MBUserDefaults.userIdStatic = result.uid ?? ""
+                    if let uid = result.uid {
+                        // Save user ID on successful login
+                        // Note: rememberMeDataStatic is now set in LoginView based on "Keep me signed in" toggle
+                        MBUserDefaults.userIdStatic = uid
                         completion()
                     } else {
                         self.errorMessage = result.errorMessage ?? ""
@@ -26,7 +27,7 @@ class LoginViewModel: ObservableObject {
                         errorCompletion()
                     }
                 } else {
-                    self.errorMessage = result?.errorMessage ?? ""
+                    self.errorMessage = result?.errorMessage ?? error?.localizedDescription ?? "Login failed"
                     self.showToast = true
                     errorCompletion()
                 }

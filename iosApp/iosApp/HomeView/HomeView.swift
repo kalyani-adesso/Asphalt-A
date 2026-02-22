@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var home: HomeViewModel
-    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @StateObject var home =  HomeViewModel()
+    @StateObject var viewModel  =  UpcomingRideViewModel()
     @StateObject var profileVM = ProfileViewModel()
+    @StateObject var createRideVM = CreateRideViewModel()
     @State private var currentDate = Date()
     @State private var activeChatHostName: String? = nil
     var body: some View {
@@ -18,21 +19,19 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 15){
                     TopNavBar(viewModel: profileVM)
-                    ActionButtonView()
+                    ActionButtonView(viewModel: createRideVM, upcomingRideViewModel: viewModel, homeViewModel: home)
                     DashboardView()
-                    UpcomingRidesView{ hostName in
+                    UpcomingRidesView(home: home, viewModel:viewModel){ hostName in
                         withAnimation(.easeInOut) {
                             activeChatHostName = hostName
                         }
                     }
-                        .environmentObject(home)
-                        .environmentObject(viewModel)
                     JourneyCardView()
                     PlacesVisitedView()
                 }
                 .padding()
             }
-            if viewModel.isRideLoading {
+            if  createRideVM.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
             if let hostName = activeChatHostName {
@@ -40,16 +39,14 @@ struct HomeView: View {
             }
         }
         .task {
-            viewModel.isRideLoading = true
             
+            viewModel.isRideLoading = true
             async let rides = viewModel.fetchAllUsers()
             async let allRides = viewModel.fetchAllRides()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             async let stats =  home.updateStatsFor(month: month, year: year)
-            
             _ = await (rides, allRides, stats)
-            
             viewModel.isRideLoading = false
         }
         .task {
@@ -129,10 +126,4 @@ struct HomeView: View {
         }
     }
 
-}
-
-#Preview {
-    HomeView()
-        .environmentObject(HomeViewModel())
-        .environmentObject(UpcomingRideViewModel())
 }

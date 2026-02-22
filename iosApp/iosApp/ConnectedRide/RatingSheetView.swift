@@ -13,8 +13,8 @@ struct RatingSheetView: View {
     @State private var rating: Int = 0
     @State private var feedback: String = ""
     @State var showHome: Bool = false
-    @EnvironmentObject var home: HomeViewModel
-    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @ObservedObject var home: HomeViewModel
+    @ObservedObject var viewModel : UpcomingRideViewModel
     @ObservedObject var coneectedRideVM  = ConnectedRideViewModel()
     var rideModel: JoinRideModel
     var ratingText: String {
@@ -83,9 +83,7 @@ struct RatingSheetView: View {
             .cornerRadius(16)
             .shadow(radius: 10)
             .navigationDestination(isPresented: $showHome, destination: {
-                UpcomingRidesView(onMessageTap: {_ in })
-                    .environmentObject(home)
-                    .environmentObject(viewModel)
+                UpcomingRidesView(home: home, viewModel: viewModel, onMessageTap: {_ in })
             })
         }
     }

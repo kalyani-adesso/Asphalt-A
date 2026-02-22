@@ -51,6 +51,7 @@ struct RideModel: Identifiable,Hashable {
     let startTime: String?
     let endTime: String?
     let ratings: Int?
+    let imageData:[ImageData]?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -63,6 +64,7 @@ struct RideDetailsModel: Identifiable,Hashable {
     let confirmedCount:Int
 }
 
+@MainActor
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
     @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invities]
@@ -81,6 +83,7 @@ class UpcomingRideViewModel: ObservableObject {
     private let userRepo: UserRepository
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
+    @Published var isUploading:Bool = false
     @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
@@ -212,11 +215,12 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    startDate: startDate,
+                    hasPhotos: ride.images.count > 0, startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
                     endTime: EndRideTime,
-                    ratings: myRating
+                    ratings: myRating,
+                    imageData: ride.images
                 )
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
@@ -495,16 +499,21 @@ extension UpcomingRideViewModel {
                 encoadedImages.append(encodedImage)
             }
         }
-        
+        isUploading = true
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             rideRepository.uploadImage(rideId: rideId, images: encoadedImages, completionHandler: { result, error in
                 if let error = error {
-                    print("Error uploading image: \(error)")
-                    continuation.resume(throwing: error)
+                    Task { @MainActor in
+                        print("Error uploading image: \(error)")
+                        self.isUploading = false
+                        continuation.resume(throwing: error)
+                    }
                 } else {
-                    print("Image uploaded successfully:\(images.count)")
-                    // If the result contains a message or URL, adapt here. For now, return a generic success string.
-                    continuation.resume(returning: "success")
+                    Task { @MainActor in
+                        print("Image uploaded successfully:\(images.count)")
+                        self.isUploading = false
+                        continuation.resume(returning: "success")
+                    }
                 }
             })
         }
@@ -519,6 +528,20 @@ extension UpcomingRideViewModel {
     func decodeBase64ToImage(base64: String) -> UIImage? {
         guard let data = Data(base64Encoded: base64) else { return nil }
         return UIImage(data: data)
+    }
+    
+    func deleteRidePhoto(rideId: String, photoId: String) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            rideRepository.deleteImage(rideId: rideId, imageId: photoId, completionHandler: { result, error in
+                if let error = error {
+                    print("Error deleting photo: \(error)")
+                    continuation.resume(throwing: error)
+                } else {
+                    print("Photo deleted successfully")
+                    continuation.resume()
+                }
+            })
+        }
     }
 }
 

@@ -19,105 +19,118 @@ struct BottomNavBar: View {
     @State var showHome : Bool = false
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                ZStack {
-                    switch selectedTab {
-                    case 0:
-                        if rideJoined && showHome == false {
-                            if let ride = createRideVM.activeRide {
-                                ConnectedRideView(
-                                    notificationTitle: AppStrings.JoinRide.rideActive,
-                                    title: AppStrings.ConnectedRide.startRideTitle,
-                                    subTitle: AppStrings.ConnectedRide.startRideSubtitle,
-                                    model: ride,
-                                    rideCompleteModel: []
-                                )
+            ZStack {
+                VStack(spacing: 0) {
+                    ZStack {
+                        switch selectedTab {
+                        case 0:
+                            if rideJoined && showHome == false {
+                                if let ride = createRideVM.activeRide {
+                                    ConnectedRideView(
+                                        notificationTitle: AppStrings.JoinRide.rideActive,
+                                        title: AppStrings.ConnectedRide.startRideTitle,
+                                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                                        model: ride,
+                                        rideCompleteModel: []
+                                    )
+                                }
+                            } else {
+                                HomeView()
+                                    .environmentObject(homeViewModel)
+                                    .environmentObject(upcomingRideViewModel)
                             }
-                        } else {
-                            HomeView()
+                           
+                        case 1:
+                            UpcomingRideView(viewModel: upcomingRideViewModel, showpopup: false , navigationDone: false)
+                            
+                        case 2:
+                            QueriesView()
+                        case 3:
+                            ProfileScreen()
                                 .environmentObject(homeViewModel)
-                                .environmentObject(upcomingRideViewModel)
+                        default:
+                            if rideJoined && showHome == false {
+                                if let ride = createRideVM.activeRide {
+                                    ConnectedRideView(
+                                        notificationTitle: AppStrings.JoinRide.rideActive,
+                                        title: AppStrings.ConnectedRide.startRideTitle,
+                                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                                        model: ride,
+                                        rideCompleteModel: []
+                                    )
+                                }
+                            } else {
+                                HomeView()
+                            }
                         }
-                       
-                    case 1:
-                        UpcomingRideView(showpopup: false , navigationDone: false)
-                            .environmentObject(upcomingRideViewModel)
-                            .environmentObject(homeViewModel)
-                        
-                    case 2:
-                        QueriesView()
-                    case 3:
-                        ProfileScreen()
-                            .environmentObject(homeViewModel)
-                    default:
-                        HomeView()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingRideViewModel)
                     }
+                    .frame(maxHeight: .infinity)
+                    .animation(.easeInOut(duration: 0.25), value: selectedTab)
+                    HStack {
+                        tabItem(index: 0, label: "Home", systemIcon: "house")
+                        Spacer()
+                        tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides  .renderingMode(.template))
+                        Spacer()
+                        tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
+                        Spacer()
+                        tabItem(index: 3, label: "Profile", systemIcon: "person")
+                    }
+                    .padding(.horizontal, 40)
+                    .padding(.vertical, 10)
+                    .background(Color.white)
+                    .overlay(
+                        Rectangle()
+                            .frame(height: 0.5)
+                            .foregroundColor(.gray.opacity(0.2)),
+                        alignment: .top
+                    )
                 }
-                .frame(maxHeight: .infinity)
-                .animation(.easeInOut(duration: 0.25), value: selectedTab)
-                HStack {
-                    tabItem(index: 0, label: "Home", systemIcon: "house")
-                    Spacer()
-                    tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides  .renderingMode(.template))
-                    Spacer()
-                    tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
-                    Spacer()
-                    tabItem(index: 3, label: "Profile", systemIcon: "person")
-                }
-                .padding(.horizontal, 40)
-                .padding(.vertical, 10)
-                .background(Color.white)
-                .overlay(
-                    Rectangle()
-                        .frame(height: 0.5)
-                        .foregroundColor(.gray.opacity(0.2)),
-                    alignment: .top
-                )
-            }
-            .ignoresSafeArea(edges: .bottom)
-            
-            .toolbar {
-    
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    if selectedTab != 0 {
+                .ignoresSafeArea(edges: .bottom)
+                
+                .toolbar {
+        
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        if selectedTab != 0 {
+                            Button {
+                                selectedTab = 0
+                            } label: {
+                                AppIcon.CreateRide.backButton
+                            }
+                        }
+                    }
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
-                            selectedTab = 0
+                            self.showNotification = true
                         } label: {
-                            AppIcon.CreateRide.backButton
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(AppColor.celticBlue)
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
+                        }
+                        Button(action: {
+                            self.showSlideBar = true
+                        }) {
+                            AppIcon.Home.navigation
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button {
-                        self.showNotification = true
-                    } label: {
-                        ZStack(alignment: .topTrailing) {
-                            Image(systemName: "bell")
-                                .font(.system(size: 15))
-                                .foregroundColor(AppColor.celticBlue)
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                                .offset(x: -2, y: 1)
-                        }
-                    }
-                    Button(action: {
-                        self.showSlideBar = true
-                    }) {
-                        AppIcon.Home.navigation
-                    }
+                
+                .navigationDestination(isPresented: $showSlideBar, destination: {
+                    NavigationSlideBar()
+                })
+                .navigationDestination(isPresented: $showNotification, destination: {
+                    NotificationView()
+                })
+                .navigationBarBackButtonHidden(true)
+                if createRideVM.isRideLoading || upcomingRideViewModel.isRideLoading  {
+                    ProgressViewReusable(title: "Loading...")
                 }
             }
-            
-            .navigationDestination(isPresented: $showSlideBar, destination: {
-                NavigationSlideBar()
-            })
-            .navigationDestination(isPresented: $showNotification, destination: {
-                NotificationView()
-            })
-            .navigationBarBackButtonHidden(true)
         }
         .task {
             await createRideVM.getActiveJoinedRide()
@@ -168,9 +181,3 @@ struct BottomNavBar: View {
         }
     }
 }
-
-
-#Preview {
-    BottomNavBar()
-}
-

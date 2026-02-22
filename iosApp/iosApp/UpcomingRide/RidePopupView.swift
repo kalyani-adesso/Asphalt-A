@@ -186,17 +186,22 @@ struct RidePopupView: View {
             )
             
             if activePopup == .previewSelected {
+                let canAddMore = selectedImages.count < 6
                 ButtonView(
                     title: AppStrings.RidePopup.addMore,
                     fontSize: 16 ,
-                    background: AppColor.celticBlue,
+                    background: canAddMore ? AppColor.celticBlue : AppColor.stoneGray,
                     foregroundColor: AppColor.white,
                     showShadow: false,
                     borderColor: AppColor.stoneGray.opacity(0.3),
                     onTap: {
-                        openGallery = true
+                        if canAddMore {
+                            openGallery = true
+                        }
                     }
                 )
+                .disabled(!canAddMore)
+                .opacity(canAddMore ? 1.0 : 0.6)
             }
             ButtonView(
                 title: activePopup == .uploadOptions ? "SELECT PHOTOS" : "UPLOAD" ,

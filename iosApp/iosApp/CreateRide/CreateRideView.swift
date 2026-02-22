@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CreateRideView: View {
+    @StateObject var upcomingRideVM = UpcomingRideViewModel()
+    @StateObject var homeVM = HomeViewModel()
     @EnvironmentObject var viewModel: CreateRideViewModel
     var body: some View {
         
@@ -36,7 +38,7 @@ struct CreateRideView: View {
                 case 4:
                     ReviewView()
                 case 5:
-                    ShareView()
+                    ShareView(upcomingViewModel: upcomingRideVM, home: homeVM)
                 default:
                     Text("Coming Soon...")
                         .font(.title)
@@ -47,8 +49,4 @@ struct CreateRideView: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-#Preview {
-    CreateRideView()
 }

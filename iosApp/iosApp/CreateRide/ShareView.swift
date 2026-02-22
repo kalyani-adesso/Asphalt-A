@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ShareView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
-    @EnvironmentObject var UpcomingViewModel: UpcomingRideViewModel
-    @EnvironmentObject var home: HomeViewModel
+    @ObservedObject var upcomingViewModel: UpcomingRideViewModel
+    @ObservedObject var home: HomeViewModel
     @State private var isPresented: Bool = false
     var body: some View {
         VStack(spacing: 20) {
@@ -71,10 +71,10 @@ struct ShareView: View {
             .padding()
         }
         .navigationDestination(isPresented: $isPresented, destination: {
-            UpcomingRideView(showpopup: true, navigationDone: true)
-                .environmentObject(viewModel)
-                .environmentObject(UpcomingViewModel)
-                .environmentObject(home)
+            UpcomingRideView(viewModel: upcomingViewModel, showpopup: true, navigationDone: true)
+//                .environmentObject(viewModel)
+//                .environmentObject(UpcomingViewModel)
+//                .environmentObject(home)
             
         })
     }
@@ -105,8 +105,4 @@ struct ShareIconButton: View {
         }
         
     }
-}
-
-#Preview {
-    ShareView()
 }

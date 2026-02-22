@@ -12,6 +12,12 @@ struct SignInView: View {
     @State private var isPasswordEntering: Bool = false
     @StateObject private var viewModel: LoginViewModel = .init()
     @State var hasLoggedIn: Bool = false
+    
+    // Load "Keep me signed in" preference on view appear
+    init() {
+        // Initialize rememberMe from UserDefaults if it exists
+        _rememberMe = State(initialValue: MBUserDefaults.rememberMeDataStatic)
+    }
     var body: some View {
         ZStack {
             VStack {
@@ -38,9 +44,11 @@ struct SignInView: View {
                 rememberMeToggle()
                 ButtonView(title: AppStrings.SignInLabel.signInTitle.localized, onTap: {
                     viewModel.didTapLogin(email: emailOrPhone, password: password, completion: {
+                        // Only save login state if "Keep me signed in" is checked
+                        MBUserDefaults.rememberMeDataStatic = rememberMe
                         hasLoggedIn = true
-                        MBUserDefaults.rememberMeDataStatic = true
                     }, errorCompletion: {
+                        // Clear login state on error
                         MBUserDefaults.rememberMeDataStatic = false
                     })
                 })
@@ -58,6 +66,13 @@ struct SignInView: View {
                     LoginSucessView()
                 }
             })
+            .onAppear {
+                // Reset rememberMe checkbox state based on current UserDefaults value
+                rememberMe = MBUserDefaults.rememberMeDataStatic
+                // Clear form fields on view appear
+                emailOrPhone = ""
+                password = ""
+            }
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
         }
     }
@@ -112,7 +127,6 @@ extension SignInView {
         HStack {
             Button(action: {
                 rememberMe.toggle()
-                MBUserDefaults.rememberMeDataStatic = rememberMe
             }) {
                 HStack {
                     (rememberMe

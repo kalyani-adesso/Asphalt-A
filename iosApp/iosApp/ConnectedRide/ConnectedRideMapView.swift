@@ -157,6 +157,7 @@ struct ConnectedRideMapView: View {
                                     viewModel.endRide(rideId:rideModel.rideId)
                                     viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
                                     viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
+                                    MBUserDefaults.isRideJoinedID = nil
                                     stopTimer()
                                 }, label: {
                                     Text(AppStrings.ConnectedRide.endRideButton)
@@ -315,8 +316,12 @@ struct ConnectedRideMapView: View {
     func startOngoingRideTimer() {
         // Invalidate any existing timer
         viewModel.ongoingRideTimer?.invalidate()
-        // Schedule the timer to trigger every 2 min minutes (900 seconds)
-        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {  _ in
+        // Schedule the timer to trigger every 10 seconds
+        viewModel.ongoingRideTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) {  _ in
+            if MBUserDefaults.userIdStatic == nil || MBUserDefaults.userIdStatic?.isEmpty == true {
+                self.stopTimer()
+                return
+            }
             Task { @MainActor in
                 await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                 

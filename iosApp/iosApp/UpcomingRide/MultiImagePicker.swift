@@ -12,10 +12,13 @@ import PhotosUI
 
 struct PhotoPicker: UIViewControllerRepresentable{
     @Binding var images: [UIImage]
+    let maxImages: Int = 6
     
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
-        config.selectionLimit = 0
+        // Calculate remaining slots
+        let remainingSlots = max(0, maxImages - images.count)
+        config.selectionLimit = remainingSlots
         config.filter = .images
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -37,10 +40,16 @@ struct PhotoPicker: UIViewControllerRepresentable{
             
             for result in results {
                 if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
-                        if let img = object as? UIImage {
-                            DispatchQueue.main.async {
-                                self.parent.images.append(img)
+                    // Check if we haven't exceeded max images
+                    if self.parent.images.count < self.parent.maxImages {
+                        result.itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
+                            if let img = object as? UIImage {
+                                DispatchQueue.main.async {
+                                    // Double-check before adding
+                                    if self.parent.images.count < self.parent.maxImages {
+                                        self.parent.images.append(img)
+                                    }
+                                }
                             }
                         }
                     }

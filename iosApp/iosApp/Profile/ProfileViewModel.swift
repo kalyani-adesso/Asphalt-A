@@ -85,11 +85,6 @@ class ProfileViewModel: ObservableObject {
     }
     
     func loadData(homeVM: HomeViewModel) {
-        
-        
-        let totalRides = homeVM.stats.first(where: { $0.title == "Total Rides" })?.value ?? "0"
-           let locations = homeVM.stats.first(where: { $0.title == "Locations" })?.value ?? "0"
-
         sections = [
             ProfileSection(
                 section: 0, title: AppStrings.Profile.yourVehicles,
@@ -105,8 +100,8 @@ class ProfileViewModel: ObservableObject {
                 icon: Image(""),
                 
                 items: [
-                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "\(totalRides) Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
-                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "\(locations) Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "0 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "0 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
                 ]
             ),
             ProfileSection(
@@ -260,12 +255,16 @@ extension ProfileViewModel {
         
         let base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
         
-        profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, profileImage:base64Image , completionHandler: { result,error  in
+        profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, profileImage:base64Image , completionHandler: { [weak self] result,error  in
             
             if let error = error {
                 print("Error editing profile: \(error)")
             } else {
                 print("Profile updated successfully.")
+                // Refresh the profile data after successful update
+                Task {
+                    await self?.fetchProfile(userId: userId)
+                }
             }
             
             if let result = result {

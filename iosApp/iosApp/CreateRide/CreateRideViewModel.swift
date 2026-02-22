@@ -249,7 +249,13 @@ extension CreateRideViewModel {
                     rideJoined: isJoined,
                     participants: ride.participants
                 )
+                self.isRideLoading = false
                 break
+            }
+            
+            // If no active ride was found, set loading to false
+            if self.activeRide == nil {
+                self.isRideLoading = false
             }
 
         } catch {

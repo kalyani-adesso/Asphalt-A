@@ -92,6 +92,8 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var lastMessageId: String?
     @Published var chatMessages: [MessageUIModel] = []
     @Published var latestIncomingSenderName: String = ""
+    @Published var activeRide:JoinRideModel? = nil
+    @Published var isRideLoading = false
     var rider: Rider? {
         guard !groupRiders.isEmpty else { return nil }
         guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
