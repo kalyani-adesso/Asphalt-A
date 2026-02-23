@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import Combine
+import CoreLocation
 
 @available(iOS 17.0, *)
 struct ConnectedRideMapView: View {
@@ -27,11 +28,25 @@ struct ConnectedRideMapView: View {
     @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
     @State private var index: Int = 0
+    @State private var showNavigation: Bool = false
     var rideModel: JoinRideModel
     
     var body: some View {
         
         ZStack{
+            if showNavigation {
+                NavigationBottomSheetView(
+                    viewModel: viewModel,
+                    startCoordinate: CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong),
+                    endCoordinate: CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong),
+                    userLocation: locationManager.lastLocation?.coordinate,
+                    onDismiss: { showNavigation = false }
+                )
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .transition(.move(edge: .bottom))
+                .zIndex(2)
+            }
+            
             if showMessagePopup{
                 MessagePopupView(viewModel: viewModel, isPresented: $showMessagePopup, showMessageNotification: $showMessageNotification, riderName: $selectedRiderName)
                     .transition(.scale)
@@ -444,10 +459,12 @@ struct ConnectedRideMapView: View {
     }
     
     func updateCameraFollow() {
-        guard let userLocation = locationManager.lastLocation?.coordinate else { return }
-        withAnimation(.easeInOut(duration: 0.4)) {
-            position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
-        }
+//        guard let userLocation = locationManager.lastLocation?.coordinate else { return }
+//        withAnimation(.easeInOut(duration: 0.4)) {
+//            position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
+//        }
+//        // Show navigation when Near Me is tapped
+        showNavigation = true
     }
 }
 

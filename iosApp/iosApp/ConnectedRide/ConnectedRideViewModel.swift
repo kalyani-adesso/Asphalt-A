@@ -78,6 +78,24 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
+    
+    // Track snapshot update timestamps for each rider
+    @Published var riderLastSnapshotTime: [String: TimeInterval] = [:]
+    
+    // New navigation features
+    @Published var isOffRoute: Bool = false
+    @Published var availableRoutes: [MKRoute] = []
+    @Published var selectedRouteIndex: Int = 0
+    @Published var speedLimit: Int = 50
+    @Published var currentSpeed: Int = 0
+    @Published var laneInfo: String = ""
+    @Published var isHighway: Bool = false
+    @Published var showPOIs: Bool = false
+    
+    @ObservedObject var headingManager = HeadingManager()
+    private var trafficManager: TrafficDataManager
+    @ObservedObject var poiManager = POISearchManager()
+    
     @Published var ongoingRideId = ""
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
@@ -112,9 +130,18 @@ final class ConnectedRideViewModel: ObservableObject {
         self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
         userAPIService = UserAPIServiceImpl(client: KtorClient())
         userRepository = UserRepository(apiService: userAPIService)
+        
+        // Initialize traffic manager with default distance
+        trafficManager = TrafficDataManager(routeDistance: 10000)
+        trafficManager.startTrafficUpdates()
+        
+        // Start heading updates
+        headingManager.startUpdating()
     }
     deinit {
          stopOngoingRideTimer()
+         trafficManager.stopTrafficUpdates()
+         headingManager.stopUpdating()
     }
     
     @Published var selectedType: MapType = .standard
@@ -248,20 +275,26 @@ extension ConnectedRideViewModel {
                             let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
                             
                             for ongoingRide in filteredRides {
-                                _ = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
+                                
+                                // Record snapshot update time for this rider
+                                let currentTime = Date().timeIntervalSince1970
+                                self.riderLastSnapshotTime[ongoingRide.userID] = currentTime
+                                
+                                // Calculate status based on snapshot update frequency
+                                let status = self.calculateRiderStatusFromSnapshot(userId: ongoingRide.userID)
+                                
                                 let rider = Rider(
                                     name: userDetails?.0 ?? "",
                                     speed: Int(ongoingRide.speedInKph),
-                                    status: RiderStatus(rawValue: ongoingRide.status) ?? .stopped,
+                                    status: status,
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: ongoingRide.currentLat,
                                     currentLong: ongoingRide.currentLong,
                                     rideId: ongoingRide.rideID,
                                     receiverId: ongoingRide.userID
-                                    
                                 )
                                 
                                 // Update or add to dictionary (ensures uniqueness by userID)
@@ -432,6 +465,29 @@ extension ConnectedRideViewModel {
         }
         
         // DELAYED (break in update < 2 min OR speed = 0)
+        return .delayed
+    }
+    
+    /// Calculate rider status based on snapshot update frequency
+    /// - Connected: Snapshot received (latest update)
+    /// - Delayed: Snapshot gap of 20-120 seconds (missing some expected updates)
+    /// - Stopped: No snapshot for > 2 minutes
+    func calculateRiderStatusFromSnapshot(userId: String) -> RiderStatus {
+        let currentTime = Date().timeIntervalSince1970
+        let lastSnapshot = riderLastSnapshotTime[userId] ?? currentTime
+        let timeSinceSnapshot = currentTime - lastSnapshot
+        
+        // Connected: Just received update (< 20 seconds, allowing buffer for 10s intervals)
+        if timeSinceSnapshot < 20 {
+            return .connected
+        }
+        
+        // Stopped: No snapshot for > 2 minutes
+        if timeSinceSnapshot > 120 {
+            return .stopped
+        }
+        
+        // Delayed: Gap between 20 seconds and 2 minutes
         return .delayed
     }
 
