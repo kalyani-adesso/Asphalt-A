@@ -22,11 +22,14 @@ struct ConnectedRideMapView: View {
     @State var showMessagePopup:Bool = false
     @State var showMessageNotification: Bool = false
     @State private var position: MapCameraPosition = .automatic
+    @State private var trackingMode: MapUserTrackingMode = .none
     @State private var elapsedSeconds = 0
     @State private var selectedRiderName: String = ""
     @State private var selectedRiderDelayText: String = ""
     @State var timer:Timer?
     @State private var index: Int = 0
+    @State private var showNavigationOptions: Bool = false
+    @State private var showInAppNavigation: Bool = false
     var rideModel: JoinRideModel
     
     var body: some View {
@@ -266,6 +269,10 @@ struct ConnectedRideMapView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 showToast = false
                             }
+                            // Request authorization and start location updates so recenter/follow works
+                            locationManager.requestLocation()
+                            locationManager.manager.startUpdatingLocation()
+
                             if !rideModel.rideJoined {
                                 viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                             } else {
@@ -344,39 +351,40 @@ struct ConnectedRideMapView: View {
     }
     
     @ViewBuilder func mapActionButton() -> some View {
-        Button(action: {
-            showMapViewFullScreen.toggle()
-        }) {
-            AppIcon.ConnectedRide.zoom
-                .resizable()
-                .frame(width: 50, height: 50)
-                .padding([.top, .leading],15)
-        }
-        .buttonStyle(.plain)
-        Spacer()
-        Menu {
-            Picker("", selection: $viewModel.selectedType) {
-                ForEach(MapType.allCases, id: \.self) { type in
-                    Text(type.rawValue)
+        HStack {
+            Button(action: { showMapViewFullScreen.toggle() }) {
+                AppIcon.ConnectedRide.zoom
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .padding([.top, .leading], 15)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+            Menu {
+                Picker("", selection: $viewModel.selectedType) {
+                    ForEach(MapType.allCases, id: \.self) { type in
+                        Text(type.rawValue)
+                    }
                 }
+            } label: {
+                HStack(alignment: .center) {
+                    Text(viewModel.selectedType.rawValue)
+                        .font(KlavikaFont.regular.font(size: 12))
+                        .foregroundColor(AppColor.stoneGray)
+                }
+                .frame(width: 69, height: 24)
+                .background(
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill(AppColor.white)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(AppColor.darkGray, lineWidth: 1)
+                )
             }
-        } label: {
-            HStack(alignment: .center) {
-                Text(viewModel.selectedType.rawValue)
-                    .font(KlavikaFont.regular.font(size: 12))
-                    .foregroundColor(AppColor.stoneGray)
-            }
-            .frame(width: 69, height: 24)
-            .background(
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(AppColor.white)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(AppColor.darkGray, lineWidth: 1)
-            )
+            .padding(.trailing, 16)
         }
-        .padding(.trailing,16)
     }
     
     @ViewBuilder func showToast(title:String) -> some View {
@@ -421,14 +429,32 @@ struct ConnectedRideMapView: View {
     
     @ViewBuilder func floatingButton() -> some View {
         HStack(spacing: 10) {
-            ButtonView(title: "", icon: AppIcon.ConnectedRide.refresh ,onTap: {
-                recenterMap()
-            })
             ButtonView(title: "", icon: AppIcon.ConnectedRide.nearMe,onTap: {
-                updateCameraFollow()
+                showNavigationOptions = true
             })
+            .confirmationDialog("Navigation", isPresented: $showNavigationOptions, titleVisibility: .visible) {
+                Button("In-App Navigation") {
+                    showInAppNavigation = true
+                }
+                Button("Open in Apple Maps") {
+                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
+                    openInAppleMaps(start: startCoord, end: endCoord)
+                }
+                Button("Open in Google Maps") {
+                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
+                    openInGoogleMaps(start: startCoord, end: endCoord)
+                }
+                Button("Cancel", role: .cancel) { }
+            }
+            .sheet(isPresented: $showInAppNavigation) {
+                let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+                let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
+                InAppNavigationView(start: startCoord, end: endCoord)
+            }
         }
-        .frame(width: 198)
+        .frame(width: 60)
         .padding(.trailing)
     }
     
@@ -447,6 +473,28 @@ struct ConnectedRideMapView: View {
         guard let userLocation = locationManager.lastLocation?.coordinate else { return }
         withAnimation(.easeInOut(duration: 0.4)) {
             position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
+        }
+    }
+
+    // MARK: - Navigation option handlers
+    func openInAppleMaps(start: CLLocationCoordinate2D, end: CLLocationCoordinate2D) {
+        let startItem = MKMapItem(placemark: MKPlacemark(coordinate: start))
+        let endItem = MKMapItem(placemark: MKPlacemark(coordinate: end))
+        MKMapItem.openMaps(with: [startItem, endItem], launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving])
+    }
+
+    func openInGoogleMaps(start: CLLocationCoordinate2D, end: CLLocationCoordinate2D) {
+        // Prefer comgooglemaps URL scheme if available, fallback to web directions
+        let urlScheme = "comgooglemaps://"
+        let directions = "?saddr=\(start.latitude),\(start.longitude)&daddr=\(end.latitude),\(end.longitude)&directionsmode=driving"
+        if let schemeURL = URL(string: urlScheme), UIApplication.shared.canOpenURL(schemeURL) {
+            if let url = URL(string: "comgooglemaps://\(directions)") {
+                UIApplication.shared.open(url)
+            }
+        } else {
+            if let webURL = URL(string: "https://www.google.com/maps/dir/\(start.latitude),\(start.longitude)/\(end.latitude),\(end.longitude)/") {
+                UIApplication.shared.open(webURL)
+            }
         }
     }
 }
