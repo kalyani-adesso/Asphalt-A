@@ -72,7 +72,6 @@ fun JoinRideMainListScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     navigateToConnectedRide:(RidesData) -> Unit,
-    ridesData: RidesData,
     navigateToEndRide : () -> Unit)
 {
     var toolbarTitle by remember { mutableStateOf("") }
@@ -87,8 +86,7 @@ fun JoinRideMainListScreen(
             )) {
             JoinRide(viewModel,
                 navigateToConnectedRide = {rides -> navigateToConnectedRide.invoke(rides)},
-                navigateToEndRide = { navigateToEndRide.invoke()},
-                ridesData)
+                navigateToEndRide = { navigateToEndRide.invoke()})
         }
 }
 @Composable
@@ -96,7 +94,6 @@ fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
-    ridesData: RidesData,
 
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -141,9 +138,11 @@ fun JoinRide(
             }
         }
         else {
+            // display riders list
             LazyColumn {
                 items(items = sortedList) { rider ->
-                    RiderCard( navigateToConnectedRide = {ridesD -> navigateToConnectedRide.invoke(ridesD)},
+                    RiderCard( navigateToConnectedRide = {ridesD ->
+                        navigateToConnectedRide.invoke(ridesD)},
                         navigateToEndRide = { navigateToEndRide.invoke() },
                         ridesData = rider, viewModel = viewModel
                     )
@@ -351,43 +350,45 @@ fun RiderCard(
                         )
                     }
                    //  join/ rejoin ride button
-                    if (ridesData.rideStatus == RIDE_JOINED) {
-                        ElevatedButton (
-                            modifier = Modifier
-                                .weight(weight = 1f)
-                                .height(height = Dimensions.size50),
-                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
-                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
-                            onClick = {
-//                                  rejoin api
-//                                viewModel.updateRideStatus(userId = ridersList.createdBy ?: "", rideId = ridersList.ridesID ?: "",
+//                    if (ridesData.rideStatus == RIDE_JOINED) {
+//                        ElevatedButton (
+//                            modifier = Modifier
+//                                .weight(weight = 1f)
+//                                .height(height = Dimensions.size50),
+//                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
+//                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
+//                            onClick = {
+////                                  rejoin api
+//                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
 //                                    status = RIDE_JOINED)
-                                viewModel.joinRide(joinRide = ridesData)
-                                navigateToConnectedRide.invoke(ridesData)
-                            },
-                            contentPadding = PaddingValues(all = Dimensions.size0)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = Dimensions.padding10),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(
-                                        id = R.drawable.moved_location),
-                                    contentDescription = "Riders icon",
-                                    tint = NeutralWhite)
-                                Text(
-                                    stringResource(R.string.rejoinRide).uppercase(),
-                                    color = NeutralWhite,
-                                    style = TypographyBold.titleMedium,
-                                    fontSize = Dimensions.textSize14,
-                                    modifier = Modifier.padding(start = 8.dp)
-                                )
-                            }
-                        }
-                    } else {
+//                                viewModel.joinRide(joinRide = ridesData)
+//                                navigateToConnectedRide.invoke(ridesData)
+//                            },
+//                            contentPadding = PaddingValues(all = Dimensions.size0)
+//                        ) {
+//                            Row(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .padding(start = Dimensions.padding10),
+//                                horizontalArrangement = Arrangement.Center
+//                            ) {
+//                                Icon(
+//                                    painter = painterResource(
+//                                        id = R.drawable.moved_location),
+//                                    contentDescription = "Riders icon",
+//                                    tint = NeutralWhite)
+//                                Text(
+//                                    stringResource(R.string.rejoinRide).uppercase(),
+//                                    color = NeutralWhite,
+//                                    style = TypographyBold.titleMedium,
+//                                    fontSize = Dimensions.textSize14,
+//                                    modifier = Modifier.padding(start = 8.dp)
+//                                )
+//                            }
+//                        }
+//                    }
+
+                  //  else {
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
@@ -425,7 +426,7 @@ fun RiderCard(
                                 )
                             }
                         }
-                    }
+                   // }
                 }
             }
         }

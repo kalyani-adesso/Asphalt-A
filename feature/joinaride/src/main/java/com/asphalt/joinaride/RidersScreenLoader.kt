@@ -43,6 +43,7 @@ fun RidersScreenLoader(
     val logoRes = R.drawable.ic_app_icon
 
     val rideId = rideViewModel.getRideId()
+    Log.d("RidersScreenLoader", "RidersScreenLoader: $rideId")
 
 //    if (rideId != null) {
 //        val details = rideViewModel.joinRide(connectedRideRoot)

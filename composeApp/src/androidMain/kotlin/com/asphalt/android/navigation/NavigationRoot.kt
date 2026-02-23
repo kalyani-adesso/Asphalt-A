@@ -402,7 +402,6 @@ fun NavigationRoot(
                     }
                     entry<AppNavKey.JoinRideNavKey> { key ->
                         JoinRideMainListScreen(
-                            ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
                             navigateToConnectedRide = { item ->
                                 backStack.add(AppNavKey.ConnectedRideNavKey(item))
