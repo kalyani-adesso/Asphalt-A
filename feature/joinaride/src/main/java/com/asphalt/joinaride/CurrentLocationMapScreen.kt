@@ -121,34 +121,34 @@ fun MapWithCurrentLocation(
     }
 
     // start
-    val start = remember(ridesData) {
-        if (ridesData.startLatitude != 0.0 && ridesData.startLongitude != 0.0)
-            LatLng(ridesData.startLatitude, ridesData.startLongitude)
-        else null
-    }
-
-    // end
-    val end = remember(ridesData) {
-        if (ridesData.endLatitude != 0.0 && ridesData.endLongitude != 0.0)
-            LatLng(ridesData.endLatitude, ridesData.endLongitude)
-        else null
-    }
+//    val start = remember(ridesData) {
+//        if (ridesData.startLatitude != 0.0 && ridesData.startLongitude != 0.0)
+//            LatLng(ridesData.startLatitude, ridesData.startLongitude)
+//        else null
+//    }
+//
+//    // end
+//    val end = remember(ridesData) {
+//        if (ridesData.endLatitude != 0.0 && ridesData.endLongitude != 0.0)
+//            LatLng(ridesData.endLatitude, ridesData.endLongitude)
+//        else null
+//    }
 
     // Move camera when map + data ready
-    LaunchedEffect(mapLoaded, start, end, userLocation) {
+    LaunchedEffect(mapLoaded, userLocation) {
         if (!mapLoaded) return@LaunchedEffect
 
         when {
-            start != null && end != null -> {
-                val bounds = LatLngBounds.Builder()
-                    .include(start)
-                    .include(end)
-                    .build()
-
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngBounds(bounds, 150)
-                )
-            }
+//            start != null && end != null -> {
+//                val bounds = LatLngBounds.Builder()
+//                    .include(start)
+//                    .include(end)
+//                    .build()
+//
+//                cameraPositionState.animate(
+//                    CameraUpdateFactory.newLatLngBounds(bounds, 150)
+//                )
+//            }
 
             userLocation != null -> {
                 cameraPositionState.animate(
@@ -189,26 +189,26 @@ fun MapWithCurrentLocation(
                 }
             }
             // Start & End markers
-            start?.let {
-                Marker(
-                    state = MarkerState(it),
-                    title = ridesData.startLocation
-                )
-            }
-            end?.let {
-                Marker(
-                    state = MarkerState(it),
-                    title = ridesData.endLocation
-                )
-            }
-            // Polyline
-            if (start != null && end != null) {
-                Polyline(
-                    points = listOf(start, end),
-                    color = Color.Blue,
-                    width = 8f
-                )
-            }
+//            start?.let {
+//                Marker(
+//                    state = MarkerState(it),
+//                    title = ridesData.startLocation
+//                )
+//            }
+//            end?.let {
+//                Marker(
+//                    state = MarkerState(it),
+//                    title = ridesData.endLocation
+//                )
+//            }
+//            // Polyline
+//            if (start != null && end != null) {
+//                Polyline(
+//                    points = listOf(start, end),
+//                    color = Color.Blue,
+//                    width = 8f
+//                )
+//            }
         }
 
         if (isLoading) {

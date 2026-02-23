@@ -220,7 +220,7 @@ class JoinRideViewModel(
                     _joinedUsers.value = emptyList()
                     return
                 }
-                startedAt = snapshot.child("dateTime").getValue(Long::class.java)
+                startedAt = snapshot.child("dateTime").getValue(Double::class.java)?.toLong()
 
                 val users = snapshot.children
                     .filter { it.key != "dateTime" }
