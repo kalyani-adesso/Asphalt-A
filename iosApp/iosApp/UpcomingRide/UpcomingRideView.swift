@@ -11,12 +11,13 @@ struct UpcomingRideView: View {
     @ObservedObject var viewModel : UpcomingRideViewModel
     var currentSelected: RideAction { viewModel.selectedTab }
     var startingTab: RideAction = .upcoming
+    @State var showpopup: Bool = false
+    @State var navigationDone: Bool
+    @Binding var rideIdToOpen: String?
     @State private var showHomeView:Bool = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
-    @State var showpopup: Bool = false
-    @State var navigationDone: Bool
     var hasPendingInvites: Bool {
         viewModel.rides.contains { $0.rideAction == .invities }
     }
@@ -28,6 +29,8 @@ struct UpcomingRideView: View {
     @State private var showSlideBar = false
     @State private var showPhotosViewer = false
     @State private var selectedRideForPhotos: RideModel?
+    @State private var showDeepLinkRideDetail = false
+    @State private var deepLinkRide: RideModel?
     
     var body: some View {
         ZStack{
@@ -108,6 +111,28 @@ struct UpcomingRideView: View {
                             showpopup = false
                         }
                     }
+                }
+            }
+            .task {
+                if let id = rideIdToOpen, !id.isEmpty {
+                    await viewModel.getSingleRide(rideId: id)
+                    viewModel.setRideFromDeepLinkIfPossible()
+                    rideIdToOpen = nil
+                }
+            }
+            .onChange(of: viewModel.rideFromDeepLink) { newValue in
+                if let r = newValue {
+                    deepLinkRide = r
+                    showDeepLinkRideDetail = true
+                    viewModel.rideFromDeepLink = nil
+                }
+            }
+            .navigationDestination(isPresented: $showDeepLinkRideDetail) {
+                if let r = deepLinkRide {
+                    RideDetailsView(viewModel: viewModel, ride: Binding(
+                        get: { r },
+                        set: { deepLinkRide = $0 }
+                    ))
                 }
             }
             .navigationBarBackButtonHidden(true)

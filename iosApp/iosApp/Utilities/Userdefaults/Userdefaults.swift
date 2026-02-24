@@ -80,6 +80,17 @@ struct MBUserDefaults {
         }
     }
     
+    /// Ride ID from deep link; when set, app should open ride detail (then clear after handling).
+    static var deepLinkRideIdStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue)
+        }
+        set {
+            if let v = newValue { UserDefaults.standard.set(v, forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue) }
+            else { UserDefaults.standard.removeObject(forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue) }
+        }
+    }
+    
     static var removeAllUserDefaults: Void {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
             print("Warning: Bundle identifier is nil, cannot remove UserDefaults")

@@ -30,7 +30,6 @@ struct LoginSucessView: View {
                 MBUserDefaults.hasShownLoginSuccessStatic = true
                 goToHome = true
             }) {
-                
                 Text(AppStrings.SignInSucessView.exploreButton.rawValue)
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
@@ -42,6 +41,7 @@ struct LoginSucessView: View {
                     .foregroundStyle(AppColor.white)
                     .font(KlavikaFont.bold.font(size: 18))
             }
+            .padding(.horizontal, 24)
             .padding(.bottom, 21)
         }
         .padding(.horizontal, 24)

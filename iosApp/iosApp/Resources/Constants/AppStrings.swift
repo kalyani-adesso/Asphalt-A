@@ -134,6 +134,7 @@ public struct AppStrings{
         case rideId = "com.adesso.rider.club.rideId"
         case rideJoinedId = "com.adesso.rider.club.rideJoinedId"
         case emergencyContact = "com.adesso.rider.club.emergencyContact"
+        case deepLinkRideId = "com.adesso.rider.club.deepLinkRideId"
     }
     
     enum ForgotPassword: String {
