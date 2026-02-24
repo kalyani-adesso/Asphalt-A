@@ -117,7 +117,8 @@ object RidesFilter {
                 createdBy = ride.createdBy,
                 startDate = ride.startDate,
                 ratings = ride.ratings,
-                starsCount = ride.ratings.find { it.userId == userId }?.stars ?: 0
+                starsCount = ride.ratings.find { it.userId == userId }?.stars ?: 0,
+                images_server = ArrayList(ride.images)
             )
         }
     }

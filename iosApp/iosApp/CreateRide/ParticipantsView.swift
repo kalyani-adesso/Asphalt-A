@@ -12,67 +12,74 @@ struct ParticipantsView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
     
     var body: some View {
-        VStack(spacing: 20) {
-            stepIndicator
-            VStack(alignment: .leading, spacing: 20) {
-                
-                HStack {
-                    Text(AppStrings.CreateRide.inviteContacts)
-                        .font(KlavikaFont.medium.font(size: 16))
-                    Spacer()
-                    Text("\(viewModel.selectedParticipants.count) selected")
-                        .font(KlavikaFont.regular.font(size: 14))
-                        .foregroundColor(.gray)
-                }
-                FormFieldView(
-                    label: " ",
-                    icon:  AppIcon.CreateRide.searchLens,
-                    placeholder:AppStrings.CreateRide.search,
-                    iconColor: AppColor.celticBlue,
-                    value: $searchText,
-                    isValidEmail: .constant(false),
-                    backgroundColor: AppColor.white)
+        ZStack {
+            VStack {
+                VStack(spacing: 20) {
+                    stepIndicator
+                    VStack(alignment: .leading, spacing: 20) {
+                        
+                        HStack {
+                            Text(AppStrings.CreateRide.inviteContacts)
+                                .font(KlavikaFont.medium.font(size: 16))
+                            Spacer()
+                            Text("\(viewModel.selectedParticipants.count) selected")
+                                .font(KlavikaFont.regular.font(size: 14))
+                                .foregroundColor(.gray)
+                        }
+                        FormFieldView(
+                            label: " ",
+                            icon:  AppIcon.CreateRide.searchLens,
+                            placeholder:AppStrings.CreateRide.search,
+                            iconColor: AppColor.celticBlue,
+                            value: $searchText,
+                            isValidEmail: .constant(false),
+                            backgroundColor: AppColor.white)
 
-                ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(filteredParticipants) { participant in
-                            ParticipantsRow(
-                                participant: participant,
-                                isSelected: Binding(
-                                    get: { viewModel.isSelected(participant.id) },
-                                    set: { _ in viewModel.toggle(participant.id)
-                                    }
-                                )
-                            )
+                        ScrollView {
+                            VStack(spacing: 10) {
+                                ForEach(filteredParticipants) { participant in
+                                    ParticipantsRow(
+                                        participant: participant,
+                                        isSelected: Binding(
+                                            get: { viewModel.isSelected(participant.id) },
+                                            set: { _ in viewModel.toggle(participant.id)
+                                            }
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
+                    .frame(width: 343, height: 448)
+                    .padding()
+                    .background(AppColor.backgroundLight)
+                    .cornerRadius(10)
+                }
+                Spacer()
+                HStack(spacing: 15) {
+                    ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
+                                background: AppColor.white,
+                                foregroundColor: AppColor.celticBlue,
+                                showShadow: false ,
+                                borderColor: AppColor.celticBlue) {
+                        viewModel.previousStep()
+                    }
+                    
+                    ButtonView( title: AppStrings.CreateRideButton.next.rawValue,
+                                showShadow: false , onTap: {
+                        viewModel.nextStep()
+                    }
+                    )
+                    
+                }
+                .padding()
+                .onAppear {
+                    viewModel.getAllUsers()
                 }
             }
-            .frame(width: 343, height: 448)
-            .padding()
-            .background(AppColor.backgroundLight)
-            .cornerRadius(10)
-        }
-        Spacer()
-        HStack(spacing: 15) {
-            ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
-                        background: AppColor.white,
-                        foregroundColor: AppColor.celticBlue,
-                        showShadow: false ,
-                        borderColor: AppColor.celticBlue) {
-                viewModel.previousStep()
+            if viewModel.isRideLoading {
+                ProgressViewReusable(title: "Loading...")
             }
-            
-            ButtonView( title: AppStrings.CreateRideButton.next.rawValue,
-                        showShadow: false , onTap: {
-                viewModel.nextStep()
-            }
-            )
-            
-        }
-        .padding()
-        .onAppear {
-            viewModel.getAllUsers()
         }
     }
     var filteredParticipants: [Participant] {

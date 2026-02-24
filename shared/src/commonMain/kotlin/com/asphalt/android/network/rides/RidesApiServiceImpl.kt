@@ -1,10 +1,12 @@
 package com.asphalt.android.network.rides
 
 import com.asphalt.android.constants.APIConstants.END_RIDE_SUMMARY_URL
+import com.asphalt.android.constants.APIConstants.IMAGES
 import com.asphalt.android.constants.APIConstants.MESSAGES
 import com.asphalt.android.constants.APIConstants.ONGOING_RIDE_URL
 import com.asphalt.android.constants.APIConstants.PARTICIPANTS_URL
 import com.asphalt.android.constants.APIConstants.RATINGS
+import com.asphalt.android.constants.APIConstants.RIDES_IMAGES_URL
 import com.asphalt.android.constants.APIConstants.RIDES_URL
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.GenericResponse
@@ -15,9 +17,11 @@ import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
 import com.asphalt.android.model.rides.Ratings
+import com.asphalt.android.model.rides.UrlNode
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.network.BaseAPIService
 import com.asphalt.android.network.KtorClient
+import com.asphalt.android.utils.Utils
 import io.ktor.client.call.body
 
 class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApIService {
@@ -142,4 +146,28 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             delete("$RIDES_URL/$rideId").body()
         }
     }
+
+    override suspend fun uploadImages(
+        ridesId: String,
+        images: List<String>
+    ): APIResult<Unit> {
+        val imagesMap = images.associate { image ->
+            val key = Utils.generateFirebaseKey() // generate dynamic key manually
+            key to UrlNode(image)
+        }
+        return safeApiCall {
+            patch(imagesMap, "$RIDES_URL/$ridesId$IMAGES").body()
+        }
+    }
+
+    override suspend fun deleteImage(
+        ridesID: String,
+        imageID: String
+    ): APIResult<Unit> {
+        return safeApiCall {
+            delete("$RIDES_URL/$ridesID$IMAGES/$imageID").body()
+        }
+    }
+
+
 }

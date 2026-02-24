@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.network.KtorClient
@@ -73,9 +74,11 @@ import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.util.GetGradient
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.commonui.utils.ImageUtils
 import com.asphalt.dashboard.composables.screens.gallery.GalleryDialog
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.constants.RideStatConstants.UPCOMING
+import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.viewmodels.RidesScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -421,22 +424,42 @@ fun UpcomingRides(
 fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDataModel) {
     var addPhotos by remember { mutableStateOf(false) }
     var showGalleryDialog by remember { mutableStateOf(false) }
-    var showViewPhotos by remember { mutableStateOf(history.images.size > 0) }
+    var showViewPhotos by remember { mutableStateOf(history.images_server.size > 0) }
+    val context = LocalContext.current
     if (addPhotos) {
-        GalleryDialog(isShowUpload = true, onDismiss = {
+        GalleryDialog(isShowUpload = true, onDismiss = { isRefresh, imgcount ->
             addPhotos = false
         }, onUpload = { images ->
             showViewPhotos = true
             addPhotos = false
-            ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+            val imageList: List<String> = images.map { image ->
+                ImageUtils.uriToBase64Blob(context, image.uri) ?: ""
+            }
+            ridesScreenViewModel.uploadImages(history.ridesId ?: "", imageList)
+            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+
+        }, onDelete = { imageId ->
 
         })
     }
     if (showGalleryDialog) {
-        GalleryDialog(images = history.images, isShowUpload = false, onDismiss = {
+        var images: ArrayList<GalleryModel> = arrayListOf()
+        images = ArrayList(history.images_server.map {
+            GalleryModel(
+                "".toUri(),
+                isFromLocal = false,
+                it.url, it.imageID
+            )
+        })
+        GalleryDialog(images = images, isShowUpload = false, onDismiss = { isRefresh, imgCount ->
             showGalleryDialog = false
+            showViewPhotos = imgCount > 0
+            if (isRefresh) {
+                ridesScreenViewModel.getRides()
+            }
         }, onUpload = { images ->
-            //ridesScreenViewModel.updateImages(images, history.ridesId ?: "")
+        }, onDelete = { imageId ->
+            ridesScreenViewModel.deleteImage(history.ridesId ?: "", imageId)
         })
     }
     Column(

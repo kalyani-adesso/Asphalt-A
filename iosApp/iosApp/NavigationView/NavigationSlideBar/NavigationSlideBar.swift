@@ -35,7 +35,9 @@ struct MenuItemRow: View {
     let viewModel:NavigationSliderViewModel
     let item: MenuItemModel
     @State var itemIsSelected: Bool = false
-    @AppStorage("rememberMeDataStatic") private var isLoggedIn: Bool = false
+    // Use the same key as MBUserDefaults / iOSApp for login state
+    @AppStorage(AppStrings.userdefaultKeys.rememberMeData.rawValue)
+    private var isLoggedIn: Bool = false
     var body: some View {
         HStack(spacing: 8) {
             item.icon

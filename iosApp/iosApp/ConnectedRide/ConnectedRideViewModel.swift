@@ -10,6 +10,7 @@ import SwiftUI
 import MapKit
 import shared
 import Combine
+import UIKit
 
 struct RideCompleteModel: Identifiable {
     let id = UUID()
@@ -35,12 +36,12 @@ enum TrackingStatus:String {
 struct Rider: Identifiable {
     let id = UUID()
     let name: String
-    let speed: Int // Kph
-    let status: RiderStatus
-    let timeSinceUpdate: String
-    let contactNumber: String
-    let currentLat:Double
-    let currentLong:Double
+    var speed: Int // Kph
+    var status: RiderStatus
+    var timeSinceUpdate: String
+    var contactNumber: String
+    var currentLat:Double
+    var currentLong:Double
     let rideId:String
     let receiverId:String
 }
@@ -92,6 +93,8 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var lastMessageId: String?
     @Published var chatMessages: [MessageUIModel] = []
     @Published var latestIncomingSenderName: String = ""
+    @Published var activeRide:JoinRideModel? = nil
+    @Published var isRideLoading = false
     var rider: Rider? {
         guard !groupRiders.isEmpty else { return nil }
         guard messageIndex >= 0 && messageIndex < groupRiders.count else { return nil }
@@ -103,6 +106,13 @@ final class ConnectedRideViewModel: ObservableObject {
     var lastSpeed: Double = 0.0
     var lastUpdateTime: TimeInterval = Date().timeIntervalSince1970
     var lastMovementTime: TimeInterval = Date().timeIntervalSince1970
+
+    // used when we receive the `getOnGoingRides` stream; the backend sends a
+    // snapshot roughly every 10 s. the timestamp helps drive rideStatus.
+    var lastMessageReceivedTime: TimeInterval = Date().timeIntervalSince1970
+
+    // remembers the last coordinate for each user (keyed by userID)
+    var lastLocations: [String: CLLocationCoordinate2D] = [:]
     
     init () {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
@@ -152,16 +162,44 @@ final class ConnectedRideViewModel: ObservableObject {
         //            print("Tracking toggled. New speed: \(newSpeed) Kph")
     }
     
-    /// Sends an emergency SOS signal.
+    /// Sends an emergency SOS signal by dialing the ride creator's contact number.
     func sendEmergencySOS() {
-        // Logic for sending location/alert
-        print("!!! EMERGENCY SOS SENT !!!")
+        guard let number = activeRide?.contactNumber, !number.isEmpty else {
+            print("sendEmergencySOS: organizer contact not available")
+            return
+        }
+        let cleaned = number.replacingOccurrences(of: " ", with: "")
+        if let url = URL(string: "tel://\(cleaned)") {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("sendEmergencySOS: invalid phone number")
+        }
     }
     
-    /// Requests to share the user's live location with external contacts.
+    /// Requests to share the user's live location with external contacts (WhatsApp).
+    ///
+    /// Constructs a link using the latest latitude/longitude (updated via
+    /// `onLocationUpdate` or received ride snapshots) and opens WhatsApp's
+    /// send API.  If coordinates are unavailable the method does nothing.
     func shareLocation() {
-        // Logic for initiating location sharing
-        print("Live location sharing initiated.")
+        guard let lat = lastLat, let long = lastLong else {
+            print("shareLocation: no coordinates available")
+            return
+        }
+
+        // Apple's maps URL with latitude and longitude
+        let mapsLink = "https://maps.apple.com/?ll=\(lat),\(long)"
+        let text = "I'm currently here: \(mapsLink)"
+        let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "https://api.whatsapp.com/send?text=\(encoded)"
+
+        if let url = URL(string: urlString) {
+            DispatchQueue.main.async {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        } else {
+            print("shareLocation: failed to create URL")
+        }
     }
     
     /// Finds a specific rider by name (example of a helper method).
@@ -182,7 +220,7 @@ extension ConnectedRideViewModel {
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed), status: getRideStatus().rawValue,
+            speedInKph: KotlinDouble(value: speed), status: status.rawValue,
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: false)
         )
@@ -190,8 +228,10 @@ extension ConnectedRideViewModel {
         rideRepository.joinRide(joinRide: connectedRideRoot) { result, error in
             if let result = result as? APIResultSuccess<ConnectedRideDTO> {
                 let ride = result.data
-                MBUserDefaults.isRideJoinedID = ride?.rideJoinedID ?? ""
-                self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
+                DispatchQueue.main.async {
+                    MBUserDefaults.isRideJoinedID = ride?.rideJoinedID ?? ""
+                    self.ongoingRideId = MBUserDefaults.isRideJoinedID ?? ""
+                }
             } else if let error = error {
                 print("Error joining ride:", error.localizedDescription)
             } else {
@@ -208,7 +248,7 @@ extension ConnectedRideViewModel {
             userID: userId,
             currentLat: KotlinDouble(value: currentLat),
             currentLong: KotlinDouble(value: currentLong),
-            speedInKph: KotlinDouble(value: speed), status: getRideStatus().rawValue ,
+            speedInKph: KotlinDouble(value: speed), status: status.rawValue ,
             dateTime: KotlinLong(value: dateTimeMillis),
             isRejoined: KotlinBoolean(value: true)
         )
@@ -243,26 +283,61 @@ extension ConnectedRideViewModel {
                         
                         Task {
                             var ridersDict: [String: Rider] = [:]  // Dictionary to track unique riders by userID
-                            let filteredRides = ongoingRides.filter { $0.userID != MBUserDefaults.userIdStatic }
-                            
-                            for ongoingRide in filteredRides {
+                            let now = Date().timeIntervalSince1970
+
+                            // whenever we receive the stream, treat it as both a status update
+                            // and a "message" arriving from the backend
+                            self.lastMessageReceivedTime = now
+
+                            for ongoingRide in ongoingRides {
+                                // process our own snapshot for status calculations and
+                                // to update activeRider
+                                if ongoingRide.userID == MBUserDefaults.userIdStatic {
+                                    let lat = ongoingRide.currentLat
+                                    let long = ongoingRide.currentLong
+
+                                    if let prev = self.lastLocations[ongoingRide.userID],
+                                       prev.latitude != lat || prev.longitude != long {
+                                        self.lastMovementTime = now
+                                    }
+                                    self.lastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
+
+                                    if !self.activeRider.isEmpty {
+                                        var me = self.activeRider[0]
+                                        me.currentLat = lat
+                                        me.currentLong = long
+                                        me.speed = Int(ongoingRide.speedInKph)
+                                        self.activeRider[0] = me
+                                    }
+
+                                    continue // we don't display current user in group list
+                                }
+
+                                // build rider model for other participants
                                 _ = self.getRideStatus()
                                 let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
                                 let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
+
+                                let lat = ongoingRide.currentLat
+                                let long = ongoingRide.currentLong
+                                if let prev = self.lastLocations[ongoingRide.userID],
+                                   prev.latitude != lat || prev.longitude != long {
+                                    // you could react to their movement here if needed
+                                }
+                                self.lastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
+
                                 let rider = Rider(
                                     name: userDetails?.0 ?? "",
                                     speed: Int(ongoingRide.speedInKph),
                                     status: RiderStatus(rawValue: ongoingRide.status) ?? .stopped,
                                     timeSinceUpdate: timeSinceUpdate,
                                     contactNumber: userDetails?.1 ?? "",
-                                    currentLat: ongoingRide.currentLat,
-                                    currentLong: ongoingRide.currentLong,
+                                    currentLat: lat,
+                                    currentLong: long,
                                     rideId: ongoingRide.rideID,
                                     receiverId: ongoingRide.userID
-                                    
                                 )
-                                
-                                // Update or add to dictionary (ensures uniqueness by userID)
+
                                 ridersDict[ongoingRide.userID] = rider
                             }
                             
@@ -417,19 +492,20 @@ extension ConnectedRideViewModel {
     
     func getRideStatus() -> RiderStatus {
         let now = Date().timeIntervalSince1970
-        let timeSinceUpdate = now - lastUpdateTime
+        let timeSinceMsg = now - lastMessageReceivedTime
         let timeSinceMovement = now - lastMovementTime
-        
-        if timeSinceUpdate > 120 && timeSinceMovement > 120 && lastSpeed == 0 {
+
+        // stopped if no server update for over 2 minutes or no movement for 2 minutes
+        if timeSinceMsg > 120 || timeSinceMovement > 120 {
             return .stopped
         }
         
-        // CONNECTED (movement + continuous updates)
-        if timeSinceUpdate < 120 && lastSpeed > 0 {
+        // if we're within expected heartbeat interval and recently moved, connected
+        if timeSinceMsg <= 10 && timeSinceMovement <= 10 {
             return .connected
         }
         
-        // DELAYED (break in update < 2 min OR speed = 0)
+        // anything else in the two‑minute window is delayed
         return .delayed
     }
 

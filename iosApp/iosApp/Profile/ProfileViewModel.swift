@@ -58,7 +58,10 @@ class ProfileViewModel: ObservableObject {
     @Published var email = "--"
     @Published var role = ""
     @Published var phoneNumber = "--"
-    @Published var profileImage = AppImage.Welcome.bg
+    @Published var emergencyNumber = "--"
+    @Published var drivingLicenseNumber: String = "--"
+    @Published var isMechanic: Bool = false
+    @Published var profileImage = AppImage.Profile.profile
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
     let vehicleArray: [AppStrings.VehicleType] = AppStrings.VehicleType.allCases
@@ -82,11 +85,6 @@ class ProfileViewModel: ObservableObject {
     }
     
     func loadData(homeVM: HomeViewModel) {
-        
-        
-        let totalRides = homeVM.stats.first(where: { $0.title == "Total Rides" })?.value ?? "0"
-           let locations = homeVM.stats.first(where: { $0.title == "Locations" })?.value ?? "0"
-
         sections = [
             ProfileSection(
                 section: 0, title: AppStrings.Profile.yourVehicles,
@@ -102,8 +100,8 @@ class ProfileViewModel: ObservableObject {
                 icon: Image(""),
                 
                 items: [
-                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "\(totalRides) Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
-                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "\(locations) Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.path, iconColor: AppColor.skyBlue, title: "0 Rides", subtitle: AppStrings.Profile.totalRides, destination: AnyView(HomeView())),
+                    ProfileItemModel(icon: AppIcon.Profile.pin, iconColor: AppColor.yellow, title: "0 Cities", subtitle: AppStrings.Profile.placesExplored, destination: AnyView(HomeView())),
                 ]
             ),
             ProfileSection(
@@ -117,8 +115,8 @@ class ProfileViewModel: ObservableObject {
         ]
     }
     
-    func validateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String, isMachanic:Bool ) -> Bool {
-        return fullName.isEmpty && email.isEmpty && phoneNumber.isEmpty && emargencyContact.isEmpty && DL.isEmpty && !isMachanic
+    func validateProfile(fullName:String, email:String,phoneNumber:String,emargencyContact:String, DL:String) -> Bool {
+        return fullName.isEmpty && email.isEmpty && phoneNumber.isEmpty && emargencyContact.isEmpty && DL.isEmpty
     }
     
     func validateMake(make:String,moodel:String) -> Bool {
@@ -138,6 +136,20 @@ class ProfileViewModel: ObservableObject {
     }
 }
 
+//MARK: - Base64 -
+extension ProfileViewModel {
+    func encodeImageToBase64(image: UIImage) -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.1) else { return nil}
+        let data = NSData(data: imageData)
+        return data.base64EncodedString()
+    }
+    
+    func decodeBase64ToImage(base64: String) -> UIImage? {
+        guard let data = Data(base64Encoded: base64) else { return nil }
+        return UIImage(data: data)
+    }
+}
+
 // MARK: - Firebase API -
 
 extension ProfileViewModel {
@@ -153,12 +165,16 @@ extension ProfileViewModel {
                             self.email = domain.email
                             self.phoneNumber = domain.phoneNumber
                             self.role = domain.isMechanic ? "Mechanic" : ""
-//                           ratingpicker
+                            self.isMechanic = domain.isMechanic
+                            if let domainImage = domain.profilePicUrl as? String,
+                             let base64Image = self.decodeBase64ToImage(base64: domainImage) {
+                              self.profileImage = Image(uiImage: base64Image)
+                                self.emergencyNumber = domain.emergencyContact
+                                self.drivingLicenseNumber = domain.drivingLicense
+                          }
                             self.isLoading = false
                             continuation.resume()
                         }
-                       
-                     
                     } else if let error = error {
                         Task { @MainActor in
                             continuation.resume(throwing: error)
@@ -233,15 +249,22 @@ extension ProfileViewModel {
         phoneNumber: String,
         emergencyContact: String,
         drivingLicense: String,
-        isMachanic: Bool
+        isMachanic: Bool,
+        profileUIImage: UIImage
     ) {
         
-        profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, completionHandler: { result,error  in
+        let base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
+        
+        profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, profileImage:base64Image , completionHandler: { [weak self] result,error  in
             
             if let error = error {
                 print("Error editing profile: \(error)")
             } else {
                 print("Profile updated successfully.")
+                // Refresh the profile data after successful update
+                Task {
+                    await self?.fetchProfile(userId: userId)
+                }
             }
             
             if let result = result {
@@ -261,3 +284,4 @@ extension ProfileViewModel {
         }
     }
 }
+

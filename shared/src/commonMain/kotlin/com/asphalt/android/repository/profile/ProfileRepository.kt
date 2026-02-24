@@ -44,7 +44,7 @@ class ProfileRepository(private val apiService: ProfileAPIService) {
         contactNumber: String,
         emergencyContact: String,
         drivingLicense: String,
-        isMechanic: Boolean
+        isMechanic: Boolean,profileImage: String
     ): APIResult<Unit> {
         val profileDto = EditProfileRequestDTO(
             userName = userName,
@@ -52,7 +52,7 @@ class ProfileRepository(private val apiService: ProfileAPIService) {
             phoneNumber = contactNumber,
             emergencyContact = emergencyContact,
             drivingLicense = drivingLicense,
-            isMechanic = isMechanic
+            isMechanic = isMechanic,profileImage
         )
         return apiService.editProfile(userId, profileDto).mapApiResult {
         }

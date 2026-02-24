@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import shared
+import FirebaseAuth
 
 struct MenuItemModel: Identifiable, Hashable {
     let id = UUID()
@@ -30,10 +31,20 @@ final class NavigationSliderViewModel: ObservableObject {
    @Published var sections: [MenuItemModel] = []
    private var createRideVM = CreateRideViewModel()
     init()  {
+        // Load data immediately to avoid empty list delay
+        loadData()
+        
+        // Then fetch active ride asynchronously to update destinations
         Task {
             await createRideVM.getActiveJoinedRide()
             await MainActor.run {
-                loadData()
+                // Update connected ride destination with fresh data
+                self.sections[0] = MenuItemModel(
+                    icon: AppIcon.NavigationSlider.connectedRide,
+                    iconColor: AppColor.black,
+                    title: AppStrings.NavigationSlider.connectedRide,
+                    destination: self.connectedRideDestination
+                )
             }
         }
     }
@@ -68,11 +79,24 @@ final class NavigationSliderViewModel: ObservableObject {
     
     func logout(completeion: @escaping () -> Void) {
         AuthenticatorImpl().logout(completionHandler: { sucess, error in
-            if let error = error {
-                print("Error: \(error)")
-            } else {
-                completeion()
+            // Always clear Firebase Auth session and local data, even if there's an error
+            do {
+                try Auth.auth().signOut()
+            } catch {
+                print("Firebase Auth sign out error: \(error)")
             }
+            
+            // Clear local session so user is taken back to SignIn
+            UserDefaults.standard.removeObject(forKey: AppStrings.userdefaultKeys.rememberMeData.rawValue)
+            MBUserDefaults.userIdStatic = nil
+            MBUserDefaults.userNameStatic = nil
+            // Keep hasShownLoginSuccessStatic so that login success is only shown on fresh install
+            MBUserDefaults.rideIdStatic = nil
+            if let error = error {
+                print("Logout error: \(error)")
+            }
+            
+            completeion()
         })
     }
 }

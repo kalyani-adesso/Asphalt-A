@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
@@ -46,6 +47,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.CustomSwitch
 import com.asphalt.commonui.utils.ComposeUtils.HeaderWithInputField
+import com.asphalt.commonui.utils.ImageUtils
 import com.asphalt.profile.viewmodels.EditProfileVM
 import com.asphalt.profile.viewmodels.ProfileSectionVM
 import kotlinx.coroutines.launch
@@ -54,11 +56,12 @@ import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun EditProfile(
-    onSaveChanges: (String, String, String, String, String, Boolean) -> Unit,
+    onSaveChanges: (String, String, String, String, String, Boolean, String) -> Unit,
     onDismiss: () -> Unit,
     editProfileVM: EditProfileVM = koinViewModel(),
     profileSectionVM: ProfileSectionVM = koinActivityViewModel()
 ) {
+    val context = LocalContext.current
     Dialog(
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -84,8 +87,9 @@ fun EditProfile(
         }
         var launchPicker: (() -> Unit)? by remember { mutableStateOf(null) }
         CombinedCameraGalleryLauncher(onMediaPicked = { url ->
+
             url?.let {
-                imageUrl = it.toString()
+                imageUrl = ImageUtils.uriToBase64Blob(context, it)
             }
         }, trigger = { launch ->
             launchPicker = launch
@@ -279,7 +283,8 @@ fun EditProfile(
                                             phoneNumber.value,
                                             license.value,
                                             emergencyNo.value,
-                                            mechanic.value
+                                            mechanic.value,
+                                            imageUrl.orEmpty()
                                         )
                                         onDismiss.invoke()
                                     }

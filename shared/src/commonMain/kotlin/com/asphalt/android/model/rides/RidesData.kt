@@ -32,4 +32,5 @@ class RidesData(
     var assemblyLat: Double = 0.0,
     var assemblyLon: Double = 0.0,
     var ratings: List<RatingsData> = emptyList(),
+    var images: List<ImageData> = emptyList(),
 )

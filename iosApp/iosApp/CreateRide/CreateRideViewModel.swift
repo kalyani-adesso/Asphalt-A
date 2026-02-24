@@ -159,6 +159,7 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
 //MARK: - Create Ride API
 extension CreateRideViewModel {
     func getAllUsers() {
+        isRideLoading = true
         userRepository.getAllUsers { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
@@ -180,12 +181,15 @@ extension CreateRideViewModel {
                 
                 DispatchQueue.main.async {
                     self.participants = filteredParticpants
+                    self.isRideLoading = false
                 }
                 
             } else if let error = error {
                 print("Error fetching users: \(error)")
+                self.isRideLoading = false
             } else {
                 print("Unexpected data format")
+                self.isRideLoading = false
             }
         }
     }
@@ -249,7 +253,13 @@ extension CreateRideViewModel {
                     rideJoined: isJoined,
                     participants: ride.participants
                 )
+                self.isRideLoading = false
                 break
+            }
+            
+            // If no active ride was found, set loading to false
+            if self.activeRide == nil {
+                self.isRideLoading = false
             }
 
         } catch {
@@ -322,7 +332,7 @@ extension CreateRideViewModel {
             endDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, ratings: ratings, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong), hasAssemblyPoint: ride.hasAssemblyPoint ?? false, assemblyPoint: ride.assemblyPoint, assemblyLat:  ride.assemblyLat ?? 0.0, assemblyLon: ride.assemblyLon ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, ratings: ratings, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong), hasAssemblyPoint: ride.hasAssemblyPoint ?? false, assemblyPoint: ride.assemblyPoint, assemblyLat:  ride.assemblyLat ?? 0.0, assemblyLon: ride.assemblyLon ?? 0.0, images: nil)
         
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,

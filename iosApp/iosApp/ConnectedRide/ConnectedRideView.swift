@@ -13,10 +13,12 @@ struct ConnectedRideView: View {
     let subTitle:String
     let model:JoinRideModel
     let rideCompleteModel:[RideCompleteModel]
+    @StateObject var upcomingViewModel = UpcomingRideViewModel()
+    @StateObject var homeViewModel = HomeViewModel()
     @Environment(\.dismiss) var dismiss
     @State var showView = false
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack(spacing: 10) {
                 AppIcon.ConnectedRide.checkmark
                     .padding(.leading,20)
@@ -36,10 +38,14 @@ struct ConnectedRideView: View {
                     .stroke(AppColor.aeroGreen, lineWidth: 2)
             )
             .padding([.leading, .trailing,.top],16)
-            .padding(.bottom,183)
+            .padding(.bottom,16)
+            
+            Spacer()
+            
             DisplayView
                 .padding(.bottom,32)
             LoadingView()
+            
             Spacer()
         }
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
@@ -47,7 +53,8 @@ struct ConnectedRideView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showView, destination: {
             if title == AppStrings.ConnectedRide.rideMessage {
-                ConnectedRideCompleteView(viewModel:model, rideCompleteModel: rideCompleteModel)
+                ConnectedRideCompleteView(viewModel: model, homeViewModel: homeViewModel, upcomingRideViewModel: upcomingViewModel, rideCompleteModel: rideCompleteModel)
+                
             } else {
                 if #available(iOS 17.0, *) {
                     ConnectedRideMapView(rideModel: model)

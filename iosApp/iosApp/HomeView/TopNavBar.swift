@@ -10,9 +10,10 @@ import SwiftUI
 struct TopNavBar: View {
     @EnvironmentObject var home: HomeViewModel
     @State var showNotification: Bool = false
+    @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
         HStack(alignment: .center , spacing: 20) {
-            AppImage.Welcome.bg.resizable()
+            viewModel.profileImage.resizable()
                 .frame(width: 63, height: 63)
                 .clipShape(Circle())
                 .overlay(
@@ -33,7 +34,7 @@ struct TopNavBar: View {
                     AppIcon.Home.badge
                         .font(.system(size: 17))
                     
-                    Text("Level 4 - Rider")
+                    Text("Level 1 - Rider")
                         .font(KlavikaFont.regular.font(size: 14))
                         .foregroundColor(AppColor.black)
                 }
@@ -44,8 +45,4 @@ struct TopNavBar: View {
             home.loadUserName()
         }
     }
-}
-
-#Preview {
-    TopNavBar()
 }

@@ -9,8 +9,8 @@
 import SwiftUI
 
 struct UpcomingRidesView: View {
-    @EnvironmentObject var home: HomeViewModel
-    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @ObservedObject var home: HomeViewModel
+    @ObservedObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
     let onMessageTap: (String) -> Void
     
@@ -41,7 +41,7 @@ struct UpcomingRidesView: View {
         }
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
-            UpcomingRideView(startingTab: .upcoming, navigationDone: true)
+            UpcomingRideView(viewModel: viewModel, startingTab: .upcoming, navigationDone: true)
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })

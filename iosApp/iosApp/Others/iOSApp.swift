@@ -15,20 +15,14 @@ struct iOSApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
-    @AppStorage("rememberMeDataStatic") private var isLoggedIn: Bool = false
-    @AppStorage("hasSeenOnboardingStatic") private var hasSeenOnboarding: Bool = false
-
-    @StateObject private var homeViewModel = HomeViewModel()
-    @StateObject private var upcomingVM = UpcomingRideViewModel()
+    @AppStorage("com.adesso.rider.club.rememberMeData") private var isLoggedIn: Bool = false
+    @AppStorage("com.adesso.rider.club.hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if isLoggedIn {
                     BottomNavBar()
-                        .environmentObject(homeViewModel)
-                        .environmentObject(upcomingVM)
-
                 } else if hasSeenOnboarding {
                     SignInView()
 

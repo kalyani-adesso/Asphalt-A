@@ -5,14 +5,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
- data class UserInvites(
+data class UserInvites(
 
     @SerialName("acceptInvite")
     var acceptInvite: Int = APIConstants.RIDE_INVITED // 0 - invite sent,1- invite accept, 2- invite declined, 3 - participant joined.
 )
 
 @Serializable
-data class Ratings (
+data class Ratings(
     @SerialName("stars")
     var stars: Int = 0,
 )
@@ -24,14 +24,24 @@ data class RideInvitesDomain(
     val destination: String,
     val startDateTime: Long?,
     val acceptedParticipants: List<String>,
-    val isOrganiser:Boolean,
-    val rideTitle:String,
+    val isOrganiser: Boolean,
+    val rideTitle: String,
     val allParticipants: List<String>,
     val rideType: String = ""
 )
 
 @Serializable
-data class RatingsData (
+data class RatingsData(
     var stars: Int = 0,
-    var userId:String
+    var userId: String
+)
+
+@Serializable
+data class Images(@SerialName("url") var url: String)
+
+@Serializable
+data class ImageData(
+    @SerialName("url") var url: String,
+    @SerialName("imageID") var imageID: String,
+    var isServerImg: Boolean = true
 )

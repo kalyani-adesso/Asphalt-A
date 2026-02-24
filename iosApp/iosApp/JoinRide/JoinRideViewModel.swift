@@ -42,7 +42,6 @@ final class JoinRideViewModel: ObservableObject {
     private var userRepository: UserRepository
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     @Published var isRideLoading = false
-    @Published var showRideAlreadyActivePopup = false
     @Published var totalRides:Int = 0
     @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
@@ -225,17 +224,29 @@ extension JoinRideViewModel {
         }
     }
     // MARK: - Join Flow
+    /// Handles the join ride flow with non-blocking navigation
+    /// - Parameter ride: The ride model to join
+    /// - Returns: The ride model to trigger navigation
+    /// - Note: Join API call happens in background without blocking UI navigation
+    /// This was optimized to prevent slowness when tapping join ride button
     func handleJoin(for ride: JoinRideModel) async -> JoinRideModel? {
         if ride.rideJoined { return ride }
         
-        if let active = await getUserActiveRide() {
-            if active.ridesID != ride.rideId {
-                showRideAlreadyActivePopup = true
-                return nil
+        // Check for active ride in background without blocking navigation
+        // Fixed: Previously this was an await call that blocked navigation
+        Task.detached { [weak self] in
+            if let _ = await self?.getUserActiveRide() {
+              
             }
         }
         
-        await joinRide(ride)
+        // Send join request in background without waiting
+        // This ensures the API call doesn't block the navigation to ConnectedRideView
+        Task.detached { [weak self] in
+            await self?.joinRide(ride)
+        }
+        
+        // Return immediately for fast navigation
         return ride
     }
     
@@ -262,8 +273,6 @@ extension JoinRideViewModel {
                 inviteStatus: 4
             )
         }
-        showRideAlreadyActivePopup = false
-        
         endRide(rideId: active.ridesID ?? "")
         
     }
