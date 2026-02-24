@@ -176,7 +176,7 @@ fun RiderCard(
                 end = Dimensions.padding16,
                 bottom = Dimensions.padding16
             ),
-        ) {
+    ) {
         Column(
             modifier = Modifier
                 .padding(vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16)
@@ -199,7 +199,7 @@ fun RiderCard(
                         ),
                         size = Dimensions.size32,
                         imageUrl = "dashboardRideInvite.inviterProfilePicUrl",
-                        placeholderPainter = painterResource(id=R.drawable.profile_placeholder)
+                        placeholderPainter = painterResource(id = R.drawable.profile_placeholder)
                     )
                     Spacer(Modifier.width(width = Dimensions.size10))
                     Column {
@@ -237,16 +237,20 @@ fun RiderCard(
                 )
                 Spacer(Modifier.height(height = Dimensions.padding10))
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                    , modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Icon(
                             painter = painterResource(
-                                id = R.drawable.ic_location_purple),
+                                id = R.drawable.ic_location_purple
+                            ),
                             contentDescription = "location Icon",
-                            tint = PrimaryDarkerLightB75)
+                            tint = PrimaryDarkerLightB75
+                        )
 
                         Spacer(Modifier.width(width = Dimensions.size5))
 
@@ -263,7 +267,8 @@ fun RiderCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_rides),
                             contentDescription = "Ride KM",
-                            tint = SafetyOrange)
+                            tint = SafetyOrange
+                        )
                         Spacer(Modifier.width(Dimensions.size5))
                         val distance = ridesData.rideDistance
                         val smallDistance = String.format("%.2f", distance)
@@ -279,7 +284,7 @@ fun RiderCard(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(
@@ -292,11 +297,14 @@ fun RiderCard(
 
                         val timeStampString = ridesData.startDate
                         val date = Date(timeStampString ?: 0L)
-                        val formatted = SimpleDateFormat("EEE, MMM dd - hh:mm a", Locale.getDefault()).format(date)
+                        val formatted =
+                            SimpleDateFormat("EEE, MMM dd - hh:mm a", Locale.getDefault()).format(
+                                date
+                            )
 
                         Text(
                             text = Utils.formatDateTime(
-                                input =formatted,
+                                input = formatted,
                                 inputFormat = "dd/MM/yyyy HH:mm",
                                 outputFormat = "EEE, dd MMM yyyy - hh:mm a"
                             ),
@@ -314,7 +322,7 @@ fun RiderCard(
                         )
                         Spacer(Modifier.width(Dimensions.size5))
                         Text(
-                            text =  "0/8 Riders",
+                            text = "0/8 Riders",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
@@ -338,9 +346,11 @@ fun RiderCard(
                             .height(Dimensions.size50),
                         shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS)
                     ) {
-                        Icon(imageVector = Icons.Default.Call,
+                        Icon(
+                            imageVector = Icons.Default.Call,
                             contentDescription = "Call",
-                            tint = PrimaryDarkerLightB75)
+                            tint = PrimaryDarkerLightB75
+                        )
                         Text(
                             stringResource(R.string.call_ride).uppercase(),
                             color = NeutralBlack,
@@ -349,46 +359,46 @@ fun RiderCard(
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
-                   //  join/ rejoin ride button
-//                    if (ridesData.rideStatus == RIDE_JOINED) {
-//                        ElevatedButton (
-//                            modifier = Modifier
-//                                .weight(weight = 1f)
-//                                .height(height = Dimensions.size50),
-//                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
-//                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
-//                            onClick = {
-////                                  rejoin api
+//                     join/ rejoin ride button
+                    if (ridesData.rideStatus == RIDE_JOINED) {
+                        ElevatedButton(
+                            modifier = Modifier
+                                .weight(weight = 1f)
+                                .height(height = Dimensions.size50),
+                            shape = RoundedCornerShape(Constants.DEFAULT_CORNER_RADIUS),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenLIGHT),
+                            onClick = {
+//                                  rejoin api
 //                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
 //                                    status = RIDE_JOINED)
 //                                viewModel.joinRide(joinRide = ridesData)
-//                                navigateToConnectedRide.invoke(ridesData)
-//                            },
-//                            contentPadding = PaddingValues(all = Dimensions.size0)
-//                        ) {
-//                            Row(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .padding(start = Dimensions.padding10),
-//                                horizontalArrangement = Arrangement.Center
-//                            ) {
-//                                Icon(
-//                                    painter = painterResource(
-//                                        id = R.drawable.moved_location),
-//                                    contentDescription = "Riders icon",
-//                                    tint = NeutralWhite)
-//                                Text(
-//                                    stringResource(R.string.rejoinRide).uppercase(),
-//                                    color = NeutralWhite,
-//                                    style = TypographyBold.titleMedium,
-//                                    fontSize = Dimensions.textSize14,
-//                                    modifier = Modifier.padding(start = 8.dp)
-//                                )
-//                            }
-//                        }
-//                    }
-
-                  //  else {
+                                navigateToConnectedRide.invoke(ridesData)
+                            },
+                            contentPadding = PaddingValues(all = Dimensions.size0)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = Dimensions.padding10),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.moved_location
+                                    ),
+                                    contentDescription = "Riders icon",
+                                    tint = NeutralWhite
+                                )
+                                Text(
+                                    stringResource(R.string.rejoinRide).uppercase(),
+                                    color = NeutralWhite,
+                                    style = TypographyBold.titleMedium,
+                                    fontSize = Dimensions.textSize14,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                        }
+                    } else {
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
@@ -396,9 +406,11 @@ fun RiderCard(
                                 viewModel.setRideId(ridesData.ridesID ?: "")
 
                                 // if user trying to join another ride previous will end then new ride join logic pending
-                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "",
+                                viewModel.updateRideStatus(
+                                    userId = ridesData.createdBy ?: "",
                                     rideId = ridesData.ridesID ?: "",
-                                    status = RIDE_JOINED) // status 3
+                                    status = RIDE_JOINED
+                                ) // status 3
                                 // post join ride
                                 viewModel.joinRide(joinRide = ridesData)
                                 navigateToConnectedRide.invoke(ridesData)
@@ -414,9 +426,11 @@ fun RiderCard(
                             ) {
                                 Icon(
                                     painter = painterResource(
-                                        id = R.drawable.moved_location),
+                                        id = R.drawable.moved_location
+                                    ),
                                     contentDescription = "Riders icon",
-                                    tint = NeutralWhite)
+                                    tint = NeutralWhite
+                                )
                                 Text(
                                     stringResource(R.string.join_ride).uppercase(),
                                     color = NeutralWhite,
@@ -426,13 +440,13 @@ fun RiderCard(
                                 )
                             }
                         }
-                   // }
+                        // }
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 @Preview
 fun JoinRideScrenPreview() {
