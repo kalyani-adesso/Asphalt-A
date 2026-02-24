@@ -210,7 +210,7 @@ struct ConnectedRideMapView: View {
                                 ConnectedRideHeaderView(title: AppStrings.ConnectedRide.emergencyActionsTitle, subtitle: "", image: AppIcon.ConnectedRide.emergency)
                                 HStack(spacing: 16) {
                                     Button(action: {
-                                        
+                                        viewModel.sendEmergencySOS()
                                     }) {
                                         HStack(alignment: .center,spacing: 5) {
                                             AppIcon.ConnectedRide.sos
@@ -230,7 +230,7 @@ struct ConnectedRideMapView: View {
                                         )
                                     }
                                     Button(action: {
-                                        
+                                        viewModel.shareLocation()
                                     }) {
                                         HStack(alignment: .center,spacing: 5) {
                                             AppIcon.ConnectedRide.shareLocation
