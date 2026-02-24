@@ -20,13 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
+import com.asphalt.commonui.utils.ImageUtils.bitmapDescriptorFromVector
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
@@ -34,7 +36,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,6 +45,7 @@ fun CurrentLocationMapScreen(
     ridesData: RidesData,
     rideViewModel: JoinRideViewModel = koinViewModel()
 ) {
+
     //val rideId = rideViewModel.getRideId()
 
     val rideId = rideViewModel.getRideId()
@@ -90,6 +92,8 @@ fun MapWithCurrentLocation(
     ridesData: RidesData,
     rideViewModel: JoinRideViewModel
 ) {
+    val context = LocalContext.current
+
     val riders by rideViewModel.joinedUsers.collectAsState()
 
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -176,26 +180,55 @@ fun MapWithCurrentLocation(
 
             )
         ) {
+            val startMarkerState = remember(ridesData.startLatitude, ridesData.startLongitude) {
+                MarkerState(
+                    position = LatLng(ridesData.startLatitude, ridesData.startLongitude)
+                )
+            }
+            val customStartPin = remember(context) {
+                bitmapDescriptorFromVector(context, com.asphalt.commonui.R.drawable.ic_start_pin)
+            }
+            Marker(
+                state = startMarkerState,
+                title = "Start: ${ridesData.startLocation}",
+                icon = customStartPin
 
+                // snippet = "${rider.speedInKph} km/h"
+            )
+            val endMarkerState = remember(ridesData.endLatitude, ridesData.endLongitude) {
+                MarkerState(
+                    position = LatLng(ridesData.endLatitude, ridesData.endLongitude)
+                )
+            }
+            val customDestinationPin = remember(context) {
+                bitmapDescriptorFromVector(context, com.asphalt.commonui.R.drawable.ic_destination_pin)
+            }
+
+            Marker(
+                state = endMarkerState,
+                title = "Destination: ${ridesData.endLocation}",
+                icon = customDestinationPin
+                // snippet = "${rider.speedInKph} km/h"
+            )
             // User marker
             userLocation?.let {
-                Marker(
-                    state = MarkerState(it),
-                    title = "You"
-                )
+//                Marker(
+//                    state = MarkerState(it),
+//                    title = "You"
+//                )
                 Log.d("TAG", "MapWithCurrentLocation User: $userLocation")
             }
 
             // Joined riders
             riders.forEach { rider ->
                 if (rider.currentLat != 0.0 && rider.currentLong != 0.0) {
-                    Marker(
-                        state = MarkerState(
-                            LatLng(rider.currentLat, rider.currentLong)
-                        ),
-                        title = rider.userID,
-                        snippet = "${rider.speedInKph} km/h"
-                    )
+//                    Marker(
+//                        state = MarkerState(
+//                            LatLng(rider.currentLat, rider.currentLong)
+//                        ),
+//                        title = rider.userID,
+//                        snippet = "${rider.speedInKph} km/h"
+//                    )
                     Log.d("TAG", "MapWithCurrentLocation UserId: ${rider.userID}")
                     Log.d("TAG", "MapWithCurrentLocation Rider: ${rider.currentLat} ${rider.currentLong}")
                 }

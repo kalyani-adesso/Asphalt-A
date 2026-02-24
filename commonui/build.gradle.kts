@@ -37,6 +37,7 @@ android {
 
 dependencies {
 
+    implementation(libs.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)
