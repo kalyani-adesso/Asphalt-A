@@ -34,7 +34,7 @@ struct TopNavBar: View {
                     AppIcon.Home.badge
                         .font(.system(size: 17))
                     
-                    Text("Level 4 - Rider")
+                    Text("Level 1 - Rider")
                         .font(KlavikaFont.regular.font(size: 14))
                         .foregroundColor(AppColor.black)
                 }

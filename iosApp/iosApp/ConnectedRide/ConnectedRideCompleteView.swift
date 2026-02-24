@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 struct ConnectedRideCompleteView: View {
     var viewModel: JoinRideModel
@@ -101,7 +102,7 @@ struct ConnectedRideCompleteView: View {
     @ViewBuilder var RideButtonsView: some View {
         HStack(spacing: 20) {
             Button(action: {
-               
+                shareRideDetails()
             }) {
                 HStack {
                     Text(AppStrings.UpcomingRide.share.uppercased())
@@ -117,7 +118,6 @@ struct ConnectedRideCompleteView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(AppColor.celticBlue, lineWidth: 1)
                 )
-              
             }
             .buttonStyle(.plain)
             ButtonView(title: AppStrings.NavigationSlider.home.uppercased(),onTap: {
@@ -127,6 +127,29 @@ struct ConnectedRideCompleteView: View {
         }
         .padding()
         .padding(.bottom, 70)
+    }
+
+    // MARK: - Sharing
+    private func shareRideDetails() {
+        // replicate what the user sees on screen
+        var details = "\(viewModel.title)\n" // large title
+        details += "Ride successfully completed!\n\n" // subtitle seen in UI
+
+        details += "Ride Summary:\n"
+        for item in rideCompleteModel {
+            details += "- \(item.label): \(item.value)\n"
+        }
+        details += "\n"
+
+        if !viewModel.contactNumber.isEmpty {
+            details += "Organizer: \(viewModel.organizer) (\(viewModel.contactNumber))\n"
+        }
+
+        let encoded = details.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "https://api.whatsapp.com/send?text=\(encoded)"
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 }
 
