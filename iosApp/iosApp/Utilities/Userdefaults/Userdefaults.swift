@@ -69,6 +69,16 @@ struct MBUserDefaults {
             UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.rideJoinedId.rawValue)
         }
     }
+
+    /// Emergency contact number from profile. Used for Emergency SOS when set.
+    static var emergencyContactStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.emergencyContact.rawValue)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.emergencyContact.rawValue)
+        }
+    }
     
     static var removeAllUserDefaults: Void {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {

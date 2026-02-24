@@ -92,6 +92,7 @@ final class NavigationSliderViewModel: ObservableObject {
             MBUserDefaults.userNameStatic = nil
             // Keep hasShownLoginSuccessStatic so that login success is only shown on fresh install
             MBUserDefaults.rideIdStatic = nil
+            // Do not clear isRideJoinedID on logout — it is cleared when user ends the ride; if they log back in before ending, they should still be redirected to the active ride.
             if let error = error {
                 print("Logout error: \(error)")
             }

@@ -56,13 +56,13 @@ struct MenuItemRow: View {
         .modifier(logoutSection(title: item.title))
         .contentShape(Rectangle())
         .onTapGesture {
-            //TODO: Show Logout toast
-            viewModel.logout {
-                isLoggedIn = false
+            if item.title == AppStrings.NavigationSlider.logout {
+                viewModel.logout {
+                    isLoggedIn = false
+                    itemIsSelected = true
+                }
+            } else {
                 itemIsSelected = true
-//                MBUserDefaults.rememberMeDataStatic = false
-//                MBUserDefaults.userIdStatic = ""
-//                MBUserDefaults.userNameStatic = ""
             }
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {

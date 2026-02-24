@@ -31,7 +31,8 @@ struct BottomNavBar: View {
                                         title: AppStrings.ConnectedRide.startRideTitle,
                                         subTitle: AppStrings.ConnectedRide.startRideSubtitle,
                                         model: ride,
-                                        rideCompleteModel: []
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
                                     )
                                 }
                             } else {
@@ -56,7 +57,8 @@ struct BottomNavBar: View {
                                         title: AppStrings.ConnectedRide.startRideTitle,
                                         subTitle: AppStrings.ConnectedRide.startRideSubtitle,
                                         model: ride,
-                                        rideCompleteModel: []
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
                                     )
                                 }
                             } else {
@@ -135,10 +137,16 @@ struct BottomNavBar: View {
         .task {
             await createRideVM.getActiveJoinedRide()
             await MainActor.run {
-                if (createRideVM.activeRide?.rideJoined ?? false) {
-                    rideJoined = true
-                } else {
-                    rideJoined = false
+                rideJoined = createRideVM.activeRide?.rideJoined ?? false
+            }
+        }
+        .onChange(of: selectedTab) { newTab in
+            if newTab == 0 {
+                Task {
+                    await createRideVM.getActiveJoinedRide()
+                    await MainActor.run {
+                        rideJoined = createRideVM.activeRide?.rideJoined ?? false
+                    }
                 }
             }
         }

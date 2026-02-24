@@ -133,6 +133,7 @@ public struct AppStrings{
         case userName = "com.adesso.rider.club.userName"
         case rideId = "com.adesso.rider.club.rideId"
         case rideJoinedId = "com.adesso.rider.club.rideJoinedId"
+        case emergencyContact = "com.adesso.rider.club.emergencyContact"
     }
     
     enum ForgotPassword: String {
@@ -404,6 +405,7 @@ public struct AppStrings{
         static let groupNavigationActiveSubtitle = "Group navigation active"
         static let groupStatusTitle = "Group Status"
         static let emergencyActionsTitle = "Emergency Actions"
+        static let emergencyActionsSubtitle = "Use in case of emergency or to share your location"
         static let offlineAlertTitle = "Abhishek has been stopped for 5 minutes."
         static let offlineAlertSubtitle = "Check if assistance is needed."
         static let endRideButton = "END RIDE"

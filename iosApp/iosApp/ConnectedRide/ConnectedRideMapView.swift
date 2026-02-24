@@ -150,18 +150,22 @@ struct ConnectedRideMapView: View {
                                 ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
                                 
                                 Button(action: {
-                                    self.rideComplted = true
                                     if rideModel.userId != MBUserDefaults.userIdStatic {
-                                        joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId:  MBUserDefaults.userIdStatic ?? "", inviteStatus: 4)
+                                        joinRideVM.changeRideInviteStatus(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", inviteStatus: 4)
                                     } else {
                                         joinRideVM.updateOrganizerStatus(rideId: rideModel.rideId, rideStatus: 4)
                                     }
-                                    
-                                    viewModel.endRide(rideId:rideModel.rideId)
-                                    viewModel.endRideSummary(ride: rideModel , userID: MBUserDefaults.userIdStatic ?? "")
-                                    viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
-                                    MBUserDefaults.isRideJoinedID = nil
-                                    stopTimer()
+                                    viewModel.endRide(rideId: rideModel.rideId) { success in
+                                        guard success else { return }
+                                        viewModel.endRideSummary(ride: rideModel, userID: MBUserDefaults.userIdStatic ?? "") {
+                                            DispatchQueue.main.async {
+                                                viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
+                                                MBUserDefaults.isRideJoinedID = nil
+                                                stopTimer()
+                                                rideComplted = true
+                                            }
+                                        }
+                                    }
                                 }, label: {
                                     Text(AppStrings.ConnectedRide.endRideButton)
                                         .frame(maxWidth: .infinity,minHeight: 60)
@@ -212,14 +216,16 @@ struct ConnectedRideMapView: View {
                                     Button(action: {
                                         viewModel.sendEmergencySOS()
                                     }) {
-                                        HStack(alignment: .center,spacing: 5) {
+                                        HStack(alignment: .center, spacing: 5) {
                                             AppIcon.ConnectedRide.sos
                                             Text(AppStrings.ConnectedRide.emergencySOSButton)
                                                 .font(KlavikaFont.bold.font(size: 16))
                                                 .foregroundStyle(AppColor.black)
                                         }
                                         .padding()
-                                        .frame( height: 50)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .contentShape(Rectangle())
                                         .background(
                                             RoundedRectangle(cornerRadius: 10)
                                                 .fill(AppColor.white)
@@ -229,17 +235,20 @@ struct ConnectedRideMapView: View {
                                                 .stroke(AppColor.darkGray, lineWidth: 2)
                                         )
                                     }
+                                    .buttonStyle(.plain)
                                     Button(action: {
                                         viewModel.shareLocation()
                                     }) {
-                                        HStack(alignment: .center,spacing: 5) {
+                                        HStack(alignment: .center, spacing: 5) {
                                             AppIcon.ConnectedRide.shareLocation
                                             Text(AppStrings.ConnectedRide.shareLocationButton)
                                                 .font(KlavikaFont.bold.font(size: 16))
                                                 .foregroundStyle(AppColor.black)
                                         }
                                         .padding()
-                                        .frame( height: 50)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .contentShape(Rectangle())
                                         .background(
                                             RoundedRectangle(cornerRadius: 10)
                                                 .fill(AppColor.white)
@@ -249,6 +258,7 @@ struct ConnectedRideMapView: View {
                                                 .stroke(AppColor.darkGray, lineWidth: 2)
                                         )
                                     }
+                                    .buttonStyle(.plain)
                                 }
                                 .padding(.bottom)
                             }
@@ -259,6 +269,7 @@ struct ConnectedRideMapView: View {
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }.listStyle(.plain)
                         .listRowSeparator(.hidden)
                         .navigationBarBackButtonHidden()
@@ -266,19 +277,19 @@ struct ConnectedRideMapView: View {
                             ConnectedRideView(notificationTitle: "Ride sucessfully completed", title: "Completing ride", subTitle: "Saving your ride data and generating summary", model: rideModel, rideCompleteModel: viewModel.rideCompleteModel)
                         })
                         .onAppear() {
+                            viewModel.activeRide = rideModel
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 showToast = false
                             }
-                            // Request authorization and start location updates so recenter/follow works
                             locationManager.requestLocation()
                             locationManager.manager.startUpdatingLocation()
 
                             if !rideModel.rideJoined {
-                                viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                                tryJoinWhenLocationReady()
                             } else {
                                 startOngoingRideTimer()
                             }
-                            viewModel.onLocationUpdate(lat:locationManager.lastLocation?.coordinate.latitude ?? 0.0 , long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            viewModel.onLocationUpdate(lat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
                             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                                 DispatchQueue.main.async {
                                     self.elapsedSeconds += 1
@@ -306,6 +317,9 @@ struct ConnectedRideMapView: View {
                         .task {
                             await viewModel.receiveMessage(rideId: rideModel.rideId)
                         }
+                        .task {
+                            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
+                        }
                         .onChange(of: viewModel.ongoingRideId) { ride in
                             if !ride.isEmpty {
                                 startOngoingRideTimer()
@@ -320,6 +334,20 @@ struct ConnectedRideMapView: View {
         .animation(.easeInOut, value: showMessageNotification)
     }
     
+    func tryJoinWhenLocationReady(retryCount: Int = 0) {
+        let maxRetries = 4
+        let lat = locationManager.lastLocation?.coordinate.latitude ?? 0
+        let long = locationManager.lastLocation?.coordinate.longitude ?? 0
+        let isValid = (lat != 0 || long != 0) && locationManager.lastLocation != nil
+        if isValid || retryCount >= maxRetries {
+            viewModel.joinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: lat, currentLong: long, speed: locationManager.speedInKph ?? 0.0)
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                tryJoinWhenLocationReady(retryCount: retryCount + 1)
+            }
+        }
+    }
+
     func startOngoingRideTimer() {
         // Invalidate any existing timer
         viewModel.ongoingRideTimer?.invalidate()
@@ -612,9 +640,6 @@ struct ActiveRiderView: View {
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
         .padding([.leading,.trailing],16)
-        .task {
-            await viewModel.getOnGoingRides(rideId: rideModel.rideId)
-        }
     }
 }
 

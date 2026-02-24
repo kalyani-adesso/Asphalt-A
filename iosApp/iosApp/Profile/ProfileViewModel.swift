@@ -188,11 +188,13 @@ extension ProfileViewModel {
                             self.phoneNumber = domain.phoneNumber
                             self.role = domain.isMechanic ? "Mechanic" : ""
                             self.isMechanic = domain.isMechanic
+                            self.emergencyNumber = domain.emergencyContact
+                            self.drivingLicenseNumber = domain.drivingLicense
+                            let emergency = (domain.emergencyContact).trimmingCharacters(in: .whitespaces)
+                            MBUserDefaults.emergencyContactStatic = emergency.isEmpty ? nil : emergency
                             if let domainImage = domain.profilePicUrl as? String,
                              let base64Image = self.decodeBase64ToImage(base64: domainImage) {
                               self.profileImage = Image(uiImage: base64Image)
-                                self.emergencyNumber = domain.emergencyContact
-                                self.drivingLicenseNumber = domain.drivingLicense
                           }
                             self.isLoading = false
                             continuation.resume()
@@ -288,7 +290,7 @@ extension ProfileViewModel {
                 print("Error editing profile: \(error)")
             } else {
                 print("Profile updated successfully.")
-                // Refresh the profile data after successful update (updates the same viewModel ProfileScreen uses)
+                MBUserDefaults.emergencyContactStatic = emergencyContact.isEmpty ? nil : emergencyContact
                 Task { @MainActor in
                     await self?.fetchProfile(userId: userId)
                     onSuccess?()
@@ -323,27 +325,33 @@ extension ProfileViewModel {
             }
             
             let currentUserID = MBUserDefaults.userIdStatic ?? ""
+            guard !currentUserID.isEmpty else {
+                return (0, 0)
+            }
             
             var completedRidesCount = 0
             var visitedCities = Set<String>()
             
             for ride in rideArray {
+                let isCreator = (ride.createdBy ?? "") == currentUserID
+                let isParticipant = ride.participants.contains { ($0.userId ?? "") == currentUserID }
                 
-                let isCreator = ride.createdBy == currentUserID
-                let isParticipant = ride.participants.contains { $0.userId == currentUserID }
+                let statusValue: Int = {
+                    if let n = ride.rideStatus as? NSNumber { return n.intValue }
+                    if let i = ride.rideStatus as? Int { return i }
+                    if let i32 = ride.rideStatus as? Int32 { return Int(i32) }
+                    return 0
+                }()
                 
-                // Only completed rides where user is involved
-                if ride.rideStatus == 4 && (isCreator || isParticipant) {
-                    
-                    completedRidesCount += 1
-                    
-                    if let startCity = ride.startLocation, !startCity.isEmpty {
-                        visitedCities.insert(startCity)
-                    }
-                    
-                    if let endCity = ride.endLocation, !endCity.isEmpty {
-                        visitedCities.insert(endCity)
-                    }
+                guard statusValue == 4, isCreator || isParticipant else { continue }
+                
+                completedRidesCount += 1
+                
+                if let start = ride.startLocation?.trimmingCharacters(in: .whitespaces), !start.isEmpty {
+                    visitedCities.insert(start)
+                }
+                if let end = ride.endLocation?.trimmingCharacters(in: .whitespaces), !end.isEmpty {
+                    visitedCities.insert(end)
                 }
             }
             

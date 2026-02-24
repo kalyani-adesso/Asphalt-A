@@ -26,7 +26,7 @@ struct BikeRouteMapView: View {
                 
                 if !routeCoordinates.isEmpty {
                     MapPolyline(coordinates: routeCoordinates)
-                        .stroke(.blue, lineWidth: 5)
+                        .stroke(AppColor.celticBlue, lineWidth: 6)
                 }
                 
                 // Start location annotation
@@ -34,9 +34,9 @@ struct BikeRouteMapView: View {
                     if let image = AppIcon.ConnectedRide.startLocation {
                         Image(uiImage: image)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
                             .clipShape(Circle())
-                            .shadow(radius: 3)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
                 
@@ -45,7 +45,8 @@ struct BikeRouteMapView: View {
                     if let image = AppIcon.ConnectedRide.endLocation {
                         Image(uiImage: image)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
                 
