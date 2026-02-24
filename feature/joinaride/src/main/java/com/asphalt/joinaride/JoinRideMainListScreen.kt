@@ -106,7 +106,7 @@ fun JoinRide(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
 
-    val sortedList = rides.sortedByDescending { it.createdDate }
+    val sortedList = rides.sortedBy{ it.startDate }
 
     // ride removed from list once completed
 //    LaunchedEffect(Unit) {

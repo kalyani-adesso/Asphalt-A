@@ -3,6 +3,7 @@ package com.asphalt.joinaride.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.helpers.APIHelperUI
@@ -61,7 +62,7 @@ class JoinRideViewModel(
             val q = query.trim().lowercase()
             ridesList
                 .filter { ride ->
-                    ride.createdBy == currentUid ||
+                    (ride.createdBy == currentUid && ride.rideStatus!= APIConstants.END_RIDE)||
                             ride.participants.any {
                                 it.inviteStatus in listOf(
                                     RIDE_ACCEPTED,
