@@ -62,13 +62,11 @@ class JoinRideViewModel(
             val q = query.trim().lowercase()
             ridesList
                 .filter { ride ->
-                    (ride.createdBy == currentUid && ride.rideStatus!= APIConstants.END_RIDE)||
-                            ride.participants.any {
-                                it.inviteStatus in listOf(
-                                    RIDE_ACCEPTED,
-                                    RIDE_JOINED
-                                )
-                            }
+                    if (ride.createdBy == currentUid) {
+                        ride.rideStatus != 4
+                    } else {
+                        ride.participants.any { it.inviteStatus in listOf(RIDE_ACCEPTED, RIDE_JOINED) }
+                    }
                 }
                 .let { accepted ->
                     if (q.isEmpty()) accepted
