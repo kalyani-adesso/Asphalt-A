@@ -146,11 +146,11 @@ class JoinRideViewModel(
                 //    val sortedArray = response.sortedBy{ it.startDate }}
                 // Filter out current user from “other users
                 val otherUsers = response.filter { it.userID != currentUid }
-                val joinedList = otherUsers
-                _joinedUsers.value = joinedList
-                Log.d("TAG", "getOnGoingRides otherUsers: ${joinedList.size}")
+              //  val joinedList = otherUsers
+                _joinedUsers.value = otherUsers
+                Log.d("TAG", "getOnGoingRides otherUsers: ${otherUsers.size}")
 
-                val rideUsersList = joinedList.mapNotNull { ride ->
+                val rideUsersList = otherUsers.mapNotNull { ride ->
                     androidUserVM.getUser(ride.userID)?.let { user ->
                         RidesData(ridesID = user.uid, createdBy = user.name)
                     }
@@ -166,21 +166,21 @@ class JoinRideViewModel(
                 //Update basic ride list (optional, if you need)
                 _joinedUsers.value = joinRidersList
 
-                val rideUsers = joinRidersList.mapNotNull { ride ->
-
-                    val userDomain = androidUserVM.getUser(ride.userID)
-
-                    userDomain?.let { user ->
-                        RidesData(
-                            ridesID = user.uid,
-                            createdBy = user.name
-                        )
-                    }
-                }
-                _rideUsers.value = rideUsers
-                Log.d("TAG", "getJoinRides joined finalList: $joinRidersList")
-                Log.d("TAG", "All rides: $response")
-                Log.d("TAG", "Ride users for UI: ${rideUsers.size}")
+//                val rideUsers = joinRidersList.mapNotNull { ride ->
+//
+//                    val userDomain = androidUserVM.getUser(ride.userID)
+//
+//                    userDomain?.let { user ->
+//                        RidesData(
+//                            ridesID = user.uid,
+//                            createdBy = user.name
+//                        )
+//                    }
+//                }
+//                _rideUsers.value = rideUsers
+//                Log.d("TAG", "getJoinRides joined finalList: $joinRidersList")
+//                Log.d("TAG", "All rides: $response")
+//                Log.d("TAG", "Ride users for UI: ${rideUsers.size}")
             }
         }
     }

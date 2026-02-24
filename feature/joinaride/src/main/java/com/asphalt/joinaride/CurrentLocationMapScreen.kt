@@ -165,7 +165,16 @@ fun MapWithCurrentLocation(
             cameraPositionState = cameraPositionState,
             onMapLoaded = { mapLoaded = true },
             properties = MapProperties(isMyLocationEnabled = true),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false)
+            uiSettings = MapUiSettings(
+                tiltGesturesEnabled = true,
+                rotationGesturesEnabled = true,
+                scrollGesturesEnabled = true,
+                zoomControlsEnabled = true,      // + / - buttons
+                compassEnabled = true,           // Compass icon
+                myLocationButtonEnabled = true,  // My location button
+                mapToolbarEnabled = true,      // Navigation icon (open in Google Maps)
+
+            )
         ) {
 
             // User marker
@@ -174,6 +183,7 @@ fun MapWithCurrentLocation(
                     state = MarkerState(it),
                     title = "You"
                 )
+                Log.d("TAG", "MapWithCurrentLocation User: $userLocation")
             }
 
             // Joined riders
@@ -186,6 +196,8 @@ fun MapWithCurrentLocation(
                         title = rider.userID,
                         snippet = "${rider.speedInKph} km/h"
                     )
+                    Log.d("TAG", "MapWithCurrentLocation UserId: ${rider.userID}")
+                    Log.d("TAG", "MapWithCurrentLocation Rider: ${rider.currentLat} ${rider.currentLong}")
                 }
             }
             // Start & End markers
