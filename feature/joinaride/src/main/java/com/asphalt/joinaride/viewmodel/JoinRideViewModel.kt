@@ -208,9 +208,9 @@ class JoinRideViewModel(
         // Remove old listener safely
         rideListener?.let { listener -> rideRef?.removeEventListener(listener) }
 
-        val ref = database.getReference("rides")
+        val ref = database.getReference("ongoing_ride")
             .child(rideId)
-            .child("ongoing_ride")
+//            .child("ongoing_ride")
 
         rideListener = object : ValueEventListener {
 
@@ -221,12 +221,27 @@ class JoinRideViewModel(
                     return
                 }
                 startedAt = snapshot.child("dateTime").getValue(Double::class.java)?.toLong()
+                val connectedRides = snapshot.children.mapNotNull { child ->
+                    val data = child.value as? Map<*, *> ?: return@mapNotNull null
 
-                val users = snapshot.children
-                    .filter { it.key != "dateTime" }
-                    .mapNotNull { it.getValue(ConnectedRideDTO::class.java) }
+                    ConnectedRideDTO(
+                        rideJoinedID = child.key ?: "", // Usually the push key
+                        rideID = data["rideID"] as? String ?: "",
+                        userID = data["userID"] as? String ?: "",
+                        currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
+                        currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
+                        speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
+                        status = data["status"] as? String ?: "UNKNOWN",
+                        dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
+                        isRejoined = data["isRejoined"] as? Boolean ?: false
+                    )
+                }
+
+
                 // Always emit NEW list instance
-                _joinedUsers.value = users
+                _joinedUsers.value = connectedRides
+                Log.d("connectedRides=", joinedUsers.value.size.toString())
+
             }
             override fun onCancelled(error: DatabaseError) {
                 rideListener?.let {

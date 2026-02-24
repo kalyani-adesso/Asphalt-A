@@ -85,7 +85,7 @@ fun RidersGroupStatus(
 
     LaunchedEffect(currentUser) {
         val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
-        viewModel.observeRideLocations(ridesData.createdBy.toString())
+        viewModel.observeRideLocations(ridesData.ridesID.toString())
         Log.d("TAG", "RidersGroupStatus userData: $userData")
     }
 

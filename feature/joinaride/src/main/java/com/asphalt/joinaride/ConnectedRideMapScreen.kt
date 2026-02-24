@@ -69,8 +69,8 @@ fun ConnectedRideGoogleMapScreen(
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
 
     if (rideId != null) {
-        val details = rideViewModel.getOnGoingRides(rideId ?: "")
-        Log.d("TAG", "ConnectedRideMapScreen details: $details")
+//        val details = rideViewModel.getOnGoingRides(rideId ?: "")
+//        Log.d("TAG", "ConnectedRideMapScreen details: $details")
     }
 
 //    DisposableEffect(Unit) {
