@@ -67,7 +67,12 @@ class JoinRideViewModel(
                     if (ride.createdBy == currentUid) {
                         ride.rideStatus != END_RIDE
                     } else {
-                        ride.participants.any { it.inviteStatus in listOf(RIDE_ACCEPTED, RIDE_JOINED) }
+                        ride.participants.any {
+                            it.inviteStatus in listOf(
+                                RIDE_ACCEPTED,
+                                RIDE_JOINED
+                            )
+                        }
                     }
                 }
                 .let { accepted ->
@@ -227,7 +232,7 @@ class JoinRideViewModel(
                     startLocation,
                     endLocation,
                     isOrganiser,
-                    isParticipant,currentTimeMillis
+                    isParticipant, currentTimeMillis
                 )
             )
 
@@ -243,6 +248,7 @@ class JoinRideViewModel(
     private var rideRef: DatabaseReference? = null
     private var startedAt: Long? = null
     private val database = FirebaseDatabase.getInstance()
+    var endRideID: String? = null
 
     // Observe all riders in real-time
     fun observeRideLocations(rideId: String) {
@@ -264,6 +270,8 @@ class JoinRideViewModel(
                 startedAt = snapshot.child("dateTime").getValue(Double::class.java)?.toLong()
                 val connectedRides = snapshot.children.mapNotNull { child ->
                     val data = child.value as? Map<*, *> ?: return@mapNotNull null
+                    if (data["userID"] == androidUserVM.getCurrentUserUID())
+                        endRideID = child.key.orEmpty()
 
                     ConnectedRideDTO(
                         rideJoinedID = child.key ?: "", // Usually the push key

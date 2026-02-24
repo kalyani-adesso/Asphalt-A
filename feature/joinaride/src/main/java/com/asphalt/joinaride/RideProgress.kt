@@ -236,10 +236,11 @@ fun RideProgress(
                     val duration = viewmodel.finalDuration.value
                     Log.d("TAG", "RideProgress: timeformat  ${formatTime(duration)}")
                     Log.d("TAG", "RideProgress: finalDuration  ${formatTime(finalDuration)}")
+                    Log.d("TAG", "RideProgress: endRideId  ${viewmodel.endRideID}")
 
                     viewmodel.endRide(
                         rideId = ridesData.ridesID ?: "",
-                        rideJoinedId = ridesData.rideJoinedID ?: ""
+                        rideJoinedId = viewmodel.endRideID ?: ""
                     )
                     val isOrganiser = ridesData.createdBy == androidUserVM.getCurrentUserUID()
                     viewmodel.sendEndRideSummary(
