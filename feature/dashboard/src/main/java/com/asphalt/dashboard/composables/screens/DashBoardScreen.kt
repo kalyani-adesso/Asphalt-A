@@ -141,7 +141,7 @@ fun DashBoardScreen(
                                     tint = Color.Unspecified
                                 )
                                 Text(
-                                    "Level 4 - Rider",
+                                    "Level 1 - Rider",
                                     style = Typography.bodyMedium,
                                     fontSize = Dimensions.textSize16
                                 )

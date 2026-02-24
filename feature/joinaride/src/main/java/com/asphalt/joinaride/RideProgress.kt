@@ -24,7 +24,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,8 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.asphalt.android.constants.APIConstants.END_RIDE
-import com.asphalt.android.constants.APIConstants.RIDE_JOINED
-import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
@@ -51,7 +48,6 @@ import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -59,7 +55,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
     viewmodel: JoinRideViewModel = koinViewModel(),
-    onClickEndRide :() -> Unit,
+    onClickEndRide: () -> Unit,
     ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
@@ -129,20 +125,22 @@ fun RideProgress(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp),
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        vertical = Dimensions.padding8,
-                        horizontal = Dimensions.padding16
-                    ),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            vertical = Dimensions.padding8,
+                            horizontal = Dimensions.padding16
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(vertical = Dimensions.padding6)
-                    ){
+                    ) {
                         Box(contentAlignment = Alignment.BottomEnd) {
 
                             CircularNetworkImage(
@@ -169,7 +167,7 @@ fun RideProgress(
                     Column(
                         verticalArrangement = Arrangement.Center,
 
-                    ) {
+                        ) {
                         Text(
                             text = currentUser.value?.name.toString(),
                             style = TypographyBold.bodySmall,
@@ -197,13 +195,15 @@ fun RideProgress(
                             )
                         }
                     }
-                    Row(horizontalArrangement = Arrangement.End,
+                    Row(
+                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)) {
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Button(
                             onClick = {
-                               // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
-                                onClickEndRide.invoke()
+                                // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
+//                                onClickEndRide.invoke()
                             },
                             modifier = Modifier
                                 .widthIn(min = 130.dp, max = 130.dp)
@@ -228,14 +228,28 @@ fun RideProgress(
             // end ride button
             RedButton(
                 onClick = {
-                    viewmodel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
-                        status = END_RIDE)
-                       val finalDuration =  viewmodel.stopRide()
+                    viewmodel.updateRideStatus(
+                        userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
+                        status = END_RIDE
+                    )
+                    val finalDuration = viewmodel.stopRide()
                     val duration = viewmodel.finalDuration.value
                     Log.d("TAG", "RideProgress: timeformat  ${formatTime(duration)}")
                     Log.d("TAG", "RideProgress: finalDuration  ${formatTime(finalDuration)}")
 
-                    viewmodel.endRide(rideId=ridesData.ridesID ?: "", rideJoinedId = ridesData.rideJoinedID ?: "")
+                    viewmodel.endRide(
+                        rideId = ridesData.ridesID ?: "",
+                        rideJoinedId = ridesData.rideJoinedID ?: ""
+                    )
+                    val isOrganiser = ridesData.createdBy == androidUserVM.getCurrentUserUID()
+                    viewmodel.sendEndRideSummary(
+                        ridesData.ridesID,
+                        ridesData.rideDistance,
+                        ridesData.rideType != Constants.SOLO,
+                        ridesData.startLocation,
+                        ridesData.endLocation,
+                        isOrganiser,!isOrganiser, System.currentTimeMillis()
+                    )
                     onClickEndRide.invoke()
                 },
                 modifier = Modifier
@@ -258,6 +272,6 @@ fun RideProgress(
 @Composable
 fun RideProgressPreview() {
 
-   // RideProgress(onClickEndRide = {})
+    // RideProgress(onClickEndRide = {})
 
 }

@@ -10,6 +10,7 @@ import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -62,7 +63,7 @@ class JoinRideViewModel(
             val q = query.trim().lowercase()
             ridesList
                 .filter { ride ->
-                    (ride.createdBy == currentUid && ride.rideStatus!= APIConstants.END_RIDE)||
+                    (ride.createdBy == currentUid && ride.rideStatus != APIConstants.END_RIDE) ||
                             ride.participants.any {
                                 it.inviteStatus in listOf(
                                     RIDE_ACCEPTED,
@@ -205,6 +206,32 @@ class JoinRideViewModel(
             val result = ridesRepo.endRide(rideId = rideId, rideJoinedId = rideJoinedId)
             _endRideResult.value = result
             Log.d("TAG", "endRide: $result")
+        }
+    }
+
+    fun sendEndRideSummary(
+        ridesID: String?,
+        rideDistance: Double,
+        isGroupRide: Boolean,
+        startLocation: String?,
+        endLocation: String?,
+        isOrganiser: Boolean,
+        isParticipant: Boolean,
+        currentTimeMillis: Long
+    ) {
+        viewModelScope.launch {
+            ridesRepo.endRideSummary(
+                androidUserVM.getCurrentUserUID(), DashboardDTO(
+                    ridesID,
+                    rideDistance,
+                    isGroupRide,
+                    startLocation,
+                    endLocation,
+                    isOrganiser,
+                    isParticipant,currentTimeMillis
+                )
+            )
+
         }
     }
 

@@ -13,6 +13,7 @@ object APIConstants {
     const val PARTICIPANTS_URL = "/participants"
     const val GENERIC_ERROR_MSG = "Something went wrong!"
     const val PLACE_SEARCH = "/search"
+    const val JSON_EXCEPTION_CODE = -1
 
     const val RATINGS = "/ratings"
 
