@@ -61,7 +61,13 @@ struct ProfileScreen: View {
                             SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
                         }
                         if showEditProfile {
-                            EditProfileView(isPresented: $showEditProfile)
+                            EditProfileView(profileViewModel: viewModel, isPresented: $showEditProfile)
+                                .onDisappear {
+                                    // Refresh when sheet closes (e.g. after Cancel) so data stays in sync
+                                    Task {
+                                        await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                                    }
+                                }
                         }
                     }
                 }
@@ -70,16 +76,21 @@ struct ProfileScreen: View {
                 .refreshable {
                     Task {
                         await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                        await viewModel.loadData(homeVM: homeVM)
                     }
                 }
                 .task {
-                    await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                    // Load profile and stats in parallel so the screen feels faster
+                    async let loadStats: () = viewModel.loadData(homeVM: homeVM)
+                    async let loadProfile: () = viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                    _ = await loadStats
+                    _ = await loadProfile
                 }
-                .onAppear {
-                    viewModel.loadData(homeVM: homeVM)
-                    }
                 if viewModel.isLoading {
-                    ProgressViewReusable(title: "Loading Profile...")
+                    // Light overlay only while profile (header) is loading; content is already visible
+                    Color.black.opacity(0.15)
+                        .ignoresSafeArea()
+                    ProgressViewReusable(title: "Loading...")
                 }
             }
     }
@@ -96,7 +107,17 @@ struct ProfileSectionView: View {
                 .padding([.top,.bottom],21)
                 .padding(.horizontal,16)
             if section.section == 0 {
-                YourVehicleRow(item: section.items[0], itemIsSelected: $itemSelected, viewModel: viewModel)
+                if viewModel.isLoadingBikes {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .padding()
+                        Spacer()
+                    }
+                    .frame(height: 80)
+                } else {
+                    YourVehicleRow(item: section.items[0], itemIsSelected: $itemSelected, viewModel: viewModel)
+                }
             } else if section.section == 1 {
                 ProfileGridView(items: section.items)
             } else {
