@@ -53,7 +53,7 @@ class JoinRideViewModel(
 //    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
 //    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
 
-    private val currentUid = androidUserVM.userState.value?.uid
+    val currentUid = androidUserVM.userState.value?.uid
 
     // Accepted rides with search filter
     val acceptedRides: StateFlow<List<RidesData>> =
@@ -62,7 +62,12 @@ class JoinRideViewModel(
             ridesList
                 .filter { ride ->
                     ride.createdBy == currentUid ||
-                            ride.participants.any { it.inviteStatus in listOf(RIDE_ACCEPTED, RIDE_JOINED)}
+                            ride.participants.any {
+                                it.inviteStatus in listOf(
+                                    RIDE_ACCEPTED,
+                                    RIDE_JOINED
+                                )
+                            }
                 }
                 .let { accepted ->
                     if (q.isEmpty()) accepted
@@ -73,11 +78,14 @@ class JoinRideViewModel(
     init {
         getAllRiders()
     }
+
     fun setRideId(selectedId: String) {
         _rideId.value = selectedId
         idRepository.id = selectedId
     }
-    fun getRideId() : String? = idRepository.id
+
+    fun getRideId(): String? = idRepository.id
+
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -93,6 +101,7 @@ class JoinRideViewModel(
             }
         }
     }
+
     fun setCreatedBy(ride: RidesData): String {
         return if (androidUserVM.getCurrentUserUID() == ride.createdBy) "Me"
         else androidUserVM.getUser(ride.createdBy.toString())?.name.orEmpty()
@@ -119,6 +128,7 @@ class JoinRideViewModel(
             }
         }
     }
+
     fun joinRide(joinRide: RidesData) {
 
         viewModelScope.launch {
@@ -138,7 +148,8 @@ class JoinRideViewModel(
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
-    fun getOnGoingRides(rideId:String) {
+
+    fun getOnGoingRides(rideId: String) {
 
         viewModelScope.launch {
 
@@ -147,7 +158,7 @@ class JoinRideViewModel(
                 //    val sortedArray = response.sortedBy{ it.startDate }}
                 // Filter out current user from “other users
                 val otherUsers = response.filter { it.userID != currentUid }
-              //  val joinedList = otherUsers
+                //  val joinedList = otherUsers
                 _joinedUsers.value = otherUsers
                 Log.d("TAG", "getOnGoingRides otherUsers: ${otherUsers.size}")
 
@@ -188,9 +199,9 @@ class JoinRideViewModel(
 
     private val _endRideResult = MutableStateFlow<APIResult<Unit>?>(null)
     val endRideResult = _endRideResult
-    fun endRide(rideId: String,rideJoinedId: String) {
+    fun endRide(rideId: String, rideJoinedId: String) {
         viewModelScope.launch {
-            val result = ridesRepo.endRide(rideId = rideId,rideJoinedId = rideJoinedId)
+            val result = ridesRepo.endRide(rideId = rideId, rideJoinedId = rideJoinedId)
             _endRideResult.value = result
             Log.d("TAG", "endRide: $result")
         }
@@ -199,11 +210,13 @@ class JoinRideViewModel(
     fun removeEndRideList(joinRide: List<RidesData>) {
         _rides.value = joinRide.filter { it.rideStatus != 4 }
     }
+
     //Firebase
     private var rideListener: ValueEventListener? = null
     private var rideRef: DatabaseReference? = null
     private var startedAt: Long? = null
     private val database = FirebaseDatabase.getInstance()
+
     // Observe all riders in real-time
     fun observeRideLocations(rideId: String) {
         // Remove old listener safely
@@ -244,6 +257,7 @@ class JoinRideViewModel(
                 Log.d("connectedRides=", joinedUsers.value.size.toString())
 
             }
+
             override fun onCancelled(error: DatabaseError) {
                 rideListener?.let {
                     rideListener?.let { rideRef?.removeEventListener(it) }
@@ -281,7 +295,7 @@ class JoinRideViewModel(
         }
     }
 
-    fun stopRide() : Long {
+    fun stopRide(): Long {
         _isRideStarted.value = false
         timerJob?.cancel()
         timerJob = null
@@ -294,12 +308,15 @@ class JoinRideViewModel(
         rideStartTime = null
         return finalSeconds
     }
+
     fun setEndTime(finalTime: Long) {
         _finalDuration.value = finalTime
     }
+
     override fun onCleared() {
         rideListener?.let { rideRef?.removeEventListener(it) }
         timerJob?.cancel()
         super.onCleared()
     }
+
 }

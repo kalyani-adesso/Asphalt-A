@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.model.rides.showRejoinButton
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.SearchView
@@ -67,39 +68,45 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 @Composable
 fun JoinRideMainListScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    navigateToConnectedRide:(RidesData) -> Unit,
-    navigateToEndRide : () -> Unit)
-{
+    navigateToConnectedRide: (RidesData) -> Unit,
+    navigateToEndRide: () -> Unit
+) {
     var toolbarTitle by remember { mutableStateOf("") }
     toolbarTitle = stringResource(R.string.join_ride)
 
     setTopAppBarState(
-        AppBarState(title = toolbarTitle))
-        Column(modifier = Modifier
+        AppBarState(title = toolbarTitle)
+    )
+    Column(
+        modifier = Modifier
             .fillMaxSize()
             .background(
                 color = NeutralWhite,
-            )) {
-            JoinRide(viewModel,
-                navigateToConnectedRide = {rides -> navigateToConnectedRide.invoke(rides)},
-                navigateToEndRide = { navigateToEndRide.invoke()})
-        }
+            )
+    ) {
+        JoinRide(
+            viewModel,
+            navigateToConnectedRide = { rides -> navigateToConnectedRide.invoke(rides) },
+            navigateToEndRide = { navigateToEndRide.invoke() })
+    }
 }
+
 @Composable
 fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
 
-) {
+    ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
 
-    val sortedList = rides.sortedByDescending{ it .createdDate}
+    val sortedList = rides.sortedByDescending { it.createdDate }
 
     // ride removed from list once completed
 //    LaunchedEffect(Unit) {
@@ -121,7 +128,8 @@ fun JoinRide(
                     shape = RoundedCornerShape(size = Dimensions.size10)
                 ),
             onQueryChange = {
-                viewModel.setSearchQuery(it) },
+                viewModel.setSearchQuery(it)
+            },
             onClearClick = {
                 viewModel.setSearchQuery("") // Clear search filter
             },
@@ -136,13 +144,14 @@ fun JoinRide(
             ) {
                 Text(text = "No Riders Found", style = MaterialTheme.typography.bodyLarge)
             }
-        }
-        else {
+        } else {
             // display riders list
             LazyColumn {
                 items(items = sortedList) { rider ->
-                    RiderCard( navigateToConnectedRide = {ridesD ->
-                        navigateToConnectedRide.invoke(ridesD)},
+                    RiderCard(
+                        navigateToConnectedRide = { ridesD ->
+                            navigateToConnectedRide.invoke(ridesD)
+                        },
                         navigateToEndRide = { navigateToEndRide.invoke() },
                         ridesData = rider, viewModel = viewModel
                     )
@@ -157,8 +166,9 @@ fun JoinRide(
 fun RiderCard(
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
-    ridesData : RidesData,
-    viewModel: JoinRideViewModel) {
+    ridesData: RidesData,
+    viewModel: JoinRideViewModel
+) {
 
     val createdBy = viewModel.setCreatedBy(ridesData)
 
@@ -360,7 +370,7 @@ fun RiderCard(
                         )
                     }
 //                     join/ rejoin ride button
-                    if (ridesData.rideStatus == RIDE_JOINED) {
+                    if (ridesData.showRejoinButton(viewModel.currentUid ?: "")) {
                         ElevatedButton(
                             modifier = Modifier
                                 .weight(weight = 1f)
@@ -447,6 +457,7 @@ fun RiderCard(
         }
     }
 }
+
 @Composable
 @Preview
 fun JoinRideScrenPreview() {
