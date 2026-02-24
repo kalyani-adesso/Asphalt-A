@@ -38,7 +38,7 @@ object RidesFilter {
                     val participant = ride.participants.find { it.userId == userId }
                     participant?.let {
                         when (it.inviteStatus) {
-                            APIConstants.RIDE_ACCEPTED -> UPCOMING
+                            APIConstants.RIDE_JOINED, APIConstants.RIDE_ACCEPTED -> UPCOMING
                             else -> null
                         }
                     }

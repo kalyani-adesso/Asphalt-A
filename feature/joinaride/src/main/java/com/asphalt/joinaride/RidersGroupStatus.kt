@@ -69,25 +69,24 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RidersGroupStatus(
     viewModel: JoinRideViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
-    ridesData: RidesData
 
-) {
+    ) {
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
 
-    val rideUsers by viewModel.rideUsers.collectAsState()
+//    val rideUsers by viewModel.rideUsers.collectAsState()
 
-    val riders by viewModel.joinedUsers.collectAsState()
+//    val riders by viewModel.joinedUsers.collectAsState()
 
-    val currentUser = androidUserVM.userState.collectAsState(null)
+//    val currentUser = androidUserVM.userState.collectAsState(null)
 
     val joinedRiders by viewModel.joinedUsers.collectAsState()
 
-    LaunchedEffect(currentUser) {
-        val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
-        viewModel.observeRideLocations(ridesData.ridesID.toString())
-        Log.d("TAG", "RidersGroupStatus userData: $userData")
-    }
+//    LaunchedEffect(currentUser) {
+//        val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+//        viewModel.observeRideLocations(ridesData.ridesID.toString())
+//        Log.d("TAG", "RidersGroupStatus userData: $userData")
+//    }
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -132,14 +131,11 @@ fun RidersGroupStatus(
                     ), contentPadding = PaddingValues(bottom = Dimensions.padding10),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.padding6)
             ) {
-                items(items=riders,
-                    key = {it.rideJoinedID}) { riders ->
-                    val userData= rideUsers.firstOrNull { it.ridesID == riders.userID }
+                items(items = joinedRiders.filter { rideDTO -> rideDTO.userID != androidUserVM.getCurrentUserUID() }) { rider ->
+//                    val userData= rideUsers.firstOrNull { it.ridesID == riders.userID }
 
                     Spacer(Modifier.height(Dimensions.padding10))
-                    if (userData != null) {
-                        GroupRidersCard(riders,userData,viewModel,androidUserVM)
-                    }
+                    GroupRidersCard(rider, viewModel, androidUserVM)
                 }
             }
         }
@@ -148,10 +144,11 @@ fun RidersGroupStatus(
 
 @Composable
 fun GroupRidersCard(
-    ridersList: ConnectedRideDTO,
-    ridesData: RidesData?,
+//    ridersList: List<ConnectedRideDTO>,
+    riderData: ConnectedRideDTO?,
     viewModel: JoinRideViewModel = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel()) {
+    androidUserVM: AndroidUserVM = koinViewModel()
+) {
 
     val currentUser = androidUserVM.userState.collectAsState(null)
     val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
@@ -195,7 +192,7 @@ fun GroupRidersCard(
                     Spacer(Modifier.width(Dimensions.size5))
                     Column(modifier = Modifier) {
                         Row() {
-                            val name = ridesData?.createdBy?.take(20)
+                            val name = androidUserVM.getUser(riderData?.userID ?: "")?.name
 
                             Text(
                                 text = name ?: "",
@@ -205,7 +202,7 @@ fun GroupRidersCard(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Spacer(Modifier.width(Dimensions.size5))
-                            when (ridersList.status) {
+                            when (riderData?.status) {
                                 "Connected" -> {
                                     Row(
                                         modifier = Modifier
@@ -220,15 +217,18 @@ fun GroupRidersCard(
                                                 //                      top = Dimensions.size5,
                                                 //                      bottom =  Dimensions.size2pt5
                                             ),
-                                        verticalAlignment = Alignment.CenterVertically) {
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
-                                            text = ridersList.status,
+                                            text = riderData.status,
                                             style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                             color = GreenLIGHT25,
-                                            modifier = Modifier)
+                                            modifier = Modifier
+                                        )
                                     }
                                 }
+
                                 "Delayed" -> {
                                     Row(
                                         modifier = Modifier
@@ -249,12 +249,14 @@ fun GroupRidersCard(
                                         ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
-                                            text = ridersList.status,
+                                            text = riderData.status,
                                             style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                             color = NeutralBrown,
-                                            modifier = Modifier)
+                                            modifier = Modifier
+                                        )
                                     }
                                 }
+
                                 "Stopped" -> {
                                     Row(
                                         modifier = Modifier
@@ -275,10 +277,11 @@ fun GroupRidersCard(
                                         ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
-                                            text = ridersList.status,
+                                            text = riderData.status,
                                             style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                             color = DarkBrown,
-                                            modifier = Modifier)
+                                            modifier = Modifier
+                                        )
                                     }
                                 }
                             }
@@ -294,10 +297,11 @@ fun GroupRidersCard(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = ridesData?.createdBy ?: "",
+                                text = riderData?.speedInKph?.toString() ?: "",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
-                                modifier = Modifier)
+                                modifier = Modifier
+                            )
                             Spacer(modifier = Modifier.width(Dimensions.padding5))
                             Image(
                                 painter = painterResource(R.drawable.ic_circle),
@@ -316,16 +320,21 @@ fun GroupRidersCard(
                         }
                     }
                     Spacer(modifier = Modifier.width(Dimensions.padding))
-                    Row(horizontalArrangement = Arrangement.End,
+                    Row(
+                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)) {
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Box(
                             modifier = Modifier
                                 .clickable {
                                     // onDeleteBike.invoke()
                                 }
                         ) {
-                            ColorIconRounded(backColor = PrimaryBrighterLightW75, resId = R.drawable.ic_call_white)
+                            ColorIconRounded(
+                                backColor = PrimaryBrighterLightW75,
+                                resId = R.drawable.ic_call_white
+                            )
                         }
                         Spacer(modifier = Modifier.width(Dimensions.padding10))
                         Box(
@@ -334,7 +343,10 @@ fun GroupRidersCard(
                                     // onDeleteBike.invoke()
                                 }
                         ) {
-                            ColorIconRounded(backColor = PrimaryBrighterLightW75, resId = R.drawable.ic_message)
+                            ColorIconRounded(
+                                backColor = PrimaryBrighterLightW75,
+                                resId = R.drawable.ic_message
+                            )
                         }
                     }
 

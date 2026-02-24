@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
+import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
@@ -49,8 +50,8 @@ class JoinRideViewModel(
     val rideId = _rideId.asStateFlow()
     private val _joinedUsers = MutableStateFlow<List<ConnectedRideDTO>>(emptyList())
     val joinedUsers: StateFlow<List<ConnectedRideDTO>> = _joinedUsers
-    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
-    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
+//    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
+//    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
 
     private val currentUid = androidUserVM.userState.value?.uid
 
@@ -61,7 +62,7 @@ class JoinRideViewModel(
             ridesList
                 .filter { ride ->
                     ride.createdBy == currentUid ||
-                            ride.participants.any { it.inviteStatus == RIDE_ACCEPTED }
+                            ride.participants.any { it.inviteStatus in listOf(RIDE_ACCEPTED, RIDE_JOINED)}
                 }
                 .let { accepted ->
                     if (q.isEmpty()) accepted
@@ -155,7 +156,7 @@ class JoinRideViewModel(
                         RidesData(ridesID = user.uid, createdBy = user.name)
                     }
                 }
-                _rideUsers.value = rideUsersList
+//                _rideUsers.value = rideUsersList
 
                 val user = ridesRepo.getSingeRide(rideId)
                 Log.d("TAG", "getOnGoingRides: user $user ")

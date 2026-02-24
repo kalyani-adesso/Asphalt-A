@@ -58,11 +58,17 @@ fun ConnectedRideGoogleMapScreen(
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
+    val currentUser = androidUserVM.userState.collectAsState(null)
 
     val elapsedTime by rideViewModel.elapsedTime.collectAsState()
 
     LaunchedEffect(Unit) {
         rideViewModel.startRideTimer()
+    }
+    LaunchedEffect(currentUser) {
+        val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+        rideViewModel.observeRideLocations(ridesData.ridesID.toString())
+        Log.d("TAG", "RidersGroupStatus userData: $userData")
     }
 
     val rideId = rideViewModel.getRideId()
@@ -168,7 +174,7 @@ fun ConnectedRideGoogleMapScreen(
             RideProgress(androidUserVM = androidUserVM,
                 onClickEndRide = onClick,
                 ridesData = ridesData)
-            RidersGroupStatus(rideViewModel,androidUserVM,ridesData)
+            RidersGroupStatus(rideViewModel,androidUserVM)
             EmergecyActions()
 
         }
