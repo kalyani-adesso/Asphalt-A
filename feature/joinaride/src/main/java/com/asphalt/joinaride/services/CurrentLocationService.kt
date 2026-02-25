@@ -1,5 +1,6 @@
 package com.asphalt.joinaride.services
 
+import android.R
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -23,9 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
-class CurrentLocationService : Service(){
+class CurrentLocationService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val database = PlatformDatabase() // Your Firebase/KMP wrapper
@@ -53,7 +55,7 @@ class CurrentLocationService : Service(){
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Ride Active")
             .setContentText("Sharing live location with your group...")
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+            .setSmallIcon(R.drawable.ic_menu_mylocation)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
 //            .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
@@ -61,7 +63,11 @@ class CurrentLocationService : Service(){
 
         // 2. Start Foreground (Handle Android 14+ types)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
@@ -80,7 +86,13 @@ class CurrentLocationService : Service(){
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.lastLocation ?: return
-                saveToFirebase(location.latitude, location.longitude)
+                var speedInMps: Float
+                var speedInKph = 0.0
+                if (location.hasSpeed()) {
+                     speedInMps = location.speed // Meters per second
+                     speedInKph = speedInMps * 3.6
+                }
+                saveToFirebase(location.latitude, location.longitude,speedInKph)
             }
         }
 
@@ -95,14 +107,15 @@ class CurrentLocationService : Service(){
         }
     }
 
-    private fun saveToFirebase(lat: Double, lng: Double) {
+    private fun saveToFirebase(lat: Double, lng: Double, speedInKph: Double) {
         val rId = rideId ?: return
         val uId = ongoingRideId ?: return
-
+        val roundedSpeed = (speedInKph * 100).roundToInt() / 100.0
         serviceScope.launch {
             val data = mapOf(
                 "currentLat" to lat,
                 "currentLong" to lng,
+                "speedInKph" to roundedSpeed
 //                "timestamp" to System.currentTimeMillis()
             )
             database.getReference("ongoing_ride/$rId/$uId").updateChildren(data)
@@ -124,7 +137,7 @@ class CurrentLocationService : Service(){
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
-        Log.d("service?","stopped")
+        Log.d("service?", "stopped")
         serviceScope.cancel()
         super.onDestroy()
     }
