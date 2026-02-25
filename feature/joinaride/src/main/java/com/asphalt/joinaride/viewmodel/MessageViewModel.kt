@@ -37,4 +37,49 @@ class MessageViewModel : ViewModel() {
     fun cancel() {
         _customMessage.value = ""
     }
+
+    private val _uiState = MutableStateFlow(MessageDriverUiState())
+    val uiState: StateFlow<MessageDriverUiState> = _uiState.asStateFlow()
+
+    fun onEvent(event: MessageDriverEvent) {
+        when (event) {
+
+            is MessageDriverEvent.OnQuickMessageClick -> {
+                _uiState.value = _uiState.value.copy(
+                    customMessage = event.message
+                )
+            }
+
+            is MessageDriverEvent.OnCustomMessageChange -> {
+                _uiState.value = _uiState.value.copy(
+                    customMessage = event.message
+                )
+            }
+
+            MessageDriverEvent.OnSendClick -> {
+                sendMessage()
+            }
+
+            MessageDriverEvent.OnCancelClick -> {
+                _uiState.value = _uiState.value.copy(
+                    customMessage = ""
+                )
+            }
+        }
+    }
+
+    private fun sendMessage() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSending = true)
+
+            // Simulate API call
+            delay(1500)
+
+            _uiState.value = _uiState.value.copy(
+                isSending = false,
+                customMessage = ""
+            )
+        }
+    }
+
 }
