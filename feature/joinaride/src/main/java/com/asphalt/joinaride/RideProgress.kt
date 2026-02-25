@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -59,6 +61,7 @@ fun RideProgress(
     ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
+    val context = LocalContext.current
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -228,6 +231,7 @@ fun RideProgress(
             // end ride button
             RedButton(
                 onClick = {
+                    CurrentLocationUpdates.stopRideTracking(context)
                     viewmodel.updateRideStatus(
                         userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
                         status = END_RIDE
@@ -249,8 +253,9 @@ fun RideProgress(
                         ridesData.rideType != Constants.SOLO,
                         ridesData.startLocation,
                         ridesData.endLocation,
-                        isOrganiser,!isOrganiser, System.currentTimeMillis()
+                        isOrganiser, !isOrganiser, System.currentTimeMillis()
                     )
+
                     onClickEndRide.invoke()
                 },
                 modifier = Modifier

@@ -22,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.utils.ImageUtils.bitmapDescriptorFromVector
+import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -47,13 +49,25 @@ fun CurrentLocationMapScreen(
 ) {
 
     //val rideId = rideViewModel.getRideId()
-
+    val context = LocalContext.current
     val rideId = rideViewModel.getRideId()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
 
     LaunchedEffect(rideId) {
         rideId?.let {
             rideViewModel.observeRideLocations(it)
+        }
+    }
+    val ongoingRideID by rideViewModel.ongoingRideUpdate.collectAsStateWithLifecycle()
+    LaunchedEffect(ongoingRideID) {
+        if (ongoingRideID.isNotEmpty()) {
+            ridesData.ridesID?.let {
+                CurrentLocationUpdates.startRideTracking(
+                    context,
+                    it,
+                    ongoingRideID,
+                )
+            }
         }
     }
 
@@ -201,7 +215,10 @@ fun MapWithCurrentLocation(
                 )
             }
             val customDestinationPin = remember(context) {
-                bitmapDescriptorFromVector(context, com.asphalt.commonui.R.drawable.ic_destination_pin)
+                bitmapDescriptorFromVector(
+                    context,
+                    com.asphalt.commonui.R.drawable.ic_destination_pin
+                )
             }
 
             Marker(
@@ -230,7 +247,10 @@ fun MapWithCurrentLocation(
 //                        snippet = "${rider.speedInKph} km/h"
 //                    )
                     Log.d("TAG", "MapWithCurrentLocation UserId: ${rider.userID}")
-                    Log.d("TAG", "MapWithCurrentLocation Rider: ${rider.currentLat} ${rider.currentLong}")
+                    Log.d(
+                        "TAG",
+                        "MapWithCurrentLocation Rider: ${rider.currentLat} ${rider.currentLong}"
+                    )
                 }
             }
             // Start & End markers

@@ -251,6 +251,8 @@ class JoinRideViewModel(
     private var startedAt: Long? = null
     private val database = FirebaseDatabase.getInstance()
     var endRideID: String? = null
+    private var _ongoingRideUpdate = MutableStateFlow("")
+    var ongoingRideUpdate = _ongoingRideUpdate.asStateFlow()
 
     // Observe all riders in real-time
     fun observeRideLocations(rideId: String) {
@@ -272,8 +274,10 @@ class JoinRideViewModel(
                 startedAt = snapshot.child("dateTime").getValue(Double::class.java)?.toLong()
                 val connectedRides = snapshot.children.mapNotNull { child ->
                     val data = child.value as? Map<*, *> ?: return@mapNotNull null
-                    if (data["userID"] == androidUserVM.getCurrentUserUID())
+                    if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()
+                        _ongoingRideUpdate.value = child.key.orEmpty()
+                    }
 
                     ConnectedRideDTO(
                         rideJoinedID = child.key ?: "", // Usually the push key
@@ -282,7 +286,7 @@ class JoinRideViewModel(
                         currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
                         currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
                         speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
-                        status = data["status"] as? String ?: "UNKNOWN",
+                        status = data["status"] as? String ?: "Connected",
                         dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
                         isRejoined = data["isRejoined"] as? Boolean ?: false
                     )
