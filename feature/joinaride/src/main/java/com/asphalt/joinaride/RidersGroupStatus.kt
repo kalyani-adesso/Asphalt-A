@@ -111,7 +111,7 @@ fun RidersGroupStatus(
 
                 Spacer(Modifier.width(Dimensions.size10))
                 Text(
-                    text = ("Group Status   (${joinedRiders.size} Riders)"),
+                    text = ("Group Status   (${if (joinedRiders.size > 0) joinedRiders.size - 1 else 0} Riders)"),
                     style = TypographyBold.titleMedium,
                     fontSize = Dimensions.textSize16,
                     maxLines = 1,
