@@ -2,6 +2,7 @@ package com.asphalt.joinaride
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +55,7 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.theme.BlueLite25
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
@@ -105,8 +107,10 @@ fun JoinRide(
     ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
+    viewModel.completedRideID(rides)
+    val completedRideID by viewModel.completedRideId.collectAsState()
 
-    val sortedList = rides.sortedBy{ it.startDate }
+    val sortedList = rides.sortedBy { it.startDate }
 
     // ride removed from list once completed
 //    LaunchedEffect(Unit) {
@@ -153,7 +157,7 @@ fun JoinRide(
                             navigateToConnectedRide.invoke(ridesD)
                         },
                         navigateToEndRide = { navigateToEndRide.invoke() },
-                        ridesData = rider, viewModel = viewModel
+                        ridesData = rider, viewModel = viewModel, completedRideID
                     )
                 }
             }
@@ -167,9 +171,10 @@ fun RiderCard(
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
     ridesData: RidesData,
-    viewModel: JoinRideViewModel
+    viewModel: JoinRideViewModel,
+    completedRideID: String?
 ) {
-
+    val context = LocalContext.current
     val createdBy = viewModel.setCreatedBy(ridesData)
 
     var currentRideId by remember { mutableStateOf("") }
@@ -412,18 +417,37 @@ fun RiderCard(
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
+                            startColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                BlueLite25
+                            } else {
+                                PrimaryDarkerLightB75
+                            },
+                            endColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                BlueLite25
+                            } else {
+                                PrimaryDarkerLightB75
+                            },
                             onClick = {
-                                viewModel.setRideId(ridesData.ridesID ?: "")
+                                if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                    Toast.makeText(
+                                        context,
+                                        "You are already on a ride. Please complete the current ride and then start a new one.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    viewModel.setRideId(ridesData.ridesID ?: "")
 
-                                // if user trying to join another ride previous will end then new ride join logic pending
-                                viewModel.updateRideStatus(
-                                    userId = ridesData.createdBy ?: "",
-                                    rideId = ridesData.ridesID ?: "",
-                                    status = RIDE_JOINED
-                                ) // status 3
-                                // post join ride
-                                viewModel.joinRide(joinRide = ridesData)
-                                navigateToConnectedRide.invoke(ridesData)
+                                    // if user trying to join another ride previous will end then new ride join logic pending
+                                    viewModel.updateRideStatus(
+                                        userId = ridesData.createdBy ?: "",
+                                        rideId = ridesData.ridesID ?: "",
+                                        status = RIDE_JOINED
+                                    ) // status 3
+                                    // post join ride
+                                    viewModel.joinRide(joinRide = ridesData)
+                                    navigateToConnectedRide.invoke(ridesData)
+                                }
+
                             },
                             buttonHeight = Dimensions.size50,
                             contentPadding = PaddingValues(Dimensions.size0)

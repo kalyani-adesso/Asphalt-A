@@ -87,6 +87,7 @@ val NeutralPink = Color(0xFFD20755)
 val NeutralBrown = Color(0xFF884B00)
 
 val DarkBrown = Color(0xFF9D0814)
+val BlueGray = Color(0x4D006EC7)
 
 val LightYellow = Color(0xFFF7F3C1)
 

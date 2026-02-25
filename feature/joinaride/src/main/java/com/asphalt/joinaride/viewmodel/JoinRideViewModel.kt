@@ -56,6 +56,8 @@ class JoinRideViewModel(
 //    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
 //    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
 
+    private val _completedRideId = MutableStateFlow<String?>(null)
+    val completedRideId: StateFlow<String?> = _completedRideId
     val currentUid = androidUserVM.userState.value?.uid
 
     // Accepted rides with search filter
@@ -352,6 +354,18 @@ class JoinRideViewModel(
         rideListener?.let { rideRef?.removeEventListener(it) }
         timerJob?.cancel()
         super.onCleared()
+    }
+
+    fun completedRideID(newRides: List<RidesData>) {
+        _completedRideId.value =
+            newRides.firstOrNull { ride ->
+                (ride.createdBy == currentUid && ride.rideStatus == APIConstants.RIDE_JOINED)
+                        ||
+                        ride.participants.any {
+                            it.userId == currentUid &&
+                                    it.inviteStatus == APIConstants.RIDE_JOINED
+                        }
+            }?.ridesID
     }
 
 }
