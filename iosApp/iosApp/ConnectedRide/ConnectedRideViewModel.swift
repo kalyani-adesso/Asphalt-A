@@ -66,6 +66,8 @@ struct Rider: Identifiable {
     var speed: Int // Kph
     var status: RiderStatus
     var timeSinceUpdate: String
+    /// Epoch milliseconds of last update; used to show live "Xs ago" in group section.
+    let lastUpdateEpochMillis: Int64
     var contactNumber: String
     var currentLat:Double
     var currentLong:Double
@@ -103,7 +105,7 @@ struct ConnectedRideMessage: Identifiable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -112,6 +114,9 @@ final class ConnectedRideViewModel: ObservableObject {
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
     var ongoingRideTimer:Timer?
+    /// Ticks every second when groupRiders is non-empty so group section "Xs ago" updates live.
+    @Published var groupStatusTick: Int = 0
+    private var groupStatusTimer: Timer?
     private var previousRidersDict: [String: Rider] = [:]
     /// Cache for user lookups (userId → (name, contact)). Only name/contact; status always comes from snapshot.
     private var userDetailsCache: [String: (name: String, contact: String)] = [:]
@@ -175,7 +180,7 @@ final class ConnectedRideViewModel: ObservableObject {
     
     func endRide() {
         print("Ride ended.")
-        // Example of a state change that updates the view:
+        stopGroupStatusTimer()
         self.groupRiders = []
         self.isGroupNavigationActive = false
         self.activeRider = []
@@ -377,6 +382,7 @@ extension ConnectedRideViewModel {
                                     speed: Int(ongoingRide.speedInKph),
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,
+                                    lastUpdateEpochMillis: epochMillis,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: lat,
                                     currentLong: long,
@@ -398,6 +404,11 @@ extension ConnectedRideViewModel {
                                 self.detectRiderChanges(newRiders: updatedRiders)
                                 self.groupRiders = updatedRiders
                                 self.previousRidersDict = Dictionary(uniqueKeysWithValues: updatedRiders.map { ($0.contactNumber, $0) })
+                                if updatedRiders.isEmpty {
+                                    self.stopGroupStatusTimer()
+                                } else {
+                                    self.startGroupStatusTimer()
+                                }
                             }
                         }
                     },
@@ -571,15 +582,22 @@ extension ConnectedRideViewModel {
     }
 
     /// Extracts epoch millis from ConnectedRideDTO.dateTime for formatTime / status.
+    /// If value is in 1e9..<1e10 range, treats as seconds; else treats as milliseconds.
     private func epochMillisFromOngoing(_ ongoing: ConnectedRideDTO) -> Int64 {
-        if let num = ongoing.dateTime as? NSNumber { return num.int64Value }
-        if let val = ongoing.dateTime as? Int64 { return val }
-        return 0
+        let raw: Int64
+        if let num = ongoing.dateTime as? NSNumber { raw = num.int64Value }
+        else if let val = ongoing.dateTime as? Int64 { raw = val }
+        else { return 0 }
+        if raw <= 0 { return 0 }
+        if raw >= 1_000_000_000 && raw < 10_000_000_000 { return raw * 1000 }
+        return raw
     }
 
     func formatTime(from timestamp: Int64) -> String {
+        guard timestamp > 0 else { return "just now" }
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
-        let diff = Int(Date().timeIntervalSince(date))
+        var diff = Int(Date().timeIntervalSince(date))
+        if diff < 0 { diff = 0 }
         
         if diff < 60 {
             return "\(diff)s ago"
@@ -594,6 +612,23 @@ extension ConnectedRideViewModel {
     func stopOngoingRideTimer() {
         ongoingRideTimer?.invalidate()
         ongoingRideTimer = nil
+        stopGroupStatusTimer()
+    }
+
+    /// Starts a 1s timer that increments groupStatusTick so group section "Xs ago" updates every second.
+    func startGroupStatusTimer() {
+        guard groupStatusTimer == nil else { return }
+        groupStatusTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.groupStatusTick += 1
+            }
+        }
+        RunLoop.main.add(groupStatusTimer!, forMode: .common)
+    }
+
+    func stopGroupStatusTimer() {
+        groupStatusTimer?.invalidate()
+        groupStatusTimer = nil
     }
     
     func endRideSummary(ride: JoinRideModel, userID: String, completion: @escaping () -> Void) {

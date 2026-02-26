@@ -23,6 +23,8 @@ struct InAppNavigationView: View {
     @State private var recenterCounter: Int = 0
     @State private var focusCoordinate: CLLocationCoordinate2D? = nil
     @State private var focusCounter: Int = 0
+    /// When focusing on start (after simulation stopped), use larger distance to zoom out.
+    @State private var focusCameraDistance: Double? = nil
     @State private var followUserState: Bool = true
     @State private var showInstructions: Bool = false
     @State private var isCalculatingRoute: Bool = true
@@ -30,6 +32,17 @@ struct InAppNavigationView: View {
     @State private var routeETA: TimeInterval = 0
     private let synthesizer = AVSpeechSynthesizer()
     @StateObject private var speechDelegate = SpeechDelegate()
+    // Route simulation demo
+    @State private var isSimulating: Bool = false
+    @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
+    @State private var simulationIndex: Int = 0
+
+    /// User position shown on map: simulated during demo, or endpoint after demo ends, otherwise real location.
+    private var displayUserCoordinate: CLLocationCoordinate2D? {
+        if isSimulating { return simulatedCoordinate }
+        if let sim = simulatedCoordinate { return sim } // show endpoint after simulation ends
+        return locationManager.lastLocation?.coordinate
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -66,7 +79,7 @@ struct InAppNavigationView: View {
                 InAppMapView(routeCoordinates: routeCoordinates,
                              startCoordinate: start,
                              endCoordinate: end,
-                             userCoordinate: locationManager.lastLocation?.coordinate,
+                             userCoordinate: displayUserCoordinate,
                              followUser: followUserState,
                              cameraAltitude: 200,
                              mapType: mapType,
@@ -117,7 +130,21 @@ struct InAppNavigationView: View {
                             }
                             .disabled(steps.isEmpty)
 
-                        Button(action: { followUserState = true; recenterCounter += 1 }) {
+                        Button(action: {
+                            if isSimulating {
+                                followUserState = true
+                                recenterCounter += 1
+                            } else if simulatedCoordinate != nil {
+                                // Simulation stopped – show start point (default zoom)
+                                followUserState = false
+                                focusCoordinate = start
+                                focusCameraDistance = nil
+                                focusCounter += 1
+                            } else {
+                                followUserState = true
+                                recenterCounter += 1
+                            }
+                        }) {
                             Image(systemName: "location.fill")
                                 .font(.system(size: 18))
                                 .foregroundColor(.white)
@@ -149,6 +176,16 @@ struct InAppNavigationView: View {
                                 .background(.regularMaterial)
                                 .clipShape(Circle())
                         }
+
+                        Button(action: { toggleRouteSimulation() }) {
+                            Image(systemName: isSimulating ? "stop.circle.fill" : "play.circle.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(isSimulating ? Color.red : AppColor.celticBlue)
+                                .clipShape(Circle())
+                        }
+                        .disabled(routeCoordinates.isEmpty)
                     }
                     .padding(8)
                     .background(.ultraThinMaterial)
@@ -177,7 +214,8 @@ struct InAppNavigationView: View {
                     synthesizer.delegate = speechDelegate
                 }
                 .onDisappear {
-                    // Ensure any speaking stops when leaving the navigation view
+                    isSimulating = false
+                    simulatedCoordinate = nil
                     if synthesizer.isSpeaking {
                         synthesizer.stopSpeaking(at: .immediate)
                     }
@@ -266,6 +304,7 @@ struct InAppNavigationView: View {
     }
 
     func checkProgress(current: CLLocation) {
+        guard !isSimulating else { return }
         guard currentStepIndex < stepCoords.count else { return }
         let target = stepCoords[currentStepIndex]
         let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
@@ -274,6 +313,70 @@ struct InAppNavigationView: View {
         if distance <= 30 {
             speakStep(index: currentStepIndex)
             currentStepIndex += 1
+        }
+    }
+
+    // MARK: - Route simulation demo
+    func toggleRouteSimulation() {
+        if isSimulating {
+            stopRouteSimulation()
+        } else {
+            startRouteSimulation()
+        }
+    }
+
+    func startRouteSimulation() {
+        guard !routeCoordinates.isEmpty else { return }
+        simulationIndex = 0
+        currentStepIndex = 0
+        simulatedCoordinate = routeCoordinates[0]
+        isSimulating = true
+        followUserState = true
+        // Speak first instruction when simulation starts
+        if !steps.isEmpty {
+            speakStep(index: 0)
+        }
+        advanceSimulationStep(index: 0)
+    }
+
+    private func advanceSimulationStep(index: Int) {
+        guard isSimulating else { return }
+        let count = routeCoordinates.count
+        guard count > 0 else { stopRouteSimulation(); return }
+        if index >= count {
+            // Ensure we end exactly at the end point
+            simulatedCoordinate = routeCoordinates[count - 1]
+            simulationIndex = count - 1
+            recenterCounter += 1
+            stopRouteSimulation()
+            return
+        }
+        simulationIndex = index
+        simulatedCoordinate = routeCoordinates[index]
+        recenterCounter += 1
+        // Voice over: when simulated position is near next step, speak it
+        if currentStepIndex < stepCoords.count, let currentSim = simulatedCoordinate {
+            let target = stepCoords[currentStepIndex]
+            let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
+            let simLoc = CLLocation(latitude: currentSim.latitude, longitude: currentSim.longitude)
+            if simLoc.distance(from: targetLoc) <= 50 {
+                speakStep(index: currentStepIndex)
+                currentStepIndex += 1
+            }
+        }
+        // 1 second per point
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            advanceSimulationStep(index: index + 1)
+        }
+    }
+
+    func stopRouteSimulation() {
+        isSimulating = false
+        // Leave dot at endpoint when simulation ends (reached end or user tapped stop)
+        if !routeCoordinates.isEmpty {
+            simulatedCoordinate = routeCoordinates[routeCoordinates.count - 1]
+        } else {
+            simulatedCoordinate = nil
         }
     }
 
@@ -317,6 +420,7 @@ struct InAppNavigationView: View {
                                 Spacer()
                                 Button(action: {
                                     followUserState = false
+                                    focusCameraDistance = nil
                                     if i < stepCoords.count {
                                         focusCoordinate = stepCoords[i]
                                         focusCounter += 1

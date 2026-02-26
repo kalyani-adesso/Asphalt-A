@@ -22,6 +22,8 @@ struct ConnectedRideMapView: View {
     @State var showMessagePopup:Bool = false
     @State var showMessageNotification: Bool = false
     @State private var position: MapCameraPosition = .automatic
+    /// Saved when route is first fitted; used by refresh to restore original map view.
+    @State private var initialMapRegion: MKCoordinateRegion?
     @State private var trackingMode: MapUserTrackingMode = .none
     @State private var elapsedSeconds = 0
     @State private var selectedRiderName: String = ""
@@ -113,7 +115,7 @@ struct ConnectedRideMapView: View {
                         Section {
                             VStack {
                                 ZStack(alignment: .topLeading) {
-                                    BikeRouteMapView(position: $position, currentMapStyle:viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack)
+                                    BikeRouteMapView(position: $position, currentMapStyle: viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack, onRouteFitted: { initialMapRegion = $0 })
                                         .cornerRadius(12)
                                         .ignoresSafeArea(edges: .top)
                                     VStack {
@@ -194,7 +196,8 @@ struct ConnectedRideMapView: View {
                                     
                                     ForEach(viewModel.groupRiders.indices, id: \.self) { index in
                                         let rider = viewModel.groupRiders[index]
-                                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: rider.timeSinceUpdate, index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                        let _ = viewModel.groupStatusTick
+                                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
                                             selectedRiderName = viewModel.groupRiders[index].name
                                             viewModel.messageIndex = val
                                         })
@@ -457,7 +460,8 @@ struct ConnectedRideMapView: View {
     
     @ViewBuilder func floatingButton() -> some View {
         HStack(spacing: 10) {
-            ButtonView(title: "", icon: AppIcon.ConnectedRide.nearMe,onTap: {
+            ButtonView(title: "", icon: AppIcon.ConnectedRide.refresh, onTap: resetMapToInitial)
+            ButtonView(title: "", icon: AppIcon.ConnectedRide.nearMe, onTap: {
                 showNavigationOptions = true
             })
             .confirmationDialog("Navigation", isPresented: $showNavigationOptions, titleVisibility: .visible) {
@@ -482,10 +486,17 @@ struct ConnectedRideMapView: View {
                 InAppNavigationView(start: startCoord, end: endCoord)
             }
         }
-        .frame(width: 60)
+        .frame(width: 130)
         .padding(.trailing)
     }
     
+    func resetMapToInitial() {
+        guard let region = initialMapRegion else { return }
+        withAnimation(.easeInOut(duration: 0.35)) {
+            position = .region(region)
+        }
+    }
+
     func recenterMap() {
         if let userLocation = locationManager.manager.location?.coordinate {
             withAnimation {
@@ -658,7 +669,7 @@ struct GroupRiderView: View {
                     .resizable()
                     .clipShape(Circle())
                     .frame(width: 37, height: 37)
-                    .overlay(Circle().stroke(AppColor.green, lineWidth: 1.5))
+                    .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
                     .padding(.leading, 18)
                 
                 VStack(alignment: .leading, spacing: 5) {
@@ -667,11 +678,12 @@ struct GroupRiderView: View {
                             .font(KlavikaFont.bold.font(size: 16))
                             .foregroundColor(AppColor.black)
                         Text(status)
-                            .padding(6)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
                             .font(KlavikaFont.regular.font(size: 12))
                             .foregroundColor(statusTextColor)
                             .background(statusBgColor)
-                            .frame(height: 16)
+                            .fixedSize(horizontal: true, vertical: false)
                             .cornerRadius(10)
                     }
                     HStack(spacing: 3) {
@@ -730,6 +742,18 @@ struct GroupRiderView: View {
     var statusTextColor:Color {
         if status == RiderStatus.connected.rawValue {
             return AppColor.darkGreen
+        } else if status == RiderStatus.delayed.rawValue {
+            return AppColor.deepOrange
+        } else if status == RiderStatus.stopped.rawValue {
+            return AppColor.crimsonRed
+        } else {
+            return AppColor.pink
+        }
+    }
+    
+    var statusPinColor: Color {
+        if status == RiderStatus.connected.rawValue {
+            return AppColor.green
         } else if status == RiderStatus.delayed.rawValue {
             return AppColor.deepOrange
         } else if status == RiderStatus.stopped.rawValue {
