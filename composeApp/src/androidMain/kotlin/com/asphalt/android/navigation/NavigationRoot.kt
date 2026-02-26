@@ -93,6 +93,8 @@ fun NavigationRoot(
     var bannerMsg by remember { mutableStateOf("") }
     var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
     val density = LocalDensity.current
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     LaunchedEffect(Unit) {
 
         UIStateHandler.event.collect { state ->
@@ -149,6 +151,10 @@ fun NavigationRoot(
 
         else -> false
     }
+    val isGestureEnabled= when(key){
+        is AppNavKey.ConnectedRideMapNavKey -> !drawerState.isClosed
+        else -> true
+    }
 
     val showTopAppBar = when (key) {
         is AppNavKey.DashboardNavKey,
@@ -171,7 +177,6 @@ fun NavigationRoot(
         else -> false
     }
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     val items = listOf(
@@ -576,7 +581,7 @@ fun NavigationRoot(
                 }
             }
 
-        }) {
+        },isGestureEnabled) {
             AppContent()
         }
     else AppContent()

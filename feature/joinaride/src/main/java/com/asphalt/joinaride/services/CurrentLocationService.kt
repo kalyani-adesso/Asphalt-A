@@ -89,7 +89,7 @@ class CurrentLocationService : Service() {
                 var speedInMps: Float
                 var speedInKph = 0.0
                 if (location.hasSpeed()) {
-                     speedInMps = location.speed // Meters per second
+                     speedInMps = location.speed
                      speedInKph = speedInMps * 3.6
                 }
                 saveToFirebase(location.latitude, location.longitude,speedInKph)
