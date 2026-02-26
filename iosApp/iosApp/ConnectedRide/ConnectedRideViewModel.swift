@@ -377,8 +377,9 @@ extension ConnectedRideViewModel {
                                 }
 
                                 newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                                let name = (userDetails?.0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 let rider = Rider(
-                                    name: userDetails?.0 ?? "",
+                                    name: name.isEmpty ? "Rider" : name,
                                     speed: Int(ongoingRide.speedInKph),
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,

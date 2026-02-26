@@ -33,7 +33,14 @@ struct ConnectedRideMapView: View {
     @State private var showNavigationOptions: Bool = false
     @State private var showInAppNavigation: Bool = false
     var rideModel: JoinRideModel
-    
+
+    /// Display name for "Ride in Progress" card; fallback when userNameStatic is empty (e.g. after ride stopped).
+    private var currentUserDisplayName: String {
+        let name = MBUserDefaults.userNameStatic ?? ""
+        if !name.isEmpty { return name }
+        return rideModel.userId == MBUserDefaults.userIdStatic ? rideModel.organizer : "Rider"
+    }
+
     var body: some View {
         
         ZStack{
@@ -149,7 +156,7 @@ struct ConnectedRideMapView: View {
                             VStack(spacing: 18) {
                                 ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
                                 
-                                ActiveRiderView(title:  MBUserDefaults.userNameStatic ?? "", speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+                                ActiveRiderView(title: currentUserDisplayName, speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
                                 
                                 Button(action: {
                                     if rideModel.userId != MBUserDefaults.userIdStatic {
@@ -674,7 +681,7 @@ struct GroupRiderView: View {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
-                        Text(title)
+                        Text(title.isEmpty ? "Rider" : title)
                             .font(KlavikaFont.bold.font(size: 16))
                             .foregroundColor(AppColor.black)
                         Text(status)
