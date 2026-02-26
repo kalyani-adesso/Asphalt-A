@@ -79,8 +79,8 @@ class CurrentLocationService : Service() {
     }
 
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-            .setMinUpdateDistanceMeters(5f) // Only update if moved 5 meters to save battery
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
+//            .setMinUpdateDistanceMeters(5f) // Only update if moved 5 meters to save battery
             .build()
 
         val locationCallback = object : LocationCallback() {

@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.constants.APIConstants.END_RIDE
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -62,16 +64,19 @@ fun RideProgress(
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
     val context = LocalContext.current
+    val currentUserConnectedRideData by viewmodel.currentUserConnectedRideData.collectAsStateWithLifecycle()
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16)
+                .padding(
+                    vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16
+                )
                 .fillMaxWidth()
         ) {
             Row(
@@ -80,8 +85,7 @@ fun RideProgress(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)
                 ) {
                     CircularNetworkImage(
                         modifier = Modifier.border(
@@ -132,8 +136,7 @@ fun RideProgress(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            vertical = Dimensions.padding8,
-                            horizontal = Dimensions.padding16
+                            vertical = Dimensions.padding8, horizontal = Dimensions.padding16
                         ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -141,8 +144,7 @@ fun RideProgress(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(vertical = Dimensions.padding6)
+                        modifier = Modifier.padding(vertical = Dimensions.padding6)
                     ) {
                         Box(contentAlignment = Alignment.BottomEnd) {
 
@@ -151,9 +153,7 @@ fun RideProgress(
                                     width = Dimensions.size2pt5,
                                     color = GreenLIGHT,
                                     shape = CircleShape
-                                ),
-                                size = Dimensions.padding40,
-                                imageUrl = "ridersList.imgUrl" ?: ""
+                                ), size = Dimensions.padding40, imageUrl = "ridersList.imgUrl" ?: ""
                             )
                             Image(
                                 painter = painterResource(R.drawable.ic_online_icon),
@@ -191,7 +191,8 @@ fun RideProgress(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = "55 kph",
+                                text = (currentUserConnectedRideData?.speedInKph?.toString()
+                                    ?: "0") + "kph",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
                                 modifier = Modifier
@@ -233,7 +234,8 @@ fun RideProgress(
                 onClick = {
                     CurrentLocationUpdates.stopRideTracking(context)
                     viewmodel.updateRideStatus(
-                        userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
+                        userId = ridesData.createdBy ?: "",
+                        rideId = ridesData.ridesID ?: "",
                         status = END_RIDE
                     )
                     val finalDuration = viewmodel.stopRide()
@@ -243,8 +245,7 @@ fun RideProgress(
                     Log.d("TAG", "RideProgress: endRideId  ${viewmodel.endRideID}")
 
                     viewmodel.endRide(
-                        rideId = ridesData.ridesID ?: "",
-                        rideJoinedId = viewmodel.endRideID ?: ""
+                        rideId = ridesData.ridesID ?: "", rideJoinedId = viewmodel.endRideID ?: ""
                     )
                     val isOrganiser = ridesData.createdBy == androidUserVM.getCurrentUserUID()
                     viewmodel.sendEndRideSummary(
@@ -253,7 +254,9 @@ fun RideProgress(
                         ridesData.rideType != Constants.SOLO,
                         ridesData.startLocation,
                         ridesData.endLocation,
-                        isOrganiser, !isOrganiser, System.currentTimeMillis()
+                        isOrganiser,
+                        !isOrganiser,
+                        System.currentTimeMillis()
                     )
 
                     onClickEndRide.invoke()
@@ -261,12 +264,11 @@ fun RideProgress(
                 modifier = Modifier
                     .height(Dimensions.size50)
                     .fillMaxWidth(),
-                buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = "END RIDE",
-                    style = TypographyBold.bodySmall,
-                    color = Color.White
+                    text = "END RIDE", style = TypographyBold.bodySmall, color = Color.White
                 )
             }
         }
