@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationServices
@@ -44,6 +45,27 @@ object ShareLocation {
             } else {
                 Toast.makeText(context, "Unable to get location", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    fun openGoogleMapsNavigation(
+        context: Context,
+        destinationLat: Double,
+        destinationLng: Double
+    ) {
+        val gmmIntentUri = Uri.parse(
+            "https://www.google.com/maps/dir/?api=1&destination=$destinationLat,$destinationLng&travelmode=driving"
+        )
+
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+            setPackage("com.google.android.apps.maps")
+        }
+
+        if (mapIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(mapIntent)
+        } else {
+            val browserIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            context.startActivity(browserIntent)
         }
     }
 }
