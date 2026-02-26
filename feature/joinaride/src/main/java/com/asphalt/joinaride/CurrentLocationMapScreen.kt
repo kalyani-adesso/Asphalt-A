@@ -136,6 +136,8 @@ fun MapWithCurrentLocation(
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var mapLoaded by remember { mutableStateOf(false) }
+    val currentUserConnectedRideData by rideViewModel.currentUserConnectedRideData.collectAsStateWithLifecycle()
+
 
     val cameraPositionState = rememberCameraPositionState()
 
@@ -331,7 +333,7 @@ fun MapWithCurrentLocation(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "25",
+                        text = currentUserConnectedRideData?.speedInKph?.toString() ?:"0",
                         style = TypographyBold.bodyMedium,
                         fontSize = Dimensions.textSize19,
                         color = NeutralBlack

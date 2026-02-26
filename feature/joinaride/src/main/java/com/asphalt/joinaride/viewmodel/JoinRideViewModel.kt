@@ -53,6 +53,9 @@ class JoinRideViewModel(
     val rideId = _rideId.asStateFlow()
     private val _joinedUsers = MutableStateFlow<List<ConnectedRideDTO>>(emptyList())
     val joinedUsers: StateFlow<List<ConnectedRideDTO>> = _joinedUsers
+
+    private val _currentUserConnectedRideData = MutableStateFlow<ConnectedRideDTO?>(null)
+    val currentUserConnectedRideData = _currentUserConnectedRideData.asStateFlow()
 //    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
 //    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
 
@@ -274,22 +277,26 @@ class JoinRideViewModel(
                 startedAt = snapshot.child("dateTime").getValue(Double::class.java)?.toLong()
                 val connectedRides = snapshot.children.mapNotNull { child ->
                     val data = child.value as? Map<*, *> ?: return@mapNotNull null
+
+                    val connectedRideDTO =
+                        ConnectedRideDTO(
+                            rideJoinedID = child.key ?: "", // Usually the push key
+                            rideID = data["rideID"] as? String ?: "",
+                            userID = data["userID"] as? String ?: "",
+                            currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
+                            currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
+                            speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
+                            status = data["status"] as? String ?: "Connected",
+                            dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
+                            isRejoined = data["isRejoined"] as? Boolean ?: false
+                        )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()
                         _ongoingRideUpdate.value = child.key.orEmpty()
+                        _currentUserConnectedRideData.value = connectedRideDTO
                     }
+                    connectedRideDTO
 
-                    ConnectedRideDTO(
-                        rideJoinedID = child.key ?: "", // Usually the push key
-                        rideID = data["rideID"] as? String ?: "",
-                        userID = data["userID"] as? String ?: "",
-                        currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
-                        currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
-                        speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
-                        status = data["status"] as? String ?: "Connected",
-                        dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
-                        isRejoined = data["isRejoined"] as? Boolean ?: false
-                    )
                 }
 
 
