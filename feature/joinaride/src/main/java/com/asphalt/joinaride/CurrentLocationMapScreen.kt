@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -348,22 +349,22 @@ fun MapWithCurrentLocation(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
+           // Spacer(modifier = Modifier.weight(1f))
             GradientButton(
                 onClick = {
 
                 },
                 buttonRadius = Dimensions.size10,
-                modifier = Modifier
-                    .height(Dimensions.radius40)
-                    .width(Dimensions.padding100)
+                buttonHeight = Dimensions.radius40,
+                contentPadding = PaddingValues(0.dp)
             ) {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_refresh),
                     contentDescription = ""
                 )
             }
+            Spacer(modifier = Modifier.width(Dimensions.size10))
             GradientButton(
                 onClick = {
 
@@ -375,9 +376,8 @@ fun MapWithCurrentLocation(
 
                 },
                 buttonRadius = Dimensions.size10,
-                modifier = Modifier
-                    .height(Dimensions.radius40)
-                    .width(Dimensions.padding100)
+                buttonHeight = Dimensions.radius40,
+                contentPadding = PaddingValues(0.dp)
             ) {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_navigate),
