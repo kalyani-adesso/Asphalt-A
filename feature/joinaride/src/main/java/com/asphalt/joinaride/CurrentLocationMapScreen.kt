@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +15,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.location.LocationProvider
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayLite25
@@ -49,8 +56,10 @@ import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.utils.ImageUtils.bitmapDescriptorFromVector
+import com.asphalt.commonui.utils.Utils.generateUserColor
 import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.joinaride.locationutils.ShareLocation
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
@@ -62,9 +71,12 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -72,7 +84,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CurrentLocationMapScreen(
     locationProvider: LocationProvider,
     ridesData: RidesData,
-    rideViewModel: JoinRideViewModel = koinViewModel()
+    rideViewModel: JoinRideViewModel = koinViewModel(),
 ) {
 
     //val rideId = rideViewModel.getRideId()
@@ -288,6 +300,11 @@ fun MapWithCurrentLocation(
             // Joined riders
             riders.forEach { rider ->
                 if (rider.currentLat != 0.0 && rider.currentLong != 0.0) {
+                    val state = rememberUpdatedMarkerState(
+                        position = LatLng(rider.currentLat, rider.currentLong)
+                    )
+
+                    RiderMarker(ride = rider, state = state)
 //                    Marker(
 //                        state = MarkerState(
 //                            LatLng(rider.currentLat, rider.currentLong)
@@ -303,7 +320,7 @@ fun MapWithCurrentLocation(
                 }
             }
 
-            if(polyline.isNotEmpty()){
+            if (polyline.isNotEmpty()) {
                 Polyline(
                     points = polyline,
                     color = Color.Blue,
@@ -420,6 +437,61 @@ fun MapWithCurrentLocation(
             }
 
 
+        }
+    }
+}
+
+@Composable
+fun RiderMarker(
+    ride: ConnectedRideDTO,
+    state: MarkerState,
+    androidUserVM: AndroidUserVM = koinViewModel()
+) {
+    val riderColor = remember(ride.userID) {
+        generateUserColor(ride.userID)
+    }
+
+    val haloColor = remember(riderColor) {
+        riderColor.copy(alpha = 0.25f)
+    }
+
+    val userName = remember(ride.userID) {
+        androidUserVM.getUser(ride.userID)?.name ?: ""
+    }
+
+    val profileImage = remember(ride.userID) {
+        androidUserVM.getUser(ride.userID)?.profilePic ?: ""
+    }
+
+    MarkerComposable(
+        state = state,
+        anchor = Offset(0.5f, 0.5f),
+        title = userName
+    ) {
+        Box(
+            modifier = Modifier.size(48.dp),
+            contentAlignment = Alignment.Center
+        ) {
+//            ImageAsync("",LocalContext.current)
+
+//           AsyncImage
+//            CircularNetworkImage(size = 24.dp, imageUrl = profileImage,modifier = Modifier
+//                .align(Alignment.TopStart))
+
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .background(haloColor, shape = CircleShape)
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(riderColor, shape = CircleShape)
+                        .border(1.dp, Color.White.copy(alpha = 0.3f), CircleShape)
+                )
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ data class ConnectedRideDTO(
     val userID: String,
     val currentLat: Double = 0.0,
     val currentLong: Double = 0.0,
-    val speedInKph: Double,
+    val speedInKph: Double = 0.0,
     val status: String,
     val dateTime: Long,
     val isRejoined: Boolean,
