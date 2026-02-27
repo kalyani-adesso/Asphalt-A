@@ -105,7 +105,12 @@ class CurrentLocationService : Service() {
                     speedInMps = currentLocation.speed
                     speedInKph = speedInMps * 3.6
                 }
-                saveToFirebase(currentLocation.latitude, currentLocation.longitude, speedInKph,totalDistanceMetres)
+                saveToFirebase(
+                    currentLocation.latitude,
+                    currentLocation.longitude,
+                    speedInKph,
+                    totalDistanceMetres
+                )
             }
         }
 
@@ -120,14 +125,19 @@ class CurrentLocationService : Service() {
         }
     }
 
-    private fun saveToFirebase(lat: Double, lng: Double, speedInKph: Double, totalDistanceMetres: Float) {
+    private fun saveToFirebase(
+        lat: Double,
+        lng: Double,
+        speedInKph: Double,
+        totalDistanceMetres: Float
+    ) {
         val rId = rideId ?: return
         val uId = ongoingRideId ?: return
         val roundedSpeed = (speedInKph * 100).roundToInt() / 100.0
         var status = "connected"
-        if (roundedSpeed == 0.0) {
+        if (roundedSpeed < 1) {
             status = "stopped"
-        } else if (roundedSpeed < 1)
+        } else if (roundedSpeed < 10)
             status = "delayed"
 
         serviceScope.launch {
@@ -136,7 +146,7 @@ class CurrentLocationService : Service() {
                 "currentLong" to lng,
                 "speedInKph" to roundedSpeed,
                 "status" to status,
-                "totalDistance" to totalDistanceMetres/1000
+                "totalDistance" to totalDistanceMetres / 1000
 //                "timestamp" to System.currentTimeMillis()
             )
             database.getReference("ongoing_ride/$rId/$uId").updateChildren(data)
