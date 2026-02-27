@@ -298,7 +298,9 @@ struct UpComingView: View {
     @State private var openGallery = false
     @State private var showRideDetails: Bool = false
     var onAddPhotos: ((String) -> Void)? = nil
+    @State private var activeChat: ActiveChat? = nil
     @State private var userRating: Int = 0
+    let onMessageTap: (String) -> Void
     var body: some View {
         ZStack{
             VStack(alignment: .leading, spacing: 22) {
@@ -318,8 +320,18 @@ struct UpComingView: View {
                     Spacer()
                     if ride.rideAction == .invities {
                         Button(action: {
-                            
-                        }) {
+                                let currentUserID = MBUserDefaults.userIdStatic ?? ""
+                                let members = [currentUserID, ride.createdBy]
+                                withAnimation(.easeInOut) {
+                                    activeChat = ActiveChat(
+                                        id: ride.createdBy,
+                                        name: viewModel.usersById[ride.createdBy] ?? "Unknown",
+                                        chatType: .private,
+                                        memberList: members,
+                                        rideTitle: ride.title
+                                    )
+                                }
+                            })  {
                             AppIcon.UpcomingRide.message
                                 .resizable()
                                 .frame(width:30, height:30)
@@ -582,6 +594,9 @@ struct UpComingView: View {
             .contentShape(Rectangle())
             .refreshable {
                 await viewModel.getSingleRide(rideId: ride.id)
+            }
+            if activeChat != nil {
+                ChatOverlayView(activeChat: $activeChat)
             }
         }
     }

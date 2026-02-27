@@ -2,6 +2,7 @@ package com.asphalt.android.repository.chat
 
 import com.asphalt.android.DataSnapshot
 import com.asphalt.android.FirebaseServerValue
+import com.asphalt.android.Logger
 import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.TransactionResult
 import com.asphalt.android.model.chat.ChatRoom
@@ -21,7 +22,8 @@ class ChatRepository {
         val chatRef = database.getReference("chats").child(chatRoomId)
 
         chatRef.runTransaction { currentSnapshot ->
-            if (currentSnapshot.getValue() == null) {
+            val existingData = currentSnapshot.getValue() as? Map<*, *>
+            if (existingData.isNullOrEmpty())  {
                 val newChatData = mapOf(
                     "type" to "private",
                     "members" to mapOf(userAId to true, userBId to true)
@@ -37,7 +39,8 @@ class ChatRepository {
         val chatRef = database.getReference("chats").child(rideID)
         val membersMap = memberList.associateWith { true }
         chatRef.runTransaction { currentSnapshot ->
-            if (currentSnapshot.getValue() == null) {
+            val existingData = currentSnapshot.getValue() as? Map<*, *>
+            if (existingData.isNullOrEmpty()){
                 val newChatData = mapOf(
                     "name" to rideTitle,
                     "type" to "group",

@@ -54,6 +54,7 @@ class HomeViewModel: ObservableObject {
                 if let currentUser = try await userRepo.getUserDetails() {
                     DispatchQueue.main.async {
                         MBUserDefaults.userNameStatic = currentUser.name!
+                        print("username in hOME")
                     }
                 }
             } catch {

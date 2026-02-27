@@ -23,7 +23,13 @@ class IosDatabaseReference(
         get() = nativeRef.key
 
     override fun setValue(value: Any?) {
-        nativeRef.setValue(value)
+       val finalValue = when (value) {
+            is Boolean -> value
+            is Number -> value.toInt() == 1
+            is String -> value.lowercase() == "true" || value == "1"
+            else -> false
+        }
+        nativeRef.setValue(finalValue)
     }
 
     override fun child(path: String): IDatabaseReference {

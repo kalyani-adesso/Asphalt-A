@@ -7,18 +7,21 @@
 
 import SwiftUI
 
-struct ActiveChatUser {
+struct ActiveChat {
     let id: String
     let name: String
+    let chatType: MessagesViewModel.ChatType
+    let memberList: [String]?
+    let rideTitle: String?
 }
+
 struct HomeView: View {
     @EnvironmentObject var home: HomeViewModel
     @EnvironmentObject var viewModel : UpcomingRideViewModel
-    @EnvironmentObject var message : MessagesViewModel
     @State private var currentDate = Date()
-    @State private var activeChatUser: ActiveChatUser? = nil
-    @StateObject private var messagesVM = MessagesViewModel(recipientId: "")
-
+    @State private var activeChat: ActiveChat? = nil
+    @StateObject private var messagesVM = MessagesViewModel(currentUserId: MBUserDefaults.userIdStatic ?? "", recipientId: "", chatType: .private)
+    
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
@@ -26,15 +29,67 @@ struct HomeView: View {
                     TopNavBar()
                     ActionButtonView()
                     DashboardView()
-                    UpcomingRidesView { hostId in
-                        if let hostName = viewModel.usersById[hostId] {
+                    UpcomingRidesView { rideId in
+                        
+                        guard let ride = viewModel.upcomingInvitesRide.first(where: { $0.id == rideId }) else {
+                            return
+                        }
+                        
+                        let currentUserID = MBUserDefaults.userIdStatic ?? ""
+                        print("my id from home :\(currentUserID)")
+                        
+                        var chatType: MessagesViewModel.ChatType
+                        var chatName: String
+                        var rideTitle: String? = nil
+                        
+                        if ride.createdBy == currentUserID {
+                            //  GROUP CHAT
+                            
+                            chatType = .group
+                            rideTitle = ride.title
+                            chatName = ride.title
+                            
+                            Task {
+                                let members = (ride.participants ?? []).map { $0.userId }
+                                    var allMembers = members
+                                    if !allMembers.contains(ride.createdBy) {
+                                        allMembers.append(ride.createdBy)
+                                    }
+                                print("members: \(allMembers)")
+                                
+                                await MainActor.run {
+                                    withAnimation(.easeInOut) {
+                                        activeChat = ActiveChat(
+                                            id: ride.id,
+                                            name: chatName,
+                                            chatType: chatType,
+                                            memberList: allMembers,
+                                            rideTitle: rideTitle
+                                        )
+                                    }
+                                }
+                            }
+                            
+                        } else {
+                            
+                            chatType = .private
+                            rideTitle = ride.title
+                            chatName = viewModel.usersById[ride.createdBy] ?? "Unknown"
+                            let members = [currentUserID, ride.createdBy]
                             withAnimation(.easeInOut) {
-                                activeChatUser = ActiveChatUser(id: hostId, name: hostName)
+                                activeChat = ActiveChat(
+                                    id: ride.createdBy,
+                                    name: chatName,
+                                    chatType: chatType,
+                                    memberList: members,
+                                    rideTitle: rideTitle
+                                )
                             }
                         }
                     }
-                        .environmentObject(home)
-                        .environmentObject(viewModel)
+                    
+                    .environmentObject(home)
+                    .environmentObject(viewModel)
                     JourneyCardView()
                     PlacesVisitedView()
                 }
@@ -43,8 +98,8 @@ struct HomeView: View {
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
-            if let user = activeChatUser {
-                chatOverlay(user: user)
+            if activeChat != nil {
+                ChatOverlayView(activeChat: $activeChat)
             }
         }
         .task {
@@ -65,83 +120,5 @@ struct HomeView: View {
             await viewModel.fetchAllUsers()
         }
     }
-    private func chatOverlay(user: ActiveChatUser) -> some View {
-       
-          ZStack {
-            Color.black.opacity(0.45)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation(.easeInOut) {
-                        activeChatUser = nil
-                    }
-                }
-
-            VStack(spacing: 0) {
-                HStack(spacing: 12) {
-                    
-                    ZStack(alignment: .bottomTrailing) {
-                        AppImage.Profile.profile.resizable()
-                            .frame(width: 37, height: 37)
-                            .clipShape(Circle())
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 32.5)
-                                    .stroke(AppColor.green, lineWidth: 2.5)
-                            )
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 13, height: 13)
-                                .offset(x: 2, y: 2)
-                                .overlay(
-                                    Circle()
-                                        .offset(x: 2, y: 2)
-                                        .stroke(Color.white, lineWidth: 1.5)
-                                )
-                    }
-
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(user.name)
-                            .font(KlavikaFont.bold.font(size: 16))
-                            .foregroundColor(AppColor.white)
-                    }
-
-                    Spacer()
-                    Button {
-                                withAnimation(.easeInOut) {
-                                    activeChatUser = nil
-                                }
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.white)
-                                    .padding(8)
-                            }
-                }
-                .padding(.horizontal, 16)
-                   .padding(.vertical, 12)
-                   .background(AppColor.celticBlue)
-                ChatDetailView(
-                    viewModel:MessagesViewModel(recipientId: user.id),
-                    chatName: user.name,
-                    isGroup: false,
-                    isOverlay: true
-                )
-            }
-            .frame(
-                width: UIScreen.main.bounds.width - 32,
-                height: UIScreen.main.bounds.height * 0.6
-            )
-            .background(AppColor.backgroundLight)
-            .cornerRadius(22)
-            .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 8)
-            .transition(.scale.combined(with: .opacity))
-        }
-    }
-
 }
 
-#Preview {
-    HomeView()
-        .environmentObject(HomeViewModel())
-        .environmentObject(UpcomingRideViewModel())
-        .environmentObject(MessagesViewModel(recipientId: ""))
-}

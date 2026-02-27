@@ -11,6 +11,7 @@ struct RideDetailsView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
     @State private var deleteRide = false
+    @State private var activeChat: ActiveChat? = nil
     var body: some View {
         AppToolBar(showBack: true){
         ZStack {
@@ -33,7 +34,7 @@ struct RideDetailsView: View {
                                 }
                                 Spacer()
                                 Button(action: {
-                                    
+                                    openChat(for: ride)
                                 }) {
                                     AppIcon.UpcomingRide.message
                                         .resizable()
@@ -155,12 +156,59 @@ struct RideDetailsView: View {
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
+            if let _ = activeChat {
+                ChatOverlayView(activeChat: $activeChat)
+            }
         }
         
         var declinedCount:Int  {
             ride.participantAcceptedCount > 0 ? (ride.riderCount  - ride.participantAcceptedCount) : 0
         }
+            
     }
+        
+    }
+    private func openChat(for ride: RideModel) {
+        let currentUserID = MBUserDefaults.userIdStatic ?? ""
+        
+        var chatType: MessagesViewModel.ChatType
+        var chatName: String
+        var rideTitle: String? = nil
+        
+        if ride.createdBy == currentUserID {
+            // Group chat
+            chatType = .group
+            rideTitle = ride.title
+            chatName = ride.title
+            
+            let members = (ride.participants ?? []).map { $0.userId } + [ride.createdBy]
+            
+            withAnimation(.easeInOut) {
+                activeChat = ActiveChat(
+                    id: ride.id,
+                    name: chatName,
+                    chatType: chatType,
+                    memberList: members,
+                    rideTitle: rideTitle
+                )
+            }
+            
+        } else {
+            // Private chat
+            chatType = .private
+            chatName = viewModel.usersById[ride.createdBy] ?? "Unknown"
+            let members = [currentUserID, ride.createdBy]
+            
+            withAnimation(.easeInOut) {
+                activeChat = ActiveChat(
+                    id: ride.createdBy,
+                    name: chatName,
+                    chatType: chatType,
+                    memberList: members,
+                    rideTitle: ride.title
+                )
+            }
+        }
     }
     
     struct StatusCard: View {

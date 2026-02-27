@@ -9,11 +9,11 @@ import SwiftUI
 import Foundation
 
 struct Chat: Identifiable {
-    let id = UUID()
+    let id: String
     let name: String
     let lastMessage: String
     let time: String
-    let unreadCount: Int
+    var unreadCount: Int
     let isGroup: Bool
 }
 
@@ -28,117 +28,107 @@ struct LocalMessage: Identifiable {
 
 struct MessagesListView: View {
     
-    @StateObject private var viewModel = MessagesViewModel(recipientId: "")
+    @ObservedObject var viewModel: MessagesViewModel
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     
-    let chats: [Chat] = [
-        Chat(name: "Sooraj",
-             lastMessage: "See you at the meeting point!",
-             time: "10:45 AM",
-             unreadCount: 2,
-             isGroup: false),
-        
-        Chat(name: "Abhishek",
-             lastMessage: "See you at the meeting point!",
-             time: "10:45 AM",
-             unreadCount: 2,
-             isGroup: false),
-        
-        Chat(name: "Vyshnav",
-             lastMessage: "See you at the meeting point!",
-             time: "10:45 AM",
-             unreadCount: 2,
-             isGroup: false),
-        
-        Chat(name: "Group Chat",
-             lastMessage: "See you at the meeting point!",
-             time: "10:45 AM",
-             unreadCount: 2,
-             isGroup: true)
-    ]
-    
     var body: some View {
         AppToolBar(showBack: true){
-        NavigationStack {
-            
-            VStack(spacing: 0) {
-                ReusableHeader {
-                    Text("Messages")
-                        .font(KlavikaFont.bold.font(size: 22))
-                        .foregroundColor(AppColor.black)
-                } trailing: {
-                    EmptyView()
-                }
-                VStack(spacing: 20) {
-                    FormFieldView(
-                        label: " ",
-                        icon: AppIcon.CreateRide.searchLens,
-                        placeholder: AppStrings.Chat.searchLabel,
-                        iconColor: AppColor.celticBlue,
-                        value: $viewModel.searchText,
-                        isValidEmail: .constant(false),
-                        backgroundColor: AppColor.listGray
-                    )
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(viewModel.messageStatus, id: \.self) { status in
-                                let isSelected = viewModel.selectedCategory == status.rawValue
-                                QSegmentButtonView(
-                                    rideStatus: status.rawValue,
-                                    isSelected: isSelected
-                                ) {
-                                    if viewModel.selectedCategory == status.rawValue {
-                                        viewModel.selectedCategory = nil
-                                    } else {
-                                        viewModel.selectedCategory = status.rawValue
+            NavigationStack {
+                
+                VStack(spacing: 0) {
+                    ReusableHeader {
+                        Text("Messages")
+                            .font(KlavikaFont.bold.font(size: 22))
+                            .foregroundColor(AppColor.black)
+                    } trailing: {
+                        EmptyView()
+                    }
+                    VStack(spacing: 20) {
+                        FormFieldView(
+                            label: " ",
+                            icon: AppIcon.CreateRide.searchLens,
+                            placeholder: AppStrings.Chat.searchLabel,
+                            iconColor: AppColor.celticBlue,
+                            value: $viewModel.searchText,
+                            isValidEmail: .constant(false),
+                            backgroundColor: AppColor.listGray
+                        )
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(viewModel.messageStatus, id: \.self) { status in
+                                    let isSelected = viewModel.selectedCategory == status.rawValue
+                                    QSegmentButtonView(
+                                        rideStatus: status.rawValue,
+                                        isSelected: isSelected
+                                    ) {
+                                        if viewModel.selectedCategory == status.rawValue {
+                                            viewModel.selectedCategory = nil
+                                        } else {
+                                            viewModel.selectedCategory = status.rawValue
+                                        }
                                     }
                                 }
                             }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 15)
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 15)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppColor.listGray)
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                    .zIndex(1)
+                    .padding(.bottom, 20)
+                    
+                    
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.recentChats) { chat in
+                                NavigationLink {
+                                    let detailVM = MessagesViewModel(
+                                        currentUserId:  MBUserDefaults.userIdStatic ?? "", recipientId: chat.id,
+                                        chatType: chat.isGroup ? .group : .private,
+                                    )
+
+                                    ChatDetailView(
+                                        viewModel: detailVM,
+                                        chatName: chat.isGroup
+                                        ? chat.name
+                                        : (viewModel.usersById[chat.id]?.name ?? chat.name),
+                                        isGroup: chat.isGroup,
+                                        isOverlay: false
+                                    )
+                                    .onAppear {
+                                        detailVM.receiveMessageFromKMP(chatRoomId: chat.id)
+                                        detailVM.markChatAsRead(chatRoomId: chat.id)
+                                    }
+                                }label: {
+                                    ChatRowView(chat: chat)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 20)
                     }
                     .background(
                         RoundedRectangle(cornerRadius: 10)
                             .fill(AppColor.listGray)
                     )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .padding(.horizontal, 20)
-                .zIndex(1)
-                .padding(.bottom, 20)
-                
-                
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(chats) { chat in
-                            NavigationLink {
-                                ChatDetailView(viewModel: viewModel, chatName: chat.name, isGroup: chat.isGroup,   isOverlay: false)
-                            } label: {
-                                ChatRowView(chat: chat)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
+                .task {
+                        viewModel.fetchRecentChats()
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(AppColor.listGray)
-                )
-                .frame(width: 355, height: 400)
             }
+            .navigationBarBackButtonHidden(true)
         }
-        .navigationBarBackButtonHidden(true)
-    }
     }
 }
 
-#Preview {
-    MessagesListView()
-}
+

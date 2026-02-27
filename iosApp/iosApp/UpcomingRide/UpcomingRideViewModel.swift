@@ -51,6 +51,7 @@ struct RideModel: Identifiable,Hashable {
     let startTime: String?
     let endTime: String?
     let ratings: Int?
+    let participants: [ParticipantData]?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -79,6 +80,7 @@ class UpcomingRideViewModel: ObservableObject {
     private var rideAPIService: RidesApIService
     private var rideRepository: RidesRepository
     private let userRepo: UserRepository
+    @Published var  rideMembersList: [String] = []
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
     @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
@@ -216,7 +218,8 @@ class UpcomingRideViewModel: ObservableObject {
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
                     endTime: EndRideTime,
-                    ratings: myRating
+                    ratings: myRating,
+                    participants: ride.participants
                 )
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
@@ -387,7 +390,6 @@ class UpcomingRideViewModel: ObservableObject {
             // MARK: Build Final Participants List
             // -------------------------
             var finalParticipants = ride.participants
-
             // Add creator if not in the list
             if !finalParticipants.contains(where: { $0.userId == ride.createdBy }) {
                 finalParticipants.append(
