@@ -14,12 +14,13 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var ride = Ride()
     @Published var currentStep = 1
     @Published var selectedParticipants: [Participant] = []
-    @Published var shareLink = "https://adessoriderclub.app/12121312"
+    @Published var shareLink = ""
     @Published var selectedStartTime: Date? = nil
     @Published var selectedStartDate: Date? = nil
     @Published var selectedEndTime: Date? = nil
     @Published var selectedEndDate: Date? = nil
     @Published var isRideLoading = false
+    @Published var activeRide:JoinRideModel? = nil
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     
     @Published var query = "" {
@@ -158,6 +159,7 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
 //MARK: - Create Ride API
 extension CreateRideViewModel {
     func getAllUsers() {
+        isRideLoading = true
         userRepository.getAllUsers { result, error in
             if let success = result as? APIResultSuccess<AnyObject>,
                let domainList = success.data as? [UserDomain] {
@@ -179,15 +181,132 @@ extension CreateRideViewModel {
                 
                 DispatchQueue.main.async {
                     self.participants = filteredParticpants
+                    self.isRideLoading = false
                 }
                 
             } else if let error = error {
                 print("Error fetching users: \(error)")
+                self.isRideLoading = false
             } else {
                 print("Unexpected data format")
+                self.isRideLoading = false
             }
         }
     }
+    
+    @MainActor
+    func getActiveJoinedRide() async {
+        do {
+            self.isRideLoading = true
+
+            let allRides = try await getAllRidesAsync()
+            let currentUserId = MBUserDefaults.userIdStatic
+
+
+            for ride in allRides {
+
+                // Dates
+                guard
+                    let startEpoch = ride.startDate,
+                    let endEpoch = ride.endDate
+                else { continue }
+
+                let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
+                let endDate   = Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000)
+
+                // Ignore ended rides
+                guard endDate >= Date() else { continue }
+
+                // User role
+                let isCreator = ride.createdBy == currentUserId
+                let participant = ride.participants.first { $0.userId == currentUserId }
+
+                // Joined logic (creator OR participant)
+                let isJoined =
+                    participant?.inviteStatus == 3 ||
+                    (isCreator && ride.rideStatus == 3)
+
+                guard isJoined else { continue }
+
+                // Fetch creator info
+                let userInfo = await getAllUsers(createdBy: ride.createdBy ?? "")
+                let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
+                let dateString = formatDate(startDate)
+
+                activeRide = JoinRideModel(
+                    userId: ride.createdBy ?? "",
+                    rideId: ride.ridesID ?? "",
+                    title: ride.rideTitle ?? "",
+                    organizer: isCreator ? "Me" : (userInfo?.0 ?? ""),
+                    description: ride.description_ ?? "",
+                    route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
+                    distance: "\(Int(ride.rideDistance)) km",
+                    date: dateString,
+                    ridersCount: "\(joinedCount)",
+                    maxRiders: "\(ride.participants.count)",
+                    riderImage: "rider_avatar",
+                    contactNumber: userInfo?.1 ?? "",
+                    startLat: ride.startLatitude,
+                    startLong: ride.startLongitude,
+                    endLat: ride.endLatitude,
+                    endLong: ride.endLongitude,
+                    rideJoined: isJoined,
+                    participants: ride.participants
+                )
+                self.isRideLoading = false
+                break
+            }
+            
+            // If no active ride was found, set loading to false
+            if self.activeRide == nil {
+                self.isRideLoading = false
+            }
+
+        } catch {
+            await MainActor.run {
+                self.isRideLoading = false
+            }
+            print("Failed to fetch active ride: \(error.localizedDescription)")
+        }
+    }
+    
+    private func getAllRidesAsync() async throws -> [RidesData] {
+        try await withCheckedThrowingContinuation { continuation in
+            rideRepository.getAllRide { result, error in
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let rideArray = success.data as? [RidesData] {
+                    continuation.resume(returning: rideArray)
+                } else if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: [])
+                }
+            }
+        }
+    }
+    
+    func getAllUsers(createdBy: String) async -> (String, String)? {
+        await withCheckedContinuation { continuation in
+            userRepository.getAllUsers { result, error in
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let domainList = success.data as? [UserDomain],
+                   let matchedUser = domainList.first(where: { $0.uid == createdBy }) {
+                    
+                    let userName = matchedUser.name
+                    let contactNumber = matchedUser.contactNumber
+                    continuation.resume(returning: (userName, contactNumber))
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+    
+    func formatDate(_ date: Date) -> String { let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.string(from: date) }
+
     
     func createRide(completion: @escaping (Bool) -> Void) {
         self.isRideLoading = true
@@ -213,7 +332,7 @@ extension CreateRideViewModel {
             endDateLong = Int64(merged.timeIntervalSince1970 * 1000)
         }
         
-        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, ratings: ratings, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong), hasAssemblyPoint: ride.hasAssemblyPoint ?? false, assemblyPoint: ride.assemblyPoint, assemblyLat:  ride.assemblyLat ?? 0.0, assemblyLon: ride.assemblyLon ?? 0.0)
+        let createRideRoot = CreateRideRoot(userID: MBUserDefaults.userIdStatic, rideType: ride.type?.rawValue ?? "", rideTitle: ride.title, description: ride.description, startDate: KotlinLong(value: startDateLong), startLocation: ride.startLocation, endLocation: ride.endLocation, createdDate: KotlinLong(value: createdDateLong) , participants:participantDict, ratings: ratings, startLatitude: ride.startLat ?? 0.0, startLongitude: ride.startLng ?? 0.0, endLatitude: ride.endLat ?? 0.0, endLongitude: ride.endLng ?? 0.0, distance: ride.rideDistance ?? 0.0, rideStatus: 0, endDate: KotlinLong(value: endDateLong), hasAssemblyPoint: ride.hasAssemblyPoint ?? false, assemblyPoint: ride.assemblyPoint, assemblyLat:  ride.assemblyLat ?? 0.0, assemblyLon: ride.assemblyLon ?? 0.0, images: nil)
         
         rideRepository.createRide(createRideRoot: createRideRoot, completionHandler: { rideResult, error in
             if let success = rideResult as? APIResultSuccess<AnyObject>,
@@ -221,8 +340,11 @@ extension CreateRideViewModel {
                 Task { @MainActor in
                     self.isRideLoading = false
                     self.nextStep()
-                    print("ride id:\(data.name)")
-                    MBUserDefaults.rideIdStatic = data.name
+                    let rideId = data.name
+                    let shareCode = Self.generateRandomShareCode()
+                    self.shareLink = "https://adessoriderclub.app/\(shareCode)"
+                    print("ride id:\(rideId), share link: \(self.shareLink)")
+                    MBUserDefaults.rideIdStatic = rideId
                     completion(true)
                 }
             }
@@ -230,6 +352,11 @@ extension CreateRideViewModel {
     }
     
     // MARK: - Epoch converter
+    
+    /// Generates a random 8-digit numeric string for the share link path (e.g. "82938473").
+    static func generateRandomShareCode() -> String {
+        String(Int.random(in: 1000_0000...9999_9999))
+    }
     
     func combine(date: Date?, time: Date?) -> Date? {
         guard let date = date, let time = time else { return nil }

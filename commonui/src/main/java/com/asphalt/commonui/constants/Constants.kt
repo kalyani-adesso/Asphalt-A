@@ -53,6 +53,7 @@ object Constants {
 
     const val GROUP_CHAT = "group"
     const val PRIVATE_CHAT ="private"
+    const val SOLO ="Solo Ride"
 
 
 }

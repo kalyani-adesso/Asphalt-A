@@ -61,14 +61,14 @@ fun ProfileScreen(
             EditProfile(onDismiss = {
                 showEditProfile = false
 
-            }, onSaveChanges = { name, email, contact, license, emergencyContact, isMechanic ->
+            }, onSaveChanges = { name, email, contact, license, emergencyContact, isMechanic,profileImage ->
                 profileSectionVM.editProfile(
                     name,
                     email,
                     contact,
                     emergencyContact,
                     license,
-                    isMechanic
+                    isMechanic,profileImage
                 )
             })
 

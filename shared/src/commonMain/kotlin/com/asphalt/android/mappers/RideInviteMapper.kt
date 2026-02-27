@@ -54,7 +54,9 @@ private fun RidesData.toRideInvitesDomain(organiser: Boolean): RideInvitesDomain
                 else null
             },
             isOrganiser = organiser,
-            rideTitle = this.rideTitle.orEmpty()
+            rideTitle = this.rideTitle.orEmpty(),
+            allParticipants = participants.map { it.userId }.plus( this.createdBy.orEmpty()),
+            rideType = rideType.orEmpty()
         )
     }
 }

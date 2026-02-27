@@ -112,7 +112,7 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
         }
 
     }
-
+// Function for return members user ids
     fun getAllMembers(): List<String> {
         val userIds = ridesData.value?.let { ride ->
             (ride.participants.map { it.userId } +

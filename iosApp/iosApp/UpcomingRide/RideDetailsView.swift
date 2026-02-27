@@ -144,7 +144,7 @@ struct RideDetailsView: View {
                     .padding(.all,16)
                     .navigationBarBackButtonHidden(true)
                     .navigationDestination(isPresented:$deleteRide,  destination: {
-                        UpcomingRideView(navigationDone: true)
+                        UpcomingRideView(viewModel: viewModel, showpopup: false, navigationDone: true, rideIdToOpen: .constant(nil))
                     })
                     .onAppear {
                         Task {

@@ -41,6 +41,7 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.chat.model.ChatParamsModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AsphaltTheme
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
@@ -463,23 +464,25 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 }
 
             }
-            RoundedBox(
-                modifier = Modifier.size(Dimensions.size30),
-                cornerRadius = Dimensions.size10,
-                backgroundColor = PrimaryDarkerLightB75
-            ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_message),
-                        null,
-                        modifier = Modifier.clickable {
-                            var params = ChatParamsModel(
-                                viewModel.ridesData.value?.ridesID ?: "",
-                                viewModel.getAllMembers(),
-                                viewModel.ridesData.value?.rideTitle ?: ""
-                            )
-                            onChatClick.invoke(params)
-                        })
+            if (viewModel.ridesData.value?.rideType != Constants.SOLO) {
+                RoundedBox(
+                    modifier = Modifier.size(Dimensions.size30),
+                    cornerRadius = Dimensions.size10,
+                    backgroundColor = PrimaryDarkerLightB75
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_message),
+                            null,
+                            modifier = Modifier.clickable {
+                                var params = ChatParamsModel(
+                                    viewModel.ridesData.value?.ridesID ?: "",
+                                    viewModel.getAllMembers(),
+                                    viewModel.ridesData.value?.rideTitle ?: ""
+                                )
+                                onChatClick.invoke(params)
+                            })
+                    }
                 }
             }
         }

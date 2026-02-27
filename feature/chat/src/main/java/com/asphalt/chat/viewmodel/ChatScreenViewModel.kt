@@ -30,6 +30,10 @@ class ChatScreenViewModel(val androidUserVM: AndroidUserVM, val chatRepository: 
         return androidUserVM.getUser(id)?.name ?: ""
     }
 
+    fun getProfileImg(id: String): String {
+        return androidUserVM.getUser(id)?.profilePic ?: ""
+    }
+
     fun initialise1V1Chat(receiverID: String) {
         var chatRoomID = chatRepository.getCanonicalChatId(
             currentUid ?: "",

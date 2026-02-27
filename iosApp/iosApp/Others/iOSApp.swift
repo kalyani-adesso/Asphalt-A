@@ -12,30 +12,34 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct iOSApp: App {
-    @AppStorage(AppStrings.userdefaultKeys.hasSeenOnboarding.rawValue) var hasSeenOnboarding: Bool = false
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var homeViewModel: HomeViewModel = .init()
-    @StateObject var upcomingVM: UpcomingRideViewModel = .init()
+
+    @AppStorage("com.adesso.rider.club.rememberMeData") private var isLoggedIn: Bool = false
+    @AppStorage("com.adesso.rider.club.hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            if MBUserDefaults.rememberMeDataStatic == true  {
-                BottomNavBar()
-                    .environmentObject(homeViewModel)
-                    .environmentObject(upcomingVM)
-                
-            } else {
-                if MBUserDefaults.hasSeenOnboardingStatic {
-                    NavigationStack {
-//                        SignInView()
-                        BottomNavBar()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingVM)
-                    }
+            NavigationStack {
+                if isLoggedIn {
+                    BottomNavBar()
+                } else if hasSeenOnboarding {
+                    SignInView()
+
                 } else {
                     WelcomeScreen()
                 }
             }
-            
+            .onOpenURL { url in
+                let rideId: String? = {
+                    if !url.lastPathComponent.isEmpty { return url.lastPathComponent }
+                    if let host = url.host, !host.isEmpty { return host }
+                    return nil
+                }()
+                if let id = rideId, !id.isEmpty {
+                    MBUserDefaults.deepLinkRideIdStatic = id
+                }
+            }
         }
     }
 }

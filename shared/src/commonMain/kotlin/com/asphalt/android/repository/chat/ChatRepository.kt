@@ -17,24 +17,25 @@ class ChatRepository {
         return if (uid1 < uid2) "${uid1}_${uid2}" else "${uid2}_${uid1}"
     }
 
-    fun createOrGet1v1Chat(userAId: String, userBId: String) {
-        val chatRoomId = getCanonicalChatId(userAId, userBId)
-        val chatRef = database.getReference("chats").child(chatRoomId)
 
-        chatRef.runTransaction { currentSnapshot ->
-            val existingData = currentSnapshot.getValue() as? Map<*, *>
-            if (existingData.isNullOrEmpty())  {
-                val newChatData = mapOf(
-                    "type" to "private",
-                    "members" to mapOf(userAId to true, userBId to true)
-                )
-                return@runTransaction TransactionResult.success(newChatData)
-            } else {
-                val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
-                return@runTransaction TransactionResult.success(existingData)
-            }
+fun createOrGet1v1Chat(userAId: String, userBId: String) {
+    val chatRoomId = getCanonicalChatId(userAId, userBId)
+    val chatRef = database.getReference("chats").child(chatRoomId)
+
+    chatRef.runTransaction { currentSnapshot ->
+        val existingData = currentSnapshot.getValue() as? Map<*, *>
+        if (existingData.isNullOrEmpty())  {
+            val newChatData = mapOf(
+                "type" to "private",
+                "members" to mapOf(userAId to true, userBId to true)
+            )
+            return@runTransaction TransactionResult.success(newChatData)
+        } else {
+            val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
+            return@runTransaction TransactionResult.success(existingData)
         }
     }
+}
     fun createOrGetGroupChat(memberList:List<String>,rideID: String,rideTitle:String) {
         val chatRef = database.getReference("chats").child(rideID)
         val membersMap = memberList.associateWith { true }
@@ -53,6 +54,7 @@ class ChatRepository {
             }
         }
     }
+
 
     fun sendMessage(chatRoomId: String, senderId: String,recipientId:String, text: String) {
         val messagesRef = database.getReference("chats/$chatRoomId/messages").push()
@@ -134,7 +136,7 @@ class ChatRepository {
                             type = map["type"]as? String ?: "" ,
                             lastMessage = map["lastMessage"] as? String ?: "",
                             lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
-                            unreadCounts = map["unreadCounts"] as? Map<String, Int> ?: emptyMap(),
+                            unreadCounts = map["unreadCounts"] as? Map<String, Long> ?: emptyMap(),
                             members=members
                         )
                     } else null

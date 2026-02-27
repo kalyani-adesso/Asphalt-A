@@ -14,98 +14,151 @@ struct BottomNavBar: View {
     @StateObject private var upcomingRideViewModel = UpcomingRideViewModel()
     @State var showNotification: Bool = false
     @State var showSlideBar: Bool = false
-    
-    
+    @StateObject var createRideVM = CreateRideViewModel()
+    @State private var rideJoined : Bool = false
+    @State var showHome : Bool = false
+    @State private var pendingDeepLinkRideId: String? = nil
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                ZStack {
-                    switch selectedTab {
-                    case 0:
-                        HomeView()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingRideViewModel)
-                    case 1:
-                        UpcomingRideView(showpopup: false , navigationDone: false)
-                            .environmentObject(upcomingRideViewModel)
-                            .environmentObject(homeViewModel)
-                        
-                    case 2:
-                        QueriesView()
-                    case 3:
-                        ProfileScreen()
-                            .environmentObject(homeViewModel)
-                    default:
-                        HomeView()
-                            .environmentObject(homeViewModel)
-                            .environmentObject(upcomingRideViewModel)
-                    }
-                }
-                .frame(maxHeight: .infinity)
-                .animation(.easeInOut(duration: 0.25), value: selectedTab)
-                HStack {
-                    tabItem(index: 0, label: "Home", systemIcon: "house")
-                    Spacer()
-                    tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides  .renderingMode(.template))
-                    Spacer()
-                    tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
-                    Spacer()
-                    tabItem(index: 3, label: "Profile", systemIcon: "person")
-                }
-                .padding(.horizontal, 40)
-                .padding(.vertical, 10)
-                .background(Color.white)
-                .overlay(
-                    Rectangle()
-                        .frame(height: 0.5)
-                        .foregroundColor(.gray.opacity(0.2)),
-                    alignment: .top
-                )
-            }
-            .ignoresSafeArea(edges: .bottom)
-            
-            .toolbar {
-    
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    if selectedTab != 0 {
-                        Button {
-                            selectedTab = 0
-                        } label: {
-                            AppIcon.CreateRide.backButton
+            ZStack {
+                VStack(spacing: 0) {
+                    ZStack {
+                        switch selectedTab {
+                        case 0:
+                            if rideJoined && showHome == false {
+                                if let ride = createRideVM.activeRide {
+                                    ConnectedRideView(
+                                        notificationTitle: AppStrings.JoinRide.rideActive,
+                                        title: AppStrings.ConnectedRide.startRideTitle,
+                                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                                        model: ride,
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
+                                    )
+                                }
+                            } else {
+                                HomeView()
+                                    .environmentObject(homeViewModel)
+                                    .environmentObject(upcomingRideViewModel)
+                            }
+                           
+                        case 1:
+                            UpcomingRideView(viewModel: upcomingRideViewModel, showpopup: false , navigationDone: false, rideIdToOpen: $pendingDeepLinkRideId)
+                            
+                        case 2:
+                            QueriesView()
+                        case 3:
+                            ProfileScreen()
+                                .environmentObject(homeViewModel)
+                        default:
+                            if rideJoined && showHome == false {
+                                if let ride = createRideVM.activeRide {
+                                    ConnectedRideView(
+                                        notificationTitle: AppStrings.JoinRide.rideActive,
+                                        title: AppStrings.ConnectedRide.startRideTitle,
+                                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                                        model: ride,
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
+                                    )
+                                }
+                            } else {
+                                HomeView()
+                            }
                         }
                     }
-                }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button {
-                        self.showNotification = true
-                    } label: {
-                        ZStack(alignment: .topTrailing) {
-                            Image(systemName: "bell")
-                                .font(.system(size: 15))
-                                .foregroundColor(AppColor.celticBlue)
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                                .offset(x: -2, y: 1)
-                        }
+                    .frame(maxHeight: .infinity)
+                    .animation(.easeInOut(duration: 0.25), value: selectedTab)
+                    HStack {
+                        tabItem(index: 0, label: "Home", systemIcon: "house")
+                        Spacer()
+                        tabItem(index: 1, label: "Rides", customIcon: AppIcon.Home.rides  .renderingMode(.template))
+                        Spacer()
+                        tabItem(index: 2, label: "Queries", systemIcon: "bubble.left")
+                        Spacer()
+                        tabItem(index: 3, label: "Profile", systemIcon: "person")
                     }
-                    Button(action: {
-                        self.showSlideBar = true
-                    }) {
-                        AppIcon.Home.navigation
+                    .padding(.horizontal, 40)
+                    .padding(.vertical, 10)
+                    .background(Color.white)
+                    .overlay(
+                        Rectangle()
+                            .frame(height: 0.5)
+                            .foregroundColor(.gray.opacity(0.2)),
+                        alignment: .top
+                    )
+                }
+                .ignoresSafeArea(edges: .bottom)
+                
+                .onAppear {
+                    if let id = MBUserDefaults.deepLinkRideIdStatic {
+                        pendingDeepLinkRideId = id
+                        selectedTab = 1
+                        MBUserDefaults.deepLinkRideIdStatic = nil
                     }
                 }
-            }
-            
-            .navigationDestination(isPresented: $showSlideBar, destination: {
-                NavigationSlideBar()
-            })
-            .navigationDestination(isPresented: $showNotification, destination: {
-                NotificationView()
-            })
-            .navigationBarBackButtonHidden(true)
-        }
+                
+                .toolbar {
         
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        if selectedTab != 0 {
+                            Button {
+                                selectedTab = 0
+                            } label: {
+                                AppIcon.CreateRide.backButton
+                            }
+                        }
+                    }
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        Button {
+                            self.showNotification = true
+                        } label: {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(AppColor.celticBlue)
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
+                        }
+                        Button(action: {
+                            self.showSlideBar = true
+                        }) {
+                            AppIcon.Home.navigation
+                        }
+                    }
+                }
+                
+                .navigationDestination(isPresented: $showSlideBar, destination: {
+                    NavigationSlideBar()
+                })
+                .navigationDestination(isPresented: $showNotification, destination: {
+                    NotificationView()
+                })
+                .navigationBarBackButtonHidden(true)
+                if createRideVM.isRideLoading || upcomingRideViewModel.isRideLoading  {
+                    ProgressViewReusable(title: "Loading...")
+                }
+            }
+        }
+        .task {
+            await createRideVM.getActiveJoinedRide()
+            await MainActor.run {
+                rideJoined = createRideVM.activeRide?.rideJoined ?? false
+            }
+        }
+        .onChange(of: selectedTab) { newTab in
+            if newTab == 0 {
+                Task {
+                    await createRideVM.getActiveJoinedRide()
+                    await MainActor.run {
+                        rideJoined = createRideVM.activeRide?.rideJoined ?? false
+                    }
+                }
+            }
+        }
     }
     
     // MARK: - Tab Item View
@@ -145,9 +198,3 @@ struct BottomNavBar: View {
         }
     }
 }
-
-
-#Preview {
-    BottomNavBar()
-}
-

@@ -31,6 +31,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,6 +85,7 @@ fun ChatListingScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val chatList by viewModel.chatModel.collectAsStateWithLifecycle()
+    val text by viewModel.searchQuery.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.getChatList()
     }
@@ -112,8 +114,8 @@ fun ChatListingScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextField(
-                    value = "",
-                    onValueChange = { },
+                    value =text,
+                    onValueChange = { viewModel.updateSearchQuery(it) },
                     placeholder = {
                         Text(
                             text = "Search riders, conversations...",//stringResource(R.string._search_name_number),
@@ -305,7 +307,14 @@ fun ChatList(
                             shape = CircleShape
                         ),
                         size = Dimensions.padding40,
-                        imageUrl = "" ?: ""
+                        imageUrl =  if (chatRoom.type.equals(Constants.GROUP_CHAT)) {
+                             ""
+                        } else {
+                            androidUserVM.getUser(
+                                chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID())
+                                    ?: ""
+                            )?.profilePic ?: ""
+                        }
                     )
                     Image(
                         painter = painterResource(R.drawable.ic_online_icon),

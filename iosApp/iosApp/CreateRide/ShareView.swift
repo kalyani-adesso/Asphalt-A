@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ShareView: View {
     @EnvironmentObject var viewModel: CreateRideViewModel
-    @EnvironmentObject var UpcomingViewModel: UpcomingRideViewModel
-    @EnvironmentObject var home: HomeViewModel
+    @ObservedObject var upcomingViewModel: UpcomingRideViewModel
+    @ObservedObject var home: HomeViewModel
     @State private var isPresented: Bool = false
     var body: some View {
         VStack(spacing: 20) {
@@ -45,10 +45,10 @@ struct ShareView: View {
                             .font(KlavikaFont.medium.font(size: 16))
                             .foregroundColor(AppColor.black)
                         HStack(spacing: 15){
-                            ShareIconButton(icon: AppIcon.CreateRide.whatsapp, color: AppColor.darkCyanLimeGreen)
-                            ShareIconButton(icon: AppIcon.CreateRide.facebook, color: AppColor.skyBlue)
-                            ShareIconButton(icon: AppIcon.CreateRide.twitter, color: AppColor.lightBlue)
-                            ShareIconButton(icon: AppIcon.CreateRide.mail, color: AppColor.pink)
+                            ShareIconButton(shareURL: viewModel.shareLink, platform: .whatsApp, icon: AppIcon.CreateRide.whatsapp, color: AppColor.darkCyanLimeGreen)
+                            ShareIconButton(shareURL: viewModel.shareLink, platform: .facebook, icon: AppIcon.CreateRide.facebook, color: AppColor.skyBlue)
+                            ShareIconButton(shareURL: viewModel.shareLink, platform: .twitter, icon: AppIcon.CreateRide.twitter, color: AppColor.lightBlue)
+                            ShareIconButton(shareURL: viewModel.shareLink, platform: .mail, icon: AppIcon.CreateRide.mail, color: AppColor.pink)
                         }
                     }
                 }
@@ -71,10 +71,10 @@ struct ShareView: View {
             .padding()
         }
         .navigationDestination(isPresented: $isPresented, destination: {
-            UpcomingRideView(showpopup: true, navigationDone: true)
-                .environmentObject(viewModel)
-                .environmentObject(UpcomingViewModel)
-                .environmentObject(home)
+            UpcomingRideView(viewModel: upcomingViewModel, showpopup: true, navigationDone: true, rideIdToOpen: .constant(nil))
+//                .environmentObject(viewModel)
+//                .environmentObject(UpcomingViewModel)
+//                .environmentObject(home)
             
         })
     }
@@ -92,21 +92,48 @@ struct ShareView: View {
     
 }
 struct ShareIconButton: View {
+    let shareURL: String
+    let platform: SharePlatform
     let icon: Image
     let color: Color
     
     var body: some View {
-        Button(action: {}) {
+        Button(action: { shareDeepLink(shareURL, platform: platform) }) {
             icon
                 .foregroundColor(.white)
                 .frame(width: 68, height: 56)
                 .background(color)
                 .cornerRadius(14)
         }
-        
+        .disabled(shareURL.isEmpty)
     }
 }
 
-#Preview {
-    ShareView()
+enum SharePlatform {
+    case whatsApp, facebook, twitter, mail
+}
+
+func shareDeepLink(_ urlString: String, platform: SharePlatform) {
+    guard !urlString.isEmpty, let url = URL(string: urlString) else { return }
+    let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString
+    
+    switch platform {
+    case .whatsApp:
+        if let u = URL(string: "https://wa.me/?text=\(encoded)") {
+            UIApplication.shared.open(u)
+        }
+    case .facebook:
+        if let u = URL(string: "https://www.facebook.com/sharer/sharer.php?u=\(encoded)") {
+            UIApplication.shared.open(u)
+        }
+    case .twitter:
+        if let u = URL(string: "https://twitter.com/intent/tweet?url=\(encoded)") {
+            UIApplication.shared.open(u)
+        }
+    case .mail:
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else { return }
+        let activity = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        rootVC.present(activity, animated: true)
+    }
 }

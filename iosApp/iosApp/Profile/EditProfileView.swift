@@ -15,7 +15,7 @@ struct EditProfileView: View {
     @State var emargeContact: String = ""
     @State var drivingLicenseNumber: String = ""
     @State var enableMechanic: Bool = false
-    @StateObject var profileViewModel = ProfileViewModel()
+    @ObservedObject var profileViewModel: ProfileViewModel
     @State private var currentPage = 0
     @State private var showActionSheet: Bool = false
     @Binding var isPresented: Bool
@@ -43,7 +43,7 @@ struct EditProfileView: View {
                             }
                         }
                         ZStack(alignment: .bottomTrailing) {
-                            Image(uiImage: ((selectedImage ?? UIImage(named:"icon-profile"))!))
+                            ((selectedImage != nil) ? Image(uiImage: selectedImage!) : profileViewModel.profileImage)
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 92, height: 73)
@@ -65,9 +65,9 @@ struct EditProfileView: View {
                             EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $profileViewModel.profileName, keyboardType: .default)
                             EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $profileViewModel.email, keyboardType: .emailAddress)
                             EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.phoneNumber, keyboardType: .numberPad)
-                            EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $emargeContact, keyboardType: .numberPad)
-                            EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $drivingLicenseNumber, keyboardType: .default)
-                            MechanicView(isOn: $enableMechanic)
+                            EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.emergencyNumber, keyboardType: .numberPad)
+                            EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.drivingLicenseNumber, keyboardType: .default)
+                            MechanicView(isOn: $profileViewModel.isMechanic)
                             HStack(spacing: 19) {
                                 ButtonView( title: "CANCEL",
                                             background:AppColor.white,
@@ -79,9 +79,10 @@ struct EditProfileView: View {
                                 })
                                 .padding(.bottom, 21)
                                 ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                    profileViewModel.editProfile(userId:MBUserDefaults.userIdStatic ?? "", userName: userName, email: email, phoneNumber: phoneNumber, emergencyContact: emargeContact, drivingLicense: drivingLicenseNumber, isMachanic: enableMechanic)
-                                    isPresented = false
-                                }).disabled(profileViewModel.validateProfile(fullName: userName, email: email, phoneNumber: phoneNumber, emargencyContact: emargeContact, DL: drivingLicenseNumber, isMachanic: enableMechanic))
+                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage ?? UIImage(named: "icon-profile")!, onSuccess: {
+                                        isPresented = false
+                                    })
+                                }).disabled(profileViewModel.validateProfile(fullName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emargencyContact: profileViewModel.emergencyNumber, DL: profileViewModel.drivingLicenseNumber))
                                     .padding(.bottom, 21)
                             }
                         }
@@ -137,7 +138,7 @@ struct EditProfileFieldView: View {
                     .font(KlavikaFont.regular.font(size: 16))
                     .autocapitalization(.none)
                     .foregroundStyle(AppColor.richBlack)
-                    .keyboardType(.emailAddress)
+                    .keyboardType(keyboardType)
             }
             .padding()
             .background(

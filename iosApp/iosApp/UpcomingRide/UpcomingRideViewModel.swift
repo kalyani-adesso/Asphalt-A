@@ -64,6 +64,7 @@ struct RideDetailsModel: Identifiable,Hashable {
     let confirmedCount:Int
 }
 
+@MainActor
 class UpcomingRideViewModel: ObservableObject {
     @Published var rides: [RideModel] = []
     @Published var rideStatus: [RideAction]  = [.upcoming, .history, .invities]
@@ -83,6 +84,8 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var  rideMembersList: [String] = []
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
+    @Published var rideFromDeepLink: RideModel? = nil
+    @Published var isUploading:Bool = false
     @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
@@ -214,7 +217,7 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    startDate: startDate,
+                    hasPhotos: ride.images.count > 0, startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
                     endTime: EndRideTime,
@@ -484,8 +487,101 @@ class UpcomingRideViewModel: ObservableObject {
             }
         }
     }
-
+    
+    /// Call after getSingleRide to set rideFromDeepLink for navigation (e.g. from deep link).
+    func setRideFromDeepLinkIfPossible() {
+        if let model = buildRideModelFromCurrentJoinRide() {
+            rideFromDeepLink = model
+        }
+    }
+    
+    /// Build a RideModel from current joinRideModel/rideDetails (e.g. after getSingleRide for deep link).
+    func buildRideModelFromCurrentJoinRide() -> RideModel? {
+        let j = joinRideModel
+        guard !j.rideId.isEmpty else { return nil }
+        let parts = j.route.split(separator: "-").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let routeStart = parts.first ?? ""
+        let routeEnd = parts.dropFirst().joined(separator: "-").trimmingCharacters(in: .whitespaces)
+        let confirmedCount = rideDetails.filter { $0.status == "confirmed" }.count
+        return RideModel(
+            id: j.rideId,
+            title: j.title,
+            routeStart: routeStart,
+            routeEnd: routeEnd,
+            status: .upcoming,
+            rideViewAction: .viewDetails,
+            rideAction: .upcoming,
+            date: j.date,
+            riderCount: Int(j.ridersCount) ?? 0,
+            createdBy: j.userId,
+            hasPhotos: false,
+            startDate: Date(),
+            participantAcceptedCount: confirmedCount,
+            startTime: nil,
+            endTime: nil,
+            ratings: nil,
+            imageData: nil
+        )
+    }
 }
+
+extension UpcomingRideViewModel {
+    
+    @MainActor
+    func uploadImages(images:[UIImage], rideId:String) async throws -> String {
+        print("Images Count:\(images.count)")
+        var encoadedImages:[String] = [""]
+        for eachImage in images {
+            if let encodedImage = encodeImageToBase64(image: eachImage) {
+                encoadedImages.append(encodedImage)
+            }
+        }
+        isUploading = true
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            rideRepository.uploadImage(rideId: rideId, images: encoadedImages, completionHandler: { result, error in
+                if let error = error {
+                    Task { @MainActor in
+                        print("Error uploading image: \(error)")
+                        self.isUploading = false
+                        continuation.resume(throwing: error)
+                    }
+                } else {
+                    Task { @MainActor in
+                        print("Image uploaded successfully:\(images.count)")
+                        self.isUploading = false
+                        continuation.resume(returning: "success")
+                    }
+                }
+            })
+        }
+    }
+    
+    func encodeImageToBase64(image: UIImage) -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.1) else { return nil}
+        let data = NSData(data: imageData)
+        return data.base64EncodedString()
+    }
+    
+    func decodeBase64ToImage(base64: String) -> UIImage? {
+        guard let data = Data(base64Encoded: base64) else { return nil }
+        return UIImage(data: data)
+    }
+    
+    func deleteRidePhoto(rideId: String, photoId: String) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            rideRepository.deleteImage(rideId: rideId, imageId: photoId, completionHandler: { result, error in
+                if let error = error {
+                    print("Error deleting photo: \(error)")
+                    continuation.resume(throwing: error)
+                } else {
+                    print("Photo deleted successfully")
+                    continuation.resume()
+                }
+            })
+        }
+    }
+}
+
 
 // Extension to help with async mapping (if not already available)
 extension Sequence {
@@ -502,3 +598,4 @@ extension Date {
         Calendar.current.startOfDay(for: self)
     }
 }
+

@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct UpcomingRideView: View {
-    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @ObservedObject var viewModel : UpcomingRideViewModel
     var currentSelected: RideAction { viewModel.selectedTab }
     var startingTab: RideAction = .upcoming
+    @State var showpopup: Bool = false
+    @State var navigationDone: Bool
+    @Binding var rideIdToOpen: String?
     @State private var showHomeView:Bool = false
-    @EnvironmentObject var homeViewModel : HomeViewModel
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
-    @State var showpopup: Bool = false
-    @State var navigationDone: Bool
     var hasPendingInvites: Bool {
         viewModel.rides.contains { $0.rideAction == .invities }
     }
@@ -27,6 +27,10 @@ struct UpcomingRideView: View {
     @State private var selectedRideId: String? = nil
     @State private var showNotification = false
     @State private var showSlideBar = false
+    @State private var showPhotosViewer = false
+    @State private var selectedRideForPhotos: RideModel?
+    @State private var showDeepLinkRideDetail = false
+    @State private var deepLinkRide: RideModel?
     
     var body: some View {
         ZStack{
@@ -79,11 +83,17 @@ struct UpcomingRideView: View {
                             ForEach($viewModel.rides.indices.filter { index in
                                 viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
                             }, id: \.self) { index in
-                                UpComingView(viewModel: viewModel, ride: $viewModel.rides[index]){ rideId in
-                                    selectedRideId = rideId
-                                    selectedImages = []
-                                    withAnimation(.easeInOut) { activePopup = .uploadOptions }
-                                }
+                                UpComingView(
+                                    viewModel: viewModel,
+                                    ride: $viewModel.rides[index],
+                                    onAddPhotos: { rideId in
+                                        selectedRideId = rideId
+                                        selectedImages = []
+                                        withAnimation(.easeInOut) { activePopup = .uploadOptions }
+                                    },
+                                    showPhotosViewer: $showPhotosViewer,
+                                    selectedRideForPhotos: $selectedRideForPhotos
+                                )
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                             }
@@ -101,6 +111,28 @@ struct UpcomingRideView: View {
                             showpopup = false
                         }
                     }
+                }
+            }
+            .task {
+                if let id = rideIdToOpen, !id.isEmpty {
+                    await viewModel.getSingleRide(rideId: id)
+                    viewModel.setRideFromDeepLinkIfPossible()
+                    rideIdToOpen = nil
+                }
+            }
+            .onChange(of: viewModel.rideFromDeepLink) { newValue in
+                if let r = newValue {
+                    deepLinkRide = r
+                    showDeepLinkRideDetail = true
+                    viewModel.rideFromDeepLink = nil
+                }
+            }
+            .navigationDestination(isPresented: $showDeepLinkRideDetail) {
+                if let r = deepLinkRide {
+                    RideDetailsView(viewModel: viewModel, ride: Binding(
+                        get: { r },
+                        set: { deepLinkRide = $0 }
+                    ))
                 }
             }
             .navigationBarBackButtonHidden(true)
@@ -134,11 +166,6 @@ struct UpcomingRideView: View {
                 .transition(.scale)
                 .zIndex(2)
             }
-            
-            if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading Rides...")
-            }
-            
         }
         .overlay {
             if activePopup != nil {
@@ -147,11 +174,19 @@ struct UpcomingRideView: View {
                     openGallery: $openGallery,
                     selectedImages: $selectedImages,
                     onUpload: {
-                        handleUpload()
+                      
+                           handleUpload(selectedImages: selectedImages)
+                        
                     }
                 )
                 .transition(.opacity.combined(with: .scale))
                 .zIndex(10)
+            }
+        }
+        .overlay(alignment: .center) {
+            if viewModel.isUploading {
+                ProgressViewReusable(title: "Uploading Photos...")
+                    .zIndex(11)
             }
         }
         .sheet(isPresented: $openGallery, onDismiss: {
@@ -160,6 +195,16 @@ struct UpcomingRideView: View {
             }
         }) {
             PhotoPicker(images: $selectedImages)
+        }
+        .sheet(isPresented: $showPhotosViewer) {
+            if let ride = selectedRideForPhotos {
+                RidePhotosViewerView(
+                    rideId: ride.id,
+                    rideTitle: ride.title,
+                    isPresented: $showPhotosViewer
+                )
+                .environmentObject(viewModel)
+            }
         }
         .zIndex(showpopup ? 2 : 0)
         .task{
@@ -214,18 +259,22 @@ struct UpcomingRideView: View {
         })
     }
     
-    private func handleUpload() {
+    private func handleUpload(selectedImages:[UIImage]) {
         guard let rideId = selectedRideId else { return }
         
         if let index = viewModel.rides.firstIndex(where: { $0.id == rideId }) {
             var ride = viewModel.rides[index]
             ride.hasPhotos = true
             viewModel.rides[index] = ride
+            Task {
+                try await viewModel.uploadImages(images: selectedImages, rideId: rideId)
+            }
         }
         
         withAnimation {
             selectedRideId = nil
         }
+        
     }
 }
 
@@ -477,44 +526,23 @@ struct UpComingView: View {
                     case .history:
                         VStack(alignment: .leading, spacing: 20){
                             if ride.hasPhotos {
-                                HStack{
-                                    Button(action: {
-                                        onAddPhotos?(ride.id)
-                                    }) {
-                                        HStack{
-                                            AppIcon.YourRides.photos
-                                            Text(ride.rideViewAction.rawValue.uppercased())
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 50)
-                                        .background(AppColor.white)
-                                        .foregroundColor(AppColor.celticBlue)
-                                        .font(KlavikaFont.bold.font(size: 14))
-                                        .overlay(RoundedRectangle(cornerRadius: 10)
-                                            .stroke(AppColor.celticBlue, lineWidth: 1))
-                                        
+                                Button(action: {
+                                    selectedRideForPhotos = ride
+                                    showPhotosViewer = true
+                                }) {
+                                    HStack{
+                                        AppIcon.YourRides.view
+                                        Text(AppStrings.UpcomingRide.viewPhotos.uppercased())
                                     }
-                                    
-                                    
-                                    Button(action: {
-                                        // open viewer
-                                    }) {
-                                        HStack{
-                                            AppIcon.YourRides.view
-                                            Text(AppStrings.UpcomingRide.viewPhotos.uppercased())
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 50)
-                                        .background(AppColor.white)
-                                        .foregroundColor(AppColor.celticBlue)
-                                        .font(KlavikaFont.bold.font(size: 14))
-                                        .cornerRadius(10)
-                                        .overlay(RoundedRectangle(cornerRadius: 10)
-                                            .stroke(AppColor.celticBlue, lineWidth: 1))
-                                    }
-                                    
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(AppColor.white)
+                                    .foregroundColor(AppColor.celticBlue)
+                                    .font(KlavikaFont.bold.font(size: 14))
+                                    .cornerRadius(10)
+                                    .overlay(RoundedRectangle(cornerRadius: 10)
+                                        .stroke(AppColor.celticBlue, lineWidth: 1))
                                 }
-                                
                             } else {
                                 Button(action: {
                                     onAddPhotos?(ride.id)
@@ -681,10 +709,4 @@ struct ButtonBackground: ViewModifier {
                 )
         }
     }
-}
-
-#Preview {
-    UpcomingRideView( navigationDone: true)
-        .environmentObject(HomeViewModel())
-        .environmentObject(UpcomingRideViewModel())
 }

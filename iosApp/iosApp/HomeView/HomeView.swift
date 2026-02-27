@@ -16,8 +16,10 @@ struct ActiveChat {
 }
 
 struct HomeView: View {
-    @EnvironmentObject var home: HomeViewModel
-    @EnvironmentObject var viewModel : UpcomingRideViewModel
+    @StateObject var home =  HomeViewModel()
+    @StateObject var viewModel  =  UpcomingRideViewModel()
+    @StateObject var profileVM = ProfileViewModel()
+    @StateObject var createRideVM = CreateRideViewModel()
     @State private var currentDate = Date()
     @State private var activeChat: ActiveChat? = nil
     @StateObject private var messagesVM = MessagesViewModel(currentUserId: MBUserDefaults.userIdStatic ?? "", recipientId: "", chatType: .private)
@@ -26,8 +28,8 @@ struct HomeView: View {
         ZStack(alignment: .top) {
             ScrollView {
                 VStack(spacing: 15){
-                    TopNavBar()
-                    ActionButtonView()
+                    TopNavBar(viewModel: profileVM)
+                    ActionButtonView(viewModel: createRideVM, upcomingRideViewModel: viewModel, homeViewModel: home)
                     DashboardView()
                     UpcomingRidesView { rideId in
                         
@@ -95,7 +97,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            if viewModel.isRideLoading {
+            if  createRideVM.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
             if activeChat != nil {
@@ -103,17 +105,18 @@ struct HomeView: View {
             }
         }
         .task {
-            viewModel.isRideLoading = true
             
+            viewModel.isRideLoading = true
             async let rides = viewModel.fetchAllUsers()
             async let allRides = viewModel.fetchAllRides()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             async let stats =  home.updateStatsFor(month: month, year: year)
-            
             _ = await (rides, allRides, stats)
-            
             viewModel.isRideLoading = false
+        }
+        .task {
+            await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
         }
         .refreshable {
             await viewModel.fetchAllRides()

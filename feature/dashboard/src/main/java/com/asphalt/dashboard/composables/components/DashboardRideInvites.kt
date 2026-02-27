@@ -27,6 +27,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.constants.APIConstants
+import com.asphalt.chat.model.ChatParamsModel
+import com.asphalt.chat.screen.ChatDialog
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -53,6 +59,7 @@ import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.DashboardInvitesConstants
+import com.asphalt.dashboard.data.DashboardChatModel
 import com.asphalt.dashboard.data.DashboardRideInviteUIModel
 import com.asphalt.dashboard.viewmodels.DashboardRideInviteViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -67,6 +74,8 @@ fun DashboardRideInviteList(
     }
     val rideInvites =
         dashboardRideInviteViewModel.dashboardRideInviteList.collectAsStateWithLifecycle()
+    val dashboardChats =
+        dashboardRideInviteViewModel.dashboardRideInviteChat.collectAsStateWithLifecycle()
     Box(modifier = Modifier.fillMaxWidth()) {
         if (rideInvites.value.isEmpty())
             Text(
@@ -76,7 +85,11 @@ fun DashboardRideInviteList(
             )
         LazyRow {
             items(rideInvites.value) {
-                DashboardRideInviteUI(it, { id, status ->
+                val inviteRideId = it.rideID
+                val chatModel =
+                    dashboardChats.value.find { dashboardChatModel -> dashboardChatModel.rideID == inviteRideId }
+
+                DashboardRideInviteUI(chatModel, it, { id, status ->
                     dashboardRideInviteViewModel.updateRideInviteStatus(id, status)
                 }, { rideId ->
                     dashboardRideInviteViewModel.cancelRide(rideID = rideId)
@@ -91,11 +104,34 @@ fun DashboardRideInviteList(
 
 @Composable
 fun DashboardRideInviteUI(
+    dashboardChatModel: DashboardChatModel?,
     dashboardRideInvite: DashboardRideInviteUIModel,
     updateInviteStatus: (String, Int) -> Unit,
     cancelRide: (String) -> Unit,
     viewDetails: (String) -> Unit
 ) {
+    var showChatPopup by remember { mutableStateOf(false) }
+    if (showChatPopup) {
+        dashboardChatModel?.let { chatModel ->
+            var receiverID = ""
+            if (!chatModel.isGroup) {
+                receiverID = chatModel.organiserID
+            }
+
+
+
+            ChatDialog(
+                receiverID = receiverID,
+                isGroupChat = chatModel.isGroup,
+                chatParams = ChatParamsModel(
+                    chatModel.rideID, chatModel.members, chatModel.title
+                ),
+                onDismiss = {
+                    showChatPopup = false
+                }
+            )
+        }
+    }
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
@@ -167,22 +203,26 @@ fun DashboardRideInviteUI(
                         )
                     }
                 }
-                RoundedBox(
-                    modifier = Modifier
-                        .size(Dimensions.size30)
-                        .clickable {
-
-                        },
-                    cornerRadius = Dimensions.size10,
-                    backgroundColor = PrimaryDarkerLightB75
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_message),
-                            null,
-                        )
+                if (dashboardChatModel?.isSoloRide == false)
+                    RoundedBox(
+                        modifier = Modifier
+                            .size(Dimensions.size30)
+                            .clickable {
+                                showChatPopup = true
+                            },
+                        cornerRadius = Dimensions.size10,
+                        backgroundColor = PrimaryDarkerLightB75
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_message),
+                                null,
+                            )
+                        }
                     }
-                }
 
             }
             Spacer(Modifier.height(Dimensions.size17))
