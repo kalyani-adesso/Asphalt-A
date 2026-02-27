@@ -297,7 +297,8 @@ class JoinRideViewModel(
                             speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
                             status = data["status"] as? String ?: "Connected",
                             dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
-                            isRejoined = data["isRejoined"] as? Boolean ?: false
+                            isRejoined = data["isRejoined"] as? Boolean ?: false,
+                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0
                         )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()

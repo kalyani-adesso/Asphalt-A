@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
@@ -32,7 +33,8 @@ class CurrentLocationService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val database = PlatformDatabase() // Your Firebase/KMP wrapper
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
+    private var lastLocation: Location? = null
+    private var totalDistanceMetres: Float = 0f
     private var rideId: String? = null
     private var ongoingRideId: String? = null
 
@@ -85,14 +87,25 @@ class CurrentLocationService : Service() {
 
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                val location = result.lastLocation ?: return
+                val currentLocation = result.lastLocation ?: return
+
+                lastLocation?.let { previous ->
+                    val distanceBetween = previous.distanceTo(currentLocation)
+
+                    if (currentLocation.accuracy < 20 && distanceBetween > 2.0) {
+                        totalDistanceMetres += distanceBetween
+                    }
+                }
+
+                lastLocation = currentLocation
+
                 var speedInMps: Float
                 var speedInKph = 0.0
-                if (location.hasSpeed()) {
-                    speedInMps = location.speed
+                if (currentLocation.hasSpeed()) {
+                    speedInMps = currentLocation.speed
                     speedInKph = speedInMps * 3.6
                 }
-                saveToFirebase(location.latitude, location.longitude, speedInKph)
+                saveToFirebase(currentLocation.latitude, currentLocation.longitude, speedInKph,totalDistanceMetres)
             }
         }
 
@@ -107,7 +120,7 @@ class CurrentLocationService : Service() {
         }
     }
 
-    private fun saveToFirebase(lat: Double, lng: Double, speedInKph: Double) {
+    private fun saveToFirebase(lat: Double, lng: Double, speedInKph: Double, totalDistanceMetres: Float) {
         val rId = rideId ?: return
         val uId = ongoingRideId ?: return
         val roundedSpeed = (speedInKph * 100).roundToInt() / 100.0
@@ -122,7 +135,8 @@ class CurrentLocationService : Service() {
                 "currentLat" to lat,
                 "currentLong" to lng,
                 "speedInKph" to roundedSpeed,
-                "status" to status
+                "status" to status,
+                "totalDistance" to totalDistanceMetres/1000
 //                "timestamp" to System.currentTimeMillis()
             )
             database.getReference("ongoing_ride/$rId/$uId").updateChildren(data)
