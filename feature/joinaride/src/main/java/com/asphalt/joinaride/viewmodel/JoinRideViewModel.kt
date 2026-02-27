@@ -81,6 +81,7 @@ class JoinRideViewModel(
                         ride.rideStatus != END_RIDE
                     } else {
                         ride.participants.any {
+                            it.userId == currentUid &&
                             it.inviteStatus in listOf(
                                 RIDE_ACCEPTED,
                                 RIDE_JOINED
