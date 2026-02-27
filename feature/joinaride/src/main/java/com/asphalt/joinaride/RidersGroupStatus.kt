@@ -202,8 +202,8 @@ fun GroupRidersCard(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Spacer(Modifier.width(Dimensions.size5))
-                            when (riderData?.status) {
-                                "Connected" -> {
+                            when (riderData?.status?.lowercase()) {
+                                "connected" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(
@@ -229,7 +229,7 @@ fun GroupRidersCard(
                                     }
                                 }
 
-                                "Delayed" -> {
+                                "delayed" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(
@@ -257,7 +257,7 @@ fun GroupRidersCard(
                                     }
                                 }
 
-                                "Stopped" -> {
+                                "stopped" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(

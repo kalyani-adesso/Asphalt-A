@@ -89,10 +89,10 @@ class CurrentLocationService : Service() {
                 var speedInMps: Float
                 var speedInKph = 0.0
                 if (location.hasSpeed()) {
-                     speedInMps = location.speed
-                     speedInKph = speedInMps * 3.6
+                    speedInMps = location.speed
+                    speedInKph = speedInMps * 3.6
                 }
-                saveToFirebase(location.latitude, location.longitude,speedInKph)
+                saveToFirebase(location.latitude, location.longitude, speedInKph)
             }
         }
 
@@ -111,11 +111,18 @@ class CurrentLocationService : Service() {
         val rId = rideId ?: return
         val uId = ongoingRideId ?: return
         val roundedSpeed = (speedInKph * 100).roundToInt() / 100.0
+        var status = "connected"
+        if (roundedSpeed == 0.0) {
+            status = "stopped"
+        } else if (roundedSpeed < 1)
+            status = "delayed"
+
         serviceScope.launch {
             val data = mapOf(
                 "currentLat" to lat,
                 "currentLong" to lng,
-                "speedInKph" to roundedSpeed
+                "speedInKph" to roundedSpeed,
+                "status" to status
 //                "timestamp" to System.currentTimeMillis()
             )
             database.getReference("ongoing_ride/$rId/$uId").updateChildren(data)

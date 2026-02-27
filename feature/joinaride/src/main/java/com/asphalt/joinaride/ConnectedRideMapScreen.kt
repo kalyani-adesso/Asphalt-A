@@ -97,7 +97,7 @@ fun ConnectedRideGoogleMapScreen(
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.connected_ride),
-            subtitle = "Weekend Coast Ride",
+            subtitle = ridesData.rideTitle?:"",
             isCenterAligned = false,
             actions = {
                 RoundedBox(
