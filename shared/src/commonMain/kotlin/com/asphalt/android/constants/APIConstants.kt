@@ -3,7 +3,7 @@ package com.asphalt.android.constants
 object APIConstants {
     const val BASE_URL = "asphalt-a-d59cb-default-rtdb.firebaseio.com"
     const val BASE_URL_PlACES = "nominatim.openstreetmap.org"
-    const val  USERS_URL = "/users"
+    const val USERS_URL = "/users"
     const val BIKES_URL = "/bikes"
     const val QUERIES_URL = "/queries"
     const val ANSWERS_URL = "/answers"
@@ -25,6 +25,8 @@ object APIConstants {
     const val IMAGES = "/images"
 
     const val RIDES_IMAGES_URL = "/rides_images"
+    const val POLY_LINE_API = "router.project-osrm.org"
+    const val GET_POLY_LINE= "/route/v1/driving/"
 
     //Ride Invite Status
     const val RIDE_INVITED = 0

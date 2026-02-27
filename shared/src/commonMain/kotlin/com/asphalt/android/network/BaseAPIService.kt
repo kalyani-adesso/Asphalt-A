@@ -69,6 +69,10 @@ abstract class BaseAPIService(private val client: KtorClient) {
         return client.getClient(APIConstants.BASE_URL_PlACES, true).get(url)
     }
 
+    protected suspend fun getPolyLines(url: String): HttpResponse {
+        return client.getClient(APIConstants.POLY_LINE_API, true).get(url)
+    }
+
     protected fun buildUrl(url: String): String {
         return "$url.json"
     }

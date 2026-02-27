@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.location.LocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.PermissionHandler
@@ -62,6 +63,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -77,6 +79,14 @@ fun CurrentLocationMapScreen(
     val context = LocalContext.current
     val rideId = rideViewModel.getRideId()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
+    LaunchedEffect("Test") {
+        rideViewModel.getPolyLines(
+            ridesData.startLatitude,
+            ridesData.startLongitude,
+            ridesData.endLatitude,
+            ridesData.endLongitude
+        )
+    }
 
     LaunchedEffect(rideId) {
         rideId?.let {
@@ -134,6 +144,7 @@ fun MapWithCurrentLocation(
     val context = LocalContext.current
 
     val riders by rideViewModel.joinedUsers.collectAsState()
+    val polyline by rideViewModel.polyLine.collectAsState()
 
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -143,7 +154,14 @@ fun MapWithCurrentLocation(
 
     val cameraPositionState = rememberCameraPositionState()
     LaunchedEffect(Unit) {
-        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(ridesData.startLatitude,ridesData.startLongitude) ,12f))
+        cameraPositionState.animate(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    ridesData.startLatitude,
+                    ridesData.startLongitude
+                ), 12f
+            )
+        )
 
     }
 
@@ -284,6 +302,14 @@ fun MapWithCurrentLocation(
                     )
                 }
             }
+
+            if(polyline.isNotEmpty()){
+                Polyline(
+                    points = polyline,
+                    color = Color.Blue,
+                    width = 8f
+                )
+            }
             // Start & End markers
 //            start?.let {
 //                Marker(
@@ -339,7 +365,7 @@ fun MapWithCurrentLocation(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = currentUserConnectedRideData?.speedInKph?.toString() ?:"0",
+                        text = currentUserConnectedRideData?.speedInKph?.toString() ?: "0",
                         style = TypographyBold.bodyMedium,
                         fontSize = Dimensions.textSize19,
                         color = NeutralBlack
@@ -358,7 +384,7 @@ fun MapWithCurrentLocation(
                 .align(Alignment.BottomCenter)
                 .padding(16.dp),
         ) {
-           // Spacer(modifier = Modifier.weight(1f))
+            // Spacer(modifier = Modifier.weight(1f))
             GradientButton(
                 onClick = {
 

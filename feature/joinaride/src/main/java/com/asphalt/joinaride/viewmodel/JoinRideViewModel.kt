@@ -12,10 +12,13 @@ import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.dashboard.DashboardDTO
+import com.asphalt.android.model.places.OSRMResponse
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.repository.places.PlacesRepository
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.joinaride.repository.IdRepository
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -43,6 +46,8 @@ class JoinRideViewModel(
     //Dependencies
     val ridesRepo: RidesRepository by inject()
     val androidUserVM: AndroidUserVM by inject()
+    val plcesRepo: PlacesRepository by inject()
+
 
     // stateflows
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
@@ -61,6 +66,9 @@ class JoinRideViewModel(
 
     private val _completedRideId = MutableStateFlow<String?>(null)
     val completedRideId: StateFlow<String?> = _completedRideId
+
+    private val _polyLine = MutableStateFlow<List<LatLng>>(emptyList())
+    val polyLine: StateFlow<List<LatLng>> = _polyLine
     val currentUid = androidUserVM.userState.value?.uid
 
     // Accepted rides with search filter
@@ -379,4 +387,32 @@ class JoinRideViewModel(
             }?.ridesID
     }
 
+    fun getPolyLines(startLat: Double, startLon: Double, endLat: Double, endLon: Double) {
+        var list: List<LatLng> = emptyList()
+        viewModelScope.launch {
+            val response = plcesRepo.getPolyLine(startLat, startLon, endLat, endLon)
+            when (response) {
+                is APIResult.Error -> {
+
+                }
+
+                is APIResult.Success -> {
+                    /* val coordinates = response.routes.firstOrNull()?.geometry?.coordinates
+                     coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()*/
+                    try {
+                        val coordinates = response.data.routes.firstOrNull()?.geometry?.coordinates
+                        val routePoints = coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()
+                        _polyLine.value=routePoints
+                        //_polyLine.value = listOf(LatLng(startLat, startLon))+routePoints+listOf(LatLng(endLat, endLon))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    //response.data.coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()
+                }
+            }
+
+        }
+
+    }
 }
