@@ -214,9 +214,9 @@ fun RideProgress(
                         Button(
                             onClick = {
                                 currentUserConnectedRideData?.let {
-                                    it.canTrack = !it.canTrack
+                                    val isTracking = !it.canTrack
                                     val data = mapOf(
-                                        "canTrack" to it.canTrack
+                                        "canTrack" to isTracking
                                     )
                                     ridesData.ridesID?.let { rideId ->
                                         viewmodel.updateOngoingRideDatabase(
