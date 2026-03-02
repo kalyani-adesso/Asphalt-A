@@ -388,6 +388,7 @@ fun RiderCard(
 //                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
 //                                    status = RIDE_JOINED)
 //                                viewModel.joinRide(joinRide = ridesData)
+                                viewModel.setRideId(ridesData.ridesID ?:"")
                                 navigateToConnectedRide.invoke(ridesData)
                             },
                             contentPadding = PaddingValues(all = Dimensions.size0)

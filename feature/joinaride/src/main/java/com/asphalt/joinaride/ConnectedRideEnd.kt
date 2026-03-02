@@ -76,20 +76,21 @@ fun ConnectedRideEnd(
     // val stats = viewModel.stats.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(value = false) }
     val scope = rememberCoroutineScope()
+    var duration by remember { mutableStateOf("") }
 
     setTopAppBarState(AppBarState(title = stringResource(R.string.connected_ride)))
+    LaunchedEffect(summaryData.startDateTime) {
+        duration = Utils.formatDuration(summaryData.startDateTime, System.currentTimeMillis())
 
-    val duration = Utils.formatDuration(summaryData.startDateTime, System.currentTimeMillis())
+    }
+
 
 //    val finalDuration by viewModel.finalDuration.collectAsState()
 
     LaunchedEffect(Unit) {
         delay(2000)
         showDialog = true
-        Log.d(
-            "summary_data",
-            ("distance=" + summaryData.distanceTravelled + " duration=" + duration + " riders=" + summaryData.noOfRiders)
-        )
+
 
 //        Log.d("TAG", "ConnectedRideEnd: ${formatTime(finalDuration)}")
 
@@ -160,7 +161,10 @@ fun ConnectedRideEnd(
                         statType = CommonStatType.DistanceStatType,
                         "%.1f".format(summaryData.distanceTravelled)
                     )
-                    StatView(statType = CommonStatType.RidesStatType, summaryData.noOfRiders.toString())
+                    StatView(
+                        statType = CommonStatType.RidesStatType,
+                        summaryData.noOfRiders.toString()
+                    )
                 }
             }
         }

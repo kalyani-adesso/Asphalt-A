@@ -303,8 +303,8 @@ fun MapWithCurrentLocation(
                     val state = rememberUpdatedMarkerState(
                         position = LatLng(rider.currentLat, rider.currentLong)
                     )
-
-                    RiderMarker(ride = rider, state = state)
+                    if (rider.canTrack)
+                        RiderMarker(ride = rider, state = state)
 //                    Marker(
 //                        state = MarkerState(
 //                            LatLng(rider.currentLat, rider.currentLong)

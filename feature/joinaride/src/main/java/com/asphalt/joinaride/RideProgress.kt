@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants.END_RIDE
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
@@ -207,6 +208,20 @@ fun RideProgress(
                     ) {
                         Button(
                             onClick = {
+                                currentUserConnectedRideData?.let {
+                                    it.canTrack = !it.canTrack
+                                    val data = mapOf(
+                                        "canTrack" to it.canTrack
+                                    )
+                                    ridesData.ridesID?.let { rideId ->
+                                        viewmodel.updateOngoingRideDatabase(
+                                            data,
+                                            rideId
+                                        )
+                                    }
+                                }
+
+
                                 // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
 //                                onClickEndRide.invoke()
                             },
@@ -217,8 +232,12 @@ fun RideProgress(
                             shape = RoundedCornerShape(30.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
+                            var trackText = "START TRACKING"
+                            currentUserConnectedRideData?.let {
+                                trackText = if (!it.canTrack) "START TRACKING" else "STOP TRACKING"
+                            }
                             Text(
-                                text = "STOP TRACKING",
+                                text = trackText,
                                 style = TypographyBold.bodySmall,
                                 color = Color.White,
                                 fontSize = 10.sp,
