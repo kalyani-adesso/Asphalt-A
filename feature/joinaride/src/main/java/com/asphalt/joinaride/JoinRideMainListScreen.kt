@@ -46,6 +46,7 @@ import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.showRejoinButton
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.SearchView
@@ -65,6 +66,7 @@ import com.asphalt.commonui.theme.SafetyOrange
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.util.PhoneCallUtils
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import org.koin.compose.viewmodel.koinViewModel
@@ -173,7 +175,8 @@ fun RiderCard(
     navigateToEndRide: () -> Unit,
     ridesData: RidesData,
     viewModel: JoinRideViewModel,
-    completedRideID: String?
+    completedRideID: String?,
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val context = LocalContext.current
     val createdBy = viewModel.setCreatedBy(ridesData)
@@ -353,7 +356,14 @@ fun RiderCard(
                     // call rider button
                     ElevatedButton(
                         onClick = {
-                            navigateToEndRide.invoke()
+                            ridesData.createdBy?.let {
+                                androidUserVM.getUser(it)?.contactNumber?.let { phoneNumber ->
+                                    PhoneCallUtils.dialPhoneNumber(
+                                        context,
+                                        phoneNumber
+                                    )
+                                }
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                         modifier = Modifier
