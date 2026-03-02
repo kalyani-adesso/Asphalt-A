@@ -3,16 +3,22 @@ package com.asphalt.joinaride.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.constants.APIConstants
+import com.asphalt.android.constants.APIConstants.END_RIDE
 import com.asphalt.android.constants.APIConstants.RIDE_ACCEPTED
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.model.APIResult
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
+import com.asphalt.android.model.dashboard.DashboardDTO
+import com.asphalt.android.model.places.OSRMResponse
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.repository.places.PlacesRepository
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.joinaride.repository.IdRepository
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -40,6 +46,8 @@ class JoinRideViewModel(
     //Dependencies
     val ridesRepo: RidesRepository by inject()
     val androidUserVM: AndroidUserVM by inject()
+    val plcesRepo: PlacesRepository by inject()
+
 
     // stateflows
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
@@ -50,10 +58,18 @@ class JoinRideViewModel(
     val rideId = _rideId.asStateFlow()
     private val _joinedUsers = MutableStateFlow<List<ConnectedRideDTO>>(emptyList())
     val joinedUsers: StateFlow<List<ConnectedRideDTO>> = _joinedUsers
+
+    private val _currentUserConnectedRideData = MutableStateFlow<ConnectedRideDTO?>(null)
+    val currentUserConnectedRideData = _currentUserConnectedRideData.asStateFlow()
 //    private val _rideUsers = MutableStateFlow<List<RidesData>>(emptyList())
 //    val rideUsers: StateFlow<List<RidesData>> = _rideUsers
 
-    private val currentUid = androidUserVM.userState.value?.uid
+    private val _completedRideId = MutableStateFlow<String?>(null)
+    val completedRideId: StateFlow<String?> = _completedRideId
+
+    private val _polyLine = MutableStateFlow<List<LatLng>>(emptyList())
+    val polyLine: StateFlow<List<LatLng>> = _polyLine
+    val currentUid = androidUserVM.userState.value?.uid
 
     // Accepted rides with search filter
     val acceptedRides: StateFlow<List<RidesData>> =
@@ -61,8 +77,17 @@ class JoinRideViewModel(
             val q = query.trim().lowercase()
             ridesList
                 .filter { ride ->
-                    ride.createdBy == currentUid ||
-                            ride.participants.any { it.inviteStatus in listOf(RIDE_ACCEPTED, RIDE_JOINED)}
+                    if (ride.createdBy == currentUid) {
+                        ride.rideStatus != END_RIDE
+                    } else {
+                        ride.participants.any {
+                            it.userId == currentUid &&
+                            it.inviteStatus in listOf(
+                                RIDE_ACCEPTED,
+                                RIDE_JOINED
+                            )
+                        }
+                    }
                 }
                 .let { accepted ->
                     if (q.isEmpty()) accepted
@@ -73,11 +98,14 @@ class JoinRideViewModel(
     init {
         getAllRiders()
     }
+
     fun setRideId(selectedId: String) {
         _rideId.value = selectedId
         idRepository.id = selectedId
     }
-    fun getRideId() : String? = idRepository.id
+
+    fun getRideId(): String? = idRepository.id
+
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -93,6 +121,7 @@ class JoinRideViewModel(
             }
         }
     }
+
     fun setCreatedBy(ride: RidesData): String {
         return if (androidUserVM.getCurrentUserUID() == ride.createdBy) "Me"
         else androidUserVM.getUser(ride.createdBy.toString())?.name.orEmpty()
@@ -119,6 +148,7 @@ class JoinRideViewModel(
             }
         }
     }
+
     fun joinRide(joinRide: RidesData) {
 
         viewModelScope.launch {
@@ -138,7 +168,8 @@ class JoinRideViewModel(
             Log.d("TAG", "JoinRideClick: $result")
         }
     }
-    fun getOnGoingRides(rideId:String) {
+
+    fun getOnGoingRides(rideId: String) {
 
         viewModelScope.launch {
 
@@ -147,7 +178,7 @@ class JoinRideViewModel(
                 //    val sortedArray = response.sortedBy{ it.startDate }}
                 // Filter out current user from “other users
                 val otherUsers = response.filter { it.userID != currentUid }
-              //  val joinedList = otherUsers
+                //  val joinedList = otherUsers
                 _joinedUsers.value = otherUsers
                 Log.d("TAG", "getOnGoingRides otherUsers: ${otherUsers.size}")
 
@@ -188,22 +219,53 @@ class JoinRideViewModel(
 
     private val _endRideResult = MutableStateFlow<APIResult<Unit>?>(null)
     val endRideResult = _endRideResult
-    fun endRide(rideId: String,rideJoinedId: String) {
+    fun endRide(rideId: String, rideJoinedId: String) {
         viewModelScope.launch {
-            val result = ridesRepo.endRide(rideId = rideId,rideJoinedId = rideJoinedId)
+            val result = ridesRepo.endRide(rideId = rideId, rideJoinedId = rideJoinedId)
             _endRideResult.value = result
             Log.d("TAG", "endRide: $result")
+        }
+    }
+
+    fun sendEndRideSummary(
+        ridesID: String?,
+        rideDistance: Double,
+        isGroupRide: Boolean,
+        startLocation: String?,
+        endLocation: String?,
+        isOrganiser: Boolean,
+        isParticipant: Boolean,
+        currentTimeMillis: Long
+    ) {
+        viewModelScope.launch {
+            ridesRepo.endRideSummary(
+                androidUserVM.getCurrentUserUID(), DashboardDTO(
+                    ridesID,
+                    rideDistance,
+                    isGroupRide,
+                    startLocation,
+                    endLocation,
+                    isOrganiser,
+                    isParticipant, currentTimeMillis
+                )
+            )
+
         }
     }
 
     fun removeEndRideList(joinRide: List<RidesData>) {
         _rides.value = joinRide.filter { it.rideStatus != 4 }
     }
+
     //Firebase
     private var rideListener: ValueEventListener? = null
     private var rideRef: DatabaseReference? = null
     private var startedAt: Long? = null
     private val database = FirebaseDatabase.getInstance()
+    var endRideID: String? = null
+    private var _ongoingRideUpdate = MutableStateFlow("")
+    var ongoingRideUpdate = _ongoingRideUpdate.asStateFlow()
+
     // Observe all riders in real-time
     fun observeRideLocations(rideId: String) {
         // Remove old listener safely
@@ -225,17 +287,26 @@ class JoinRideViewModel(
                 val connectedRides = snapshot.children.mapNotNull { child ->
                     val data = child.value as? Map<*, *> ?: return@mapNotNull null
 
-                    ConnectedRideDTO(
-                        rideJoinedID = child.key ?: "", // Usually the push key
-                        rideID = data["rideID"] as? String ?: "",
-                        userID = data["userID"] as? String ?: "",
-                        currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
-                        currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
-                        speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
-                        status = data["status"] as? String ?: "UNKNOWN",
-                        dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
-                        isRejoined = data["isRejoined"] as? Boolean ?: false
-                    )
+                    val connectedRideDTO =
+                        ConnectedRideDTO(
+                            rideJoinedID = child.key ?: "", // Usually the push key
+                            rideID = data["rideID"] as? String ?: "",
+                            userID = data["userID"] as? String ?: "",
+                            currentLat = (data["currentLat"] as? Number)?.toDouble() ?: 0.0,
+                            currentLong = (data["currentLong"] as? Number)?.toDouble() ?: 0.0,
+                            speedInKph = (data["speedInKph"] as? Number)?.toDouble() ?: 0.0,
+                            status = data["status"] as? String ?: "Connected",
+                            dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
+                            isRejoined = data["isRejoined"] as? Boolean ?: false,
+                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0
+                        )
+                    if (data["userID"] == androidUserVM.getCurrentUserUID()) {
+                        endRideID = child.key.orEmpty()
+                        _ongoingRideUpdate.value = child.key.orEmpty()
+                        _currentUserConnectedRideData.value = connectedRideDTO
+                    }
+                    connectedRideDTO
+
                 }
 
 
@@ -244,6 +315,7 @@ class JoinRideViewModel(
                 Log.d("connectedRides=", joinedUsers.value.size.toString())
 
             }
+
             override fun onCancelled(error: DatabaseError) {
                 rideListener?.let {
                     rideListener?.let { rideRef?.removeEventListener(it) }
@@ -281,7 +353,7 @@ class JoinRideViewModel(
         }
     }
 
-    fun stopRide() : Long {
+    fun stopRide(): Long {
         _isRideStarted.value = false
         timerJob?.cancel()
         timerJob = null
@@ -294,12 +366,55 @@ class JoinRideViewModel(
         rideStartTime = null
         return finalSeconds
     }
+
     fun setEndTime(finalTime: Long) {
         _finalDuration.value = finalTime
     }
+
     override fun onCleared() {
         rideListener?.let { rideRef?.removeEventListener(it) }
         timerJob?.cancel()
         super.onCleared()
+    }
+
+    fun completedRideID(newRides: List<RidesData>) {
+        _completedRideId.value =
+            newRides.firstOrNull { ride ->
+                (ride.createdBy == currentUid && ride.rideStatus == APIConstants.RIDE_JOINED)
+                        ||
+                        ride.participants.any {
+                            it.userId == currentUid &&
+                                    it.inviteStatus == APIConstants.RIDE_JOINED
+                        }
+            }?.ridesID
+    }
+
+    fun getPolyLines(startLat: Double, startLon: Double, endLat: Double, endLon: Double) {
+        var list: List<LatLng> = emptyList()
+        viewModelScope.launch {
+            val response = plcesRepo.getPolyLine(startLat, startLon, endLat, endLon)
+            when (response) {
+                is APIResult.Error -> {
+
+                }
+
+                is APIResult.Success -> {
+                    /* val coordinates = response.routes.firstOrNull()?.geometry?.coordinates
+                     coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()*/
+                    try {
+                        val coordinates = response.data.routes.firstOrNull()?.geometry?.coordinates
+                        val routePoints = coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()
+                        _polyLine.value=routePoints
+                        //_polyLine.value = listOf(LatLng(startLat, startLon))+routePoints+listOf(LatLng(endLat, endLon))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    //response.data.coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()
+                }
+            }
+
+        }
+
     }
 }

@@ -2,6 +2,7 @@ package com.asphalt.joinaride
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.model.rides.RidesData
+import com.asphalt.android.model.rides.showRejoinButton
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.SearchView
@@ -53,6 +55,7 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import com.asphalt.commonui.constants.Constants
+import com.asphalt.commonui.theme.BlueLite25
 import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
@@ -67,39 +70,47 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 @Composable
 fun JoinRideMainListScreen(
     viewModel: JoinRideViewModel = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
-    navigateToConnectedRide:(RidesData) -> Unit,
-    navigateToEndRide : () -> Unit)
-{
+    navigateToConnectedRide: (RidesData) -> Unit,
+    navigateToEndRide: () -> Unit
+) {
     var toolbarTitle by remember { mutableStateOf("") }
     toolbarTitle = stringResource(R.string.join_ride)
 
     setTopAppBarState(
-        AppBarState(title = toolbarTitle))
-        Column(modifier = Modifier
+        AppBarState(title = toolbarTitle)
+    )
+    Column(
+        modifier = Modifier
             .fillMaxSize()
             .background(
                 color = NeutralWhite,
-            )) {
-            JoinRide(viewModel,
-                navigateToConnectedRide = {rides -> navigateToConnectedRide.invoke(rides)},
-                navigateToEndRide = { navigateToEndRide.invoke()})
-        }
+            )
+    ) {
+        JoinRide(
+            viewModel,
+            navigateToConnectedRide = { rides -> navigateToConnectedRide.invoke(rides) },
+            navigateToEndRide = { navigateToEndRide.invoke() })
+    }
 }
+
 @Composable
 fun JoinRide(
     viewModel: JoinRideViewModel,
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
 
-) {
+    ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val rides by viewModel.acceptedRides.collectAsState()
+    viewModel.completedRideID(rides)
+    val completedRideID by viewModel.completedRideId.collectAsState()
 
-    val sortedList = rides.sortedByDescending{ it .createdDate}
+    val sortedList = rides.sortedBy { it.startDate }
 
     // ride removed from list once completed
 //    LaunchedEffect(Unit) {
@@ -121,7 +132,8 @@ fun JoinRide(
                     shape = RoundedCornerShape(size = Dimensions.size10)
                 ),
             onQueryChange = {
-                viewModel.setSearchQuery(it) },
+                viewModel.setSearchQuery(it)
+            },
             onClearClick = {
                 viewModel.setSearchQuery("") // Clear search filter
             },
@@ -136,15 +148,16 @@ fun JoinRide(
             ) {
                 Text(text = "No Riders Found", style = MaterialTheme.typography.bodyLarge)
             }
-        }
-        else {
+        } else {
             // display riders list
             LazyColumn {
                 items(items = sortedList) { rider ->
-                    RiderCard( navigateToConnectedRide = {ridesD ->
-                        navigateToConnectedRide.invoke(ridesD)},
+                    RiderCard(
+                        navigateToConnectedRide = { ridesD ->
+                            navigateToConnectedRide.invoke(ridesD)
+                        },
                         navigateToEndRide = { navigateToEndRide.invoke() },
-                        ridesData = rider, viewModel = viewModel
+                        ridesData = rider, viewModel = viewModel, completedRideID
                     )
                 }
             }
@@ -157,9 +170,11 @@ fun JoinRide(
 fun RiderCard(
     navigateToConnectedRide: (RidesData) -> Unit,
     navigateToEndRide: () -> Unit,
-    ridesData : RidesData,
-    viewModel: JoinRideViewModel) {
-
+    ridesData: RidesData,
+    viewModel: JoinRideViewModel,
+    completedRideID: String?
+) {
+    val context = LocalContext.current
     val createdBy = viewModel.setCreatedBy(ridesData)
 
     var currentRideId by remember { mutableStateOf("") }
@@ -360,7 +375,7 @@ fun RiderCard(
                         )
                     }
 //                     join/ rejoin ride button
-                    if (ridesData.rideStatus == RIDE_JOINED) {
+                    if (ridesData.showRejoinButton(viewModel.currentUid ?: "")) {
                         ElevatedButton(
                             modifier = Modifier
                                 .weight(weight = 1f)
@@ -402,18 +417,37 @@ fun RiderCard(
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
+                            startColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                BlueLite25
+                            } else {
+                                PrimaryDarkerLightB75
+                            },
+                            endColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                BlueLite25
+                            } else {
+                                PrimaryDarkerLightB75
+                            },
                             onClick = {
-                                viewModel.setRideId(ridesData.ridesID ?: "")
+                                if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                    Toast.makeText(
+                                        context,
+                                        "You are already on a ride. Please complete the current ride and then start a new one.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    viewModel.setRideId(ridesData.ridesID ?: "")
 
-                                // if user trying to join another ride previous will end then new ride join logic pending
-                                viewModel.updateRideStatus(
-                                    userId = ridesData.createdBy ?: "",
-                                    rideId = ridesData.ridesID ?: "",
-                                    status = RIDE_JOINED
-                                ) // status 3
-                                // post join ride
-                                viewModel.joinRide(joinRide = ridesData)
-                                navigateToConnectedRide.invoke(ridesData)
+                                    // if user trying to join another ride previous will end then new ride join logic pending
+                                    viewModel.updateRideStatus(
+                                        userId = ridesData.createdBy ?: "",
+                                        rideId = ridesData.ridesID ?: "",
+                                        status = RIDE_JOINED
+                                    ) // status 3
+                                    // post join ride
+                                    viewModel.joinRide(joinRide = ridesData)
+                                    navigateToConnectedRide.invoke(ridesData)
+                                }
+
                             },
                             buttonHeight = Dimensions.size50,
                             contentPadding = PaddingValues(Dimensions.size0)
@@ -447,6 +481,7 @@ fun RiderCard(
         }
     }
 }
+
 @Composable
 @Preview
 fun JoinRideScrenPreview() {

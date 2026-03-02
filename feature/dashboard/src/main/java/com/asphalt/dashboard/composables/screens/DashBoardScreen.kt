@@ -1,7 +1,6 @@
 package com.asphalt.dashboard.composables.screens
 
 import android.annotation.SuppressLint
-import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.RequestLocationPermission
+import com.asphalt.commonui.utils.RequestPermission
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
 import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
@@ -69,27 +68,27 @@ fun DashBoardScreen(
     var locationStatus by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    RequestLocationPermission(
-        onPermissionGranted = {
+    RequestPermission(
+        context = context,
+        onPermissionsGranted = {
+//            val serviceIntent = Intent(context, ChatService::class.java)
+//            startForegroundService(context, serviceIntent)
             scope.launch {
-                locationStatus = ""
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
                 fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
+                    .addOnSuccessListener { location ->
                         if (location != null) {
-                            val lat = location.latitude
-                            val lon = location.longitude
-
-                            locationStatus = Utils.getLocationRegion(context, lat, lon)
+                            locationStatus = Utils.getLocationRegion(context, location.latitude, location.longitude)
                         } else {
                             locationStatus = ""
                         }
                     }
             }
         },
-        onPermissionDenied = {
+        onPermissionsDenied = { denied ->
             locationStatus = ""
-        }, context
+            println("Permissions denied: $denied")
+        }
     )
     val currentUser = androidUserVM.userState.collectAsState(null)
 
@@ -141,7 +140,7 @@ fun DashBoardScreen(
                                     tint = Color.Unspecified
                                 )
                                 Text(
-                                    "Level 4 - Rider",
+                                    "Level 1 - Rider",
                                     style = Typography.bodyMedium,
                                     fontSize = Dimensions.textSize16
                                 )

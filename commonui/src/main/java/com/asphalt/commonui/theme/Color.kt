@@ -87,6 +87,7 @@ val NeutralPink = Color(0xFFD20755)
 val NeutralBrown = Color(0xFF884B00)
 
 val DarkBrown = Color(0xFF9D0814)
+val BlueGray = Color(0x4D006EC7)
 
 val LightYellow = Color(0xFFF7F3C1)
 
@@ -110,3 +111,5 @@ val AzureBlue = Color(0xFF155DFC)
 val BlueLite34 = Color(0xFF0160AE)
 val BlueLite36 = Color(0xFFEFF6FF)
 val BlueLite25 = Color(0x40006EC7)
+val GrayLite25 = Color(0xFF656565)
+val AmberLIGHT = Color(0xFFF0B000)

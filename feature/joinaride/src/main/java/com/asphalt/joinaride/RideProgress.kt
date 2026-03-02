@@ -28,14 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.constants.APIConstants.END_RIDE
-import com.asphalt.android.constants.APIConstants.RIDE_JOINED
-import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
@@ -51,7 +51,7 @@ import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
+import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -59,20 +59,24 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
     viewmodel: JoinRideViewModel = koinViewModel(),
-    onClickEndRide :() -> Unit,
+    onClickEndRide: () -> Unit,
     ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
+    val context = LocalContext.current
+    val currentUserConnectedRideData by viewmodel.currentUserConnectedRideData.collectAsStateWithLifecycle()
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
         radius = Constants.DEFAULT_CORNER_RADIUS,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16)
+                .padding(
+                    vertical = Dimensions.spacing19, horizontal = Dimensions.spacing16
+                )
                 .fillMaxWidth()
         ) {
             Row(
@@ -81,8 +85,7 @@ fun RideProgress(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)
                 ) {
                     CircularNetworkImage(
                         modifier = Modifier.border(
@@ -129,20 +132,20 @@ fun RideProgress(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp),
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        vertical = Dimensions.padding8,
-                        horizontal = Dimensions.padding16
-                    ),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            vertical = Dimensions.padding8, horizontal = Dimensions.padding16
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(vertical = Dimensions.padding6)
-                    ){
+                        modifier = Modifier.padding(vertical = Dimensions.padding6)
+                    ) {
                         Box(contentAlignment = Alignment.BottomEnd) {
 
                             CircularNetworkImage(
@@ -150,9 +153,7 @@ fun RideProgress(
                                     width = Dimensions.size2pt5,
                                     color = GreenLIGHT,
                                     shape = CircleShape
-                                ),
-                                size = Dimensions.padding40,
-                                imageUrl = "ridersList.imgUrl" ?: ""
+                                ), size = Dimensions.padding40, imageUrl = "ridersList.imgUrl" ?: ""
                             )
                             Image(
                                 painter = painterResource(R.drawable.ic_online_icon),
@@ -169,7 +170,7 @@ fun RideProgress(
                     Column(
                         verticalArrangement = Arrangement.Center,
 
-                    ) {
+                        ) {
                         Text(
                             text = currentUser.value?.name.toString(),
                             style = TypographyBold.bodySmall,
@@ -190,20 +191,23 @@ fun RideProgress(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = "55 kph",
+                                text = (currentUserConnectedRideData?.speedInKph?.toString()
+                                    ?: "0") + "kph",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
                                 modifier = Modifier
                             )
                         }
                     }
-                    Row(horizontalArrangement = Arrangement.End,
+                    Row(
+                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)) {
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Button(
                             onClick = {
-                               // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
-                                onClickEndRide.invoke()
+                                // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
+//                                onClickEndRide.invoke()
                             },
                             modifier = Modifier
                                 .widthIn(min = 130.dp, max = 130.dp)
@@ -228,25 +232,44 @@ fun RideProgress(
             // end ride button
             RedButton(
                 onClick = {
-                    viewmodel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
-                        status = END_RIDE)
-                       val finalDuration =  viewmodel.stopRide()
+                    CurrentLocationUpdates.stopRideTracking(context)
+                    viewmodel.updateRideStatus(
+                        userId = ridesData.createdBy ?: "",
+                        rideId = ridesData.ridesID ?: "",
+                        status = END_RIDE
+                    )
+                    val finalDuration = viewmodel.stopRide()
                     val duration = viewmodel.finalDuration.value
                     Log.d("TAG", "RideProgress: timeformat  ${formatTime(duration)}")
                     Log.d("TAG", "RideProgress: finalDuration  ${formatTime(finalDuration)}")
+                    Log.d("TAG", "RideProgress: endRideId  ${viewmodel.endRideID}")
 
-                    viewmodel.endRide(rideId=ridesData.ridesID ?: "", rideJoinedId = ridesData.rideJoinedID ?: "")
+
+                    val isOrganiser = ridesData.createdBy == androidUserVM.getCurrentUserUID()
+                    viewmodel.sendEndRideSummary(
+                        ridesData.ridesID,
+                        currentUserConnectedRideData?.distanceTravelled ?: ridesData.rideDistance,
+                        ridesData.rideType != Constants.SOLO,
+                        ridesData.startLocation,
+                        ridesData.endLocation,
+                        isOrganiser,
+                        !isOrganiser,
+                        System.currentTimeMillis()
+                    )
+                    viewmodel.endRide(
+                        rideId = ridesData.ridesID ?: "", rideJoinedId = viewmodel.endRideID ?: ""
+                    )
+
                     onClickEndRide.invoke()
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)
                     .fillMaxWidth(),
-                buttonRadius = Dimensions.size10, contentPaddingValues = PaddingValues(0.dp)
+                buttonRadius = Dimensions.size10,
+                contentPaddingValues = PaddingValues(0.dp)
             ) {
                 Text(
-                    text = "END RIDE",
-                    style = TypographyBold.bodySmall,
-                    color = Color.White
+                    text = "END RIDE", style = TypographyBold.bodySmall, color = Color.White
                 )
             }
         }
@@ -258,6 +281,6 @@ fun RideProgress(
 @Composable
 fun RideProgressPreview() {
 
-   // RideProgress(onClickEndRide = {})
+    // RideProgress(onClickEndRide = {})
 
 }

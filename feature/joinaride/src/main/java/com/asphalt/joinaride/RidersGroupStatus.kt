@@ -111,7 +111,7 @@ fun RidersGroupStatus(
 
                 Spacer(Modifier.width(Dimensions.size10))
                 Text(
-                    text = ("Group Status   (${joinedRiders.size} Riders)"),
+                    text = ("Group Status   (${if (joinedRiders.size > 0) joinedRiders.size - 1 else 0} Riders)"),
                     style = TypographyBold.titleMedium,
                     fontSize = Dimensions.textSize16,
                     maxLines = 1,
@@ -202,8 +202,8 @@ fun GroupRidersCard(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Spacer(Modifier.width(Dimensions.size5))
-                            when (riderData?.status) {
-                                "Connected" -> {
+                            when (riderData?.status?.lowercase()) {
+                                "connected" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(
@@ -229,7 +229,7 @@ fun GroupRidersCard(
                                     }
                                 }
 
-                                "Delayed" -> {
+                                "delayed" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(
@@ -257,7 +257,7 @@ fun GroupRidersCard(
                                     }
                                 }
 
-                                "Stopped" -> {
+                                "stopped" -> {
                                     Row(
                                         modifier = Modifier
                                             .background(

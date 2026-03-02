@@ -34,9 +34,10 @@ import com.asphalt.commonui.theme.VividFlameOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,content: @Composable () -> Unit) {
+fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGestureEnabled: Boolean = true,content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
     ModalNavigationDrawer(
+        gesturesEnabled = isGestureEnabled,
         drawerState = drawerState,
         drawerContent = {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
