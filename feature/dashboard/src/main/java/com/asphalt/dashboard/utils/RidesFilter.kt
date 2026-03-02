@@ -19,7 +19,10 @@ object RidesFilter {
 
             val rideStatus: String? = when {
                 ride.createdBy == userId -> {
-                    if (ride.participants.isNullOrEmpty()) {
+                    if(ride.rideStatus== APIConstants.END_RIDE){
+                     null
+                    }
+                    else if (ride.participants.isNullOrEmpty()) {
                         UPCOMING
                     } else {
                         val participant =
