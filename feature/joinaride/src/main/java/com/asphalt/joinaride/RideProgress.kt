@@ -42,6 +42,7 @@ import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
@@ -206,6 +207,10 @@ fun RideProgress(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.weight(1f)
                     ) {
+                        val trackButtonColor = currentUserConnectedRideData?.let {
+                            if (it.canTrack) ButtonDefaults.buttonColors(containerColor = VividRed)
+                            else ButtonDefaults.buttonColors(containerColor = GreenDark)
+                        }?:ButtonDefaults.buttonColors(containerColor = VividRed)
                         Button(
                             onClick = {
                                 currentUserConnectedRideData?.let {
@@ -228,11 +233,11 @@ fun RideProgress(
                             modifier = Modifier
                                 .widthIn(min = 130.dp, max = 130.dp)
                                 .height(28.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = VividRed),
+                            colors = trackButtonColor,
                             shape = RoundedCornerShape(30.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
-                            var trackText = "START TRACKING"
+                            var trackText = "STOP TRACKING"
                             currentUserConnectedRideData?.let {
                                 trackText = if (!it.canTrack) "START TRACKING" else "STOP TRACKING"
                             }
