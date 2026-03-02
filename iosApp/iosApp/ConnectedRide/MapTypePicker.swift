@@ -53,18 +53,25 @@ struct BikeRouteMapView: View {
                 }
                 
                 if startTracking {
-                    // Annotations for group riders — pin color matches ride status (Connected/Delayed/Stopped)
+                    // Annotations for group riders — avatar + status-colored pin
                     ForEach(groupRiders, id: \.name) { rider in
                         Annotation("", coordinate: CLLocationCoordinate2D(latitude: rider.currentLat, longitude: rider.currentLong)) {
                             VStack(spacing: 1) {
-                                AppIcon.Profile.profile
-                                    .resizable()
-                                    .frame(width: 26, height: 26)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white, lineWidth: 1)
-                                    )
-                                    .clipShape(Circle())
+                                Group {
+                                    if let imageName = rider.profileImageName, !imageName.isEmpty {
+                                        Image(imageName)
+                                            .resizable()
+                                    } else {
+                                        AppIcon.Profile.profile
+                                            .resizable()
+                                    }
+                                }
+                                .frame(width: 26, height: 26)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 1)
+                                )
+                                .clipShape(Circle())
                                 HStack {
                                     Spacer()
                                     (rider.status == .connected ? AppIcon.JoinRide.greenPin

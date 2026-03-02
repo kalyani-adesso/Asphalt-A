@@ -204,7 +204,7 @@ struct ConnectedRideMapView: View {
                                     ForEach(viewModel.groupRiders.indices, id: \.self) { index in
                                         let rider = viewModel.groupRiders[index]
                                         let _ = viewModel.groupStatusTick
-                                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                        GroupRiderView(profileImageName: rider.profileImageName, title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
                                             selectedRiderName = viewModel.groupRiders[index].name
                                             viewModel.messageIndex = val
                                         })
@@ -490,7 +490,7 @@ struct ConnectedRideMapView: View {
             .sheet(isPresented: $showInAppNavigation) {
                 let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
                 let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                InAppNavigationView(start: startCoord, end: endCoord)
+                InAppNavigationView(start: startCoord, end: endCoord, connectedRideViewModel: viewModel)
             }
         }
         .frame(width: 130)
@@ -662,6 +662,7 @@ struct ActiveRiderView: View {
 }
 
 struct GroupRiderView: View {
+    let profileImageName: String?
     let title: String
     let status:String
     let speed: String
@@ -672,12 +673,19 @@ struct GroupRiderView: View {
     var body: some View {
         HStack {
             HStack(spacing: 16) {
-                AppIcon.Profile.profile
-                    .resizable()
-                    .clipShape(Circle())
-                    .frame(width: 37, height: 37)
-                    .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
-                    .padding(.leading, 18)
+                Group {
+                    if let imageName = profileImageName, !imageName.isEmpty {
+                        Image(imageName)
+                            .resizable()
+                    } else {
+                        AppIcon.Profile.profile
+                            .resizable()
+                    }
+                }
+                .clipShape(Circle())
+                .frame(width: 37, height: 37)
+                .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
+                .padding(.leading, 18)
                 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {

@@ -12,6 +12,8 @@ import AVFoundation
 struct InAppNavigationView: View {
     let start: CLLocationCoordinate2D
     let end: CLLocationCoordinate2D
+    /// Shared ConnectedRideViewModel so we can show live participant pins during navigation.
+    @ObservedObject var connectedRideViewModel: ConnectedRideViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var routeCoordinates: [CLLocationCoordinate2D] = []
     @State private var steps: [String] = []
@@ -80,6 +82,7 @@ struct InAppNavigationView: View {
                              startCoordinate: start,
                              endCoordinate: end,
                              userCoordinate: displayUserCoordinate,
+                             participants: connectedRideViewModel.groupRiders,
                              followUser: followUserState,
                              cameraAltitude: 200,
                              mapType: mapType,
@@ -474,13 +477,5 @@ class SpeechDelegate: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
         DispatchQueue.main.async { self.isSpeaking = false }
-    }
-}
-
-// `MKPolyline.coordinates` extension already exists in `PolylineMapView.swift`.
-@available(iOS 17.0, *)
-struct InAppNavigationView_Previews: PreviewProvider {
-    static var previews: some View {
-        InAppNavigationView(start: CLLocationCoordinate2D(latitude: 19.0760, longitude: 72.8777), end: CLLocationCoordinate2D(latitude: 19.2183, longitude: 72.9781))
     }
 }

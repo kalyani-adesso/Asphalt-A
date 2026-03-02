@@ -63,6 +63,9 @@ enum TrackingStatus:String {
 struct Rider: Identifiable {
     let id = UUID()
     let name: String
+    /// Optional image name for the rider's avatar (from UserDomain.profilePic).
+    /// Falls back to the default profile icon when nil or empty.
+    let profileImageName: String?
     var speed: Int // Kph
     var status: RiderStatus
     var timeSinceUpdate: String
@@ -105,7 +108,7 @@ struct ConnectedRideMessage: Identifiable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", profileImageName: nil, speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -118,8 +121,9 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var groupStatusTick: Int = 0
     private var groupStatusTimer: Timer?
     private var previousRidersDict: [String: Rider] = [:]
-    /// Cache for user lookups (userId → (name, contact)). Only name/contact; status always comes from snapshot.
-    private var userDetailsCache: [String: (name: String, contact: String)] = [:]
+    /// Cache for user lookups (userId → (name, contact, profileImageName)).
+    /// Status and timestamps always come from the ongoing ride snapshot.
+    private var userDetailsCache: [String: (name: String, contact: String, imageName: String?)] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
@@ -366,20 +370,22 @@ extension ConnectedRideViewModel {
                                 let lat = ongoingRide.currentLat
                                 let long = ongoingRide.currentLong
 
-                                let userDetails: (String, String)?
+                                let userDetails: (String, String, String?)?
                                 if let cached = self.userDetailsCache[ongoingRide.userID] {
-                                    userDetails = (cached.name, cached.contact)
+                                    userDetails = (cached.name, cached.contact, cached.imageName)
                                 } else {
                                     userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                     if let details = userDetails {
-                                        self.userDetailsCache[ongoingRide.userID] = (details.0, details.1)
+                                        self.userDetailsCache[ongoingRide.userID] = (details.0, details.1, details.2)
                                     }
                                 }
 
                                 newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
                                 let name = (userDetails?.0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let imageName = userDetails?.2
                                 let rider = Rider(
                                     name: name.isEmpty ? "Rider" : name,
+                                    profileImageName: (imageName?.isEmpty == false ? imageName : nil),
                                     speed: Int(ongoingRide.speedInKph),
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,
@@ -499,7 +505,7 @@ extension ConnectedRideViewModel {
         })
     }
     
-    func getAllUsers(createdBy: String) async  -> (String, String)? {
+    func getAllUsers(createdBy: String) async  -> (String, String, String?)? {
         await withCheckedContinuation { continuation in
             userRepository.getAllUsers { result, error in
                 if let success = result as? APIResultSuccess<AnyObject>,
@@ -508,7 +514,8 @@ extension ConnectedRideViewModel {
 
                     let userName = matchedUser.name
                     let contactNumber = matchedUser.contactNumber
-                    continuation.resume(returning: (userName, contactNumber))
+                    let profilePic = matchedUser.profilePic
+                    continuation.resume(returning: (userName, contactNumber, profilePic.isEmpty ? nil : profilePic))
                 } else {
                     continuation.resume(returning: nil)
                 }
