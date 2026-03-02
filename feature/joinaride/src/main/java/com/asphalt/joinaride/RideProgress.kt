@@ -52,6 +52,7 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
+import com.asphalt.joinaride.models.RideSummaryData
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -59,7 +60,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
     viewmodel: JoinRideViewModel = koinViewModel(),
-    onClickEndRide: () -> Unit,
+    onClickEndRide: (RideSummaryData) -> Unit,
     ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
@@ -260,7 +261,13 @@ fun RideProgress(
                         rideId = ridesData.ridesID ?: "", rideJoinedId = viewmodel.endRideID ?: ""
                     )
 
-                    onClickEndRide.invoke()
+                    onClickEndRide.invoke(
+                        RideSummaryData(
+                            currentUserConnectedRideData?.rideStartedTime ?: 0,
+                            currentUserConnectedRideData?.distanceTravelled ?: 0.0,
+                            ridesData.participants.size + 1
+                        )
+                    )
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)

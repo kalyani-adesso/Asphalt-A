@@ -160,7 +160,8 @@ class JoinRideViewModel(
                 dateTime = joinRide.startDate,
                 isRejoined = false,
                 status = "connected",
-                userID = currentUid
+                userID = currentUid,
+                rideStartedTime = System.currentTimeMillis()
                 // current lat, curret long, datetime
             )
             val result = ridesRepo.joinRide(joinRide = request)
@@ -298,7 +299,8 @@ class JoinRideViewModel(
                             status = data["status"] as? String ?: "Connected",
                             dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
                             isRejoined = data["isRejoined"] as? Boolean ?: false,
-                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0
+                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0,
+                            rideStartedTime = data["rideStartedTime"] as? Long ?: 0
                         )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()

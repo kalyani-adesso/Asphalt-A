@@ -49,6 +49,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.joinaride.models.RideSummaryData
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.absoluteValue
@@ -57,7 +58,7 @@ import kotlin.math.absoluteValue
 fun ConnectedRideGoogleMapScreen(
     setTopAppBarState: (AppBarState) -> Unit,
     androidUserVM: AndroidUserVM = koinViewModel(),
-    onClick : () -> Unit,
+    onClick : (RideSummaryData) -> Unit,
     locationProvider: LocationProvider,
     ridesData: RidesData,
     rideViewModel: JoinRideViewModel = koinViewModel()

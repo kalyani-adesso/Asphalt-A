@@ -1,5 +1,6 @@
 package com.asphalt.commonui.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
@@ -257,5 +258,15 @@ object Utils {
             saturation = 0.85f,
             lightness = 0.45f
         )
+    }
+    @SuppressLint("DefaultLocale")
+    fun formatDuration(startMillis: Long, endMillis: Long): String {
+        val diff = endMillis - startMillis
+
+        val hours = diff / (1000 * 60 * 60)
+        val minutes = (diff / (1000 * 60)) % 60
+        val seconds = (diff / 1000) % 60
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
