@@ -72,6 +72,15 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
     val searchQuery = mutableStateOf("")
 
+    fun isSoloRide(): Boolean {
+        if (_rideDetailsMutableState.value.rideType == "Solo Ride") {
+            return true
+        } else {
+            return false
+        }
+        // return _rideDetailsMutableState.value.rideType ?: ""
+    }
+
     fun onSearchQueryChanged(query: String) {
         searchQuery.value = query
 
