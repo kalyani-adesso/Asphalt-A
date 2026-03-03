@@ -80,6 +80,10 @@ class CurrentLocationService : Service() {
         return START_STICKY
     }
 
+    private fun getCalculatedBearing(currentLocation: Location): Float {
+        return currentLocation.bearing
+    }
+
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
 //            .setMinUpdateDistanceMeters(5f) // Only update if moved 5 meters to save battery
@@ -88,6 +92,8 @@ class CurrentLocationService : Service() {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val currentLocation = result.lastLocation ?: return
+                val calculatedBearing = getCalculatedBearing(currentLocation)
+
 
                 lastLocation?.let { previous ->
                     val distanceBetween = previous.distanceTo(currentLocation)
@@ -109,7 +115,7 @@ class CurrentLocationService : Service() {
                     currentLocation.latitude,
                     currentLocation.longitude,
                     speedInKph,
-                    totalDistanceMetres
+                    totalDistanceMetres, calculatedBearing
                 )
             }
         }
@@ -129,7 +135,8 @@ class CurrentLocationService : Service() {
         lat: Double,
         lng: Double,
         speedInKph: Double,
-        totalDistanceMetres: Float
+        totalDistanceMetres: Float,
+        calculatedBearing: Float
     ) {
         val rId = rideId ?: return
         val uId = ongoingRideId ?: return
@@ -146,7 +153,8 @@ class CurrentLocationService : Service() {
                 "currentLong" to lng,
                 "speedInKph" to roundedSpeed,
                 "status" to status,
-                "totalDistance" to totalDistanceMetres / 1000
+                "totalDistance" to totalDistanceMetres / 1000,
+                "bearing" to calculatedBearing
 //                "timestamp" to System.currentTimeMillis()
             )
             database.getReference("ongoing_ride/$rId/$uId").updateChildren(data)
