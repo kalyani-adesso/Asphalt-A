@@ -67,4 +67,8 @@ open class AndroidUserVM(
         getAllUsers()
     }
 
+    fun removeUserData() {
+        sharedVM.resetUserData()
+    }
+
 }

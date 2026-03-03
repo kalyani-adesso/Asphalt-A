@@ -18,4 +18,8 @@ class UserViewModel(val userRepoImpl: UserRepoImpl, val coroutineScope: Coroutin
         }
 
     }
+
+    fun resetUserData() {
+        _user.value = null
+    }
 }

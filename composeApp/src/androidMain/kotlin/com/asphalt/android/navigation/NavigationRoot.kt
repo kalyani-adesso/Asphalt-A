@@ -59,6 +59,7 @@ import com.asphalt.joinaride.JoinRideMainListScreen
 import com.asphalt.joinaride.RatingThisRide
 import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
+import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.marketplace.ui.CreateAd
@@ -577,9 +578,11 @@ fun NavigationRoot(
             when (item) {
                 Constants.LOGOUT_CLICK -> {
                     scope.launch {
+                        CurrentLocationUpdates.stopRideTracking(context)
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
                         androidUserVM.initialiseUserData()
                         datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        androidUserVM.removeUserData()
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)
                         drawerState.close()
