@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +78,7 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -154,6 +156,7 @@ fun MapWithCurrentLocation(
     rideViewModel: JoinRideViewModel
 ) {
     val context = LocalContext.current
+    val refreshScope = rememberCoroutineScope()
 
     val riders by rideViewModel.joinedUsers.collectAsState()
     val polyline by rideViewModel.polyLine.collectAsState()
@@ -243,14 +246,14 @@ fun MapWithCurrentLocation(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { mapLoaded = true },
-            properties = MapProperties(isMyLocationEnabled = true),
+            properties = MapProperties(isMyLocationEnabled = false),
             uiSettings = MapUiSettings(
                 tiltGesturesEnabled = true,
                 rotationGesturesEnabled = true,
                 scrollGesturesEnabled = true,
                 zoomControlsEnabled = true,      // + / - buttons
                 compassEnabled = true,           // Compass icon
-                myLocationButtonEnabled = true,  // My location button
+                myLocationButtonEnabled = false,  // My location button
                 mapToolbarEnabled = true,      // Navigation icon (open in Google Maps)
 
             )
@@ -404,6 +407,13 @@ fun MapWithCurrentLocation(
             // Spacer(modifier = Modifier.weight(1f))
             GradientButton(
                 onClick = {
+                    refreshScope.launch {
+                        currentUserConnectedRideData?.let {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(LatLng(it.currentLat,it.currentLong), 14f)
+                            )
+                        }
+                    }
 
                 },
                 buttonRadius = Dimensions.size10,
