@@ -35,12 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants.END_RIDE
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
+import com.asphalt.commonui.theme.GreenDark
 import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
@@ -52,6 +54,7 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RedButton
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
+import com.asphalt.joinaride.models.RideSummaryData
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -59,7 +62,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
     viewmodel: JoinRideViewModel = koinViewModel(),
-    onClickEndRide: () -> Unit,
+    onClickEndRide: (RideSummaryData) -> Unit,
     ridesData: RidesData
 ) {
     val currentUser = androidUserVM.userState.collectAsState(null)
@@ -204,20 +207,42 @@ fun RideProgress(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.weight(1f)
                     ) {
+                        val trackButtonColor = currentUserConnectedRideData?.let {
+                            if (it.canTrack) ButtonDefaults.buttonColors(containerColor = VividRed)
+                            else ButtonDefaults.buttonColors(containerColor = GreenDark)
+                        }?:ButtonDefaults.buttonColors(containerColor = VividRed)
                         Button(
                             onClick = {
+                                currentUserConnectedRideData?.let {
+                                    val isTracking = !it.canTrack
+                                    val data = mapOf(
+                                        "canTrack" to isTracking
+                                    )
+                                    ridesData.ridesID?.let { rideId ->
+                                        viewmodel.updateOngoingRideDatabase(
+                                            data,
+                                            rideId
+                                        )
+                                    }
+                                }
+
+
                                 // viewmodel.endRide(rideId = ridersList.ridesID ?: "", rideJoinedId = "")
 //                                onClickEndRide.invoke()
                             },
                             modifier = Modifier
                                 .widthIn(min = 130.dp, max = 130.dp)
                                 .height(28.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = VividRed),
+                            colors = trackButtonColor,
                             shape = RoundedCornerShape(30.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp)
                         ) {
+                            var trackText = "STOP TRACKING"
+                            currentUserConnectedRideData?.let {
+                                trackText = if (!it.canTrack) "START TRACKING" else "STOP TRACKING"
+                            }
                             Text(
-                                text = "STOP TRACKING",
+                                text = trackText,
                                 style = TypographyBold.bodySmall,
                                 color = Color.White,
                                 fontSize = 10.sp,
@@ -260,7 +285,13 @@ fun RideProgress(
                         rideId = ridesData.ridesID ?: "", rideJoinedId = viewmodel.endRideID ?: ""
                     )
 
-                    onClickEndRide.invoke()
+                    onClickEndRide.invoke(
+                        RideSummaryData(
+                            currentUserConnectedRideData?.rideStartedTime ?: 0,
+                            currentUserConnectedRideData?.distanceTravelled ?: 0.0,
+                            ridesData.participants.size + 1
+                        )
+                    )
                 },
                 modifier = Modifier
                     .height(Dimensions.size50)

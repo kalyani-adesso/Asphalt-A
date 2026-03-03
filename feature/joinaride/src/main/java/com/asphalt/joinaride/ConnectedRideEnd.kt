@@ -16,19 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,35 +39,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.model.rides.RidesData
-import com.asphalt.android.viewmodel.joinridevm.RidesDifficultyViewModel
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
-import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PrimaryBrighterLightW25
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
-import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CommonStatType
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
+import com.asphalt.commonui.utils.Utils
+import com.asphalt.joinaride.models.RideSummaryData
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun ConnectedRideEnd(
@@ -81,23 +69,30 @@ fun ConnectedRideEnd(
     setTopAppBarState: (AppBarState) -> Unit,
     viewModel: JoinRideViewModel = koinViewModel(),
     onNavigateToDashboard: () -> Unit,
-    ridesData: RidesData
-    ) {
+    ridesData: RidesData,
+    summaryData: RideSummaryData
+) {
 
-   // val stats = viewModel.stats.collectAsStateWithLifecycle()
+    // val stats = viewModel.stats.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(value = false) }
     val scope = rememberCoroutineScope()
+    var duration by remember { mutableStateOf("") }
 
     setTopAppBarState(AppBarState(title = stringResource(R.string.connected_ride)))
+    LaunchedEffect(summaryData.startDateTime) {
+        duration = Utils.formatDuration(summaryData.startDateTime, System.currentTimeMillis())
+
+    }
 
 
-    val finalDuration by viewModel.finalDuration.collectAsState()
+//    val finalDuration by viewModel.finalDuration.collectAsState()
 
     LaunchedEffect(Unit) {
-        delay(2000)
+//        delay(2000)
         showDialog = true
 
-        Log.d("TAG", "ConnectedRideEnd: ${formatTime(finalDuration)}")
+
+//        Log.d("TAG", "ConnectedRideEnd: ${formatTime(finalDuration)}")
 
     }
 
@@ -161,9 +156,15 @@ fun ConnectedRideEnd(
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.size20),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    StatView(statType = CommonStatType.TimeStatType, finalDuration)
-                    StatView(statType = CommonStatType.DistanceStatType, ridesData.rideDistance.toLong())
-                    StatView(statType = CommonStatType.RidesStatType, 5)
+                    StatView(statType = CommonStatType.TimeStatType, duration)
+                    StatView(
+                        statType = CommonStatType.DistanceStatType,
+                        "%.1f".format(summaryData.distanceTravelled)
+                    )
+                    StatView(
+                        statType = CommonStatType.RidesStatType,
+                        summaryData.noOfRiders.toString()
+                    )
                 }
             }
         }
@@ -178,7 +179,7 @@ fun ConnectedRideEnd(
             }, ridesData = ridesData)
         }
 
-        Spacer(modifier=Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.spacedBy(
                 space = Dimensions.padding20, Alignment.CenterHorizontally
@@ -237,7 +238,7 @@ fun ConnectedRideEnd(
 }
 
 @Composable
-fun RowScope.StatView(statType: CommonStatType,count: Long) {
+fun RowScope.StatView(statType: CommonStatType, count: String) {
     RoundedBox(
         modifier = Modifier.weight(1f),
         borderColor = NeutralLightGrey,
@@ -254,10 +255,12 @@ fun RowScope.StatView(statType: CommonStatType,count: Long) {
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(painter = painterResource(id = statType.iconRes),
-                contentDescription = null, tint = statType.tint)
+            Icon(
+                painter = painterResource(id = statType.iconRes),
+                contentDescription = null, tint = statType.tint
+            )
 
-            ComposeUtils.SectionTitle(text = "$count")
+            ComposeUtils.SectionTitle(text = count)
 
             ComposeUtils.SectionSubtitle(
                 stringResource(statType.statDescriptionResId),

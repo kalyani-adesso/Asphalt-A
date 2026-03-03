@@ -42,9 +42,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants.RIDE_JOINED
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.model.rides.showRejoinButton
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
 import com.asphalt.commonui.SearchView
@@ -64,6 +66,7 @@ import com.asphalt.commonui.theme.SafetyOrange
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.util.PhoneCallUtils
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.Utils
 import org.koin.compose.viewmodel.koinViewModel
@@ -172,7 +175,8 @@ fun RiderCard(
     navigateToEndRide: () -> Unit,
     ridesData: RidesData,
     viewModel: JoinRideViewModel,
-    completedRideID: String?
+    completedRideID: String?,
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val context = LocalContext.current
     val createdBy = viewModel.setCreatedBy(ridesData)
@@ -347,12 +351,21 @@ fun RiderCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(
                         Dimensions.size8, Alignment.CenterHorizontally
-                    ), modifier = Modifier.fillMaxWidth()
+                    ), modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+
                 ) {
                     // call rider button
                     ElevatedButton(
                         onClick = {
-                            navigateToEndRide.invoke()
+                            ridesData.createdBy?.let {
+                                androidUserVM.getUser(it)?.contactNumber?.let { phoneNumber ->
+                                    PhoneCallUtils.dialPhoneNumber(
+                                        context,
+                                        phoneNumber
+                                    )
+                                }
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                         modifier = Modifier
@@ -387,6 +400,7 @@ fun RiderCard(
 //                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
 //                                    status = RIDE_JOINED)
 //                                viewModel.joinRide(joinRide = ridesData)
+                                viewModel.setRideId(ridesData.ridesID ?:"")
                                 navigateToConnectedRide.invoke(ridesData)
                             },
                             contentPadding = PaddingValues(all = Dimensions.size0)
@@ -395,7 +409,9 @@ fun RiderCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = Dimensions.padding10),
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+
                             ) {
                                 Icon(
                                     painter = painterResource(
@@ -456,7 +472,8 @@ fun RiderCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = Dimensions.padding10),
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     painter = painterResource(

@@ -39,6 +39,9 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     val showInviteNotification: State<Boolean> = _showInviteNotification
 
     val showChatDialog = mutableStateOf(false)
+    val showNodata = mutableStateOf(false)
+
+
 
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
@@ -129,8 +132,8 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
         )
     }
 
-    fun uploadImages(rideID: String,image:List<String>) {
-       // var list = listOf("1234", "123456", "12345678", "123456789", "1234567890", "11114444")
+    fun uploadImages(rideID: String, image: List<String>) {
+        // var list = listOf("1234", "123456", "12345678", "123456789", "1234567890", "11114444")
         viewModelScope.launch {
             APIHelperUI.handleApiResult(
                 APIHelperUI.runWithLoader {
@@ -142,7 +145,7 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
         }
     }
 
-    fun deleteImage(ridesID:String,imageID:String){
+    fun deleteImage(ridesID: String, imageID: String) {
         viewModelScope.launch {
             APIHelperUI.handleApiResult(
                 APIHelperUI.runWithLoader {

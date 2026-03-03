@@ -82,7 +82,7 @@ class JoinRideViewModel(
                     } else {
                         ride.participants.any {
                             it.userId == currentUid &&
-                            it.inviteStatus in listOf(
+                                    it.inviteStatus in listOf(
                                 RIDE_ACCEPTED,
                                 RIDE_JOINED
                             )
@@ -160,7 +160,8 @@ class JoinRideViewModel(
                 dateTime = joinRide.startDate,
                 isRejoined = false,
                 status = "connected",
-                userID = currentUid
+                userID = currentUid,
+                rideStartedTime = System.currentTimeMillis()
                 // current lat, curret long, datetime
             )
             val result = ridesRepo.joinRide(joinRide = request)
@@ -298,7 +299,9 @@ class JoinRideViewModel(
                             status = data["status"] as? String ?: "Connected",
                             dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
                             isRejoined = data["isRejoined"] as? Boolean ?: false,
-                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0
+                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0,
+                            rideStartedTime = data["rideStartedTime"] as? Long ?: 0,
+                            canTrack = data["canTrack"] as? Boolean ?: true
                         )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()
@@ -404,7 +407,7 @@ class JoinRideViewModel(
                     try {
                         val coordinates = response.data.routes.firstOrNull()?.geometry?.coordinates
                         val routePoints = coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()
-                        _polyLine.value=routePoints
+                        _polyLine.value = routePoints
                         //_polyLine.value = listOf(LatLng(startLat, startLon))+routePoints+listOf(LatLng(endLat, endLon))
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -416,5 +419,10 @@ class JoinRideViewModel(
 
         }
 
+    }
+
+    fun updateOngoingRideDatabase(data: Map<String, Any>,rideId: String) {
+        val path = "ongoing_ride/${rideId}/$endRideID"
+        database.getReference(path).updateChildren(data)
     }
 }

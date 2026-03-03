@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.chat.model.ChatParamsModel
+import com.asphalt.joinaride.models.RideSummaryData
 import kotlinx.serialization.Serializable
 
 sealed interface AppNavKey : NavKey {
@@ -63,7 +64,7 @@ sealed interface AppNavKey : NavKey {
     data class RideProgressNavKey(val ridesData: RidesData) : AppNavKey
 
     @Serializable
-    data class ConnectedRideEndNavKey(val ridesData: RidesData) : AppNavKey
+    data class ConnectedRideEndNavKey(val ridesData: RidesData,val summaryData: RideSummaryData) : AppNavKey
 
     @Serializable
     data class RatingRideNavKey(val ridesData: RidesData) : AppNavKey
@@ -76,7 +77,7 @@ sealed interface AppNavKey : NavKey {
     data class JoinRideConnectedRideMapNavKey(val joinRide: ConnectedRideRoot) : AppNavKey
 
     @Serializable
-    data class EndRideLoaderNavKey(val ridesData: RidesData) : AppNavKey
+    data class EndRideLoaderNavKey(val ridesData: RidesData,val rideSummaryData: RideSummaryData) : AppNavKey
 
     @Serializable
     data class RideDetails(val ridesID: String? = null) : AppNavKey

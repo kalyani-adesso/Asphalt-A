@@ -15,17 +15,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
-import com.asphalt.commonui.theme.PrimaryDeepBlue
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.BorderedButton
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.dashboard.viewmodels.DashboardRideSummaryVM
 
 @Composable
-fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit) {
+fun CreateOrJoinRide(
+    onCreateRideClick: () -> Unit,
+    onJoinRideClick: (RidesData?) -> Unit,
+    dashboardRideSummaryVM: DashboardRideSummaryVM
+) {
+    val onGoingRide = dashboardRideSummaryVM.onGoingRide.collectAsStateWithLifecycle()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,7 +64,7 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
         Spacer(Modifier.width(Dimensions.spacing15pt25))
         BorderedButton(
             modifier = Modifier.weight(1f),
-            onClick = { onJoinRideClick() },
+            onClick = { onJoinRideClick(onGoingRide.value) },
             buttonHeight = Dimensions.size50,
             contentPaddingValues = PaddingValues(
                 Dimensions.size0
@@ -82,11 +90,11 @@ fun CreateOrJoinRide(onCreateRideClick: () -> Unit, onJoinRideClick: () -> Unit)
     }
 }
 
-@Preview
-@Composable
-fun RidePreview() {
-    CreateOrJoinRide({
-    }, {
-
-    })
-}
+//@Preview
+//@Composable
+//fun RidePreview() {
+//    CreateOrJoinRide({
+//    }, {
+//
+//    }, DashboardRideSummaryVM)
+//}

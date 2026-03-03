@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,6 +61,7 @@ import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
+import com.asphalt.commonui.util.PhoneCallUtils
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
@@ -325,10 +327,18 @@ fun GroupRidersCard(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.weight(1f)
                     ) {
+                        val context = LocalContext.current
                         Box(
                             modifier = Modifier
                                 .clickable {
-                                    // onDeleteBike.invoke()
+                                    riderData?.userID?.let {
+                                        androidUserVM.getUser(it)?.contactNumber?.let { phoneNumber ->
+                                            PhoneCallUtils.dialPhoneNumber(
+                                                context,
+                                                phoneNumber
+                                            )
+                                        }
+                                    }
                                 }
                         ) {
                             ColorIconRounded(

@@ -59,6 +59,7 @@ import com.asphalt.joinaride.JoinRideMainListScreen
 import com.asphalt.joinaride.RatingThisRide
 import com.asphalt.joinaride.RideProgress
 import com.asphalt.joinaride.RidersScreenLoader
+import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.marketplace.ui.CreateAd
@@ -151,7 +152,7 @@ fun NavigationRoot(
 
         else -> false
     }
-    val isGestureEnabled= when(key){
+    val isGestureEnabled = when (key) {
         is AppNavKey.ConnectedRideMapNavKey -> !drawerState.isClosed
         else -> true
     }
@@ -169,6 +170,7 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
         is AppNavKey.RideDetails -> true
+
         is AppNavKey.RideDetails,
         is AppNavKey.ChatScreenNavaKey,
         is AppNavKey.ChatListNavaKey,
@@ -374,8 +376,10 @@ fun NavigationRoot(
                             setTopAppBarState = setTopAppBarState, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
                             },
-                            joinRideClick = {
-                                backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
+                            joinRideClick = { onGoingRide ->
+                                if (onGoingRide == null)
+                                    backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
+                                else backStack.add(AppNavKey.ConnectedRideNavKey(onGoingRide))
                             },
                             viewRideDetails = { ridesID ->
                                 backStack.add(AppNavKey.RideDetails(ridesID))
@@ -413,7 +417,7 @@ fun NavigationRoot(
                                 // backStack.add(AppNavKey.DashboardNavKey)
                             },
                             navigateToEndRide = {
-                                backStack.add(AppNavKey.ConnectedRideEndNavKey(key.ridesData))
+//                                backStack.add(AppNavKey.ConnectedRideEndNavKey(key.ridesData))
                             })
                     }
                     entry<AppNavKey.ForgotPasswordNav> { key ->
@@ -443,10 +447,10 @@ fun NavigationRoot(
 //                                backStack.add(AppNavKey.ConnectedRideMapNavKey),
                             locationProvider = locationProvider,
                             ridesData = key.ridesData,
-                            onClick = {
+                            onClick = { summary ->
                                 backStack.add(AppNavKey.ConnectedRideMapNavKey(key.ridesData))
-                               // backStack.remove(AppNavKey.ConnectedRideMapNavKey)
-                                backStack.add(AppNavKey.EndRideLoaderNavKey(key.ridesData))
+                                // backStack.remove(AppNavKey.ConnectedRideMapNavKey)
+                                backStack.add(AppNavKey.EndRideLoaderNavKey(key.ridesData, summary))
                             }
                         )
                     }
@@ -467,17 +471,27 @@ fun NavigationRoot(
                         RideProgress(
                             ridesData = key.ridesData,
                             onClickEndRide = {
-                            backStack.remove(AppNavKey.RideProgressNavKey(ridesData = key.ridesData))
-                           // backStack.add(AppNavKey.ConnectedRideNavKey)
-                        })
+                                backStack.remove(AppNavKey.RideProgressNavKey(ridesData = key.ridesData))
+                                // backStack.add(AppNavKey.ConnectedRideNavKey)
+                            })
                     }
                     entry<AppNavKey.EndRideLoaderNavKey> { key ->
                         EndRidersScreenLoader(
                             ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
                             onNavigateToSummaryEndRide = {
-                                backStack.remove(AppNavKey.EndRideLoaderNavKey(ridesData = key.ridesData))
-                                backStack.add(AppNavKey.ConnectedRideEndNavKey(ridesData = key.ridesData))
+                                backStack.remove(
+                                    AppNavKey.EndRideLoaderNavKey(
+                                        ridesData = key.ridesData,
+                                        key.rideSummaryData
+                                    )
+                                )
+                                backStack.add(
+                                    AppNavKey.ConnectedRideEndNavKey(
+                                        ridesData = key.ridesData,
+                                        key.rideSummaryData
+                                    )
+                                )
                             }
                         )
                     }
@@ -486,9 +500,16 @@ fun NavigationRoot(
                             ridesData = key.ridesData,
                             setTopAppBarState = setTopAppBarState,
                             onNavigateToDashboard = {
-                                backStack.remove(AppNavKey.ConnectedRideEndNavKey(ridesData = key.ridesData))
+                                backStack.remove(
+                                    AppNavKey.ConnectedRideEndNavKey(
+                                        ridesData = key.ridesData,
+                                        key.summaryData
+                                    )
+                                )
                                 backStack.add(AppNavKey.DashboardNavKey)
-                            }
+                            },
+                            summaryData = key.summaryData
+
                         )
                     }
                     entry<AppNavKey.RatingRideNavKey> { key ->
@@ -557,9 +578,11 @@ fun NavigationRoot(
             when (item) {
                 Constants.LOGOUT_CLICK -> {
                     scope.launch {
+                        CurrentLocationUpdates.stopRideTracking(context)
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
                         androidUserVM.initialiseUserData()
                         datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        androidUserVM.removeUserData()
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)
                         drawerState.close()
@@ -581,7 +604,7 @@ fun NavigationRoot(
                 }
             }
 
-        },isGestureEnabled) {
+        }, isGestureEnabled) {
             AppContent()
         }
     else AppContent()
