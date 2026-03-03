@@ -317,6 +317,7 @@ fun MapWithCurrentLocation(
                         if (rider.userID == currentUserConnectedRideData?.userID) {
                             Marker(
                                 state = state,
+                                flat = true,
                                 title = currentUserConnectedRideData?.userID,
                                 rotation = correctedRotation,
                                 anchor = Offset(0.5f, 0.5f),
