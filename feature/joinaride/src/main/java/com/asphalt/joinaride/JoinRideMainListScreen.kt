@@ -351,7 +351,9 @@ fun RiderCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(
                         Dimensions.size8, Alignment.CenterHorizontally
-                    ), modifier = Modifier.fillMaxWidth()
+                    ), modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+
                 ) {
                     // call rider button
                     ElevatedButton(
@@ -407,7 +409,9 @@ fun RiderCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = Dimensions.padding10),
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+
                             ) {
                                 Icon(
                                     painter = painterResource(
@@ -468,7 +472,8 @@ fun RiderCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = Dimensions.padding10),
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     painter = painterResource(

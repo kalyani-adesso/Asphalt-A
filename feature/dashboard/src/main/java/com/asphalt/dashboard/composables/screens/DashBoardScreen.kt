@@ -29,9 +29,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.PlatformDatabase
+import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralTaupe20
 import com.asphalt.commonui.theme.Typography
@@ -59,7 +63,7 @@ fun DashBoardScreen(
     androidUserVM: AndroidUserVM = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     creatRideClick: () -> Unit,
-    joinRideClick: () -> Unit,
+    joinRideClick: (RidesData?) -> Unit,
     viewRideDetails: (String) -> Unit,
     dashboardRideSummaryVM: DashboardRideSummaryVM = koinViewModel()
 ) {
@@ -67,6 +71,22 @@ fun DashBoardScreen(
     val context = LocalContext.current
     var locationStatus by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        PlatformDatabase().getReference(Constants.FIREBASE_DB_RIDES).observeValue().collect { snapshot ->
+            val ridesMap = mutableMapOf<String, CreateRideRoot>()
+
+            snapshot.children.forEach { child ->
+                val rideId = child.key ?: return@forEach
+                val rideObject = dashboardRideSummaryVM.getRideRootFromSnapshot(rideId, child.getValue())
+
+                if (rideObject != null) {
+                    ridesMap[rideId] = rideObject
+                }
+            }
+
+            dashboardRideSummaryVM.getRideList(ridesMap)
+        }
+    }
 
     RequestPermission(
         context = context,
@@ -78,7 +98,11 @@ fun DashBoardScreen(
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location ->
                         if (location != null) {
-                            locationStatus = Utils.getLocationRegion(context, location.latitude, location.longitude)
+                            locationStatus = Utils.getLocationRegion(
+                                context,
+                                location.latitude,
+                                location.longitude
+                            )
                         } else {
                             locationStatus = ""
                         }
@@ -166,9 +190,9 @@ fun DashBoardScreen(
     ) {
         CreateOrJoinRide({
             creatRideClick.invoke()
-        }, {
-            joinRideClick.invoke()
-        })
+        }, { onGoingRide ->
+            joinRideClick(onGoingRide)
+        }, dashboardRideSummaryVM)
         RideStatsPerMonth(dashboardSummary.value)
         DashboardUpcomingRide(upcomingRideClick, {
             viewRideDetails.invoke(it)

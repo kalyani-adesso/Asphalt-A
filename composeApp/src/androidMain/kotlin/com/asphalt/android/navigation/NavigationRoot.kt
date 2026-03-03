@@ -375,8 +375,10 @@ fun NavigationRoot(
                             setTopAppBarState = setTopAppBarState, creatRideClick = {
                                 backStack.add(AppNavKey.CreateRideNav)
                             },
-                            joinRideClick = {
-                                backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
+                            joinRideClick = { onGoingRide ->
+                                if (onGoingRide == null)
+                                    backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
+                                else backStack.add(AppNavKey.ConnectedRideNavKey(onGoingRide))
                             },
                             viewRideDetails = { ridesID ->
                                 backStack.add(AppNavKey.RideDetails(ridesID))

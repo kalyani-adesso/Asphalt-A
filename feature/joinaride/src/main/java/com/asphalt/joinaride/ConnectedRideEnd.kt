@@ -88,7 +88,7 @@ fun ConnectedRideEnd(
 //    val finalDuration by viewModel.finalDuration.collectAsState()
 
     LaunchedEffect(Unit) {
-        delay(2000)
+//        delay(2000)
         showDialog = true
 
 
