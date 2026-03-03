@@ -86,4 +86,4 @@ The application includes a variety of features that help riders stay connected, 
 
 ### Moto Quiz
 - Test your knowledge  
-- Challenge your friends  
+- Challenge your friends
