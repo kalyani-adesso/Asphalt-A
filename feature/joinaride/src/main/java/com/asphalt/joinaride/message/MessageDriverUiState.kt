@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MessageDriverUiState(
-    val driverName: String = "Sooraj Rajan",
-    val delayMinutes: Int = 15,
-    val customMessage: String = "",
+    val driverName: String,
+    val delayMinutes: Int,
+    val customMessage: String,
     val isSending: Boolean = false
 )
