@@ -311,8 +311,18 @@ fun MapWithCurrentLocation(
                     val state = rememberUpdatedMarkerState(
                         position = LatLng(rider.currentLat, rider.currentLong)
                     )
-                    if (rider.canTrack)
-                        RiderMarker(ride = rider, state = state)
+                    if (rider.canTrack) {
+                        if (rider.userID == currentUserConnectedRideData?.userID) {
+                            Marker(
+                                state = state,
+                                title = currentUserConnectedRideData?.userID,
+                                icon = ImageUtils.bitmapDescriptorFromVector(
+                                    context,
+                                    com.asphalt.commonui.R.drawable.ic_current_user
+                                )
+                            )
+                        } else RiderMarker(ride = rider, state = state)
+                    }
 //                    Marker(
 //                        state = MarkerState(
 //                            LatLng(rider.currentLat, rider.currentLong)
@@ -415,7 +425,12 @@ fun MapWithCurrentLocation(
                     refreshScope.launch {
                         currentUserConnectedRideData?.let {
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(LatLng(it.currentLat,it.currentLong), 14f)
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(
+                                        it.currentLat,
+                                        it.currentLong
+                                    ), 14f
+                                )
                             )
                         }
                     }
