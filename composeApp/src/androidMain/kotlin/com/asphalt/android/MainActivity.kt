@@ -60,6 +60,7 @@ class MainActivity : ComponentActivity() {
             locationReceiver,
             IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         )
+        checkGpsAndShowDialog()
     }
 
     override fun onPause() {

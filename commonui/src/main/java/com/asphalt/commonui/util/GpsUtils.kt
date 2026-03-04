@@ -8,6 +8,7 @@ import android.location.LocationManager
 import android.provider.Settings
 
 object GpsUtils {
+    private var gpsDialog: AlertDialog? = null
     /**
      * Check if GPS / Location is enabled
      */
@@ -26,18 +27,26 @@ object GpsUtils {
      * Automatically opens Location Settings if GPS is still OFF.
      */
     fun showGpsDialog(activity: Activity) {
-        AlertDialog.Builder(activity)
+        if (gpsDialog?.isShowing == true) return
+
+        gpsDialog = AlertDialog.Builder(activity)
             .setTitle("GPS Required")
             .setMessage("GPS is turned off. Please enable it to continue.")
             .setCancelable(false)
             .setPositiveButton("OK") { dialog, _ ->
                 if (!isLocationEnabled(activity)) {
-                    // Open Location Settings
-                    activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    activity.startActivity(
+                        Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    )
                 } else {
                     dialog.dismiss()
                 }
             }
-            .show()
+            .setOnDismissListener {
+                gpsDialog = null // Clear reference
+            }
+            .create()
+
+        gpsDialog?.show()
     }
 }
