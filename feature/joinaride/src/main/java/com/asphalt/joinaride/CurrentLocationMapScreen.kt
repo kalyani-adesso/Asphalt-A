@@ -311,8 +311,23 @@ fun MapWithCurrentLocation(
                     val state = rememberUpdatedMarkerState(
                         position = LatLng(rider.currentLat, rider.currentLong)
                     )
-                    if (rider.canTrack)
-                        RiderMarker(ride = rider, state = state)
+                    val userHeading = currentUserConnectedRideData?.bearing ?: 0f
+                    val correctedRotation = (userHeading.toFloat() - 35f + 360) % 360
+                    if (rider.canTrack) {
+                        if (rider.userID == currentUserConnectedRideData?.userID) {
+                            Marker(
+                                state = state,
+                                flat = true,
+                                title = currentUserConnectedRideData?.userID,
+                                rotation = correctedRotation,
+                                anchor = Offset(0.5f, 0.5f),
+                                icon = ImageUtils.bitmapDescriptorFromVector(
+                                    context,
+                                    com.asphalt.commonui.R.drawable.ic_current_user
+                                )
+                            )
+                        } else RiderMarker(ride = rider, state = state)
+                    }
 //                    Marker(
 //                        state = MarkerState(
 //                            LatLng(rider.currentLat, rider.currentLong)
@@ -415,7 +430,12 @@ fun MapWithCurrentLocation(
                     refreshScope.launch {
                         currentUserConnectedRideData?.let {
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(LatLng(it.currentLat,it.currentLong), 14f)
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(
+                                        it.currentLat,
+                                        it.currentLong
+                                    ), 14f
+                                )
                             )
                         }
                     }

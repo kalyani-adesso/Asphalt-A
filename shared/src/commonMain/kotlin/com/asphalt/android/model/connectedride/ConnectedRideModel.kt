@@ -41,6 +41,7 @@ data class ConnectedRideDTO(
     val distanceTravelled: Double = 0.0,
     val rideStartedTime: Long = 0,
     var canTrack: Boolean = true,
+    var bearing: Double = 0.0
 )
 
 @Serializable
