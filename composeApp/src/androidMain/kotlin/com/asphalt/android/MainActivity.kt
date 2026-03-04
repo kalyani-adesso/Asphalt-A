@@ -20,6 +20,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation3.ui.DialogSceneStrategy.Companion.dialog
 import com.asphalt.android.navigation.NavigationRoot
 import com.asphalt.commonui.theme.AsphaltTheme
+import com.asphalt.commonui.util.GpsUtils
 import com.asphalt.profile.screens.ProfileScreen
 
 class MainActivity : ComponentActivity() {
@@ -65,8 +66,13 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         unregisterReceiver(locationReceiver)
     }
+    private fun checkGpsAndShowDialog() {
+        if (!GpsUtils.isLocationEnabled(this)) {
+            GpsUtils.showGpsDialog(this)
+        }
+    }
 
-    private fun isLocationEnabled(): Boolean {
+    /*private fun isLocationEnabled(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             locationManager.isLocationEnabled
         } else {
@@ -98,7 +104,7 @@ class MainActivity : ComponentActivity() {
 
             }
             .show()
-    }
+    }*/
 }
 
 @Preview
