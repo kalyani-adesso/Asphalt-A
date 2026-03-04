@@ -158,7 +158,7 @@ fun CurrentLocationMapScreen(
 fun MapWithCurrentLocation(
     locationProvider: LocationProvider,
     ridesData: RidesData,
-    rideViewModel: JoinRideViewModel
+    rideViewModel: JoinRideViewModel, androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val context = LocalContext.current
     val refreshScope = rememberCoroutineScope()
@@ -318,7 +318,7 @@ fun MapWithCurrentLocation(
                             Marker(
                                 state = state,
                                 flat = true,
-                                title = currentUserConnectedRideData?.userID,
+                                title = androidUserVM.getUser(rider.userID)?.name ?: "Unknown User",
                                 rotation = correctedRotation,
                                 anchor = Offset(0.5f, 0.5f),
                                 icon = ImageUtils.bitmapDescriptorFromVector(
@@ -504,16 +504,16 @@ fun RiderMarker(
         title = userName
     ) {
         Box(
-            modifier = Modifier.size(60.dp),
+            modifier = Modifier.size(70.dp),
             contentAlignment = Alignment.Center
         ) {
             val imageModifier = Modifier
                 .align(Alignment.Center)
-                .offset(x = (-16).dp, y = (-16).dp) // Move top-left away from center
-                .size(28.dp)
+                .offset(x = (-18).dp, y = (-18).dp) // Move top-left away from center
+                .size(32.dp)
                 .clip(CircleShape)
                 .background(Color.Gray)
-                .border(1.5.dp, riderColor, CircleShape)
+                .border(2.dp, riderColor, CircleShape)
             profileImage?.let { bitmap ->
                 Image(
                     bitmap = bitmap.asImageBitmap(),
@@ -532,7 +532,7 @@ fun RiderMarker(
 
             Box(
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(24.dp)
                     .background(haloColor, shape = CircleShape)
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
@@ -541,7 +541,7 @@ fun RiderMarker(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(riderColor, shape = CircleShape)
-                        .border(1.dp, Color.White.copy(alpha = 0.3f), CircleShape)
+                        .border(2.dp, Color.White.copy(alpha = 0.3f), CircleShape)
                 )
             }
         }
