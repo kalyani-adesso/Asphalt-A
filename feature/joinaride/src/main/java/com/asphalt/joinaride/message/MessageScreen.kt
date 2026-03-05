@@ -54,168 +54,199 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.joinaride.viewmodel.MessageViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MessageScreen(
-    viewModel: MessageViewModel,
+fun MessageScreenUI(
     onCancel: () -> Unit,
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    viewModel: MessageViewModel = koinViewModel()
 ) {
-
-    //val state = viewModel.uiState
-
-    // Close dialog after success
-//    LaunchedEffect(state.isSuccess) {
-//        if (state.isSuccess) {
-//            onSubmit()
-//        }
-//    }
 
     Dialog(
         onDismissRequest = { onCancel() },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-
         Card(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(Dimensions.padding),
             modifier = Modifier
                 .fillMaxWidth()
-                .background(NeutralWhite)
-                .padding(14.dp)
+                .padding(Dimensions.padding8),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.padding)
+            ) {
+                // HEADER
+                Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Column(modifier = Modifier
-                .background(NeutralWhite)) {
-
-                Text(
-                    text = "Message from Sooraj Sajan",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                QuickMessageSection(viewModel)
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text("Custom Message")
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = "state.messageText",
-                    onValueChange = {
-//                        viewModel.onEvent(
-//                            MessageEvent.OnCustomMessageChange(it)
-//                        )
-                    },
-                    //placeholder = { Text("Type your message...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
-                    Button(
-                        onClick = {
-                            //onNavigateToDashboard.invoke()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_profile),
+                        contentDescription = null,
                         modifier = Modifier
-                            .weight(weight = 1f)
-                            .height(height = Dimensions.size60)
-                            .border(
-                                width = 1.dp, color = PrimaryBrighterLightW75,
-                                shape = RoundedCornerShape(size = Dimensions.size10)
-                            ),
-                    ) {
+                            .size(42.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column {
                         Text(
-                            stringResource(R.string.cancel).uppercase(),
-                            color = PrimaryBrighterLightW75,
-                            style = TypographyBold.titleMedium,
-                            fontSize = Dimensions.textSize16,
-                            modifier = Modifier.padding(start = 8.dp),
+                            text = "Aromal",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
-
-                    GradientButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                           // onNavigateToDashboard.invoke()
-
-                        },
-                        buttonHeight = Dimensions.size60,
-                        contentPadding = PaddingValues(Dimensions.size2)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF00C853))
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                stringResource(R.string.send_reply).uppercase(),
-                                color = NeutralWhite,
-                                style = TypographyBold.titleMedium,
-                                fontSize = Dimensions.textSize16,
-                                modifier = Modifier.padding(start = 8.dp),
+                                text = "Connected",
+                                color = Color.Gray,
+                                fontSize = 14.sp
                             )
                         }
                     }
                 }
-            }
-        }
-    }
-}
+                Spacer(modifier = Modifier.height(Dimensions.padding20))
+                // Incoming Message Card
+                Card(
+                    shape = RoundedCornerShape(Dimensions.padding8),
+                    colors = CardDefaults.cardColors(
+                        containerColor = PaleGreen
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(Dimensions.padding)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
 
-@Composable
-fun QuickMessageSection(viewModel: MessageViewModel) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_profile),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(Dimensions.radius40)
+                                        .clip(CircleShape)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFF00C853),
+                                            CircleShape
+                                        ),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.width(Dimensions.padding10))
 
-    val quickMessages = listOf(
-        "All good!",
-        "Taking a break",
-        "Fuel stop",
-        "Road issue"
-    )
+                                Text(
+                                    text = "Sooraj Sajan",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                            }
+                            Text(
+                                text = "Just now",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
 
-    Column(modifier = Modifier.background(color = NeutralWhite)) {
+                        Text(
+                            text = "Fuel Stop...",
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(Dimensions.padding20))
+                // Quick Messages Title
+                Text(
+                    text = "Quick Messages",
+                    fontSize = 12.sp,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.padding8))
+                // Quick Message Buttons
+                Column(verticalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
 
-        Text("Quick Messages")
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        quickMessages.chunked(2).forEach { rowItems ->
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                rowItems.forEach { message ->
-
-                    QuickMessageButton(
-                        text = message,
-                        modifier = Modifier.weight(1f)
-                    ){
-
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
+                        QuickMessageButton("All good!", Modifier.weight(1f), onClick = {})
+                        QuickMessageButton("Taking a break", Modifier.weight(1f), onClick = {})
                     }
 
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
+                        QuickMessageButton("Fuel stop", Modifier.weight(1f), onClick = {})
+                        QuickMessageButton("Road issues", Modifier.weight(1f), onClick = {})
+                    }
+                }
+                Spacer(modifier = Modifier.height(Dimensions.padding24))
+                // Custom Message Title
+                Text(
+                    text = "Custom Message",
+                    fontSize = 12.sp,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.padding8))
+
+                OutlinedTextField(
+                    value = "Fuel Stop..",
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    shape = RoundedCornerShape(Dimensions.padding8)
+                )
+                Spacer(modifier = Modifier.height(Dimensions.padding24))
+                // Buttons Row
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedButton(
+                        onClick = { onCancel() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(55.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "CANCEL",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Button(
+                        onClick = { onSend()
+                                  viewModel.sendMessage("111","kalyani","123", "Aaryan","111",true)},
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(55.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3B6CB7)
+                        )
+                    ) {
+                        Text(
+                            text = "SEND REPLY",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
-
-
 @Composable
 @Preview
 fun MessageScreenPreview() {
-    MessageScreen(onCancel = {}, onSend = {}, viewModel = viewModel())
+    MessageScreenUI(onCancel = {}, onSend = {})
 }
-
