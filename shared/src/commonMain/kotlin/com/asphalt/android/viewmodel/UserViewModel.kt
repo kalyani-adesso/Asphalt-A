@@ -7,15 +7,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class UserViewModel(val userRepoImpl: UserRepoImpl, val coroutineScope: CoroutineScope) {
+class UserViewModel(val userRepoImpl: UserRepoImpl) {
     private val _user = MutableStateFlow<CurrentUser?>(null)
     val user: StateFlow<CurrentUser?> = _user
 
-    fun fetchDetails() {
-        coroutineScope.launch {
+    suspend fun fetchDetails() {
+
             val userDetails = userRepoImpl.getUserDetails()
             _user.value = userDetails
-        }
+
 
     }
 

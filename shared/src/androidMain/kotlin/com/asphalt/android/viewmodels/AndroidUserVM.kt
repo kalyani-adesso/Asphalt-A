@@ -23,7 +23,7 @@ open class AndroidUserVM(
 ) : ViewModel() {
 
 
-    private val sharedVM = UserViewModel(userRepoImpl, viewModelScope)
+    private val sharedVM = UserViewModel(userRepoImpl)
     val userState = sharedVM.user
     private val _userList = MutableStateFlow<List<UserDomain>>(emptyList())
     val userList = _userList.asStateFlow()
@@ -31,20 +31,23 @@ open class AndroidUserVM(
 
     init {
         sharedVM.userRepoImpl.setDataStoreManager(dataStoreManager)
-        initialiseUserData()
-        getAllUsers()
+        viewModelScope.launch {
+            initialiseUserData()
+            getAllUsers()
+        }
+
     }
 
-    private fun getAllUsers() {
-        viewModelScope.launch {
-            APIHelperUI.handleApiResult(
-                userAPIRepository.getAllUsers(),
-                viewModelScope,
-                showError = false
-            ) {
-                _userList.value = it
-            }
+    private suspend fun getAllUsers() {
+
+        APIHelperUI.handleApiResult(
+            userAPIRepository.getAllUsers(),
+            viewModelScope,
+            showError = false
+        ) {
+            _userList.value = it
         }
+
 
     }
 
@@ -56,7 +59,7 @@ open class AndroidUserVM(
         return userState.value?.uid.orEmpty()
     }
 
-    fun initialiseUserData() {
+    suspend fun initialiseUserData() {
         sharedVM.fetchDetails()
     }
 

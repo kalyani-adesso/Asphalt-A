@@ -301,7 +301,8 @@ class JoinRideViewModel(
                             isRejoined = data["isRejoined"] as? Boolean ?: false,
                             distanceTravelled = data["totalDistance"] as? Double ?: 0.0,
                             rideStartedTime = data["rideStartedTime"] as? Long ?: 0,
-                            canTrack = data["canTrack"] as? Boolean ?: true
+                            canTrack = data["canTrack"] as? Boolean ?: true,
+                            bearing = data["bearing"] as? Double ?: 0.0
                         )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()
@@ -421,7 +422,7 @@ class JoinRideViewModel(
 
     }
 
-    fun updateOngoingRideDatabase(data: Map<String, Any>,rideId: String) {
+    fun updateOngoingRideDatabase(data: Map<String, Any>, rideId: String) {
         val path = "ongoing_ride/${rideId}/$endRideID"
         database.getReference(path).updateChildren(data)
     }
