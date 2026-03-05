@@ -9,30 +9,86 @@ import SwiftUI
 import MapKit
 import CoreLocation
 
+// MARK: - Route trimming (polyline shortens as rider moves, like Apple/Google Maps)
+func trimRouteFromUserPosition(_ route: [CLLocationCoordinate2D], user: CLLocationCoordinate2D) -> [CLLocationCoordinate2D] {
+    guard route.count >= 2 else { return route }
+    var bestDistSq = Double.infinity
+    var bestPoint = route[0]
+    var bestEndIndex = 0
+    for i in 0..<(route.count - 1) {
+        let a = route[i]
+        let b = route[i + 1]
+        let closest = closestPointOnSegment(point: user, segmentStart: a, segmentEnd: b)
+        let dLat = closest.latitude - user.latitude
+        let dLon = closest.longitude - user.longitude
+        let distSq = dLat * dLat + dLon * dLon
+        if distSq < bestDistSq {
+            bestDistSq = distSq
+            bestPoint = closest
+            bestEndIndex = i + 1
+        }
+    }
+    if bestEndIndex >= route.count { return [route.last!] }
+    var result = [bestPoint]
+    result.append(contentsOf: route[bestEndIndex...])
+    return result
+}
+
+func closestPointOnSegment(point: CLLocationCoordinate2D, segmentStart: CLLocationCoordinate2D, segmentEnd: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+    let dx = segmentEnd.longitude - segmentStart.longitude
+    let dy = segmentEnd.latitude - segmentStart.latitude
+    let lenSq = dx * dx + dy * dy
+    if lenSq == 0 { return segmentStart }
+    var t = ((point.longitude - segmentStart.longitude) * dx + (point.latitude - segmentStart.latitude) * dy) / lenSq
+    t = max(0, min(1, t))
+    return CLLocationCoordinate2D(
+        latitude: segmentStart.latitude + t * dy,
+        longitude: segmentStart.longitude + t * dx
+    )
+}
+
 @available(iOS 17.0, *)
 struct BikeRouteMapView: View {
     @Binding var position: MapCameraPosition
-    @State private var routeCoordinates: [CLLocationCoordinate2D] = []
+    @State private var fullRouteCoordinates: [CLLocationCoordinate2D] = []
     var currentMapStyle: MapStyle
     var rideModel: JoinRideModel
     var groupRiders: [Rider]
     @State var startLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     @State var endLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     @Binding var startTracking: Bool
+    /// When non-nil and tracking, polyline shows only from user position to end (shortens as rider moves).
+    var userLocation: CLLocationCoordinate2D?
     /// Called when the route is first fitted so the parent can restore this view on "refresh".
     var onRouteFitted: ((MKCoordinateRegion) -> Void)?
     
+    /// Displayed route: trimmed from user to end when tracking with location; otherwise full route.
+    private var displayedRouteCoordinates: [CLLocationCoordinate2D] {
+        if startTracking, let user = userLocation, !fullRouteCoordinates.isEmpty {
+            return trimRouteFromUserPosition(fullRouteCoordinates, user: user)
+        }
+        return fullRouteCoordinates
+    }
+
+    /// Arrow (start) icon position: moves to rider's current location when tracking; otherwise fixed at route start.
+    private var startAnnotationCoordinate: CLLocationCoordinate2D {
+        if startTracking, let user = userLocation {
+            return user
+        }
+        return startLocation
+    }
+
     var body: some View {
         if #available(iOS 17.0, *) {
             Map(position: $position) {
                 
-                if !routeCoordinates.isEmpty {
-                    MapPolyline(coordinates: routeCoordinates)
+                if !displayedRouteCoordinates.isEmpty {
+                    MapPolyline(coordinates: displayedRouteCoordinates)
                         .stroke(AppColor.celticBlue, lineWidth: 6)
                 }
                 
-                // Start location annotation
-                Annotation("", coordinate: startLocation) {
+                // Start / rider position annotation (arrow moves with rider when tracking)
+                Annotation("", coordinate: startAnnotationCoordinate) {
                     if let image = AppIcon.ConnectedRide.startLocation {
                         Image(uiImage: image)
                             .resizable()
@@ -57,21 +113,11 @@ struct BikeRouteMapView: View {
                     ForEach(groupRiders, id: \.name) { rider in
                         Annotation("", coordinate: CLLocationCoordinate2D(latitude: rider.currentLat, longitude: rider.currentLong)) {
                             VStack(spacing: 1) {
-                                Group {
-                                    if let imageName = rider.profileImageName, !imageName.isEmpty {
-                                        Image(imageName)
-                                            .resizable()
-                                    } else {
-                                        AppIcon.Profile.profile
-                                            .resizable()
-                                    }
-                                }
-                                .frame(width: 26, height: 26)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white, lineWidth: 1)
-                                )
-                                .clipShape(Circle())
+                                ProfileImageView(profileImageName: rider.profileImageName, size: CGSize(width: 26, height: 26))
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white, lineWidth: 1)
+                                    )
                                 HStack {
                                     Spacer()
                                     (rider.status == .connected ? AppIcon.JoinRide.greenPin
@@ -92,7 +138,12 @@ struct BikeRouteMapView: View {
             }
             .mapStyle(currentMapStyle)
             .onAppear {
-                startLocation = CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+                // When ride has assembly point, draw route assembly → end; otherwise start → end.
+                if rideModel.hasAssemblyPoint, let aLat = rideModel.assemblyLat, let aLon = rideModel.assemblyLon {
+                    startLocation = CLLocationCoordinate2D(latitude: aLat, longitude: aLon)
+                } else {
+                    startLocation = CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+                }
                 endLocation = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
                 fetchBikeRoute()
             }
@@ -112,7 +163,7 @@ struct BikeRouteMapView: View {
                 return
             }
             let polyline = route.polyline
-            routeCoordinates = polyline.coordinates
+            fullRouteCoordinates = polyline.coordinates
             
             let region = MKCoordinateRegion(polyline.boundingMapRect)
             let adjustedRegion = MKCoordinateRegion(

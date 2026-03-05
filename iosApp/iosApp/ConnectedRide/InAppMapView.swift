@@ -36,20 +36,6 @@ struct InAppMapView: View {
                 MapPolyline(coordinates: routeCoordinates)
                     .stroke(AppColor.celticBlue, lineWidth: 6)
             }
-            // User location marker (when available)
-            if let user = userCoordinate {
-                Annotation("", coordinate: user) {
-                    ZStack {
-                        Circle()
-                            .fill(AppColor.celticBlue.opacity(0.2))
-                            .frame(width: 44, height: 44)
-                        Circle()
-                            .fill(AppColor.celticBlue)
-                            .frame(width: 16, height: 16)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                    }
-                }
-            }
             // Start pin
             if let start = startCoordinate {
                 Annotation("", coordinate: start) {
@@ -76,21 +62,11 @@ struct InAppMapView: View {
             ForEach(participants) { rider in
                 Annotation("", coordinate: CLLocationCoordinate2D(latitude: rider.currentLat, longitude: rider.currentLong)) {
                     VStack(spacing: 1) {
-                        Group {
-                            if let imageName = rider.profileImageName, !imageName.isEmpty {
-                                Image(imageName)
-                                    .resizable()
-                            } else {
-                                AppIcon.Profile.profile
-                                    .resizable()
-                            }
-                        }
-                        .frame(width: 24, height: 24)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 1)
-                        )
-                        .clipShape(Circle())
+                        ProfileImageView(profileImageName: rider.profileImageName, size: CGSize(width: 24, height: 24))
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
                         HStack {
                             Spacer()
                             (rider.status == .connected ? AppIcon.JoinRide.greenPin
@@ -105,6 +81,21 @@ struct InAppMapView: View {
                     .background(.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .shadow(radius: 2)
+                }
+            }
+            // User / navigate location marker (drawn last so it appears on top of polyline)
+            if let user = userCoordinate {
+                Annotation("", coordinate: user) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.celticBlue.opacity(0.2))
+                            .frame(width: 44, height: 44)
+                        Circle()
+                            .fill(AppColor.celticBlue)
+                            .frame(width: 16, height: 16)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                    }
+                    .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
                 }
             }
         }

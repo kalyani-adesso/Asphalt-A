@@ -39,11 +39,19 @@ struct InAppNavigationView: View {
     @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
     @State private var simulationIndex: Int = 0
 
-    /// User position shown on map: simulated during demo, or endpoint after demo ends, otherwise real location.
+    /// User position shown on map: simulated during demo; otherwise real location so the navigate icon stays visible when recentering.
     private var displayUserCoordinate: CLLocationCoordinate2D? {
         if isSimulating { return simulatedCoordinate }
-        if let sim = simulatedCoordinate { return sim } // show endpoint after simulation ends
-        return locationManager.lastLocation?.coordinate
+        // Prefer real location when not simulating so the blue dot appears on the visible map when user taps navigate.
+        if let loc = locationManager.lastLocation?.coordinate { return loc }
+        return simulatedCoordinate
+    }
+
+    /// Route to draw: trimmed from user position to end when user position is known (polyline shortens as rider moves).
+    private var displayedRouteCoordinates: [CLLocationCoordinate2D] {
+        guard !routeCoordinates.isEmpty else { return [] }
+        guard let user = displayUserCoordinate else { return routeCoordinates }
+        return trimRouteFromUserPosition(routeCoordinates, user: user)
     }
 
     var body: some View {
@@ -78,7 +86,7 @@ struct InAppNavigationView: View {
             .background(Color(UIColor.systemBackground))
 
             ZStack(alignment: .top) {
-                InAppMapView(routeCoordinates: routeCoordinates,
+                InAppMapView(routeCoordinates: displayedRouteCoordinates,
                              startCoordinate: start,
                              endCoordinate: end,
                              userCoordinate: displayUserCoordinate,
@@ -134,19 +142,9 @@ struct InAppNavigationView: View {
                             .disabled(steps.isEmpty)
 
                         Button(action: {
-                            if isSimulating {
-                                followUserState = true
-                                recenterCounter += 1
-                            } else if simulatedCoordinate != nil {
-                                // Simulation stopped – show start point (default zoom)
-                                followUserState = false
-                                focusCoordinate = start
-                                focusCameraDistance = nil
-                                focusCounter += 1
-                            } else {
-                                followUserState = true
-                                recenterCounter += 1
-                            }
+                            // Always recenter on user so the navigate icon is visible on the map (and on the polyline).
+                            followUserState = true
+                            recenterCounter += 1
                         }) {
                             Image(systemName: "location.fill")
                                 .font(.system(size: 18))

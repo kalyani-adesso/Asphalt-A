@@ -122,7 +122,7 @@ struct ConnectedRideMapView: View {
                         Section {
                             VStack {
                                 ZStack(alignment: .topLeading) {
-                                    BikeRouteMapView(position: $position, currentMapStyle: viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack, onRouteFitted: { initialMapRegion = $0 })
+                                    BikeRouteMapView(position: $position, currentMapStyle: viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack, userLocation: startTrack ? locationManager.lastLocation?.coordinate : nil, onRouteFitted: { initialMapRegion = $0 })
                                         .cornerRadius(12)
                                         .ignoresSafeArea(edges: .top)
                                     VStack {
@@ -476,21 +476,15 @@ struct ConnectedRideMapView: View {
                     showInAppNavigation = true
                 }
                 Button("Open in Apple Maps") {
-                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                    openInAppleMaps(start: startCoord, end: endCoord)
+                    openInAppleMaps(start: navigationStartCoordinate(), end: navigationEndCoordinate())
                 }
                 Button("Open in Google Maps") {
-                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                    openInGoogleMaps(start: startCoord, end: endCoord)
+                    openInGoogleMaps(start: navigationStartCoordinate(), end: navigationEndCoordinate())
                 }
                 Button("Cancel", role: .cancel) { }
             }
             .sheet(isPresented: $showInAppNavigation) {
-                let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                InAppNavigationView(start: startCoord, end: endCoord, connectedRideViewModel: viewModel)
+                InAppNavigationView(start: navigationStartCoordinate(), end: navigationEndCoordinate(), connectedRideViewModel: viewModel)
             }
         }
         .frame(width: 130)
@@ -520,6 +514,21 @@ struct ConnectedRideMapView: View {
         withAnimation(.easeInOut(duration: 0.4)) {
             position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
         }
+    }
+
+    // MARK: - Navigation coordinates (assembly point → end when present)
+    /// Start for navigation: assembly point when ride has one, else user location or ride start.
+    private func navigationStartCoordinate() -> CLLocationCoordinate2D {
+        if rideModel.hasAssemblyPoint,
+           let lat = rideModel.assemblyLat,
+           let lon = rideModel.assemblyLon {
+            return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        }
+        return locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+    }
+
+    private func navigationEndCoordinate() -> CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
     }
 
     // MARK: - Navigation option handlers
@@ -673,19 +682,9 @@ struct GroupRiderView: View {
     var body: some View {
         HStack {
             HStack(spacing: 16) {
-                Group {
-                    if let imageName = profileImageName, !imageName.isEmpty {
-                        Image(imageName)
-                            .resizable()
-                    } else {
-                        AppIcon.Profile.profile
-                            .resizable()
-                    }
-                }
-                .clipShape(Circle())
-                .frame(width: 37, height: 37)
-                .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
-                .padding(.leading, 18)
+                ProfileImageView(profileImageName: profileImageName, size: CGSize(width: 37, height: 37))
+                    .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
+                    .padding(.leading, 18)
                 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {

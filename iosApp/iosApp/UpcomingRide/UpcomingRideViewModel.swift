@@ -85,7 +85,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var rideDetails: [RideDetailsModel] = []
     @Published var rideFromDeepLink: RideModel? = nil
     @Published var isUploading:Bool = false
-    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
+    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [], hasAssemblyPoint: false, assemblyLat: nil as Double?, assemblyLon: nil as Double?)
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -435,7 +435,10 @@ class UpcomingRideViewModel: ObservableObject {
                     endLat: ride.endLatitude,
                     endLong: ride.endLongitude,
                     rideJoined: rideJoinedStatus,
-                    participants: finalParticipants
+                    participants: finalParticipants,
+                    hasAssemblyPoint: ride.hasAssemblyPoint,
+                    assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil as Double?,
+                    assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil as Double?
                 )
 
                 // -------------------------
