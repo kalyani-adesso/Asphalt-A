@@ -1,6 +1,7 @@
 package com.asphalt.dashboard.composables.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -181,6 +182,8 @@ fun UpcomingRides(
     upconing: YourRideDataModel,
     upComingViewDetails: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val coming_soon_txt =stringResource(R.string.coming_soon)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -394,6 +397,7 @@ fun UpcomingRides(
 
             BorderedButton(
                 onClick = {
+                    Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
                     // upComingViewDetails.invoke(upconing.ridesId.toString())
                 },
                 modifier = Modifier

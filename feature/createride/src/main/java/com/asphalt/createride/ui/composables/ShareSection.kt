@@ -1,7 +1,9 @@
 package com.asphalt.createride.ui.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +38,8 @@ import com.asphalt.commonui.theme.TypographyBold
 
 @Composable
 fun ShareSection() {
+    val context = LocalContext.current
+    val coming_soon_txt=stringResource(R.string.coming_soon)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,25 +91,30 @@ fun ShareSection() {
                 end = Dimensions.padding16
             )
         ) {
-            Text(text = stringResource(R.string.share_link), style = TypographyBold.bodyMedium)
-            Spacer(Modifier.height(Dimensions.padding16))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.padding50)
-                    .background(
-                        NeutralWhite, shape = RoundedCornerShape(Dimensions.size5)
+            if(false) {
+                Text(text = stringResource(R.string.share_link), style = TypographyBold.bodyMedium)
+                Spacer(Modifier.height(Dimensions.padding16))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(Dimensions.padding50)
+                        .background(
+                            NeutralWhite, shape = RoundedCornerShape(Dimensions.size5)
+                        )
+                        .padding(start = Dimensions.size10, end = Dimensions.size10),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "https://adessoriderclub.app/12121312", style = Typography.bodySmall,
+                        color = NeutralDarkGrey, modifier = Modifier.weight(1f),
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
-                    .padding(start = Dimensions.size10, end = Dimensions.size10),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "https://adessoriderclub.app/12121312", style = Typography.bodySmall,
-                    color = NeutralDarkGrey, modifier = Modifier.weight(1f),
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
-                )
-                Image(painter = painterResource(R.drawable.ic_copy_icon), contentDescription = "")
+                    Image(
+                        painter = painterResource(R.drawable.ic_copy_icon),
+                        contentDescription = ""
+                    )
+                }
             }
             Spacer(Modifier.height(Dimensions.padding16))
             Text(text = stringResource(R.string.share_via), style = TypographyBold.bodyMedium)
@@ -116,22 +126,30 @@ fun ShareSection() {
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_whats_app_gradient),
-                    contentDescription = "", modifier = Modifier.weight(1f)
+                    contentDescription = "", modifier = Modifier.weight(1f).clickable{
+                        Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
+                    }
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_face_book_gradient),
                     contentDescription = "",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable{
+                        Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
+                    }
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_twit_gradient),
                     contentDescription = "",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable{
+                        Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
+                    }
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_mail_gradient),
                     contentDescription = "",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable{
+                        Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
+                    }
                 )
             }
         }
