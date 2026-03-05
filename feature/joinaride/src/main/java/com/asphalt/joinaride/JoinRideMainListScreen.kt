@@ -149,7 +149,7 @@ fun JoinRide(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "No Riders Found", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.no_data), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             // display riders list

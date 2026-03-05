@@ -73,6 +73,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.ui.BouncingCirclesLoader
 import com.asphalt.commonui.ui.LoaderPopup
 import com.asphalt.login.viewmodel.LoginScreenViewModel
 import org.koin.compose.currentKoinScope
@@ -103,7 +104,7 @@ fun LoginScreen(
     var showLoader = viewModel.showLoader.collectAsState()
 
     if (showLoader.value) {
-        LoaderPopup()
+        BouncingCirclesLoader()
     }
     LaunchedEffect(isLoginSuccess.value) {
         if (isLoginSuccess.value) {
