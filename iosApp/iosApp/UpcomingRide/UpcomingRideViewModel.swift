@@ -52,6 +52,7 @@ struct RideModel: Identifiable,Hashable {
     let endTime: String?
     let ratings: Int?
     let imageData:[ImageData]?
+    let participants: [ParticipantData]?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -221,7 +222,8 @@ class UpcomingRideViewModel: ObservableObject {
                     startTime: startRideTime,
                     endTime: EndRideTime,
                     ratings: myRating,
-                    imageData: ride.images
+                    imageData: ride.images,
+                    participants: ride.participants ?? []
                 )
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
@@ -520,7 +522,7 @@ class UpcomingRideViewModel: ObservableObject {
             startTime: nil,
             endTime: nil,
             ratings: nil,
-            imageData: nil
+            imageData: nil, participants: []
         )
     }
 }

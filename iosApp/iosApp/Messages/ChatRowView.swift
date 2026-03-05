@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ChatRowView: View {
     let chat: Chat
-
+    
     var body: some View {
         HStack(spacing: 12) {
 
@@ -70,13 +70,3 @@ struct ChatRowView: View {
         )
     }
 }
-
-#Preview {
-    ChatRowView(chat: Chat(name: "Sooraj",
-                           lastMessage: "See you at the meeting point!",
-                           time: "10:45 AM",
-                           unreadCount: 2,
-                           isGroup: false))
-}
-
-
