@@ -340,8 +340,9 @@ fun RiderCard(
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
+                        val (participantCount, totalCount) = viewModel.getParticipantCounts(ridesData)
                         Text(
-                            text = "0/8 Riders",
+                            text = "${totalCount}/${participantCount} Riders",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )

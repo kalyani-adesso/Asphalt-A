@@ -426,4 +426,20 @@ class JoinRideViewModel(
         val path = "ongoing_ride/${rideId}/$endRideID"
         database.getReference(path).updateChildren(data)
     }
+
+    fun getParticipantCounts(ridesData: RidesData): Pair<Int, Int> {
+        // Safely handle null participants
+        val list = ridesData.participants ?: emptyList()
+
+        // Count participants with inviteStatus 3 or 4
+        val participantCountWithStatus = list.count {
+            it.inviteStatus == 3 || it.inviteStatus == 4
+        }
+
+        // Add +1 to total only if rideStatus is 3 or 4
+        val total = participantCountWithStatus + if (ridesData.rideStatus == 3 || ridesData.rideStatus == 4) 1 else 0
+
+        // Return: first = size + 1, second = total as calculated
+        return Pair(list.size + 1, total)
+    }
 }
