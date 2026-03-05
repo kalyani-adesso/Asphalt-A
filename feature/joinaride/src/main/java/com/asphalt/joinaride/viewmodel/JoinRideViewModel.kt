@@ -302,7 +302,7 @@ class JoinRideViewModel(
                             distanceTravelled = data["totalDistance"] as? Double ?: 0.0,
                             rideStartedTime = data["rideStartedTime"] as? Long ?: 0,
                             canTrack = data["canTrack"] as? Boolean ?: true,
-                            bearing = data["bearing"] as? Double ?: 0.0
+                            bearing = (data["bearing"] as? Number)?.toFloat() ?: 0.0f,
                         )
                     if (data["userID"] == androidUserVM.getCurrentUserUID()) {
                         endRideID = child.key.orEmpty()
