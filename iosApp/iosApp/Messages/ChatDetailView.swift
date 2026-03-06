@@ -12,8 +12,8 @@ struct ChatDetailView: View {
        let chatName: String
        let isGroup: Bool
        let isOverlay: Bool
+    let chatId: String
     
-    @State private var messageText = ""
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
@@ -25,15 +25,29 @@ struct ChatDetailView: View {
             if !isOverlay {
                     ChatHeaderView(chatName: chatName)
                 }
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(viewModel.messages) { message in
-                        MessageBubbleView(message: message,isGroup: isGroup)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(viewModel.messages) { message in
+                            MessageBubbleView(message: message, isGroup: isGroup)
+                                .id(message.id)
+                        }
+                    }
+                    .padding()
+                }
+                .onAppear {
+                    if let last = viewModel.messages.last {
+                        proxy.scrollTo(last.id, anchor: .bottom)
                     }
                 }
-                .padding()
+                .onChange(of: viewModel.messages.count) { _ in
+                    if let last = viewModel.messages.last {
+                        withAnimation {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
+                    }
+                }
             }
-
             Divider()
 
             HStack {
@@ -42,7 +56,7 @@ struct ChatDetailView: View {
                     .background(AppColor.white)
                     .font(KlavikaFont.regular.font(size: 14))
                     .foregroundColor(
-                            messageText.isEmpty
+                        viewModel.messageText.isEmpty
                             ? AppColor.grey
                             : AppColor.black
                         )
@@ -64,13 +78,7 @@ struct ChatDetailView: View {
                 }
             }
             .padding()
-            .opacity(messageText.isEmpty ? 0.4 : 1)
-        }
-//        .task {
-//            self.viewModel.receiveMessageFromKMP(chatRoomId: viewModel.rideId ?? "")
-//        }
-        .onAppear{
-            self.viewModel.receiveMessageFromKMP(chatRoomId: viewModel.rideId ?? "" )
+            .opacity(viewModel.messageText.isEmpty ? 0.4 : 1)
         }
         .if (!isOverlay) { view in
             view

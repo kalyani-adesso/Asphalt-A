@@ -10,15 +10,19 @@ import Foundation
 
 struct Chat: Identifiable {
     let id: String
+    let recipientId: String?
     let name: String
     let lastMessage: String
     let time: String
     var unreadCount: Int
     let isGroup: Bool
+    let memberList: [String]?
+        let rideTitle: String?
+        let rideId: String?
 }
 
 struct LocalMessage: Identifiable {
-    let id = UUID()
+    let id : String
     let text: String
     let isMe: Bool
     let time: String
@@ -33,6 +37,32 @@ struct MessagesListView: View {
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
+    
+    var emptyStateTitle: String {
+        switch viewModel.selectedCategory {
+        case MessagesViewModel.MessageCategory.Unread.rawValue:
+            return "No unread messages"
+        case MessagesViewModel.MessageCategory.Groups.rawValue:
+            return "No group chats"
+        case MessagesViewModel.MessageCategory.Favourites.rawValue:
+            return "No favourite chats"
+        default:
+            return "No messages yet"
+        }
+    }
+    
+    var emptyStateSubtitle: String {
+        switch viewModel.selectedCategory {
+        case MessagesViewModel.MessageCategory.Unread.rawValue:
+            return "You're all caught up "
+        case MessagesViewModel.MessageCategory.Groups.rawValue:
+            return "You haven't joined any groups"
+        case MessagesViewModel.MessageCategory.Favourites.rawValue:
+            return "Mark chats as favourite to see them here"
+        default:
+            return "Start a conversation to see chats here"
+        }
+    }
     
     var body: some View {
         AppToolBar(showBack: true){
@@ -84,49 +114,107 @@ struct MessagesListView: View {
                     .padding(.horizontal, 20)
                     .zIndex(1)
                     .padding(.bottom, 20)
-                    
-                    
-                    ScrollView {
+                    if viewModel.isLoading {
+                        
+                        Spacer()
+                        
+                        ProgressView("Loading chats...")
+                            .scaleEffect(1.2)
+                        
+                        Spacer()
+                        
+                    } else if viewModel.filteredChats.isEmpty {
+                        
+                        Spacer()
+                        
                         VStack(spacing: 12) {
-                            ForEach(viewModel.recentChats) { chat in
-                                NavigationLink {
-                                    let detailVM = MessagesViewModel(
-                                        currentUserId:  MBUserDefaults.userIdStatic ?? "", recipientId: chat.id,
-                                        chatType: chat.isGroup ? .group : .private,
-                                    )
-
-                                    ChatDetailView(
-                                        viewModel: detailVM,
-                                        chatName: chat.isGroup
-                                        ? chat.name
-                                        : (viewModel.usersById[chat.id]?.name ?? chat.name),
-                                        isGroup: chat.isGroup,
-                                        isOverlay: false
-                                    )
-                                    .onAppear {
-                                        detailVM.receiveMessageFromKMP(chatRoomId: chat.id)
-                                        detailVM.markChatAsRead(chatRoomId: chat.id)
-                                    }
-                                }label: {
-                                    ChatRowView(chat: chat)
-                                }
-                                .buttonStyle(.plain)
-                            }
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 40))
+                                .foregroundColor(.gray.opacity(0.6))
+                            
+                            Text(emptyStateTitle)
+                                .font(KlavikaFont.bold.font(size: 16))
+                                .foregroundColor(AppColor.black)
+                            
+                            Text(emptyStateSubtitle)
+                                .font(KlavikaFont.regular.font(size: 13))
+                                .foregroundColor(AppColor.stoneGray)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                        
+                        Spacer()
+                        
+                    } else {
+                        
+                        
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach(viewModel.filteredChats) { chat in
+                                    NavigationLink {
+                                        ChatDetailContainer(chat: chat)
+                                    }label: {
+                                        ChatRowView(chat: chat)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 20)
+                        }
+                        
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppColor.listGray)
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(AppColor.listGray)
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .task {
-                        viewModel.fetchRecentChats()
+            }
+            .onAppear {
+                Task {
+                    try? await viewModel.fetchAllUsers()
+                    viewModel.fetchRecentChats()
                 }
             }
             .navigationBarBackButtonHidden(true)
+        }
+    }
+}
+struct ChatDetailContainer: View {
+
+    let chat: Chat
+    @StateObject private var viewModel: MessagesViewModel
+
+    init(chat: Chat) {
+        let currentUserId = MBUserDefaults.userIdStatic ?? ""
+        let recipient = chat.isGroup
+            ? "" : MessagesViewModel.otherUserId(from: chat.id, currentUserId: currentUserId)
+        _viewModel = StateObject(
+            wrappedValue: MessagesViewModel(
+                currentUserId: currentUserId,
+                recipientId: recipient,
+                chatType: chat.isGroup ? .group : .private,
+                memberList: chat.memberList,
+                rideTitle: chat.rideTitle,
+                rideId: chat.rideId
+            )
+        )
+
+        self.chat = chat
+    }
+
+    var body: some View {
+        ChatDetailView(
+            viewModel: viewModel,
+            chatName: chat.name,
+            isGroup: chat.isGroup,
+            isOverlay: false,
+            chatId: chat.id
+        )
+        .onAppear {
+            viewModel.receiveMessageFromKMP(chatRoomId: chat.id)
+            viewModel.markChatAsRead(chatRoomId: chat.id)
         }
     }
 }

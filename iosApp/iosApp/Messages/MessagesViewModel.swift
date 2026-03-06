@@ -9,7 +9,7 @@ import Foundation
 import shared
 import FirebaseDatabase
 
-
+@MainActor
 class MessagesViewModel: ObservableObject {
     enum MessageCategory: String, CaseIterable {
         case All, Unread, Groups, Favourites
@@ -23,13 +23,10 @@ class MessagesViewModel: ObservableObject {
     @Published var selectedCategory: String? = MessageCategory.All.rawValue
     @Published var messages: [LocalMessage] = []
     @Published var messageText: String = ""
-//    private var currentUserId: String {
-//        MBUserDefaults.userIdStatic ?? ""
-//    }
-//
     private let chatRepository = ChatRepository()
     private var messageJob: Kotlinx_coroutines_coreJob?
     private let userRepo: UserRepository
+    @Published var isLoading: Bool = false
     
     var recipientId: String
     let chatType: ChatType
@@ -40,6 +37,41 @@ class MessagesViewModel: ObservableObject {
     private var recentChatsTask: Task<Void, Never>?
     @Published var usersById: [String: UserDomain] = [:]
     private let currentUserId: String
+    var filteredChats: [Chat] {
+        var chats = recentChats
+        
+        // SEARCH FILTER
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let query = searchText.lowercased()
+            chats = chats.filter {
+                $0.name.lowercased().contains(query) ||
+                $0.lastMessage.lowercased().contains(query)
+            }
+        }
+        
+        // CATEGORY FILTER
+        guard let selected = selectedCategory else { return chats }
+        
+        switch selected {
+            
+        case MessageCategory.All.rawValue:
+            return chats
+            
+        case MessageCategory.Unread.rawValue:
+            return chats.filter { $0.unreadCount > 0 }
+            
+        case MessageCategory.Groups.rawValue:
+            return chats.filter { $0.isGroup }
+            
+        case MessageCategory.Favourites.rawValue:
+            // You don't currently store favourite chats
+            // so returning empty or all for now
+            return chats
+            
+        default:
+            return chats
+        }
+    }
     
     init(
         currentUserId: String,
@@ -70,55 +102,96 @@ class MessagesViewModel: ObservableObject {
     }
     func send1v1Message() {
         guard !messageText.isEmpty else { return }
-        
-        let chatRoomId = chatRepository.getCanonicalChatId(uid1: currentUserId, uid2: recipientId)
-        
-        print("chatRoomId: \(chatRoomId)")
-        
-        self.chatRepository.createOrGet1v1Chat(userAId: self.currentUserId, userBId: self.recipientId)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.send1v1MessageViaKMP(chatRoomId: chatRoomId)
+
+        let chatRoomId = chatRepository.getCanonicalChatId(
+            uid1: currentUserId,
+            uid2: recipientId
+        )
+
+        let textToSend = messageText
+        messageText = ""
+
+        Task {
+            do {
+                try await chatRepository.createOrGet1v1Chat(
+                    userAId: currentUserId,
+                    userBId: recipientId
+                )
+
+                chatRepository.sendMessage(
+                    chatRoomId: chatRoomId,
+                    senderId: currentUserId,
+                    recipientId: recipientId,
+                    text: textToSend
+                )
+
+                print("Message sent successfully")
+
+                // Refresh recent chats
+                await MainActor.run {
+                    self.fetchRecentChats()
+                }
+
+            } catch {
+                print("Chat creation failed:", error)
+            }
         }
     }
     private func send1v1MessageViaKMP(chatRoomId: String) {
+        let textToSend = messageText
+        messageText = ""
+        
         chatRepository.sendMessage(
             chatRoomId: chatRoomId,
             senderId: currentUserId,
             recipientId: recipientId,
-            text: messageText
+            text: textToSend
         )
         
         print("Message sent successfully: \(currentUserId)-\(recipientId)")
-        messageText = ""
     }
     
     func sendGroupMessage() {
         guard !messageText.isEmpty else { return }
-        
         guard let memberList = memberList,
-              let rideTitle = rideTitle ,
-              let rideId = rideId  else {
+              let rideTitle = rideTitle,
+              let rideId = rideId else {
             print("Group metadata missing")
             return
         }
-        
+
         let textToSend = messageText
-        
-        chatRepository.createOrGetGroupChat(
-            memberList: memberList,
-            rideID: rideId,
-            rideTitle: rideTitle
-        )
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.sendGroupMessageViaKMP(
-                rideId: rideId,
-                senderId: self.currentUserId,
-                text: textToSend,
-                allMemberIds: memberList
-            )
+        messageText = ""
+
+        Task {
+            do {
+                // Create or get group chat
+                try await chatRepository.createOrGetGroupChat(
+                    memberList: memberList,
+                    rideID: rideId,
+                    rideTitle: rideTitle
+                )
+
+                // Send group message
+                chatRepository.sendGroupMessage(
+                    rideId: rideId,
+                    senderId: currentUserId,
+                    text: textToSend,
+                    allMemberIds: memberList
+                )
+
+                print("Group message sent successfully")
+
+                // REFRESH recent chats so MessagesListView can see it
+                await MainActor.run {
+                    self.fetchRecentChats()
+                }
+
+            } catch {
+                print("Group chat creation failed:", error)
+            }
         }
     }
-    
     
     private func sendGroupMessageViaKMP(rideId: String, senderId: String, text: String, allMemberIds: [String]) {
         chatRepository.sendGroupMessage(rideId: rideId, senderId: senderId, text: text, allMemberIds: allMemberIds)
@@ -134,17 +207,23 @@ class MessagesViewModel: ObservableObject {
         
         if let success = result as? APIResultSuccess<AnyObject>,
            let users = success.data as? [UserDomain] {
-            //            for user in users {
-            //                print("User: \(user.uid) - \(user.name)")
-            //            }
-            // dictionary for easy findings
             self.usersById = Dictionary(uniqueKeysWithValues: users.map { ($0.uid, $0) })
-            
         } else {
             print("Unexpected user data type")
         }
     }
-    
+    static func otherUserId(from chatId: String, currentUserId: String) -> String {
+        let ids = chatId.split(separator: "_").map(String.init)
+        return ids.first(where: { $0 != currentUserId }) ?? ""
+    }
+    static func otherUserName(
+        from chatId: String,
+        currentUserId: String,
+        usersById: [String: UserDomain]
+    ) -> String {
+        let otherId = otherUserId(from: chatId, currentUserId: currentUserId)
+        return usersById[otherId]?.name ?? "User"
+    }
     
     func receiveMessageFromKMP(chatRoomId:String) {
         
@@ -174,14 +253,15 @@ class MessagesViewModel: ObservableObject {
                             onValue: { [weak self] messages in
                                 guard let self = self else { return }
                                 
-                                // Convert KMP → Local model
                                 let mappedMessages: [LocalMessage] = messages.map { message in
+                                    
                                     let senderName =
                                     message.senderId == self.currentUserId
                                     ? "You"
                                     : (self.usersById[message.senderId]?.name ?? "Unknown")
                                     
                                     return LocalMessage(
+                                        id : message.id,
                                         text: message.text,
                                         isMe: message.senderId == self.currentUserId,
                                         time: self.formatTime(from: message.timestamp),
@@ -191,7 +271,15 @@ class MessagesViewModel: ObservableObject {
                                 
                                 // Update UI on MainActor
                                 Task { @MainActor in
-                                    self.messages = mappedMessages
+                                    Task { @MainActor in
+                                        for msg in mappedMessages {
+                                            if !self.messages.contains(where: { $0.id == msg.id }) {
+                                                self.messages.append(msg)
+                                            }
+                                        }
+                                        
+                                        self.messages.sort { $0.id < $1.id }
+                                    }
                                 }
                             },
                             onError: { error in
@@ -228,58 +316,106 @@ class MessagesViewModel: ObservableObject {
     // MARK: - Recent Chats
     
     func fetchRecentChats() {
-        guard !currentUserId.isEmpty else {
-            print("fetchRecentChats called with empty userId\(MBUserDefaults.userIdStatic ?? "")")
-            return
-        }
-        print("fetchRecentChats called for user: \(MBUserDefaults.userIdStatic ?? "")")
-        
-        let chatFlow = chatRepository.getRecentChats(myUserId: currentUserId)
-        recentChatsTask?.cancel()
-        
-        recentChatsTask = Task {
-            do {
-                try await chatFlow.collect(
-                    collector: ChatRoomCollector { [weak self] chatRooms in
-                        guard let self = self else { return }
-                        
-                        print("Collector received chatRooms: \(chatRooms.count)")
-                        chatRooms.enumerated().forEach { index, room in
-                        }
-                        
-                        // Map to Local Swift Chat model
-                        let mappedChats = chatRooms.map { room in
+        Task { @MainActor in
+            
+            if usersById.isEmpty {
+                try? await fetchAllUsers()
+            }
+            
+            isLoading = true
+            guard !currentUserId.isEmpty else {
+                print("fetchRecentChats called with empty userId\(MBUserDefaults.userIdStatic ?? "")")
+                return
+            }
+            print("fetchRecentChats called for user: \(MBUserDefaults.userIdStatic ?? "")")
+            
+            let chatFlow = chatRepository.getRecentChats(myUserId: currentUserId)
+            recentChatsTask?.cancel()
+            
+            recentChatsTask = Task {
+                do {
+                    try await chatFlow.collect(
+                        collector: ChatRoomCollector { [weak self] chatRooms in
+                            guard let self = self else { return }
                             
-                            Chat(
-                                id: room.id ?? "",
-                                name:  room.name ?? "",
-                                lastMessage: room.lastMessage ?? "",
-                                time: room.lastTimestamp > 0 ? self.formatTime(from: room.lastTimestamp) : "",
-                                unreadCount: 0,
-                                isGroup: room.type == "group"
-                            )
+                            print("Collector received chatRooms: \(chatRooms.count)")
+                            chatRooms.enumerated().forEach { index, room in
+                            }
+                            
+                            // Map to Local Swift Chat model
+                            let mappedChats = chatRooms
+                                .sorted { $0.lastTimestamp > $1.lastTimestamp } .map { room in
+                                    
+                                    let isGroup = room.type == "group"
+                                    
+                                    let name: String
+                                    let recipient: String?
+                                    
+                                    if isGroup {
+                                        name = room.name ?? "Group"
+                                        recipient = nil
+                                    } else {
+                                        let otherId = MessagesViewModel.otherUserId(from: room.id, currentUserId: self.currentUserId)
+                                        name = self.usersById[otherId]?.name ?? "User"
+                                        recipient = otherId
+                                    }
+                                    let unread: Int = {
+                                        let rawMap = room.unreadCounts as NSDictionary
+                                        let rawValue = rawMap[self.currentUserId]
+                                        
+                                        if let n = rawValue as? NSNumber {
+                                            return n.intValue
+                                        }
+                                        
+                                        if let k = rawValue as? KotlinLong {
+                                            return Int(k.int64Value)
+                                        }
+                                        
+                                        return 0
+                                    }()
+                                    let memberList: [String] = {
+                                        let rawMap = room.members as NSDictionary
+                                        return rawMap.allKeys.compactMap { $0 as? String }
+                                    }()
+                                    return Chat(
+                                        id: room.id,
+                                        recipientId: recipient,
+                                        name: name,
+                                        lastMessage: room.lastMessage,
+                                        time: room.lastTimestamp > 0 ? self.formatTime(from: room.lastTimestamp) : "",
+                                        unreadCount: unread,
+                                        isGroup: isGroup,
+                                        memberList: memberList,
+                                        rideTitle: room.name,
+                                        rideId: room.id
+                                    )
+                                }
+                            
+                            // Update UI directly on MainActor
+                            Task { @MainActor in
+                                print("Setting recentChats with \(mappedChats.count) items")
+                                self.recentChats = mappedChats
+                                self.isLoading = false
+                            }
                         }
-                        
-                        // Update UI directly on MainActor
-                        Task { @MainActor in
-                            print("Setting recentChats with \(mappedChats.count) items")
-                            self.recentChats = mappedChats
-                        }
+                    )
+                } catch {
+                    print(" Error fetching recent chats:", error)
+                    await MainActor.run {
+                        self.isLoading = false
                     }
-                )
-            } catch {
-                print(" Error fetching recent chats:", error)
+                }
             }
         }
     }
-    
-    func markChatAsRead(chatRoomId: String) {
-        chatRepository.markAsRead(chatRoomId: chatRoomId, myUserId: currentUserId)
         
-        if let index = recentChats.firstIndex(where: { $0.id == chatRoomId }) {
-            recentChats[index].unreadCount = 0
+        func markChatAsRead(chatRoomId: String) {
+            chatRepository.markAsRead(chatRoomId: chatRoomId, myUserId: currentUserId)
+            
+            if let index = recentChats.firstIndex(where: { $0.id == chatRoomId }) {
+                recentChats[index].unreadCount = 0
+            }
         }
-    }
 }
 
 // MARK: - Collectors

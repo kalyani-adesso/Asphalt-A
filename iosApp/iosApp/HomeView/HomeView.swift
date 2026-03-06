@@ -13,6 +13,7 @@ struct ActiveChat {
     let chatType: MessagesViewModel.ChatType
     let memberList: [String]?
     let rideTitle: String?
+    let rideId: String?
 }
 
 struct HomeView: View {
@@ -22,7 +23,7 @@ struct HomeView: View {
     @StateObject var createRideVM = CreateRideViewModel()
     @State private var currentDate = Date()
     @State private var activeChat: ActiveChat? = nil
-    @StateObject private var messagesVM = MessagesViewModel(currentUserId: MBUserDefaults.userIdStatic ?? "", recipientId: "", chatType: .private)
+    @State private var chatVM: MessagesViewModel?
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
@@ -55,16 +56,23 @@ struct HomeView: View {
                                 if !allMembers.contains(ride.createdBy) {
                                     allMembers.append(ride.createdBy)
                                 }
-                                print("members: \(allMembers)")
                                 
                                 await MainActor.run {
                                     withAnimation(.easeInOut) {
+                                        chatVM = MessagesViewModel(
+                                                currentUserId: currentUserID,
+                                                recipientId: ride.createdBy,
+                                                chatType: chatType,
+                                                memberList: members,
+                                                rideTitle: rideTitle,
+                                                rideId: ride.id
+                                            )
                                         activeChat = ActiveChat(
                                             id: ride.id,
                                             name: chatName,
                                             chatType: chatType,
                                             memberList: allMembers,
-                                            rideTitle: rideTitle
+                                            rideTitle: rideTitle, rideId: ride.id
                                         )
                                     }
                                 }
@@ -75,14 +83,21 @@ struct HomeView: View {
                             chatType = .private
                             rideTitle = ride.title
                             chatName = viewModel.usersById[ride.createdBy] ?? "Unknown"
-                            let members = [currentUserID, ride.createdBy]
+                            let members = [currentUserID, ride.createdBy].sorted()
+                            let privateChatId = [currentUserID, ride.createdBy].sorted().joined(separator: "_")
                             withAnimation(.easeInOut) {
+                                chatVM = MessagesViewModel(
+                                        currentUserId: currentUserID,
+                                        recipientId: ride.createdBy,
+                                        chatType: chatType
+                                       
+                                    )
                                 activeChat = ActiveChat(
-                                    id: ride.createdBy,
+                                    id: privateChatId,
                                     name: chatName,
                                     chatType: chatType,
                                     memberList: members,
-                                    rideTitle: rideTitle
+                                    rideTitle: rideTitle, rideId: ride.id
                                 )
                             }
                         }
@@ -94,11 +109,8 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading ...")
-            }
-            if activeChat != nil {
-                chatOverlay(chat: activeChat!)
+            if let chat = activeChat, let vm = chatVM {
+                chatOverlay(chat: chat, viewModel: vm)
             }
         }
         .task {
@@ -119,8 +131,8 @@ struct HomeView: View {
             await viewModel.fetchAllUsers()
         }
     }
-    private func chatOverlay(chat: ActiveChat) -> some View {
-        ZStack {
+    private func chatOverlay(chat: ActiveChat, viewModel: MessagesViewModel) -> some View {
+        return ZStack {
             Color.black.opacity(0.45)
                 .ignoresSafeArea()
                 .onTapGesture {
@@ -173,10 +185,13 @@ struct HomeView: View {
                 .padding(.vertical, 12)
                 .background(AppColor.celticBlue)
                 ChatDetailView(
-                    viewModel: messagesVM, chatName: chat.name,
-                    isGroup: false,
-                    isOverlay: true
+                    viewModel: viewModel, chatName: chat.name,
+                    isGroup: chat.chatType == .group,
+                    isOverlay: true, chatId: chat.id
                 )
+                .onAppear {
+                    viewModel.receiveMessageFromKMP(chatRoomId: chat.id)
+                }
             }
             .frame(
                 width: UIScreen.main.bounds.width - 32,
