@@ -11,6 +11,8 @@ struct RideDetailsView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @Binding var ride:RideModel
     @State private var deleteRide = false
+    @State private var activeChat: ActiveChat? = nil
+    @State private var chatVM: MessagesViewModel?
     var body: some View {
         AppToolBar(showBack: true){
         ZStack {
@@ -33,7 +35,7 @@ struct RideDetailsView: View {
                                 }
                                 Spacer()
                                 Button(action: {
-                                    
+                                    openChat()
                                 }) {
                                     AppIcon.UpcomingRide.message
                                         .resizable()
@@ -155,6 +157,14 @@ struct RideDetailsView: View {
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
+            if let chat = activeChat, let vm = chatVM {
+                ChatOverlayView(
+                    chat: chat,
+                    viewModel: vm
+                ) {
+                    activeChat = nil
+                }
+            }
         }
         
         var declinedCount:Int  {
@@ -194,6 +204,69 @@ struct RideDetailsView: View {
             AppIcon.UpcomingRide.queueRide
         } else {
             AppIcon.UpcomingRide.completRide
+        }
+    }
+    func openChat() {
+        let currentUserID = MBUserDefaults.userIdStatic ?? ""
+
+        var chatType: MessagesViewModel.ChatType
+        var chatName: String
+        var rideTitle: String? = nil
+
+        if ride.createdBy == currentUserID {
+            // GROUP CHAT
+            chatType = .group
+            rideTitle = ride.title
+            chatName = ride.title
+
+            let members = (ride.participants ?? []).map { $0.userId }
+            var allMembers = members
+
+            if !allMembers.contains(ride.createdBy) {
+                allMembers.append(ride.createdBy)
+            }
+
+            chatVM = MessagesViewModel(
+                currentUserId: currentUserID,
+                recipientId: ride.createdBy,
+                chatType: chatType,
+                memberList: members,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
+
+            activeChat = ActiveChat(
+                id: ride.id,
+                name: chatName,
+                chatType: chatType,
+                memberList: allMembers,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
+
+        } else {
+            // PRIVATE CHAT
+            chatType = .private
+            rideTitle = ride.title
+            chatName = viewModel.usersById[ride.createdBy] ?? "Unknown"
+
+            let members = [currentUserID, ride.createdBy].sorted()
+            let privateChatId = members.joined(separator: "_")
+
+            chatVM = MessagesViewModel(
+                currentUserId: currentUserID,
+                recipientId: ride.createdBy,
+                chatType: chatType
+            )
+
+            activeChat = ActiveChat(
+                id: privateChatId,
+                name: chatName,
+                chatType: chatType,
+                memberList: members,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
         }
     }
 }

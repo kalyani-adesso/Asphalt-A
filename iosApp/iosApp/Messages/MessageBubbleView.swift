@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct MessageBubbleView: View {
-    let message: Message
+    let message: LocalMessage
     let isGroup: Bool
     
     var body: some View {
@@ -65,6 +65,3 @@ struct MessageBubbleView: View {
         .padding(.vertical, 4)
     }
 }
-
-
-

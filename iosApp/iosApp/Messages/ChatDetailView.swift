@@ -4,57 +4,64 @@
 //
 //  Created by Lavanya Selvan on 15/12/25.
 //
-
 import SwiftUI
 
 struct ChatDetailView: View {
 
-    let chatName: String
-    let isGroup: Bool
-
-    @State private var messageText = ""
+    @ObservedObject var viewModel: MessagesViewModel
+       let chatName: String
+       let isGroup: Bool
+       let isOverlay: Bool
+    let chatId: String
+    
     @State private var showNotification = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var homeViewModel: HomeViewModel
-    let isOverlay: Bool
-
-    let messages: [Message] = [
-        Message(text: "Hey! Looking forward to the ride!", isMe: false, time: "10:30 AM", senderName: "Sooraj"),
-        Message(text: "Same here! It's going to be amazing!", isMe: true, time: "10:32 AM", senderName: nil),
-        Message(text: "Will catch you there.", isMe: false, time: "10:38 AM", senderName: "Vyshnav")
-    ]
 
     var body: some View {
         VStack {
             if !isOverlay {
                     ChatHeaderView(chatName: chatName)
                 }
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(messages) { message in
-                        MessageBubbleView(message: message,isGroup: isGroup)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(viewModel.messages) { message in
+                            MessageBubbleView(message: message, isGroup: isGroup)
+                                .id(message.id)
+                        }
+                    }
+                    .padding()
+                }
+                .onAppear {
+                    if let last = viewModel.messages.last {
+                        proxy.scrollTo(last.id, anchor: .bottom)
                     }
                 }
-                .padding()
+                .onChange(of: viewModel.messages.count) { _ in
+                    if let last = viewModel.messages.last {
+                        withAnimation {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
+                    }
+                }
             }
-
             Divider()
 
             HStack {
-                TextField("Type a message...", text: $messageText)
+                TextField("Type a message...", text:  $viewModel.messageText)
                     .padding(15)
                     .background(AppColor.white)
                     .font(KlavikaFont.regular.font(size: 14))
                     .foregroundColor(
-                            messageText.isEmpty
+                        viewModel.messageText.isEmpty
                             ? AppColor.grey
                             : AppColor.black
                         )
                     .cornerRadius(15)
-                    .tint(AppColor.black) 
+                    .tint(AppColor.black)
                     .overlay(
                         RoundedRectangle(cornerRadius: 15)
                             .stroke(AppColor.celticBlue, lineWidth: 1)
@@ -62,7 +69,7 @@ struct ChatDetailView: View {
                     .frame(width: 292, height: 45)
 
                 Button {
-                    messageText = ""
+                    viewModel.sendMessage()
                 } label: {
                     AppIcon.Chat.send
                         .padding(12)
@@ -71,7 +78,7 @@ struct ChatDetailView: View {
                 }
             }
             .padding()
-            .opacity(messageText.isEmpty ? 0.4 : 1)
+            .opacity(viewModel.messageText.isEmpty ? 0.4 : 1)
         }
         .if (!isOverlay) { view in
             view
@@ -108,7 +115,6 @@ struct ChatDetailView: View {
                     }
                     
                 }
-            
                 .navigationDestination(isPresented: $showSlideBar, destination: {
                     NavigationSlideBar()
                 })
@@ -132,9 +138,3 @@ extension View {
         }
     }
 }
-
-
-
-
-
-

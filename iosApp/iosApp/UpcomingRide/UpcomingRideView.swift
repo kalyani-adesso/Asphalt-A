@@ -31,6 +31,8 @@ struct UpcomingRideView: View {
     @State private var selectedRideForPhotos: RideModel?
     @State private var showDeepLinkRideDetail = false
     @State private var deepLinkRide: RideModel?
+    @State private var activeChat: ActiveChat? = nil
+    @State private var chatVM: MessagesViewModel?
     
     var body: some View {
         ZStack{
@@ -71,18 +73,18 @@ struct UpcomingRideView: View {
                 .contentShape(Rectangle())
                 VStack {
                     List {
-                        let filtered = viewModel.rides.filter { $0.rideAction == viewModel.selectedTab }
-                        
-                        if filtered.isEmpty {
+
+                        let filteredIndices = viewModel.rides.indices.filter {
+                            viewModel.rides[$0].rideAction == viewModel.selectedTab
+                        }
+
+                        if filteredIndices.isEmpty {
                             Text("No rides found")
                                 .font(KlavikaFont.bold.font(size: 16))
                                 .foregroundColor(AppColor.stoneGray)
-                        }
-                        else{
-                            
-                            ForEach($viewModel.rides.indices.filter { index in
-                                viewModel.rides[index].rideAction.rawValue == viewModel.selectedTab.rawValue
-                            }, id: \.self) { index in
+                        } else {
+
+                            ForEach(filteredIndices, id: \.self) { index in
                                 UpComingView(
                                     viewModel: viewModel,
                                     ride: $viewModel.rides[index],
@@ -91,11 +93,16 @@ struct UpcomingRideView: View {
                                         selectedImages = []
                                         withAnimation(.easeInOut) { activePopup = .uploadOptions }
                                     },
+                                    onMessageTap: { ride in
+                                        openChatForRide(ride)
+                                    },
                                     showPhotosViewer: $showPhotosViewer,
                                     selectedRideForPhotos: $selectedRideForPhotos
                                 )
                                 .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                .listRowInsets(
+                                    EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
+                                )
                             }
                         }
                     }
@@ -166,6 +173,15 @@ struct UpcomingRideView: View {
                 .transition(.scale)
                 .zIndex(2)
             }
+            if let chat = activeChat, let vm = chatVM {
+                ChatOverlayView(
+                    chat: chat,
+                    viewModel: vm
+                ) {
+                    activeChat = nil
+                }
+            }
+            
         }
         .overlay {
             if activePopup != nil {
@@ -257,6 +273,7 @@ struct UpcomingRideView: View {
         .navigationDestination(isPresented: $showNotification, destination: {
             NotificationView()
         })
+        
     }
     
     private func handleUpload(selectedImages:[UIImage]) {
@@ -276,80 +293,91 @@ struct UpcomingRideView: View {
         }
         
     }
-}
+    private func openChatForRide(_ ride: RideModel) {
 
-struct SegmentButtonView: View {
-    var rideStatus: String
-    var isSelected: Bool = false
-    var showNotificationDot: Bool = false
-    var onTap: (() -> Void)? = nil
-    var body: some View {
-        ZStack(alignment: .topTrailing){
-            Button(action: {
-                onTap?()
-            }) {
-                Text(rideStatus)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(
-                        Group {
-                            if isSelected {
-                                LinearGradient(
-                                    gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            } else {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(AppColor.white)
-                            }
-                        }
-                    )
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                    )
-                    .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
-                            radius: isSelected ? 4 : 0,
-                            x: 0, y: isSelected ? 2 : 0)
-                    .foregroundColor(isSelected ? AppColor.white : .black)
-                    .font(KlavikaFont.bold.font(size: 16))
+        let currentUserID = MBUserDefaults.userIdStatic ?? ""
+
+        var chatType: MessagesViewModel.ChatType
+        var chatName: String
+        var rideTitle: String? = nil
+
+        if ride.createdBy == currentUserID {
+
+            chatType = .group
+            rideTitle = ride.title
+            chatName = ride.title
+
+            let members = (ride.participants ?? []).map { $0.userId }
+            var allMembers = members
+
+            if !allMembers.contains(ride.createdBy) {
+                allMembers.append(ride.createdBy)
             }
-            .buttonStyle(.plain)
-            if showNotificationDot {
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 19, height: 19)
-                        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
-                    
-                    // Inner blue circle
-                    Circle()
-                        .fill(AppColor.celticBlue)
-                        .frame(width: 12, height: 12)
-                }
-                .offset(x: 8, y: -7)
-            }
-            
+
+            chatVM = MessagesViewModel(
+                currentUserId: currentUserID,
+                recipientId: ride.createdBy,
+                chatType: chatType,
+                memberList: members,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
+
+            activeChat = ActiveChat(
+                id: ride.id,
+                name: chatName,
+                chatType: chatType,
+                memberList: allMembers,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
+
+        } else {
+
+            chatType = .private
+            rideTitle = ride.title
+            chatName = viewModel.usersById[ride.createdBy] ?? "Unknown"
+
+            let members = [currentUserID, ride.createdBy].sorted()
+            let privateChatId = members.joined(separator: "_")
+
+            chatVM = MessagesViewModel(
+                currentUserId: currentUserID,
+                recipientId: ride.createdBy,
+                chatType: chatType
+            )
+
+            activeChat = ActiveChat(
+                id: privateChatId,
+                name: chatName,
+                chatType: chatType,
+                memberList: members,
+                rideTitle: rideTitle,
+                rideId: ride.id
+            )
         }
     }
 }
 
+
 struct UpComingView: View {
     @ObservedObject var viewModel: UpcomingRideViewModel
     @ObservedObject var connectedViewModel = ConnectedRideViewModel()
-    @Binding var ride:RideModel
+
+    @Binding var ride: RideModel
+
+    var onAddPhotos: ((String) -> Void)? = nil
+    var onMessageTap: ((RideModel) -> Void)? = nil
+
+    @Binding var showPhotosViewer: Bool
+    @Binding var selectedRideForPhotos: RideModel?
+
     @State private var showUploadPopup = false
     @State private var showSelectedPopup = false
     @State private var selectedImages: [UIImage] = []
     @State private var openGallery = false
     @State private var showRideDetails: Bool = false
-    var onAddPhotos: ((String) -> Void)? = nil
     @State private var userRating: Int = 0
-    @Binding var showPhotosViewer: Bool
-    @Binding var selectedRideForPhotos: RideModel?
     var body: some View {
         ZStack{
             VStack(alignment: .leading, spacing: 22) {
@@ -369,7 +397,7 @@ struct UpComingView: View {
                     Spacer()
                     if ride.rideAction == .invities {
                         Button(action: {
-                            
+                            onMessageTap?(ride)
                         }) {
                             AppIcon.UpcomingRide.message
                                 .resizable()
@@ -645,6 +673,65 @@ struct UpComingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(rideColor)
             )
+    }
+}
+
+struct SegmentButtonView: View {
+    var rideStatus: String
+    var isSelected: Bool = false
+    var showNotificationDot: Bool = false
+    var onTap: (() -> Void)? = nil
+    var body: some View {
+        ZStack(alignment: .topTrailing){
+            Button(action: {
+                onTap?()
+            }) {
+                Text(rideStatus)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        Group {
+                            if isSelected {
+                                LinearGradient(
+                                    gradient: Gradient(colors: [AppColor.royalBlue, AppColor.pursianBlue]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            } else {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(AppColor.white)
+                            }
+                        }
+                    )
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+                    .shadow(color: isSelected ? Color.black.opacity(0.2) : .clear,
+                            radius: isSelected ? 4 : 0,
+                            x: 0, y: isSelected ? 2 : 0)
+                    .foregroundColor(isSelected ? AppColor.white : .black)
+                    .font(KlavikaFont.bold.font(size: 16))
+            }
+            .buttonStyle(.plain)
+            if showNotificationDot {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 19, height: 19)
+                        .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
+                    
+                    // Inner blue circle
+                    Circle()
+                        .fill(AppColor.celticBlue)
+                        .frame(width: 12, height: 12)
+                }
+                .offset(x: 8, y: -7)
+            }
+            
+        }
     }
 }
 
