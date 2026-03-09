@@ -31,12 +31,22 @@ fun List<RidesData>.toRideInviteListDomain(userID: String): List<RideInvitesDoma
             ridesData.startDate?.let {
                 if (it > Clock.System.now().toEpochMilliseconds()) {
                     val organiser = ridesData.isOrganiser(userID)
-                    if (ridesData.isUserInvited(userID) || organiser) ridesData.toRideInvitesDomain(
-                        organiser
-                    ) else null
+                    if (organiser && ridesData.isRideEndedByOrganiser()) {
+                        null
+                    } else
+                        if (ridesData.isUserInvited(userID) || organiser) ridesData.toRideInvitesDomain(
+                            organiser
+                        ) else null
                 } else null
             }
         }.sortedBy { it.startDateTime }
+    }
+}
+
+fun RidesData.isRideEndedByOrganiser(): Boolean {
+    return with(this) {
+        rideStatus == APIConstants.END_RIDE
+
     }
 }
 
@@ -55,7 +65,7 @@ private fun RidesData.toRideInvitesDomain(organiser: Boolean): RideInvitesDomain
             },
             isOrganiser = organiser,
             rideTitle = this.rideTitle.orEmpty(),
-            allParticipants = participants.map { it.userId }.plus( this.createdBy.orEmpty()),
+            allParticipants = participants.map { it.userId }.plus(this.createdBy.orEmpty()),
             rideType = rideType.orEmpty()
         )
     }

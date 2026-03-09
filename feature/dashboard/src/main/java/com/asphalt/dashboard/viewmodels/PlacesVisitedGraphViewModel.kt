@@ -43,9 +43,9 @@ class PlacesVisitedGraphViewModel : ViewModel() {
 
     fun setArrowDisabledOrEnabled(inputCalendar: Calendar) {
         val current = Calendar.getInstance()
-        inputCalendar.get(Calendar.YEAR) < current.get(Calendar.YEAR) ||
+        (inputCalendar.get(Calendar.YEAR) < current.get(Calendar.YEAR) ||
                 (inputCalendar.get(Calendar.YEAR) == current.get(Calendar.YEAR) &&
-                        inputCalendar.get(Calendar.MONTH) < current.get(Calendar.MONTH)).also {
+                        inputCalendar.get(Calendar.MONTH) < current.get(Calendar.MONTH))).also {
                     _isArrowEnabled.value = it
                 }
 

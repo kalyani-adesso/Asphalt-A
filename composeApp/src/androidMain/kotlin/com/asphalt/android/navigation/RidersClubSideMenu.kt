@@ -106,7 +106,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                         },
                         label = { Text("Marketplace", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = { itemClick.invoke(Constants.MARKET_PLACE_CLICK) }
+                        onClick = {
+//                            itemClick.invoke(Constants.MARKET_PLACE_CLICK)
+                        }
                     )
                     NavigationDrawerItem(
                         icon = {

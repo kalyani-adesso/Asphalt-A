@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -77,6 +78,7 @@ fun AnswerToQuery(
     queryList: List<Query>
 ) {
     val answerToQuery = queriesVM.answerToQuery.collectAsStateWithLifecycle()
+    val currentUser by queriesVM.currentUser.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -278,7 +280,7 @@ fun AnswerToQuery(
                         ) {
 
                             CircularNetworkImage(
-                                imageUrl = queriesVM.getCurrentUserData()?.profilePic?:"",
+                                imageUrl = currentUser?.profilePic?:"",
                                 size = Dimensions.size52,
                                 placeholderPainter = painterResource(R.drawable.profile_placeholder)
                             )

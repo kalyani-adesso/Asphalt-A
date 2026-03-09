@@ -43,8 +43,8 @@ class NotificationViewModel : ViewModel() {
             date = "1 hour ago",
             notificationType = Constants.RIDER_JOINED
         )
-        notifcations.add(notification1)
-        notifcations.add(notification2)
+//        notifcations.add(notification1)
+//        notifcations.add(notification2)
         delay(200)
         return notifcations;
 

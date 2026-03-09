@@ -149,7 +149,7 @@ fun JoinRide(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "No Riders Found", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.no_data), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             // display riders list
@@ -340,8 +340,9 @@ fun RiderCard(
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
+                        val (participantCount, totalCount) = viewModel.getParticipantCounts(ridesData)
                         Text(
-                            text = "0/8 Riders",
+                            text = "${totalCount}/${participantCount} Riders",
                             style = Typography.titleMedium,
                             fontSize = Dimensions.textSize12
                         )
