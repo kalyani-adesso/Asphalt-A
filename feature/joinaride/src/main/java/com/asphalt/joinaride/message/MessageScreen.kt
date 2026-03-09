@@ -1,5 +1,6 @@
 package com.asphalt.joinaride.message
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -54,14 +57,23 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.joinaride.viewmodel.MessageViewModel
+import io.ktor.util.collections.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MessageScreenUI(
     onCancel: () -> Unit,
     onSend: () -> Unit,
-    viewModel: MessageViewModel = koinViewModel()
+    viewModel: MessageViewModel = koinViewModel(),
+    androidUserVM: AndroidUserVM = koinViewModel(),
+
 ) {
+
+    val message by remember { viewModel::customMessage }
+    val currentUid = remember { viewModel.currentUid }
+    val currentUser = remember { viewModel.currentUser }
+
+    Log.d("TAG", "MessageScreenUI: $currentUid + $currentUser")
 
     Dialog(
         onDismissRequest = { onCancel() },
@@ -92,11 +104,11 @@ fun MessageScreenUI(
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.padding13))
 
                     Column {
                         Text(
-                            text = "Aromal",
+                            text = "Aromal",// receiver name
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -107,7 +119,7 @@ fun MessageScreenUI(
                                     .clip(CircleShape)
                                     .background(Color(0xFF00C853))
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Spacer(modifier = Modifier.width(Dimensions.padding6))
                             Text(
                                 text = "Connected",
                                 color = Color.Gray,
@@ -162,7 +174,7 @@ fun MessageScreenUI(
                                 color = Color.Gray
                             )
                         }
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.padding13))
 
                         Text(
                             text = "Fuel Stop...",
@@ -174,20 +186,28 @@ fun MessageScreenUI(
                 // Quick Messages Title
                 Text(
                     text = "Quick Messages",
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                 )
                 Spacer(modifier = Modifier.height(Dimensions.padding8))
                 // Quick Message Buttons
                 Column(verticalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
 
                     Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
-                        QuickMessageButton("All good!", Modifier.weight(1f), onClick = {})
-                        QuickMessageButton("Taking a break", Modifier.weight(1f), onClick = {})
+                        QuickMessageButton("All good!",
+                            Modifier.weight(1f), onClick = {
+                                viewModel.onQuickMessageClick("All good!")
+                            })
+                        QuickMessageButton("Taking a break", Modifier.weight(1f), onClick = {
+                            viewModel.onQuickMessageClick("Taking a break")
+                        })
                     }
-
                     Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding)) {
-                        QuickMessageButton("Fuel stop", Modifier.weight(1f), onClick = {})
-                        QuickMessageButton("Road issues", Modifier.weight(1f), onClick = {})
+                        QuickMessageButton("Fuel stop", Modifier.weight(1f), onClick = {
+                            viewModel.onQuickMessageClick("Fuel stop")
+                        })
+                        QuickMessageButton("Road issues", Modifier.weight(1f), onClick = {
+                            viewModel.onQuickMessageClick("Road issues")
+                        })
                     }
                 }
                 Spacer(modifier = Modifier.height(Dimensions.padding24))
@@ -199,8 +219,8 @@ fun MessageScreenUI(
                 Spacer(modifier = Modifier.height(Dimensions.padding8))
 
                 OutlinedTextField(
-                    value = "Fuel Stop..",
-                    onValueChange = {},
+                    value = message,
+                    onValueChange = {viewModel.onCustomMessageChange(it)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp),
@@ -209,7 +229,7 @@ fun MessageScreenUI(
                 Spacer(modifier = Modifier.height(Dimensions.padding24))
                 // Buttons Row
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.padding),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedButton(
@@ -217,28 +237,35 @@ fun MessageScreenUI(
                         modifier = Modifier
                             .weight(1f)
                             .height(55.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(Dimensions.padding8)
                     ) {
                         Text(
                             text = "CANCEL",
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Button(
-                        onClick = { onSend()
-                                  viewModel.sendMessage("111","kalyani","123", "Aaryan","111",true)},
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(55.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3B6CB7)
-                        )
+                    GradientButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            viewModel.sendMessage(senderID = currentUid?: "", senderName = currentUser?:"",
+                                receiverID = "", receiverName = "", onGoingRideID = "", isRideOnGoing = true,
+                                message = viewModel.customMessage)
+                        },
+                        buttonHeight = Dimensions.size60,
+                        contentPadding = PaddingValues(Dimensions.size2)
                     ) {
-                        Text(
-                            text = "SEND REPLY",
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                stringResource(R.string.send_reply).uppercase(),
+                                color = NeutralWhite,
+                                style = TypographyBold.titleMedium,
+                                fontSize = Dimensions.textSize16,
+                                modifier = Modifier.padding(start = Dimensions.padding8),
+                            )
+                        }
                     }
                 }
             }

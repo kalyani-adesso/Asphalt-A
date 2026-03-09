@@ -6,68 +6,66 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.model.chat.Message
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.repository.rides.RidesRepository
+import com.asphalt.android.viewmodels.AndroidUserVM
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.FirebaseDatabase.getInstance
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import kotlin.getValue
 
-class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel() {
+class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel(), KoinComponent {
 
-    private val database = FirebaseDatabase.getInstance()
+    val androidUserVM: AndroidUserVM by inject()
     private val messageRef = getInstance().getReference("messages")
 
+    val currentUid: String?
+        get() = androidUserVM.userState.value?.uid
+
+    val currentUser: String?
+        get() = androidUserVM.userState.value?.name
 
     var customMessage by mutableStateOf("")
         private set
 
     var isSending by mutableStateOf(false)
-        private set
-
-
-
-    fun onMessageChange(message: String) {
-        customMessage = message
-    }
-
-    fun clearMessage() {
-        customMessage = ""
-    }
 
     private val _uiState = MutableStateFlow(MessageRoot())
     val uiState: StateFlow<MessageRoot> = _uiState.asStateFlow()
 
     fun onQuickMessageClick(message: String) {
-        _uiState.update {
-            it.copy(message = message)
-        }
+        customMessage = message
     }
 
     fun onCustomMessageChange(message: String) {
-        _uiState.update {
-            it.copy(message = message)
-        }
+        customMessage = message
     }
+
     fun sendMessage(
-        senderID: String,
-        senderName: String,
-        receiverID: String,
-        receiverName: String,
-        onGoingRideID: String,
-        isRideOnGoing: Boolean
+        senderID: String, // current user id
+        senderName: String, // current user name
+        receiverID: String, // riderId who joined
+        receiverName: String, // ridername
+        onGoingRideID: String, // ongoingRideId
+        isRideOnGoing: Boolean, // true
+        message: String
     ) {
 
-        val text = _uiState.value.message
-        if (text!!.isBlank()) return
+
+        if (message.isBlank()) return
 
         viewModelScope.launch {
-
-            //_uiState.update { it.copy(isLoading = true) }
 
             val messageId = messageRef.push().key ?: return@launch
 
@@ -76,32 +74,56 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
                 senderName = senderName,
                 receiverID = receiverID,
                 receiverName = receiverName,
-                message = text,
+                message = message,
                 onGoingRideID = onGoingRideID,
                 timeStamp = System.currentTimeMillis(),
-                isRideOnGoing = true
+                isRideOnGoing = isRideOnGoing
             )
+            // save to firebase
             messageRef
                 .child(messageId)
                 .setValue(messageRoot)
                 .await()
 
+            // api called
+            ridesRepository.sendMessage(messageRoot)
+            // clear input
             customMessage = ""
 
-            try {
-                // API call
-                ridesRepository.sendMessage(messageRoot)
-                // Update header message
-                _uiState.update {
-                    it.copy(
-                        message = text,
-                        senderID = "",
-                    )
-                }
-
-            } catch (e: Exception) {
-                Log.d("TAGGGGG", "sendMessage: ${e.localizedMessage}")
+            _uiState.update {
+                it.copy(
+                    message = "",
+                    senderID = senderID,
+                )
             }
         }
+    }
+
+    private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    val messages: StateFlow<List<Message>> = _messages
+
+
+    init {
+        listenForMessages()
+    }
+    // listen for message
+    private fun listenForMessages() {
+
+        messageRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val list = mutableListOf<Message>()
+
+                for (child in snapshot.children) {
+                    val message = child.getValue(Message::class.java)
+                    message?.let { list.add(it) }
+                }
+
+                _messages.value = list
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 }

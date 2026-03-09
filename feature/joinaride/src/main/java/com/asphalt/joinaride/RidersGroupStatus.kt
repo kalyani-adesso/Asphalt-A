@@ -31,6 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,7 +67,9 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.util.PhoneCallUtils
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.joinaride.message.MessageScreenUI
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
+import com.asphalt.joinaride.viewmodel.MessageViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -75,6 +80,7 @@ fun RidersGroupStatus(
     ) {
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
+
 
 //    val rideUsers by viewModel.rideUsers.collectAsState()
 
@@ -149,11 +155,20 @@ fun GroupRidersCard(
 //    ridersList: List<ConnectedRideDTO>,
     riderData: ConnectedRideDTO?,
     viewModel: JoinRideViewModel = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel()
+    androidUserVM: AndroidUserVM = koinViewModel(),
 ) {
 
     val currentUser = androidUserVM.userState.collectAsState(null)
     val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        MessageScreenUI(
+            onSend = {},
+            onCancel = { showDialog = false }
+        )
+    }
 
     Card(
         modifier = Modifier
@@ -351,7 +366,11 @@ fun GroupRidersCard(
                             modifier = Modifier
                                 .clickable {
                                     // onDeleteBike.invoke()
+                                    Log.d("TAG", "GroupRidersCard: button clicked")
+                                    showDialog = true
+
                                 }
+
                         ) {
                             ColorIconRounded(
                                 backColor = PrimaryBrighterLightW75,

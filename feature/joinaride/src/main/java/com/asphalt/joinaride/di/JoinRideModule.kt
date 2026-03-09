@@ -7,6 +7,7 @@ import com.asphalt.android.viewmodel.joinridevm.RidersGroupViewModel
 import com.asphalt.android.viewmodel.joinridevm.RidesDifficultyViewModel
 import com.asphalt.joinaride.repository.IdRepository
 import com.asphalt.joinaride.viewmodel.JoinRideMapViewModel
+import com.asphalt.joinaride.viewmodel.MessageViewModel
 import com.asphalt.joinaride.viewmodel.RatingViewModel
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModel
@@ -20,4 +21,5 @@ val joinRideModule = module {
     viewModel { RidersGroupViewModel(get()) }
     single { JoinRideRepository(get()) }
     single { RidersGroupRepo() }
+    viewModel { MessageViewModel(get()) }
 }
