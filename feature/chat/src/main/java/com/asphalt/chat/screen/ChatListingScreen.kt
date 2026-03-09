@@ -355,9 +355,18 @@ fun ChatList(
                                     painter = if (chatRoom.isFavorite)
                                         painterResource(R.drawable.ic_favorite_golden) else
                                         painterResource(R.drawable.ic_favorite_icon_gray),
-                                    contentDescription = "", modifier = Modifier.clickable{
-                                        viewModel.updateFavorite(!chatRoom.isFavorite,chatRoom.id)
-                                    }
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .width(Dimensions.size20)
+                                        .height(
+                                            Dimensions.size20
+                                        )
+                                        .clickable {
+                                            viewModel.updateFavorite(
+                                                !chatRoom.isFavorite,
+                                                chatRoom.id
+                                            )
+                                        }
                                 )
                                 Spacer(modifier = Modifier.width(Dimensions.size10))
 
