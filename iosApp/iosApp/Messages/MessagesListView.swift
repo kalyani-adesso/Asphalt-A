@@ -167,6 +167,9 @@ struct MessagesListView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 20)
                         }
+                        .refreshable {
+                            await refreshChats()
+                        }
                         
                         .background(
                             RoundedRectangle(cornerRadius: 10)
@@ -183,6 +186,18 @@ struct MessagesListView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
+        }
+    }
+    private func refreshChats() async {
+        await MainActor.run {
+            viewModel.isLoading = true
+        }
+
+        try? await viewModel.fetchAllUsers()
+
+        await MainActor.run {
+            viewModel.fetchRecentChats()
+            viewModel.isLoading = false
         }
     }
 }

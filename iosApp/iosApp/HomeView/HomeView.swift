@@ -110,7 +110,12 @@ struct HomeView: View {
                 .padding()
             }
             if let chat = activeChat, let vm = chatVM {
-                chatOverlay(chat: chat, viewModel: vm)
+                ChatOverlayView(
+                    chat: chat,
+                    viewModel: vm
+                ) {
+                    activeChat = nil
+                }
             }
         }
         .task {
@@ -129,78 +134,6 @@ struct HomeView: View {
         .refreshable {
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
-        }
-    }
-    private func chatOverlay(chat: ActiveChat, viewModel: MessagesViewModel) -> some View {
-        return ZStack {
-            Color.black.opacity(0.45)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation(.easeInOut) {
-                        activeChat = nil
-                    }
-                }
-            
-            VStack(spacing: 0) {
-                HStack(spacing: 12) {
-                    
-                    ZStack(alignment: .bottomTrailing) {
-                        AppImage.Profile.profile.resizable()
-                            .frame(width: 37, height: 37)
-                            .clipShape(Circle())
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 32.5)
-                                    .stroke(AppColor.green, lineWidth: 2.5)
-                            )
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 13, height: 13)
-                            .offset(x: 2, y: 2)
-                            .overlay(
-                                Circle()
-                                    .offset(x: 2, y: 2)
-                                    .stroke(Color.white, lineWidth: 1.5)
-                            )
-                    }
-                    
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(chat.name)
-                            .font(KlavikaFont.bold.font(size: 16))
-                            .foregroundColor(AppColor.white)
-                    }
-                    
-                    Spacer()
-                    Button {
-                        withAnimation(.easeInOut) {
-                            activeChat = nil
-                        }
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.white)
-                            .padding(8)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(AppColor.celticBlue)
-                ChatDetailView(
-                    viewModel: viewModel, chatName: chat.name,
-                    isGroup: chat.chatType == .group,
-                    isOverlay: true, chatId: chat.id
-                )
-                .onAppear {
-                    viewModel.receiveMessageFromKMP(chatRoomId: chat.id)
-                }
-            }
-            .frame(
-                width: UIScreen.main.bounds.width - 32,
-                height: UIScreen.main.bounds.height * 0.6
-            )
-            .background(AppColor.backgroundLight)
-            .cornerRadius(22)
-            .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 8)
-            .transition(.scale.combined(with: .opacity))
         }
     }
     
