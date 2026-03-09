@@ -61,7 +61,7 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
                 /*fullList.filter {
                     it.members[currentUid] == true
                 }*/
-                fullList
+                fullList.filter { it.isFavorite }
             }
 
             else -> fullList
@@ -98,6 +98,17 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
             }
         }
 
+    }
+
+    fun updateFavorite(flag: Boolean, chatID: String) {
+        _chatListModel.value = _chatListModel.value.map { chatRoom ->
+            if (chatRoom.id == chatID) {
+                chatRoom.copy(isFavorite = flag)
+            } else {
+                chatRoom
+            }
+        }
+        applyTabFilter()
     }
 
 }
