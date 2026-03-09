@@ -17,6 +17,7 @@ struct BottomNavBar: View {
     @StateObject var createRideVM = CreateRideViewModel()
     @State private var rideJoined : Bool = false
     @State var showHome : Bool = false
+    @State private var pendingDeepLinkRideId: String? = nil
     var body: some View {
         NavigationStack {
             ZStack {
@@ -31,7 +32,8 @@ struct BottomNavBar: View {
                                         title: AppStrings.ConnectedRide.startRideTitle,
                                         subTitle: AppStrings.ConnectedRide.startRideSubtitle,
                                         model: ride,
-                                        rideCompleteModel: []
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
                                     )
                                 }
                             } else {
@@ -41,7 +43,7 @@ struct BottomNavBar: View {
                             }
                            
                         case 1:
-                            UpcomingRideView(viewModel: upcomingRideViewModel, showpopup: false , navigationDone: false)
+                            UpcomingRideView(viewModel: upcomingRideViewModel, showpopup: false , navigationDone: false, rideIdToOpen: $pendingDeepLinkRideId)
                             
                         case 2:
                             QueriesView()
@@ -56,7 +58,8 @@ struct BottomNavBar: View {
                                         title: AppStrings.ConnectedRide.startRideTitle,
                                         subTitle: AppStrings.ConnectedRide.startRideSubtitle,
                                         model: ride,
-                                        rideCompleteModel: []
+                                        rideCompleteModel: [],
+                                        onBackToHome: { showHome = true }
                                     )
                                 }
                             } else {
@@ -86,6 +89,14 @@ struct BottomNavBar: View {
                     )
                 }
                 .ignoresSafeArea(edges: .bottom)
+                
+                .onAppear {
+                    if let id = MBUserDefaults.deepLinkRideIdStatic {
+                        pendingDeepLinkRideId = id
+                        selectedTab = 1
+                        MBUserDefaults.deepLinkRideIdStatic = nil
+                    }
+                }
                 
                 .toolbar {
         
@@ -135,10 +146,16 @@ struct BottomNavBar: View {
         .task {
             await createRideVM.getActiveJoinedRide()
             await MainActor.run {
-                if (createRideVM.activeRide?.rideJoined ?? false) {
-                    rideJoined = true
-                } else {
-                    rideJoined = false
+                rideJoined = createRideVM.activeRide?.rideJoined ?? false
+            }
+        }
+        .onChange(of: selectedTab) { newTab in
+            if newTab == 0 {
+                Task {
+                    await createRideVM.getActiveJoinedRide()
+                    await MainActor.run {
+                        rideJoined = createRideVM.activeRide?.rideJoined ?? false
+                    }
                 }
             }
         }

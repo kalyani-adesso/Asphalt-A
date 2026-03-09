@@ -70,7 +70,13 @@ final class NavigationSliderViewModel: ObservableObject {
         sections = [
             MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.black, title: AppStrings.NavigationSlider.connectedRide, destination: connectedRideDestination),
             MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.black, title: AppStrings.NavigationSlider.marketplace, destination: AnyView(HomeView())),
-            MenuItemModel(icon: AppIcon.NavigationSlider.message, iconColor: AppColor.black, title: AppStrings.NavigationSlider.message, destination: AnyView(MessagesListView())),
+            MenuItemModel(icon: AppIcon.NavigationSlider.message, iconColor: AppColor.black, title: AppStrings.NavigationSlider.message, destination: AnyView(
+                           MessagesListView(viewModel: MessagesViewModel(
+                               currentUserId: MBUserDefaults.userIdStatic ?? "", recipientId: "",
+                               chatType: .private,
+                           ))
+                       )),
+            
             MenuItemModel(icon: AppIcon.NavigationSlider.settings, iconColor: AppColor.black, title: AppStrings.NavigationSlider.settings, destination: AnyView(CreateRideView())),
             MenuItemModel(icon: AppIcon.NavigationSlider.referFriend, iconColor: AppColor.black, title: AppStrings.NavigationSlider.referFriend, destination: AnyView(HomeView())),
             MenuItemModel(icon: AppIcon.NavigationSlider.logout, iconColor: AppColor.red, title: AppStrings.NavigationSlider.logout, destination: AnyView(SignInView()))
@@ -92,6 +98,7 @@ final class NavigationSliderViewModel: ObservableObject {
             MBUserDefaults.userNameStatic = nil
             // Keep hasShownLoginSuccessStatic so that login success is only shown on fresh install
             MBUserDefaults.rideIdStatic = nil
+            // Do not clear isRideJoinedID on logout — it is cleared when user ends the ride; if they log back in before ending, they should still be redirected to the active ride.
             if let error = error {
                 print("Logout error: \(error)")
             }

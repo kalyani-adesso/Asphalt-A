@@ -41,7 +41,7 @@ struct UpcomingRidesView: View {
         }
         .padding(.top,20)
         .navigationDestination(isPresented:$showAllRides , destination: {
-            UpcomingRideView(viewModel: viewModel, startingTab: .upcoming, navigationDone: true)
+            UpcomingRideView(viewModel: viewModel, startingTab: .upcoming, showpopup: false, navigationDone: true, rideIdToOpen: .constant(nil))
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })
@@ -85,7 +85,7 @@ struct UpcomingRideCard: View {
                     Spacer()
                     Button {
                         withAnimation(.easeInOut) {
-                               onMessageTap(hostName)
+                               onMessageTap(ride.id)
                            }
                     } label: {
                         AppIcon.Home.message
@@ -209,5 +209,3 @@ var emptyStateView: some View {
     .frame(maxWidth: .infinity)
     .padding(.vertical, 30)
 }
-
-

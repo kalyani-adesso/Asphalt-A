@@ -13,6 +13,8 @@ struct ConnectedRideView: View {
     let subTitle:String
     let model:JoinRideModel
     let rideCompleteModel:[RideCompleteModel]
+    /// When non-nil, back button calls this instead of dismiss (e.g. show Home when coming from tab 0).
+    var onBackToHome: (() -> Void)? = nil
     @StateObject var upcomingViewModel = UpcomingRideViewModel()
     @StateObject var homeViewModel = HomeViewModel()
     @Environment(\.dismiss) var dismiss
@@ -69,7 +71,11 @@ struct ConnectedRideView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading, content: {
                 Button(action: {
-                   dismiss()
+                    if let onBackToHome {
+                        onBackToHome()
+                    } else {
+                        dismiss()
+                    }
                 }, label:{
                     AppIcon.CreateRide.backButton
                 })

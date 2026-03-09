@@ -15,7 +15,7 @@ struct EditProfileView: View {
     @State var emargeContact: String = ""
     @State var drivingLicenseNumber: String = ""
     @State var enableMechanic: Bool = false
-    @StateObject var profileViewModel = ProfileViewModel()
+    @ObservedObject var profileViewModel: ProfileViewModel
     @State private var currentPage = 0
     @State private var showActionSheet: Bool = false
     @Binding var isPresented: Bool
@@ -79,8 +79,9 @@ struct EditProfileView: View {
                                 })
                                 .padding(.bottom, 21)
                                 ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage ?? UIImage(named: "icon-profile")!)
-                                    isPresented = false
+                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage ?? UIImage(named: "icon-profile")!, onSuccess: {
+                                        isPresented = false
+                                    })
                                 }).disabled(profileViewModel.validateProfile(fullName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emargencyContact: profileViewModel.emergencyNumber, DL: profileViewModel.drivingLicenseNumber))
                                     .padding(.bottom, 21)
                             }

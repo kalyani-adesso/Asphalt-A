@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 
 /// Reusable map view used by the in‑app navigation screen. It displays a
-/// polyline route and allows simple recentering/focusing behavior driven
+/// polyline route, user location, and allows recentering/focusing behavior driven
 /// by the parent view.
 
 @available(iOS 17.0, *)
@@ -17,6 +17,7 @@ struct InAppMapView: View {
     var routeCoordinates: [CLLocationCoordinate2D]
     var startCoordinate: CLLocationCoordinate2D?
     var endCoordinate: CLLocationCoordinate2D?
+    var userCoordinate: CLLocationCoordinate2D?
     var followUser: Bool
     var cameraAltitude: Double
     var mapType: MKMapType
@@ -25,22 +26,37 @@ struct InAppMapView: View {
     var focusCounter: Int
 
     @State private var position: MapCameraPosition = .automatic
+    @State private var hasFittedRoute = false
 
     var body: some View {
         Map(position: $position) {
             if !routeCoordinates.isEmpty {
                 MapPolyline(coordinates: routeCoordinates)
-                    .stroke(Color.blue, lineWidth: 5)
+                    .stroke(AppColor.celticBlue, lineWidth: 6)
             }
-            // start / end pins
+            // User location marker (when available)
+            if let user = userCoordinate {
+                Annotation("", coordinate: user) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.celticBlue.opacity(0.2))
+                            .frame(width: 44, height: 44)
+                        Circle()
+                            .fill(AppColor.celticBlue)
+                            .frame(width: 16, height: 16)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                    }
+                }
+            }
+            // Start pin
             if let start = startCoordinate {
                 Annotation("", coordinate: start) {
                     if let ui = AppIcon.ConnectedRide.startLocation {
                         Image(uiImage: ui)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
                             .clipShape(Circle())
-                            .shadow(radius: 3)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
             }
@@ -49,12 +65,23 @@ struct InAppMapView: View {
                     if let ui = AppIcon.ConnectedRide.endLocation {
                         Image(uiImage: ui)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
             }
         }
         .mapStyle(style(for: mapType))
+        .mapControls {
+            MapCompass()
+            MapScaleView()
+        }
+        .onChange(of: routeCoordinates.count) { _ in
+            if !routeCoordinates.isEmpty && !hasFittedRoute {
+                fitMapToRoute()
+                hasFittedRoute = true
+            }
+        }
         .onChange(of: recenterCounter) { _ in
             recenter()
         }
@@ -70,14 +97,43 @@ struct InAppMapView: View {
         }
     }
 
+    private func fitMapToRoute() {
+        var allCoords = routeCoordinates
+        if let start = startCoordinate { allCoords.append(start) }
+        if let end = endCoordinate { allCoords.append(end) }
+        if let user = userCoordinate { allCoords.append(user) }
+        guard !allCoords.isEmpty else { return }
+        let minLat = allCoords.map(\.latitude).min() ?? 0
+        let maxLat = allCoords.map(\.latitude).max() ?? 0
+        let minLon = allCoords.map(\.longitude).min() ?? 0
+        let maxLon = allCoords.map(\.longitude).max() ?? 0
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        let span = MKCoordinateSpan(
+            latitudeDelta: max((maxLat - minLat) * 1.4, 0.008),
+            longitudeDelta: max((maxLon - minLon) * 1.4, 0.008)
+        )
+        position = .region(MKCoordinateRegion(center: center, span: span))
+    }
+
     private func recenter() {
-        guard followUser, let center = routeCoordinates.first else { return }
-        position = .camera(MapCamera(
-            centerCoordinate: center,
-            distance: cameraAltitude,
-            heading: 0,
-            pitch: 0
-        ))
+        if followUser, let user = userCoordinate {
+            position = .camera(MapCamera(
+                centerCoordinate: user,
+                distance: cameraAltitude,
+                heading: 0,
+                pitch: 0
+            ))
+        } else if let center = routeCoordinates.first {
+            position = .camera(MapCamera(
+                centerCoordinate: center,
+                distance: cameraAltitude,
+                heading: 0,
+                pitch: 0
+            ))
+        }
     }
 
     private func style(for mkType: MKMapType) -> MapStyle {
@@ -94,10 +150,20 @@ struct InAppMapView: View {
 @available(iOS 17.0, *)
 struct InAppMapView_Previews: PreviewProvider {
     static var previews: some View {
-        InAppMapView(routeCoordinates: [
-            CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-            CLLocationCoordinate2D(latitude: 37.7849, longitude: -122.4094)
-        ], followUser: true, cameraAltitude: 200, mapType: .standard, recenterCounter: 0, focusCoordinate: nil, focusCounter: 0)
+        let start = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
+        let end = CLLocationCoordinate2D(latitude: 37.7849, longitude: -122.4094)
+        return InAppMapView(
+            routeCoordinates: [start, end],
+            startCoordinate: start,
+            endCoordinate: end,
+            userCoordinate: nil,
+            followUser: true,
+            cameraAltitude: 200,
+            mapType: .standard,
+            recenterCounter: 0,
+            focusCoordinate: nil,
+            focusCounter: 0
+        )
     }
 }
 #endif

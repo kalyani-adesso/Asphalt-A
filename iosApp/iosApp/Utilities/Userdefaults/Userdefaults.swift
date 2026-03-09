@@ -69,6 +69,27 @@ struct MBUserDefaults {
             UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.rideJoinedId.rawValue)
         }
     }
+
+    /// Emergency contact number from profile. Used for Emergency SOS when set.
+    static var emergencyContactStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.emergencyContact.rawValue)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: AppStrings.userdefaultKeys.emergencyContact.rawValue)
+        }
+    }
+    
+    /// Ride ID from deep link; when set, app should open ride detail (then clear after handling).
+    static var deepLinkRideIdStatic: String? {
+        get {
+            return UserDefaults.standard.string(forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue)
+        }
+        set {
+            if let v = newValue { UserDefaults.standard.set(v, forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue) }
+            else { UserDefaults.standard.removeObject(forKey: AppStrings.userdefaultKeys.deepLinkRideId.rawValue) }
+        }
+    }
     
     static var removeAllUserDefaults: Void {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
