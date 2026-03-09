@@ -7,11 +7,10 @@ plugins {
 
 android {
     namespace = "com.asphalt.createride"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -71,19 +70,4 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
-
-
-    // Unit tests
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.kotlin.testJunit)
-    testImplementation(libs.junit)
-    testImplementation(libs.koin.test)
-
-    // Instrumented tests
-    androidTestImplementation(libs.androidx.testExt.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-    // Compose UI tests
-   androidTestImplementation(libs.compose.ui.test.junit4)
-   debugImplementation(libs.compose.ui.test.manifest)
 }

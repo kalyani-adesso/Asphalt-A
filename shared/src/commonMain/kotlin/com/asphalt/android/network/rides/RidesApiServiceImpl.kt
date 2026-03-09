@@ -53,6 +53,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
+    // map screen
     override suspend fun joinRide(joinRide: ConnectedRideRoot): APIResult<FirebasePushResponse> {
         return safeApiCall {
             post(joinRide, "$ONGOING_RIDE_URL/${joinRide.rideID}").body()
@@ -74,6 +75,7 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
         }
     }
 
+    // button click end ride
     override suspend fun endRide(rideId: String, rideJoinedId: String): APIResult<Unit> {
         return safeApiCall {
             delete("$ONGOING_RIDE_URL/$rideId/$rideJoinedId").body()

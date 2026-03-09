@@ -2,6 +2,8 @@ package com.asphalt.android.di
 
 
 import com.asphalt.android.network.KtorClient
+import com.asphalt.android.network.joinrides.JoinRidesApiService
+import com.asphalt.android.network.joinrides.JoinRidesApiServiceImpl
 import com.asphalt.android.network.places.PlacesService
 import com.asphalt.android.network.places.PlacesServiceImpl
 import com.asphalt.android.network.profile.ProfileAPIService
@@ -16,6 +18,7 @@ import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.chat.ChatRepository
 import com.asphalt.android.repository.places.PlacesRepository
+import com.asphalt.android.repository.joinride.JoinRideRepository
 import com.asphalt.android.repository.profile.ProfileRepository
 import com.asphalt.android.repository.queries.QueryRepository
 import com.asphalt.android.repository.rides.RidesRepository
@@ -23,6 +26,7 @@ import com.asphalt.android.repository.user.UserRepository
 import com.asphalt.android.viewmodel.AuthViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import kotlin.math.sin
 
 val sharedModule: Module = module {
     single { KtorClient() }
@@ -40,4 +44,7 @@ val sharedModule: Module = module {
     single<PlacesService> { PlacesServiceImpl(get()) }
     single { PlacesRepository(get()) }
     single { ChatRepository() }
+    single { JoinRideRepository(get()) }
+    single<JoinRidesApiService> { JoinRidesApiServiceImpl(get()) }
+
 }

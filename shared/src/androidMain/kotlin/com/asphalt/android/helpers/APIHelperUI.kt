@@ -1,5 +1,6 @@
 package com.asphalt.android.helpers
 
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.constants.APIConstants.GENERIC_ERROR_MSG
 import com.asphalt.android.model.APIResult
 import com.asphalt.commonui.UIState
@@ -13,21 +14,21 @@ object APIHelperUI {
         apiResult: APIResult<T>,
         scope: CoroutineScope,
         showError: Boolean = true,
-        onSuccess: (data: T) -> Unit
+        onSuccess: (T) -> Unit
     ) {
         when (apiResult) {
-            is APIResult.Error -> {
-                val uIStateError =
-                    UIState.Error(apiResult.exception.message ?: GENERIC_ERROR_MSG)
-                if (showError)
-                    scope.launch {
-                        UIStateHandler.sendEvent(uIStateError)
-                    }
-
+            is APIResult.Success -> {
+                apiResult.data?.let(onSuccess)
             }
+            is APIResult.Error -> {
+                val isJsonError = apiResult.code == APIConstants.JSON_EXCEPTION_CODE
 
-            is APIResult.Success -> apiResult.data?.let {
-                onSuccess.invoke(it)
+                if (showError && !isJsonError) {
+                    scope.launch {
+                        val msg = apiResult.exception.message ?: GENERIC_ERROR_MSG
+                        UIStateHandler.sendEvent(UIState.Error(msg))
+                    }
+                }
             }
         }
     }

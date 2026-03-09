@@ -1,5 +1,10 @@
 package com.asphalt.joinaride
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
@@ -32,9 +39,15 @@ import com.asphalt.commonui.theme.OrangeLight
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.joinaride.locationutils.ShareLocation.shareCurrentLocation
+import com.google.android.gms.location.LocationServices
+import java.net.URLEncoder
 
 @Composable
 fun EmergecyActions(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
 
     ComposeUtils.CommonContentBox(
         isBordered = true,
@@ -100,7 +113,7 @@ fun EmergecyActions(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(Dimensions.size20))
                 ElevatedButton(
                     onClick = {
-                        // navigateToEndRide.invoke()
+                        shareCurrentLocation(context)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                     shape = RoundedCornerShape(Dimensions.padding10),

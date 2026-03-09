@@ -1,5 +1,6 @@
 package com.asphalt.joinaride
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,22 +16,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,55 +39,67 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.asphalt.android.viewmodel.joinridevm.RidesDifficultyViewModel
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
-import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
-import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralDarkGrey
 import com.asphalt.commonui.theme.NeutralLightGrey
 import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PrimaryBrighterLightW25
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
-import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CommonStatType
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import kotlinx.coroutines.coroutineScope
+import com.asphalt.commonui.utils.Utils
+import com.asphalt.joinaride.models.RideSummaryData
+import com.asphalt.joinaride.viewmodel.JoinRideViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun ConnectedRideEnd(
     modifier: Modifier = Modifier,
     setTopAppBarState: (AppBarState) -> Unit,
-    viewModel: RidesDifficultyViewModel = koinViewModel(),
-    onNavigateToDashboard: () -> Unit
-    ) {
+    viewModel: JoinRideViewModel = koinViewModel(),
+    onNavigateToDashboard: () -> Unit,
+    ridesData: RidesData,
+    summaryData: RideSummaryData
+) {
 
-    val stats = viewModel.stats.collectAsStateWithLifecycle()
+    // val stats = viewModel.stats.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(value = false) }
     val scope = rememberCoroutineScope()
+    var duration by remember { mutableStateOf("") }
 
     setTopAppBarState(AppBarState(title = stringResource(R.string.connected_ride)))
+    LaunchedEffect(summaryData.startDateTime) {
+        duration = Utils.formatDuration(summaryData.startDateTime, System.currentTimeMillis())
 
-    LaunchedEffect(Unit) {
-        delay(2000)
-        showDialog = true
     }
 
+
+//    val finalDuration by viewModel.finalDuration.collectAsState()
+
+    LaunchedEffect(Unit) {
+//        delay(2000)
+        showDialog = true
+
+
+//        Log.d("TAG", "ConnectedRideEnd: ${formatTime(finalDuration)}")
+
+    }
+
+
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(top = Dimensions.size30),
     ) {
         Card(
@@ -117,12 +125,12 @@ fun ConnectedRideEnd(
                     )
                 Spacer(Modifier.height(Dimensions.padding20))
                 Text(
-                    text = stringResource(id = R.string.ride_created),
+                    text = (ridesData.rideTitle ?: ""),
                     style = TypographyBold.bodyMedium
                 )
                 Spacer(Modifier.height(Dimensions.padding16))
                 Text(
-                    text = stringResource(R.string.share_with_friends),
+                    text = stringResource(R.string.ride_created),
                     style = Typography.bodySmall,
                     color = NeutralDarkGrey
                 )
@@ -143,14 +151,20 @@ fun ConnectedRideEnd(
                 ),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.padding16)
             ) {
-                ComposeUtils.SectionTitle(stringResource(R.string.ride_difficulty))
+                //ComposeUtils.SectionTitle(stringResource(R.string.ride_difficulty))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.size20),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    StatView(statType = CommonStatType.TimeStatType, stats.value.rideCount)
-                    StatView(statType = CommonStatType.DistanceStatType, stats.value.rideCount)
-                    StatView(statType = CommonStatType.RidesStatType, stats.value.rideCount)
+                    StatView(statType = CommonStatType.TimeStatType, duration)
+                    StatView(
+                        statType = CommonStatType.DistanceStatType,
+                        "%.1f".format(summaryData.distanceTravelled)
+                    )
+                    StatView(
+                        statType = CommonStatType.RidesStatType,
+                        summaryData.noOfRiders.toString()
+                    )
                 }
             }
         }
@@ -162,15 +176,16 @@ fun ConnectedRideEnd(
                 }
             }, onSubmit = {
 
-            })
+            }, ridesData = ridesData)
         }
 
-        Spacer(modifier=Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.spacedBy(
-                Dimensions.padding20, Alignment.CenterHorizontally
+                space = Dimensions.padding20, Alignment.CenterHorizontally
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(Dimensions.padding20)
                 .align(Alignment.CenterHorizontally),
         ) {
@@ -181,10 +196,12 @@ fun ConnectedRideEnd(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = NeutralWhite),
                 modifier = Modifier
-                    .weight(1f)
-                    .height(Dimensions.size60)
-                    .border(1.dp, color = PrimaryBrighterLightW75,
-                        shape = RoundedCornerShape(size = Dimensions.size10)),
+                    .weight(weight = 1f)
+                    .height(height = Dimensions.size60)
+                    .border(
+                        width = 1.dp, color = PrimaryBrighterLightW75,
+                        shape = RoundedCornerShape(size = Dimensions.size10)
+                    ),
             ) {
                 Text(
                     stringResource(R.string.share).uppercase(),
@@ -197,7 +214,7 @@ fun ConnectedRideEnd(
             GradientButton(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    //TODO
+                    onNavigateToDashboard.invoke()
 
                 },
                 buttonHeight = Dimensions.size60,
@@ -219,8 +236,9 @@ fun ConnectedRideEnd(
         }
     }
 }
+
 @Composable
-fun RowScope.StatView(statType: CommonStatType,count: Int) {
+fun RowScope.StatView(statType: CommonStatType, count: String) {
     RoundedBox(
         modifier = Modifier.weight(1f),
         borderColor = NeutralLightGrey,
@@ -237,10 +255,12 @@ fun RowScope.StatView(statType: CommonStatType,count: Int) {
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(painter = painterResource(id = statType.iconRes),
-                contentDescription = null, tint = statType.tint)
+            Icon(
+                painter = painterResource(id = statType.iconRes),
+                contentDescription = null, tint = statType.tint
+            )
 
-            ComposeUtils.SectionTitle(text = "$count")
+            ComposeUtils.SectionTitle(text = count)
 
             ComposeUtils.SectionSubtitle(
                 stringResource(statType.statDescriptionResId),
@@ -249,6 +269,7 @@ fun RowScope.StatView(statType: CommonStatType,count: Int) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

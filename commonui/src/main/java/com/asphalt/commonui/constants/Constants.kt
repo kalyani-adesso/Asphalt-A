@@ -24,7 +24,8 @@ object Constants {
     const val UNKNOWN_USER = "Unknown User"
 
     //Firebase Data base
-    const val FIREBASE_DB = "users"
+    const val FIREBASE_DB_USERS = "users"
+    const val FIREBASE_DB_RIDES = "rides"
     const val Firebase_user_name = "user_name"
     const val Firebase_user_email = "email"
 

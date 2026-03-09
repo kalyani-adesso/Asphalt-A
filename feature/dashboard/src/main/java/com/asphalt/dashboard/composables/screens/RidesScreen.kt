@@ -1,6 +1,7 @@
 package com.asphalt.dashboard.composables.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -112,49 +113,65 @@ fun RidesScreen(
 //            ActionBarWithBack(R.drawable.ic_arrow_back, stringResource(R.string.your_rides)) {
 //                // Handle back press
 //            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = Dimensions.padding16, end = Dimensions.padding16
-                    ), contentPadding = PaddingValues(bottom = Dimensions.size30)
-            ) {
-                item {
+            Box(modifier = Modifier.fillMaxSize()) {
+
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            start = Dimensions.padding16, end = Dimensions.padding16
+                        ), contentPadding = PaddingValues(bottom = Dimensions.size30)
+                ) {
+                    item {
 //                    Spacer(Modifier.height(Dimensions.size30))
-                    ButtonTabs(ridesScreenViewModel)
-                    Spacer(Modifier.height(Dimensions.padding16))
-                }
+                        ButtonTabs(ridesScreenViewModel)
+                        Spacer(Modifier.height(Dimensions.padding16))
+                    }
 //            items(10) { index ->
 //
 //            }
-                when (ridesScreenViewModel.tabSelectFlow.value) {
-                    RideStatConstants.UPCOMING_RIDE -> {
-                        items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
-                            UpcomingRides(upconing, upComingViewDetails)
-                            Spacer(Modifier.height(Dimensions.padding16))
-                        }
-
-                    }
-
-                    RideStatConstants.HISTORY_RIDES -> {
-                        items(ridesScreenViewModel.ridesListState.value.history) { history ->
-                            HistoryRides(ridesScreenViewModel, history)
-                            Spacer(Modifier.height(Dimensions.padding16))
-                        }
-                    }
-
-                    RideStatConstants.INVITES_RIDES -> {
-                        items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
-                            Invites(ridesScreenViewModel, invites) { chatModel ->
-                                selectedInvite = chatModel
+                    when (ridesScreenViewModel.tabSelectFlow.value) {
+                        RideStatConstants.UPCOMING_RIDE -> {
+                            items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
+                                UpcomingRides(upconing, upComingViewDetails)
+                                Spacer(Modifier.height(Dimensions.padding16))
                             }
-                            Spacer(Modifier.height(Dimensions.padding16))
+
                         }
+
+                        RideStatConstants.HISTORY_RIDES -> {
+                            items(ridesScreenViewModel.ridesListState.value.history) { history ->
+                                HistoryRides(ridesScreenViewModel, history)
+                                Spacer(Modifier.height(Dimensions.padding16))
+                            }
+                        }
+
+                        RideStatConstants.INVITES_RIDES -> {
+                            items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
+                                Invites(ridesScreenViewModel, invites) { chatModel ->
+                                    selectedInvite = chatModel
+                                }
+                                Spacer(Modifier.height(Dimensions.padding16))
+                            }
+                        }
+
                     }
+
 
                 }
-
-
+                ridesScreenViewModel.showNodata.value =
+                    when (ridesScreenViewModel.tabSelectFlow.value) {
+                        RideStatConstants.UPCOMING_RIDE -> ridesScreenViewModel.ridesListState.value.upcoming.isEmpty()
+                        RideStatConstants.HISTORY_RIDES -> ridesScreenViewModel.ridesListState.value.history.isEmpty()
+                        RideStatConstants.INVITES_RIDES -> ridesScreenViewModel.ridesListState.value.invite.isEmpty()
+                        else -> false
+                    }
+                if (ridesScreenViewModel.showNodata.value)
+                    Text(
+                        text = stringResource(R.string.no_data), style = Typography.bodyMedium,
+                        modifier = Modifier.align(alignment = Alignment.Center)
+                    )
             }
         }
     }
@@ -165,6 +182,8 @@ fun UpcomingRides(
     upconing: YourRideDataModel,
     upComingViewDetails: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val coming_soon_txt =stringResource(R.string.coming_soon)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -378,6 +397,7 @@ fun UpcomingRides(
 
             BorderedButton(
                 onClick = {
+                    Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
                     // upComingViewDetails.invoke(upconing.ridesId.toString())
                 },
                 modifier = Modifier

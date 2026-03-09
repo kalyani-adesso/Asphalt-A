@@ -1,7 +1,6 @@
 package com.asphalt.dashboard.composables.screens
 
 import android.annotation.SuppressLint
-import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,9 +29,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.asphalt.android.PlatformDatabase
+import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralTaupe20
 import com.asphalt.commonui.theme.Typography
@@ -40,7 +43,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.commonui.utils.ComposeUtils
-import com.asphalt.commonui.utils.RequestLocationPermission
+import com.asphalt.commonui.utils.RequestPermission
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.composables.screens.sections.AdventureJourney
 import com.asphalt.dashboard.composables.screens.sections.CreateOrJoinRide
@@ -60,7 +63,7 @@ fun DashBoardScreen(
     androidUserVM: AndroidUserVM = koinViewModel(),
     setTopAppBarState: (AppBarState) -> Unit,
     creatRideClick: () -> Unit,
-    joinRideClick: () -> Unit,
+    joinRideClick: (RidesData?) -> Unit,
     viewRideDetails: (String) -> Unit,
     dashboardRideSummaryVM: DashboardRideSummaryVM = koinViewModel()
 ) {
@@ -68,28 +71,48 @@ fun DashBoardScreen(
     val context = LocalContext.current
     var locationStatus by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        PlatformDatabase().getReference(Constants.FIREBASE_DB_RIDES).observeValue().collect { snapshot ->
+            val ridesMap = mutableMapOf<String, CreateRideRoot>()
 
-    RequestLocationPermission(
-        onPermissionGranted = {
+            snapshot.children.forEach { child ->
+                val rideId = child.key ?: return@forEach
+                val rideObject = dashboardRideSummaryVM.getRideRootFromSnapshot(rideId, child.getValue())
+
+                if (rideObject != null) {
+                    ridesMap[rideId] = rideObject
+                }
+            }
+
+            dashboardRideSummaryVM.getRideList(ridesMap)
+        }
+    }
+
+    RequestPermission(
+        context = context,
+        onPermissionsGranted = {
+//            val serviceIntent = Intent(context, ChatService::class.java)
+//            startForegroundService(context, serviceIntent)
             scope.launch {
-                locationStatus = ""
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
                 fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
+                    .addOnSuccessListener { location ->
                         if (location != null) {
-                            val lat = location.latitude
-                            val lon = location.longitude
-
-                            locationStatus = Utils.getLocationRegion(context, lat, lon)
+                            locationStatus = Utils.getLocationRegion(
+                                context,
+                                location.latitude,
+                                location.longitude
+                            )
                         } else {
                             locationStatus = ""
                         }
                     }
             }
         },
-        onPermissionDenied = {
+        onPermissionsDenied = { denied ->
             locationStatus = ""
-        }, context
+            println("Permissions denied: $denied")
+        }
     )
     val currentUser = androidUserVM.userState.collectAsState(null)
 
@@ -141,7 +164,7 @@ fun DashBoardScreen(
                                     tint = Color.Unspecified
                                 )
                                 Text(
-                                    "Level 4 - Rider",
+                                    "Level 1 - Rider",
                                     style = Typography.bodyMedium,
                                     fontSize = Dimensions.textSize16
                                 )
@@ -167,9 +190,9 @@ fun DashBoardScreen(
     ) {
         CreateOrJoinRide({
             creatRideClick.invoke()
-        }, {
-            joinRideClick.invoke()
-        })
+        }, { onGoingRide ->
+            joinRideClick(onGoingRide)
+        }, dashboardRideSummaryVM)
         RideStatsPerMonth(dashboardSummary.value)
         DashboardUpcomingRide(upcomingRideClick, {
             viewRideDetails.invoke(it)

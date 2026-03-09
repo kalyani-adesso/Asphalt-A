@@ -10,7 +10,7 @@ data class Message(
     val timestamp: Long = 0L,
     val isRead: Boolean = false,
 
-)
+    )
 
 
 @Serializable
@@ -21,7 +21,8 @@ data class ChatRoom(
     val lastTimestamp: Long = 0L,
     val type: String = "private",
     val members: Map<String, Boolean> = emptyMap(),
-    val unreadCounts: Map<String, Long> = emptyMap()
+    val unreadCounts: Map<String, Long> = emptyMap(),
+    val isFavorite: Boolean = false
 )
 
 fun ChatRoom.getOtherUserId(currentUserId: String): String? {

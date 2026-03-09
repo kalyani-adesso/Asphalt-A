@@ -1,5 +1,6 @@
 package com.asphalt.android.repository.rides
 
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.mapApiResult
 import com.asphalt.android.mappers.mapAndGroupMonthData
 import com.asphalt.android.mappers.toPerMonthRideDataDomain
@@ -58,6 +59,9 @@ class RidesRepository(val apiService: RidesApIService) {
             currentUid,
             UserInvites(acceptInvite = inviteStatus)
         )
+    }
+    fun getRidesDataList( data:Map<String, CreateRideRoot>?):List<RidesData>{
+        return data.toRides()
     }
 
     fun Map<String, CreateRideRoot>?.toRides(): List<RidesData> {
@@ -242,5 +246,43 @@ class RidesRepository(val apiService: RidesApIService) {
 
     suspend fun deleteImage(rideId: String,imageId:String): APIResult<Unit> {
         return apiService.deleteImage(rideId,imageId)
+    }
+
+    fun mapSnapshotToRide(id: String, data: Any?): CreateRideRoot? {
+        val map = data as? Map<*, *> ?: return null
+
+        return CreateRideRoot().apply {
+            userID = map["userID"] as? String
+            rideType = map["rideType"] as? String
+            rideTitle = map["rideTitle"] as? String
+            description = map["description"] as? String
+            startDate = map["startDate"] as? Long
+            startLocation = map["startLocation"] as? String
+            endLocation = map["endLocation"] as? String
+            createdDate = map["createdDate"] as? Long
+
+            startLatitude = (map["startLatitude"] as? Number)?.toDouble() ?: 0.0
+            startLongitude = (map["startLongitude"] as? Number)?.toDouble() ?: 0.0
+            endLatitude = (map["endLatitude"] as? Number)?.toDouble() ?: 0.0
+            endLongitude = (map["endLongitude"] as? Number)?.toDouble() ?: 0.0
+            distance = (map["distance"] as? Number)?.toDouble() ?: 0.0
+
+            rideStatus = (map["rideStatus"] as? Number)?.toInt() ?: 0
+            endDate = map["endDate"] as? Long
+            hasAssemblyPoint = map["hasAssemblyPoint"] as? Boolean ?: false
+            assemblyPoint = map["assemblyPoint"] as? String
+            assemblyLat = (map["assemblyLat"] as? Number)?.toDouble() ?: 0.0
+            assemblyLon = (map["assemblyLon"] as? Number)?.toDouble() ?: 0.0
+            val participantsRaw = map["participants"] as? Map<String, Any?>
+            participants = participantsRaw?.mapValues { entry ->
+                val inviteMap = entry.value as? Map<String, Any?>
+                UserInvites(
+                    acceptInvite = (inviteMap?.get("acceptInvite") as? Number)?.toInt()
+                        ?: APIConstants.RIDE_INVITED
+                )
+            }
+
+
+        }
     }
 }

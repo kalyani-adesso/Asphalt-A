@@ -1,8 +1,10 @@
 package com.asphalt.commonui.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import androidx.compose.ui.graphics.Color
 import com.asphalt.commonui.constants.Constants
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -11,6 +13,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -243,5 +246,27 @@ object Utils {
 
         val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
         return sdf.format(Date(millis))
+    }
+
+    fun generateUserColor(userId: String): Color {
+        val hash = userId.hashCode()
+
+        val hue = (abs(hash) * 137.5f) % 360f
+
+        return Color.hsl(
+            hue = hue,
+            saturation = 0.85f,
+            lightness = 0.45f
+        )
+    }
+    @SuppressLint("DefaultLocale")
+    fun formatDuration(startMillis: Long, endMillis: Long): String {
+        val diff = endMillis - startMillis
+
+        val hours = diff / (1000 * 60 * 60)
+        val minutes = (diff / (1000 * 60)) % 60
+        val seconds = (diff / 1000) % 60
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
