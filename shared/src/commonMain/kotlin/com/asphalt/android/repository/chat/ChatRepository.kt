@@ -158,10 +158,9 @@ class ChatRepository {
         return favoriteBy?.get(myUserId) ?: false
     }
 
-    private fun toggleFavorite(userId: String, chatRoomId: String, currentlyFavorite: Boolean) {
-        val ref = database.getReference("chats/$chatRoomId/favoriteBy/$userId")
-        val newValue = !currentlyFavorite
-        ref.setValue(newValue)
+     fun toggleFavorite(userId: String, chatRoomId: String, isFavorite: Boolean) {
+        val ref = database.getReference("chats/$chatRoomId/favorite_by/$userId")
+        ref.setValue(isFavorite)
     }
 
     fun markAsRead(chatRoomId: String, myUserId: String) {

@@ -101,14 +101,18 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
     }
 
     fun updateFavorite(flag: Boolean, chatID: String) {
-        _chatListModel.value = _chatListModel.value.map { chatRoom ->
+       /* _chatListModel.value = _chatListModel.value.map { chatRoom ->
             if (chatRoom.id == chatID) {
                 chatRoom.copy(isFavorite = flag)
             } else {
                 chatRoom
             }
         }
-        applyTabFilter()
+        applyTabFilter()*/
+        viewModelScope.launch {
+            chatRepository.toggleFavorite(currentUid,chatID,flag)
+        }
+
     }
 
 }
