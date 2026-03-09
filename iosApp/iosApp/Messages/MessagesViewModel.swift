@@ -27,6 +27,9 @@ class MessagesViewModel: ObservableObject {
     private var messageJob: Kotlinx_coroutines_coreJob?
     private let userRepo: UserRepository
     @Published var isLoading: Bool = false
+    private let favouriteKey = "favourite_chats"
+
+    @Published var favouriteChatIds: Set<String> = []
     
     var recipientId: String
     let chatType: ChatType
@@ -40,7 +43,7 @@ class MessagesViewModel: ObservableObject {
     var filteredChats: [Chat] {
         var chats = recentChats
         
-        // SEARCH FILTER
+        //search filter
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let query = searchText.lowercased()
             chats = chats.filter {
@@ -49,7 +52,7 @@ class MessagesViewModel: ObservableObject {
             }
         }
         
-        // CATEGORY FILTER
+        // category filter
         guard let selected = selectedCategory else { return chats }
         
         switch selected {
@@ -64,9 +67,7 @@ class MessagesViewModel: ObservableObject {
             return chats.filter { $0.isGroup }
             
         case MessageCategory.Favourites.rawValue:
-            // You don't currently store favourite chats
-            // so returning empty or all for now
-            return chats
+            return chats.filter { $0.isFavourite }
             
         default:
             return chats
@@ -89,6 +90,23 @@ class MessagesViewModel: ObservableObject {
         self.rideTitle = rideTitle
         self.rideId = rideId
         self.currentUserId = currentUserId
+        if let saved = UserDefaults.standard.array(forKey: favouriteKey) as? [String] {
+               favouriteChatIds = Set(saved)
+           }
+    }
+    func toggleFavourite(chatId: String) {
+
+        if favouriteChatIds.contains(chatId) {
+            favouriteChatIds.remove(chatId)
+        } else {
+            favouriteChatIds.insert(chatId)
+        }
+
+        UserDefaults.standard.set(Array(favouriteChatIds), forKey: favouriteKey)
+
+        if let index = recentChats.firstIndex(where: { $0.id == chatId }) {
+            recentChats[index].isFavourite.toggle()
+        }
     }
     func sendMessage() {
         guard !messageText.isEmpty else { return }
@@ -387,7 +405,8 @@ class MessagesViewModel: ObservableObject {
                                         isGroup: isGroup,
                                         memberList: memberList,
                                         rideTitle: room.name,
-                                        rideId: room.id
+                                        rideId: room.id,
+                                        isFavourite: self.favouriteChatIds.contains(room.id)
                                     )
                                 }
                             

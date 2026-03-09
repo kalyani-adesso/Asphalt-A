@@ -19,6 +19,7 @@ struct Chat: Identifiable {
     let memberList: [String]?
         let rideTitle: String?
         let rideId: String?
+    var isFavourite: Bool = false
 }
 
 struct LocalMessage: Identifiable {
@@ -154,7 +155,11 @@ struct MessagesListView: View {
                                     NavigationLink {
                                         ChatDetailContainer(chat: chat)
                                     }label: {
-                                        ChatRowView(chat: chat)
+                                        ChatRowView(
+                                            chat: chat,
+                                            onFavouriteTapped: {
+                                            viewModel.toggleFavourite(chatId: chat.id)
+                                        })
                                     }
                                     .buttonStyle(.plain)
                                 }
