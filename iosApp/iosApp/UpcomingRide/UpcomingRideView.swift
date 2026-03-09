@@ -318,7 +318,7 @@ struct UpcomingRideView: View {
                 currentUserId: currentUserID,
                 recipientId: ride.createdBy,
                 chatType: chatType,
-                memberList: members,
+                memberList: allMembers,
                 rideTitle: rideTitle,
                 rideId: ride.id
             )
