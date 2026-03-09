@@ -274,7 +274,8 @@ extension ConnectedRideViewModel {
             currentLong: KotlinDouble(value: currentLong),
             speedInKph: KotlinDouble(value: speed), status: status.rawValue,
             dateTime: KotlinLong(value: dateTimeMillis),
-            isRejoined: KotlinBoolean(value: false)
+            isRejoined: KotlinBoolean(value: false),rideJoinedID: rideId,
+            rideStartedTime: dateTimeMillis
         )
         
         rideRepository.joinRide(joinRide: connectedRideRoot) { result, error in
@@ -302,7 +303,8 @@ extension ConnectedRideViewModel {
             currentLong: KotlinDouble(value: currentLong),
             speedInKph: KotlinDouble(value: speed), status: status.rawValue ,
             dateTime: KotlinLong(value: dateTimeMillis),
-            isRejoined: KotlinBoolean(value: true)
+            isRejoined: KotlinBoolean(value: true),rideJoinedID: rideId,
+            rideStartedTime: dateTimeMillis
         )
         
         rideRepository.reJoinRide(rejoinRide:connectedRideRoot,ongoingRideId: ongoingRideId){ result, error in

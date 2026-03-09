@@ -27,9 +27,6 @@ class MessagesViewModel: ObservableObject {
     private var messageJob: Kotlinx_coroutines_coreJob?
     private let userRepo: UserRepository
     @Published var isLoading: Bool = false
-    private let favouriteKey = "favourite_chats"
-
-    @Published var favouriteChatIds: Set<String> = []
     
     var recipientId: String
     let chatType: ChatType
@@ -90,23 +87,22 @@ class MessagesViewModel: ObservableObject {
         self.rideTitle = rideTitle
         self.rideId = rideId
         self.currentUserId = currentUserId
-        if let saved = UserDefaults.standard.array(forKey: favouriteKey) as? [String] {
-               favouriteChatIds = Set(saved)
-           }
     }
     func toggleFavourite(chatId: String) {
 
-        if favouriteChatIds.contains(chatId) {
-            favouriteChatIds.remove(chatId)
-        } else {
-            favouriteChatIds.insert(chatId)
-        }
+        guard let index = recentChats.firstIndex(where: { $0.id == chatId }) else { return }
 
-        UserDefaults.standard.set(Array(favouriteChatIds), forKey: favouriteKey)
+        let currentValue = recentChats[index].isFavourite
+        let newValue = !currentValue
 
-        if let index = recentChats.firstIndex(where: { $0.id == chatId }) {
-            recentChats[index].isFavourite.toggle()
-        }
+
+        chatRepository.toggleFavorite (
+            userId: currentUserId,
+            chatRoomId: chatId,
+            isFavorite: newValue
+        )
+        fetchRecentChats()
+        recentChats[index].isFavourite = newValue
     }
     func sendMessage() {
         guard !messageText.isEmpty else { return }
@@ -406,7 +402,7 @@ class MessagesViewModel: ObservableObject {
                                         memberList: memberList,
                                         rideTitle: room.name,
                                         rideId: room.id,
-                                        isFavourite: self.favouriteChatIds.contains(room.id)
+                                        isFavourite: room.isFavorite
                                     )
                                 }
                             
