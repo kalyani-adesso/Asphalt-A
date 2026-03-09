@@ -406,26 +406,30 @@ fun ChatList(
                                 overflow = TextOverflow.Ellipsis,
                                 fontSize = Dimensions.textSize12
                             )
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(Dimensions.size20)
-                                    .clip(CircleShape)
-                                    .background(VividRed)
-                            ) {
-                                Text(
-                                    text = if (chatRoom.unreadCounts.isNotEmpty()) {
-                                        "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}"
-                                    } else {
-                                        "0"
-                                    },
-                                    style = TypographyBold.bodySmall,
-                                    color = NeutralWhite,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontSize = Dimensions.textSize12
-                                )
-                            }
+                            if(chatRoom.unreadCounts.isNotEmpty())
+                                chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]?.let {
+                                    if(it > 0L)
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .size(Dimensions.size20)
+                                                .clip(CircleShape)
+                                                .background(VividRed)
+                                        ) {
+                                            Text(
+                                                text = if (chatRoom.unreadCounts.isNotEmpty()) {
+                                                    "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}"
+                                                } else {
+                                                    "0"
+                                                },
+                                                style = TypographyBold.bodySmall,
+                                                color = NeutralWhite,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                fontSize = Dimensions.textSize12
+                                            )
+                                        }
+                                }
                         }
                     }
                 }
