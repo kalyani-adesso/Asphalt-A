@@ -1,6 +1,7 @@
 package com.asphalt.joinaride.message
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -246,10 +247,9 @@ fun MessageScreenUI(
                         items(messagesList) { msg ->
 
                             Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(1.dp, Color.LightGray,
-                                        shape = RoundedCornerShape(Dimensions.padding14)),
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(Dimensions.padding14),
+                                border = BorderStroke(Dimensions.padding1, Color.LightGray),
                                 colors = CardDefaults.cardColors(
                                     containerColor = Color(0xFFDFF3E4)
                                 )
@@ -273,7 +273,7 @@ fun MessageScreenUI(
                                                     .size(40.dp)
                                                     .clip(CircleShape)
                                                     .border(
-                                                        1.dp,
+                                                        Dimensions.padding1,
                                                         Color.Green,
                                                         CircleShape
                                                     )
