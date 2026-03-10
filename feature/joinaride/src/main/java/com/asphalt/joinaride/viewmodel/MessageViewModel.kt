@@ -29,34 +29,20 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
 
     val androidUserVM: AndroidUserVM by inject()
     private val messageRef = getInstance().getReference("messages")
-
     val currentUid: String?
         get() = androidUserVM.userState.value?.uid
-
     val currentUser: String?
         get() = androidUserVM.userState.value?.name
-
     var customMessage by mutableStateOf("")
         private set
-
-    private val _uiState = MutableStateFlow(MessageRoot())
-    val uiState: StateFlow<MessageRoot> = _uiState.asStateFlow()
-
     private val _messagesList = MutableStateFlow<List<MessageRoot>>(emptyList())
     val messagesList: StateFlow<List<MessageRoot>> = _messagesList
-
     fun onQuickMessageClick(message: String) {
         customMessage = message
     }
     fun onCustomMessageChange(message: String) {
         customMessage = message
     }
-
-    var receiverName by mutableStateOf("")
-        private set
-
-    var recevierId by mutableStateOf("")
-    private set
     fun sendMessage(
         senderID: String, // current user id
         senderName: String, // current user name
@@ -71,8 +57,6 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
 
         viewModelScope.launch {
 
-            //val messageId = messageRef.push().key ?: return@launch
-
             val messageRoot = MessageRoot(
                 senderID = senderID,
                 senderName = senderName,
@@ -83,24 +67,10 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
                 timeStamp = System.currentTimeMillis(),
                 isRideOnGoing = isRideOnGoing,
             )
-            //messageRef.setValue(messageRoot)
-            // save to firebase
-//            messageRef
-//                .child(onGoingRideID)
-//                .setValue(messageRoot)
-//                .await()
-
             // api called
             ridesRepository.sendMessage(messageRoot)
             // clear input
             customMessage = ""
-
-//            _uiState.update {
-//                it.copy(
-//                    message = "",
-//                    senderID = senderID,
-//                )
-//            }
         }
     }
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
@@ -124,7 +94,6 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
                 for (child in snapshot.children) {
 
                     val msg = child.getValue(MessageRoot::class.java)
-
                     Log.d("TAG", "Parsed message: $msg")
 
                     msg?.let {

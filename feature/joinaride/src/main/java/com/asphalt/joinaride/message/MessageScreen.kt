@@ -41,7 +41,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -74,16 +77,16 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.joinaride.viewmodel.MessageViewModel
+import io.ktor.http.invoke
 import io.ktor.util.collections.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MessageScreenUI(
     onCancel: () -> Unit,
-    onSend: () -> Unit,
     ridesData: ConnectedRideDTO?,
     viewModel: MessageViewModel = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel(),
+    androidUserVM: AndroidUserVM = koinViewModel()
 ) {
 
     val messagesList by viewModel.messagesList.collectAsState()
@@ -97,8 +100,10 @@ fun MessageScreenUI(
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        viewModel.listenForMessages(onGoingRideId = ridesData?.rideID ?: "", recevierId = ridesData?.userID ?: "")
-        Log.d("TAG", "MessageScreenUI:ride Id & userId ${ridesData?.rideID} + ${ridesData?.userID}")
+        viewModel.listenForMessages(
+            onGoingRideId = ridesData?.rideID ?: "",
+            recevierId = ridesData?.userID ?: ""
+        )
     }
 
     LaunchedEffect(messagesList.size) {
@@ -115,7 +120,7 @@ fun MessageScreenUI(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(Dimensions.padding13),
             shape = RoundedCornerShape(Dimensions.padding10),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
@@ -137,8 +142,7 @@ fun MessageScreenUI(
                             .size(Dimensions.padding40)
                             .clip(CircleShape)
                     )
-
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.padding13))
 
                     Column {
                         Text(
@@ -185,10 +189,8 @@ fun MessageScreenUI(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
                                             ),
-                                        verticalAlignment = Alignment.CenterVertically,
-
-
-                                        ) {
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
                                             text = ridesData.status,
@@ -198,6 +200,7 @@ fun MessageScreenUI(
                                         )
                                     }
                                 }
+
                                 "stopped" -> {
                                     Row(
                                         modifier = Modifier
@@ -211,7 +214,7 @@ fun MessageScreenUI(
                                                 end = Dimensions.size5,
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        ) {
+                                    ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
                                             text = ridesData.status,
@@ -222,102 +225,100 @@ fun MessageScreenUI(
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.width(Dimensions.padding6))
+                            Spacer(modifier = Modifier.width(Dimensions.padding16))
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(Dimensions.padding10))
+                Spacer(modifier = Modifier.height(Dimensions.padding16))
 
                 /* ---------------- MESSAGE LIST ---------------- */
 
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
+                if (messagesList.isNotEmpty()) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.padding10) // space between items
+                    ) {
 
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFDFF3E4)
-                            )
-                        ) {
+                        items(messagesList) { msg ->
 
-                            Column(
-                                modifier = Modifier.padding(14.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, Color.LightGray,
+                                        shape = RoundedCornerShape(Dimensions.padding14)),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(0xFFDFF3E4)
+                                )
                             ) {
 
-                                messagesList.forEach { msg ->
+                                Column(
+                                    modifier = Modifier.padding(Dimensions.padding14)
+                                ) {
 
-                                    Column {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
 
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                            CircularNetworkImage(
+                                                imageUrl = "",
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .clip(CircleShape)
+                                                    .border(
+                                                        1.dp,
+                                                        Color.Green,
+                                                        CircleShape
+                                                    )
+                                            )
 
-                                                CircularNetworkImage(
-                                                    imageUrl = "",
-                                                    modifier = Modifier
-                                                        .size(40.dp)
-                                                        .clip(CircleShape)
-                                                        .border(
-                                                            1.dp,
-                                                            Color.Green,
-                                                            CircleShape
-                                                        )
-                                                )
+                                            Spacer(modifier = Modifier.width(Dimensions.padding10))
 
-                                                Spacer(modifier = Modifier.width(10.dp))
-
-                                                Text(
-                                                    text = msg.senderName?:"", // sender name
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 16.sp
-                                                )
-                                            }
-
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-
-                                                Icon(
-                                                    imageVector = Icons.Default.AccessTime,
-                                                    contentDescription = null,
-                                                    tint = Color.Gray,
-                                                    modifier = Modifier.size(14.dp)
-                                                )
-
-                                                Spacer(modifier = Modifier.width(4.dp))
-
-                                                Text(
-                                                    text = formatTime(msg.timeStamp?:0),
-                                                    fontSize = 12.sp,
-                                                    color = Color.Gray
-                                                )
-                                            }
+                                            Text(
+                                                text = msg.senderName ?: "",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 16.sp
+                                            )
                                         }
 
-                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                                        Text(
-                                            text = msg.message ?: "",
-                                            fontSize = 14.sp
-                                        )
+                                            Icon(
+                                                imageVector = Icons.Default.AccessTime,
+                                                contentDescription = null,
+                                                tint = Color.Gray,
+                                                modifier = Modifier.size(Dimensions.padding14)
+                                            )
+
+                                            Spacer(modifier = Modifier.width(Dimensions.padding4))
+
+                                            Text(
+                                                text = formatTime(msg.timeStamp ?: 0),
+                                                fontSize = 12.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
                                     }
+
+                                    Spacer(modifier = Modifier.height(Dimensions.padding6))
+
+                                    Text(
+                                        text = msg.message ?: "",
+                                        fontSize = 14.sp
+                                    )
                                 }
                             }
                         }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -325,11 +326,11 @@ fun MessageScreenUI(
 
                 Text("Quick Messages", fontSize = 14.sp)
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimensions.padding8))
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Dimensions.padding8)) {
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding8)) {
 
                         QuickMessageButton(
                             "All good!",
@@ -346,7 +347,7 @@ fun MessageScreenUI(
                         }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.padding8)) {
 
                         QuickMessageButton(
                             "Fuel stop",
@@ -364,13 +365,13 @@ fun MessageScreenUI(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Dimensions.padding10))
 
                 /* ---------------- MESSAGE INPUT ---------------- */
 
-                Text("Custom Message", fontSize = 12.sp)
+                Text("Custom Message", fontSize = 14.sp)
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(Dimensions.padding6))
 
                 OutlinedTextField(
                     value = message,
@@ -378,15 +379,15 @@ fun MessageScreenUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(70.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(Dimensions.padding8)
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Dimensions.padding16))
 
                 /* ---------------- BUTTONS ---------------- */
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.padding10),
                     modifier = Modifier.fillMaxWidth()
                 ) {
 

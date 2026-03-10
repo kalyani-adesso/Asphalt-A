@@ -167,7 +167,6 @@ fun GroupRidersCard(
 
     if (showDialog) {
         MessageScreenUI(
-            onSend = {},
             ridesData = riderData,
             onCancel = { showDialog = false }
         )
@@ -211,7 +210,7 @@ fun GroupRidersCard(
                     }
                     Spacer(Modifier.width(Dimensions.size5))
                     Column(modifier = Modifier) {
-                        Row() {
+                        Row {
                             val name = androidUserVM.getUser(riderData?.userID ?: "")?.name
                             Log.d("TAG", "GroupRidersCard name: $name")
                             Text(
@@ -234,8 +233,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                      top = Dimensions.size5,
-                                                //                      bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -260,8 +257,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                                            top = Dimensions.size5,
-                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
@@ -288,8 +283,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                                            top = Dimensions.size5,
-                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
