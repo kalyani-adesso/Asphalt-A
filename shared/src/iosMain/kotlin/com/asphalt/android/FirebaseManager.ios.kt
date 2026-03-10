@@ -25,7 +25,7 @@ class IosDatabaseReference(
     override fun setValue(value: Any?) {
         val finalValue = when (value) {
             is Boolean -> value
-            is Number -> value.toInt() == 1
+            is Number -> value
             is String -> value.lowercase() == "true" || value == "1"
             else -> false
         }
@@ -138,7 +138,7 @@ actual class TransactionResult(
 
 actual object FirebaseServerValue {
     actual val TIMESTAMP: Any
-        get() = FIRServerValue.timestamp()  // Returns NSDictionary, fine
+        get() = FIRServerValue.timestamp()
 
     actual fun increment(value: Int): Any {
         // Use NSNumber factory

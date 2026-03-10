@@ -322,8 +322,10 @@ class MessagesViewModel: ObservableObject {
             return "\(diff)s ago"
         } else if diff < 3600 {
             return "\(diff / 60)m ago"
-        } else {
+        } else if diff < 86400 {
             return "\(diff / 3600)h ago"
+        } else {
+            return "\(diff / 86400)d ago" 
         }
     }
     
