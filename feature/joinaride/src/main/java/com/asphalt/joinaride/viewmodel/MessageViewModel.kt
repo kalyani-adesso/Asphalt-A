@@ -44,6 +44,9 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     private val _uiState = MutableStateFlow(MessageRoot())
     val uiState: StateFlow<MessageRoot> = _uiState.asStateFlow()
 
+    private val _messagesList = MutableStateFlow<List<MessageRoot>>(emptyList())
+    val messagesList: StateFlow<List<MessageRoot>> = _messagesList
+
     fun onQuickMessageClick(message: String) {
         customMessage = message
     }
@@ -51,6 +54,10 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     fun onCustomMessageChange(message: String) {
         customMessage = message
     }
+
+
+    var receiverName by mutableStateOf("")
+        private set
 
     fun sendMessage(
         senderID: String, // current user id
@@ -103,24 +110,25 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     val messages: StateFlow<List<Message>> = _messages
 
 
-    init {
-        listenForMessages()
-    }
-    // listen for message
-    private fun listenForMessages() {
+    // LISTEN FOR LIVE MESSAGES
+    fun listenForMessages(onGoingRideID: String) {
 
-        messageRef.addValueEventListener(object : ValueEventListener {
+        val ref = messageRef.database.getReference("messages/$onGoingRideID")
+
+        ref.addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val list = mutableListOf<Message>()
+                val list = mutableListOf<MessageRoot>()
 
                 for (child in snapshot.children) {
-                    val message = child.getValue(Message::class.java)
-                    message?.let { list.add(it) }
+
+                    val msg = child.getValue(MessageRoot::class.java)
+                    receiverName = snapshot.child("receiverName").getValue(String::class.java) ?: ""
+                    msg?.let { list.add(it) }
                 }
 
-                _messages.value = list
+                _messagesList.value = list.sortedBy { it.timeStamp }
             }
 
             override fun onCancelled(error: DatabaseError) {}

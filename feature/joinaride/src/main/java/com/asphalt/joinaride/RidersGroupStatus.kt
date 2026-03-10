@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
@@ -74,6 +75,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RidersGroupStatus(
+    ridesData: RidesData,
     viewModel: JoinRideViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
 
@@ -153,7 +155,7 @@ fun RidersGroupStatus(
 @Composable
 fun GroupRidersCard(
 //    ridersList: List<ConnectedRideDTO>,
-    riderData: ConnectedRideDTO?,
+    riderData: ConnectedRideDTO,
     viewModel: JoinRideViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
 ) {
@@ -166,6 +168,7 @@ fun GroupRidersCard(
     if (showDialog) {
         MessageScreenUI(
             onSend = {},
+            ridesData = riderData,
             onCancel = { showDialog = false }
         )
     }
@@ -210,7 +213,7 @@ fun GroupRidersCard(
                     Column(modifier = Modifier) {
                         Row() {
                             val name = androidUserVM.getUser(riderData?.userID ?: "")?.name
-
+                            Log.d("TAG", "GroupRidersCard name: $name")
                             Text(
                                 text = name ?: "",
                                 style = TypographyBold.bodySmall,

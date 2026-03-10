@@ -205,7 +205,7 @@ fun ConnectedRideGoogleMapScreen(
                 onClickEndRide = onClick,
                 ridesData = ridesData
             )
-            RidersGroupStatus(rideViewModel, androidUserVM)
+            RidersGroupStatus(ridesData,rideViewModel, androidUserVM)
             EmergecyActions()
         }
         if (showBanner) {
