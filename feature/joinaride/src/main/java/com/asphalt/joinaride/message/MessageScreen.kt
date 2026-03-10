@@ -81,7 +81,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MessageScreenUI(
     onCancel: () -> Unit,
     onSend: () -> Unit,
-    onGoingRideId: String,
     ridesData: ConnectedRideDTO?,
     viewModel: MessageViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
@@ -171,11 +170,6 @@ fun MessageScreenUI(
                                             color = GreenLIGHT25,
                                             modifier = Modifier
                                         )
-                                        Text(
-                                            "Connected",
-                                            color = Color.Gray,
-                                            fontSize = 13.sp
-                                        )
                                     }
                                 }
 
@@ -202,10 +196,8 @@ fun MessageScreenUI(
                                             color = NeutralBrown,
                                             modifier = Modifier
                                         )
-
                                     }
                                 }
-
                                 "stopped" -> {
                                     Row(
                                         modifier = Modifier
@@ -219,8 +211,6 @@ fun MessageScreenUI(
                                                 end = Dimensions.size5,
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
-
-
                                         ) {
                                         Spacer(Modifier.width(Dimensions.size4))
                                         Text(
@@ -229,24 +219,10 @@ fun MessageScreenUI(
                                             color = DarkBrown,
                                             modifier = Modifier
                                         )
-
                                     }
                                 }
                             }
-//                            Box(
-//                                modifier = Modifier
-//                                    .size(Dimensions.padding8)
-//                                    .clip(CircleShape)
-//                                    .background(Color.Green)
-//                            )
-
                             Spacer(modifier = Modifier.width(Dimensions.padding6))
-
-                            Text(
-                                "Connected",
-                                color = Color.Gray,
-                                fontSize = 13.sp
-                            )
                         }
                     }
                 }
