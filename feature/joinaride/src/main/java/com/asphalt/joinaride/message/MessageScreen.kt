@@ -71,6 +71,7 @@ import com.asphalt.commonui.theme.PaleGreen
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.joinaride.viewmodel.MessageViewModel
 import io.ktor.util.collections.getValue
@@ -80,6 +81,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MessageScreenUI(
     onCancel: () -> Unit,
     onSend: () -> Unit,
+    onGoingRideId: String,
     ridesData: ConnectedRideDTO?,
     viewModel: MessageViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
@@ -96,7 +98,8 @@ fun MessageScreenUI(
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        viewModel.listenForMessages(ridesData?.rideJoinedID ?: "")
+        viewModel.listenForMessages(onGoingRideId = ridesData?.rideID ?: "", recevierId = ridesData?.userID ?: "")
+        Log.d("TAG", "MessageScreenUI:ride Id & userId ${ridesData?.rideID} + ${ridesData?.userID}")
     }
 
     LaunchedEffect(messagesList.size) {
@@ -129,9 +132,8 @@ fun MessageScreenUI(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
-                    Image(
-                        painter = painterResource(R.drawable.ic_profile),
-                        contentDescription = null,
+                    CircularNetworkImage(
+                        imageUrl = "",
                         modifier = Modifier
                             .size(Dimensions.padding40)
                             .clip(CircleShape)
@@ -141,7 +143,7 @@ fun MessageScreenUI(
 
                     Column {
                         Text(
-                            text = currentUser?:"", // receiver name
+                            text = name ?: "",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -261,7 +263,6 @@ fun MessageScreenUI(
                 ) {
 
                     item {
-
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -289,9 +290,8 @@ fun MessageScreenUI(
 
                                             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                                                Image(
-                                                    painter = painterResource(R.drawable.ic_profile),
-                                                    contentDescription = null,
+                                                CircularNetworkImage(
+                                                    imageUrl = "",
                                                     modifier = Modifier
                                                         .size(40.dp)
                                                         .clip(CircleShape)
@@ -434,11 +434,11 @@ fun MessageScreenUI(
                             viewModel.sendMessage(
                                 senderID = currentUid ?: "",
                                 senderName = currentUser ?: "",
-                                receiverID = ridesData?.rideID ?: "",
+                                receiverID = ridesData?.userID ?: "",
                                 receiverName = name ?: "",
-                                onGoingRideID = ridesData?.rideJoinedID ?: "",
+                                onGoingRideID = ridesData?.rideID ?: "",
                                 isRideOnGoing = true,
-                                message = viewModel.customMessage
+                                message = viewModel.customMessage,
                             )
                         },
                         buttonHeight = Dimensions.size60,

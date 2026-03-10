@@ -169,6 +169,7 @@ fun GroupRidersCard(
         MessageScreenUI(
             onSend = {},
             ridesData = riderData,
+            onGoingRideId = viewModel.ongoingRideUpdate.value ?: "",
             onCancel = { showDialog = false }
         )
     }
