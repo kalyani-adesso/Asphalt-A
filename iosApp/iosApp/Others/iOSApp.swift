@@ -24,10 +24,20 @@ struct iOSApp: App {
                 if isLoggedIn {
                     BottomNavBar()
                 } else if hasSeenOnboarding {
-                    SignInView()
+                    BottomNavBar()
 
                 } else {
                     WelcomeScreen()
+                }
+            }
+            .onOpenURL { url in
+                let rideId: String? = {
+                    if !url.lastPathComponent.isEmpty { return url.lastPathComponent }
+                    if let host = url.host, !host.isEmpty { return host }
+                    return nil
+                }()
+                if let id = rideId, !id.isEmpty {
+                    MBUserDefaults.deepLinkRideIdStatic = id
                 }
             }
         }

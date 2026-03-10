@@ -6,6 +6,19 @@
 	<string>Your location is used to show nearby rides and routes.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>adessoriderclub</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>Ride Deep Link</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Klavika-Light.otf</string>

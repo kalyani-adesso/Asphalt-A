@@ -26,6 +26,33 @@ enum RiderStatus: String {
     case connected = "Connected"
     case delayed = "Delayed"
     case stopped = "Stopped"
+
+    /// Parses status from backend (Firebase) case-insensitively. Uses same rules as getRideStatus() when string is missing/invalid.
+    static func fromBackend(_ value: String?) -> RiderStatus {
+        guard let value = value, !value.isEmpty else { return .stopped }
+        switch value.lowercased() {
+        case "connected": return .connected
+        case "delayed": return .delayed
+        case "stopped": return .stopped
+        case "active": return .active
+        default: return RiderStatus(rawValue: value) ?? .stopped
+        }
+    }
+
+    /// Derives status from last update time (and optional speed) so UI is consistent across clients.
+    /// Same thresholds as getRideStatus(): >120s = Stopped, ≤10s = Connected, else Delayed.
+    static func fromLastUpdate(epochMillis: Int64, speedKph: Double = 0) -> RiderStatus {
+        let lastUpdate = TimeInterval(epochMillis) / 1000
+        let now = Date().timeIntervalSince1970
+        let secondsAgo = now - lastUpdate
+        if secondsAgo > 120 {
+            return .stopped
+        }
+        if secondsAgo <= 10 {
+            return .connected
+        }
+        return .delayed
+    }
 }
 
 enum TrackingStatus:String {
@@ -39,6 +66,8 @@ struct Rider: Identifiable {
     var speed: Int // Kph
     var status: RiderStatus
     var timeSinceUpdate: String
+    /// Epoch milliseconds of last update; used to show live "Xs ago" in group section.
+    let lastUpdateEpochMillis: Int64
     var contactNumber: String
     var currentLat:Double
     var currentLong:Double
@@ -76,7 +105,7 @@ struct ConnectedRideMessage: Identifiable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -85,7 +114,12 @@ final class ConnectedRideViewModel: ObservableObject {
     private var userAPIService: UserAPIService
     private var userRepository: UserRepository
     var ongoingRideTimer:Timer?
+    /// Ticks every second when groupRiders is non-empty so group section "Xs ago" updates live.
+    @Published var groupStatusTick: Int = 0
+    private var groupStatusTimer: Timer?
     private var previousRidersDict: [String: Rider] = [:]
+    /// Cache for user lookups (userId → (name, contact)). Only name/contact; status always comes from snapshot.
+    private var userDetailsCache: [String: (name: String, contact: String)] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
@@ -109,7 +143,7 @@ final class ConnectedRideViewModel: ObservableObject {
 
     // used when we receive the `getOnGoingRides` stream; the backend sends a
     // snapshot roughly every 10 s. the timestamp helps drive rideStatus.
-    var lastMessageReceivedTime: TimeInterval = Date().timeIntervalSince1970
+    var lastMessageReceivedTime: TimeInterval = 0
 
     // remembers the last coordinate for each user (keyed by userID)
     var lastLocations: [String: CLLocationCoordinate2D] = [:]
@@ -146,7 +180,7 @@ final class ConnectedRideViewModel: ObservableObject {
     
     func endRide() {
         print("Ride ended.")
-        // Example of a state change that updates the view:
+        stopGroupStatusTimer()
         self.groupRiders = []
         self.isGroupNavigationActive = false
         self.activeRider = []
@@ -162,18 +196,36 @@ final class ConnectedRideViewModel: ObservableObject {
         //            print("Tracking toggled. New speed: \(newSpeed) Kph")
     }
     
-    /// Sends an emergency SOS signal by dialing the ride creator's contact number.
+    /// Sends an emergency SOS: dials profile emergency contact if set, else govt RSA numbers (hardcoded).
     func sendEmergencySOS() {
-        guard let number = activeRide?.contactNumber, !number.isEmpty else {
-            print("sendEmergencySOS: organizer contact not available")
+        let numberToDial: String? = {
+            if let profileEmergency = MBUserDefaults.emergencyContactStatic?.trimmingCharacters(in: .whitespaces),
+               !profileEmergency.isEmpty,
+               profileEmergency != "--" {
+                return profileEmergency
+            }
+            return Self.govtRSAContactNumbers.first
+        }()
+        guard let number = numberToDial, !number.isEmpty else {
+            print("sendEmergencySOS: no emergency contact or RSA number available")
             return
         }
+        callRSAForEmergencySOS()
         let cleaned = number.replacingOccurrences(of: " ", with: "")
         if let url = URL(string: "tel://\(cleaned)") {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         } else {
             print("sendEmergencySOS: invalid phone number")
         }
+    }
+
+    /// Hardcoded government RSA / emergency contact numbers (dialled when profile emergency contact is not set).
+    private static let govtRSAContactNumbers = ["103", "108", "112"]
+
+    /// Notifies RSA (e.g. backend / roadside assistance) of emergency SOS. Override or implement when API is available.
+    func callRSAForEmergencySOS() {
+        guard let ride = activeRide else { return }
+        // TODO: Call RSA API when available, e.g. rideRepository.reportEmergencySOS(rideId: ride.rideId, userId: MBUserDefaults.userIdStatic ?? "", contactNumber: ride.contactNumber) { _, _ in }
     }
     
     /// Requests to share the user's live location with external contacts (WhatsApp).
@@ -222,7 +274,8 @@ extension ConnectedRideViewModel {
             currentLong: KotlinDouble(value: currentLong),
             speedInKph: KotlinDouble(value: speed), status: status.rawValue,
             dateTime: KotlinLong(value: dateTimeMillis),
-            isRejoined: KotlinBoolean(value: false)
+            isRejoined: KotlinBoolean(value: false),rideJoinedID: rideId,
+            rideStartedTime: dateTimeMillis
         )
         
         rideRepository.joinRide(joinRide: connectedRideRoot) { result, error in
@@ -250,7 +303,8 @@ extension ConnectedRideViewModel {
             currentLong: KotlinDouble(value: currentLong),
             speedInKph: KotlinDouble(value: speed), status: status.rawValue ,
             dateTime: KotlinLong(value: dateTimeMillis),
-            isRejoined: KotlinBoolean(value: true)
+            isRejoined: KotlinBoolean(value: true),rideJoinedID: rideId,
+            rideStartedTime: dateTimeMillis
         )
         
         rideRepository.reJoinRide(rejoinRide:connectedRideRoot,ongoingRideId: ongoingRideId){ result, error in
@@ -280,81 +334,84 @@ extension ConnectedRideViewModel {
             try await flow.collect(
                 collector: ConnectedRideCollector(
                     onValue: { ongoingRides in
-                        
                         Task {
-                            var ridersDict: [String: Rider] = [:]  // Dictionary to track unique riders by userID
+                            var ridersDict: [String: Rider] = [:]
                             let now = Date().timeIntervalSince1970
-
-                            // whenever we receive the stream, treat it as both a status update
-                            // and a "message" arriving from the backend
-                            self.lastMessageReceivedTime = now
+                            var newLastMessageReceivedTime = now
+                            var newLastMovementTime = self.lastMovementTime
+                            var newLastLocations = self.lastLocations
+                            var newActiveRider = self.activeRider
 
                             for ongoingRide in ongoingRides {
-                                // process our own snapshot for status calculations and
-                                // to update activeRider
                                 if ongoingRide.userID == MBUserDefaults.userIdStatic {
                                     let lat = ongoingRide.currentLat
                                     let long = ongoingRide.currentLong
-
-                                    if let prev = self.lastLocations[ongoingRide.userID],
+                                    if let prev = newLastLocations[ongoingRide.userID],
                                        prev.latitude != lat || prev.longitude != long {
-                                        self.lastMovementTime = now
+                                        newLastMovementTime = now
                                     }
-                                    self.lastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
-
-                                    if !self.activeRider.isEmpty {
-                                        var me = self.activeRider[0]
+                                    newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                                    if !newActiveRider.isEmpty {
+                                        var me = newActiveRider[0]
                                         me.currentLat = lat
                                         me.currentLong = long
                                         me.speed = Int(ongoingRide.speedInKph)
-                                        self.activeRider[0] = me
+                                        newActiveRider[0] = me
                                     }
-
-                                    continue // we don't display current user in group list
+                                    continue
                                 }
 
-                                // build rider model for other participants
                                 _ = self.getRideStatus()
-                                let timeSinceUpdate = self.formatTime(from: ongoingRide.dateTime)
-                                let userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
-
+                                let epochMillis = self.epochMillisFromOngoing(ongoingRide)
+                                let timeSinceUpdate = self.formatTime(from: epochMillis)
+                                let status = self.riderStatusFromOngoing(ongoingRide)
                                 let lat = ongoingRide.currentLat
                                 let long = ongoingRide.currentLong
-                                if let prev = self.lastLocations[ongoingRide.userID],
-                                   prev.latitude != lat || prev.longitude != long {
-                                    // you could react to their movement here if needed
-                                }
-                                self.lastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
 
+                                let userDetails: (String, String)?
+                                if let cached = self.userDetailsCache[ongoingRide.userID] {
+                                    userDetails = (cached.name, cached.contact)
+                                } else {
+                                    userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
+                                    if let details = userDetails {
+                                        self.userDetailsCache[ongoingRide.userID] = (details.0, details.1)
+                                    }
+                                }
+
+                                newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                                let name = (userDetails?.0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 let rider = Rider(
-                                    name: userDetails?.0 ?? "",
+                                    name: name.isEmpty ? "Rider" : name,
                                     speed: Int(ongoingRide.speedInKph),
-                                    status: RiderStatus(rawValue: ongoingRide.status) ?? .stopped,
+                                    status: status,
                                     timeSinceUpdate: timeSinceUpdate,
+                                    lastUpdateEpochMillis: epochMillis,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: lat,
                                     currentLong: long,
                                     rideId: ongoingRide.rideID,
                                     receiverId: ongoingRide.userID
                                 )
-
                                 ridersDict[ongoingRide.userID] = rider
                             }
-                            
-                            // Convert dictionary values to array
+
                             let updatedRiders = Array(ridersDict.values)
-                            
                             DispatchQueue.main.async {
+                                self.lastMessageReceivedTime = newLastMessageReceivedTime
+                                self.lastMovementTime = newLastMovementTime
+                                self.lastLocations = newLastLocations
+                                self.activeRider = newActiveRider
                                 if self.groupRiders.count > 0 {
                                     self.groupRiders.removeAll()
                                 }
-                                
                                 self.detectRiderChanges(newRiders: updatedRiders)
-                                
                                 self.groupRiders = updatedRiders
-                                
                                 self.previousRidersDict = Dictionary(uniqueKeysWithValues: updatedRiders.map { ($0.contactNumber, $0) })
-
+                                if updatedRiders.isEmpty {
+                                    self.stopGroupStatusTimer()
+                                } else {
+                                    self.startGroupStatusTimer()
+                                }
                             }
                         }
                     },
@@ -461,13 +518,15 @@ extension ConnectedRideViewModel {
         }
     }
     
-    func endRide(rideId: String) {
+    func endRide(rideId: String, completion: @escaping (Bool) -> Void) {
         let rideJoinedId = MBUserDefaults.isRideJoinedID ?? ""
-        rideRepository.endRide(rideId: rideId, rideJoinedId:rideJoinedId) { result, error in
+        rideRepository.endRide(rideId: rideId, rideJoinedId: rideJoinedId) { result, error in
             if let error = error {
                 print("Failed to end ride: \(error.localizedDescription)")
+                completion(false)
             } else {
                 print("Successfully ended ride")
+                completion(true)
             }
         }
     }
@@ -509,9 +568,39 @@ extension ConnectedRideViewModel {
         return .delayed
     }
 
+    /// Connected/Delayed/Stopped for another rider from their last update time (same thresholds as getRideStatus).
+    func riderStatusFromOngoing(_ ongoing: ConnectedRideDTO) -> RiderStatus {
+        let epochMillis: Int64
+        if let num = ongoing.dateTime as? NSNumber {
+            epochMillis = num.int64Value
+        } else if let val = ongoing.dateTime as? Int64 {
+            epochMillis = val
+        } else {
+            epochMillis = 0
+        }
+        if epochMillis <= 0 {
+            return RiderStatus.fromBackend(ongoing.status)
+        }
+        return RiderStatus.fromLastUpdate(epochMillis: epochMillis, speedKph: ongoing.speedInKph)
+    }
+
+    /// Extracts epoch millis from ConnectedRideDTO.dateTime for formatTime / status.
+    /// If value is in 1e9..<1e10 range, treats as seconds; else treats as milliseconds.
+    private func epochMillisFromOngoing(_ ongoing: ConnectedRideDTO) -> Int64 {
+        let raw: Int64
+        if let num = ongoing.dateTime as? NSNumber { raw = num.int64Value }
+        else if let val = ongoing.dateTime as? Int64 { raw = val }
+        else { return 0 }
+        if raw <= 0 { return 0 }
+        if raw >= 1_000_000_000 && raw < 10_000_000_000 { return raw * 1000 }
+        return raw
+    }
+
     func formatTime(from timestamp: Int64) -> String {
+        guard timestamp > 0 else { return "just now" }
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
-        let diff = Int(Date().timeIntervalSince(date))
+        var diff = Int(Date().timeIntervalSince(date))
+        if diff < 0 { diff = 0 }
         
         if diff < 60 {
             return "\(diff)s ago"
@@ -526,12 +615,27 @@ extension ConnectedRideViewModel {
     func stopOngoingRideTimer() {
         ongoingRideTimer?.invalidate()
         ongoingRideTimer = nil
+        stopGroupStatusTimer()
+    }
+
+    /// Starts a 1s timer that increments groupStatusTick so group section "Xs ago" updates every second.
+    func startGroupStatusTimer() {
+        guard groupStatusTimer == nil else { return }
+        groupStatusTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.groupStatusTick += 1
+            }
+        }
+        RunLoop.main.add(groupStatusTimer!, forMode: .common)
+    }
+
+    func stopGroupStatusTimer() {
+        groupStatusTimer?.invalidate()
+        groupStatusTimer = nil
     }
     
-    func endRideSummary(ride: JoinRideModel, userID: String) {
-        
+    func endRideSummary(ride: JoinRideModel, userID: String, completion: @escaping () -> Void) {
         let isParticipant = ride.participants?.contains { $0.userId == userID } ?? false
-        
         let dto = DashboardDTO(
               rideID: ride.rideId,
               rideDistance: KotlinDouble(value: Double(ride.distance.replacingOccurrences(of: " km", with: "")) ?? 0),
@@ -542,16 +646,11 @@ extension ConnectedRideViewModel {
               isParticipantGroupRide: KotlinBoolean(bool: isParticipant),
               endRideDate: KotlinLong(value: Int64(Date().timeIntervalSince1970 * 1000))
         )
-        
-        rideRepository.endRideSummary(userID: userID, endRide: dto){ result, error in
-            if let result = result as? APIResultSuccess<ConnectedRideDTO> {
-                _ = result.data
-               
-            } else if let error = error {
-                print("Error joining ride:", error.localizedDescription)
-            } else {
-                print("Result is nil")
+        rideRepository.endRideSummary(userID: userID, endRide: dto) { result, error in
+            if let error = error {
+                print("Error endRideSummary:", error.localizedDescription)
             }
+            completion()
         }
     }
     

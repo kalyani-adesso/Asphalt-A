@@ -52,6 +52,7 @@ struct RideModel: Identifiable,Hashable {
     let endTime: String?
     let ratings: Int?
     let imageData:[ImageData]?
+    let participants: [ParticipantData]?
 }
 
 struct RideDetailsModel: Identifiable,Hashable {
@@ -83,6 +84,7 @@ class UpcomingRideViewModel: ObservableObject {
     private let userRepo: UserRepository
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
+    @Published var rideFromDeepLink: RideModel? = nil
     @Published var isUploading:Bool = false
     @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
     init() {
@@ -220,7 +222,8 @@ class UpcomingRideViewModel: ObservableObject {
                     startTime: startRideTime,
                     endTime: EndRideTime,
                     ratings: myRating,
-                    imageData: ride.images
+                    imageData: ride.images,
+                    participants: ride.participants ?? []
                 )
                 switch rideAction {
                 case .upcoming: upcoming.append(mapped)
@@ -485,6 +488,42 @@ class UpcomingRideViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    /// Call after getSingleRide to set rideFromDeepLink for navigation (e.g. from deep link).
+    func setRideFromDeepLinkIfPossible() {
+        if let model = buildRideModelFromCurrentJoinRide() {
+            rideFromDeepLink = model
+        }
+    }
+    
+    /// Build a RideModel from current joinRideModel/rideDetails (e.g. after getSingleRide for deep link).
+    func buildRideModelFromCurrentJoinRide() -> RideModel? {
+        let j = joinRideModel
+        guard !j.rideId.isEmpty else { return nil }
+        let parts = j.route.split(separator: "-").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let routeStart = parts.first ?? ""
+        let routeEnd = parts.dropFirst().joined(separator: "-").trimmingCharacters(in: .whitespaces)
+        let confirmedCount = rideDetails.filter { $0.status == "confirmed" }.count
+        return RideModel(
+            id: j.rideId,
+            title: j.title,
+            routeStart: routeStart,
+            routeEnd: routeEnd,
+            status: .upcoming,
+            rideViewAction: .viewDetails,
+            rideAction: .upcoming,
+            date: j.date,
+            riderCount: Int(j.ridersCount) ?? 0,
+            createdBy: j.userId,
+            hasPhotos: false,
+            startDate: Date(),
+            participantAcceptedCount: confirmedCount,
+            startTime: nil,
+            endTime: nil,
+            ratings: nil,
+            imageData: nil, participants: []
+        )
     }
 }
 

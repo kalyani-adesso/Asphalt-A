@@ -14,7 +14,7 @@ class CreateRideViewModel: NSObject, ObservableObject {
     @Published var ride = Ride()
     @Published var currentStep = 1
     @Published var selectedParticipants: [Participant] = []
-    @Published var shareLink = "https://adessoriderclub.app/12121312"
+    @Published var shareLink = ""
     @Published var selectedStartTime: Date? = nil
     @Published var selectedStartDate: Date? = nil
     @Published var selectedEndTime: Date? = nil
@@ -340,8 +340,11 @@ extension CreateRideViewModel {
                 Task { @MainActor in
                     self.isRideLoading = false
                     self.nextStep()
-                    print("ride id:\(data.name)")
-                    MBUserDefaults.rideIdStatic = data.name
+                    let rideId = data.name
+                    let shareCode = Self.generateRandomShareCode()
+                    self.shareLink = "https://adessoriderclub.app/\(shareCode)"
+                    print("ride id:\(rideId), share link: \(self.shareLink)")
+                    MBUserDefaults.rideIdStatic = rideId
                     completion(true)
                 }
             }
@@ -349,6 +352,11 @@ extension CreateRideViewModel {
     }
     
     // MARK: - Epoch converter
+    
+    /// Generates a random 8-digit numeric string for the share link path (e.g. "82938473").
+    static func generateRandomShareCode() -> String {
+        String(Int.random(in: 1000_0000...9999_9999))
+    }
     
     func combine(date: Date?, time: Date?) -> Date? {
         guard let date = date, let time = time else { return nil }

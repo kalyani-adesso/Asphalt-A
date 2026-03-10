@@ -135,8 +135,25 @@ class ChatRepository {
             .observeValue().map { snapshot ->
                 snapshot.children.mapNotNull { child ->
                     val map = child.getValue() as? Map<String, Any?> ?: return@mapNotNull null
-                    val members = map["members"] as? Map<String, Boolean> ?: emptyMap()
-                    val favoriteBy = map["favorite_by"] as? Map<String, Boolean> ?: emptyMap()
+                    val membersRaw = map["members"] as? Map<String, Any?> ?: emptyMap()
+
+                    val members = membersRaw.mapValues { (_, value) ->
+                        when (value) {
+                            is Boolean -> value
+                            is Number -> value.toInt() == 1
+                            else -> false
+                        }
+                    }
+                    val favoriteByRaw = map["favorite_by"] as? Map<String, Any?> ?: emptyMap()
+
+                    val favoriteBy = favoriteByRaw.mapValues { (_, value) ->
+                        when (value) {
+                            is Boolean -> value
+                            is Number -> value.toInt() == 1
+                            else -> false
+                        }
+                    }
+
 
                     if (members.containsKey(myUserId)) {
                         ChatRoom(

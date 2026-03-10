@@ -23,28 +23,63 @@ struct InAppNavigationView: View {
     @State private var recenterCounter: Int = 0
     @State private var focusCoordinate: CLLocationCoordinate2D? = nil
     @State private var focusCounter: Int = 0
+    /// When focusing on start (after simulation stopped), use larger distance to zoom out.
+    @State private var focusCameraDistance: Double? = nil
     @State private var followUserState: Bool = true
     @State private var showInstructions: Bool = false
+    @State private var isCalculatingRoute: Bool = true
+    @State private var routeDistance: Double = 0
+    @State private var routeETA: TimeInterval = 0
     private let synthesizer = AVSpeechSynthesizer()
     @StateObject private var speechDelegate = SpeechDelegate()
+    // Route simulation demo
+    @State private var isSimulating: Bool = false
+    @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
+    @State private var simulationIndex: Int = 0
+
+    /// User position shown on map: simulated during demo, or endpoint after demo ends, otherwise real location.
+    private var displayUserCoordinate: CLLocationCoordinate2D? {
+        if isSimulating { return simulatedCoordinate }
+        if let sim = simulatedCoordinate { return sim } // show endpoint after simulation ends
+        return locationManager.lastLocation?.coordinate
+    }
 
     var body: some View {
         VStack(spacing: 0) {
+            // Header with app styling
             HStack {
                 Button(action: { dismiss() }) {
-                    Text("Close")
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Close")
+                            .font(KlavikaFont.medium.font(size: 16))
+                    }
+                    .foregroundColor(AppColor.celticBlue)
                 }
                 Spacer()
-                Text("Navigation")
-                    .font(.headline)
+                VStack(spacing: 2) {
+                    Text("Navigation")
+                        .font(KlavikaFont.bold.font(size: 18))
+                        .foregroundColor(AppColor.black)
+                    if !isCalculatingRoute && routeDistance > 0 {
+                        Text(routeSummaryText)
+                            .font(KlavikaFont.regular.font(size: 12))
+                            .foregroundColor(AppColor.stoneGray)
+                    }
+                }
                 Spacer()
+                Color.clear.frame(width: 60, height: 44)
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(UIColor.systemBackground))
 
             ZStack(alignment: .top) {
                 InAppMapView(routeCoordinates: routeCoordinates,
                              startCoordinate: start,
                              endCoordinate: end,
+                             userCoordinate: displayUserCoordinate,
                              followUser: followUserState,
                              cameraAltitude: 200,
                              mapType: mapType,
@@ -53,7 +88,28 @@ struct InAppNavigationView: View {
                              focusCounter: focusCounter)
                     .edgesIgnoringSafeArea(.all)
 
-                // Top-left control column: floating buttons stacked vertically, with map-type as fourth
+                if isCalculatingRoute {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                                .scaleEffect(1.2)
+                                .tint(AppColor.celticBlue)
+                            Text("Calculating route...")
+                                .font(KlavikaFont.medium.font(size: 14))
+                                .foregroundColor(AppColor.stoneGray)
+                            Spacer()
+                        }
+                        .padding(.vertical, 16)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
+                        .padding(.horizontal, 40)
+                        Spacer().frame(height: 120)
+                    }
+                }
+
+                // Top-left control column
                 HStack {
                         VStack(spacing: 12) {
                             Button(action: {
@@ -64,32 +120,48 @@ struct InAppNavigationView: View {
                                 }
                             }) {
                                 Image(systemName: speechDelegate.isSpeaking ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                                    .font(.system(size: 18))
                                     .foregroundColor(.white)
                                     .frame(width: 44, height: 44)
                                     .background(
-                                        steps.isEmpty ? Color.gray.opacity(0.4) : (speechDelegate.isSpeaking ? Color.red : Color.accentColor)
+                                        steps.isEmpty ? AppColor.stoneGray.opacity(0.5) : (speechDelegate.isSpeaking ? Color.red : AppColor.celticBlue)
                                     )
                                     .clipShape(Circle())
                             }
                             .disabled(steps.isEmpty)
 
-                        Button(action: { followUserState = true; recenterCounter += 1 }) {
+                        Button(action: {
+                            if isSimulating {
+                                followUserState = true
+                                recenterCounter += 1
+                            } else if simulatedCoordinate != nil {
+                                // Simulation stopped – show start point (default zoom)
+                                followUserState = false
+                                focusCoordinate = start
+                                focusCameraDistance = nil
+                                focusCounter += 1
+                            } else {
+                                followUserState = true
+                                recenterCounter += 1
+                            }
+                        }) {
                             Image(systemName: "location.fill")
+                                .font(.system(size: 18))
                                 .foregroundColor(.white)
                                 .frame(width: 44, height: 44)
-                                .background(Color.accentColor)
+                                .background(AppColor.celticBlue)
                                 .clipShape(Circle())
                         }
 
-                        Button(action: { withAnimation { showInstructions.toggle() } }) {
+                        Button(action: { withAnimation(.easeInOut(duration: 0.25)) { showInstructions.toggle() } }) {
                             Image(systemName: "list.bullet")
+                                .font(.system(size: 18))
                                 .foregroundColor(.white)
                                 .frame(width: 44, height: 44)
-                                .background(Color.accentColor)
+                                .background(AppColor.celticBlue)
                                 .clipShape(Circle())
                         }
 
-                        // Map type menu integrated in the same column
                         Menu {
                             Button("Standard") { mapType = .standard }
                             Button("Satellite") { mapType = .satellite }
@@ -99,10 +171,21 @@ struct InAppNavigationView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 18, height: 18)
+                                .foregroundColor(AppColor.celticBlue)
                                 .padding(12)
                                 .background(.regularMaterial)
                                 .clipShape(Circle())
                         }
+
+                        Button(action: { toggleRouteSimulation() }) {
+                            Image(systemName: isSimulating ? "stop.circle.fill" : "play.circle.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(isSimulating ? Color.red : AppColor.celticBlue)
+                                .clipShape(Circle())
+                        }
+                        .disabled(routeCoordinates.isEmpty)
                     }
                     .padding(8)
                     .background(.ultraThinMaterial)
@@ -131,7 +214,8 @@ struct InAppNavigationView: View {
                     synthesizer.delegate = speechDelegate
                 }
                 .onDisappear {
-                    // Ensure any speaking stops when leaving the navigation view
+                    isSimulating = false
+                    simulatedCoordinate = nil
                     if synthesizer.isSpeaking {
                         synthesizer.stopSpeaking(at: .immediate)
                     }
@@ -143,7 +227,26 @@ struct InAppNavigationView: View {
         }
     }
 
+    private var routeSummaryText: String {
+        var parts: [String] = []
+        if routeDistance >= 1000 {
+            parts.append(String(format: "%.1f km", routeDistance / 1000))
+        } else if routeDistance > 0 {
+            parts.append(String(format: "%.0f m", routeDistance))
+        }
+        if routeETA > 0 {
+            let mins = Int(routeETA / 60)
+            if mins >= 60 {
+                parts.append(String(format: "%d hr %d min", mins / 60, mins % 60))
+            } else {
+                parts.append("\(mins) min")
+            }
+        }
+        return parts.joined(separator: " · ")
+    }
+
     func calculateRoute() {
+        isCalculatingRoute = true
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: start))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: end))
@@ -151,34 +254,37 @@ struct InAppNavigationView: View {
 
         let directions = MKDirections(request: request)
         directions.calculate { response, error in
+            DispatchQueue.main.async {
+                isCalculatingRoute = false
+            }
             guard let route = response?.routes.first else { return }
-            routeCoordinates = route.polyline.coordinates
-            // extract step instructions and representative coordinate & distance for each step
-            var tempSteps: [String] = []
+            let polylineCoords = route.polyline.coordinates
+            let tempSteps: [String] = route.steps.compactMap { step in
+                let instr = step.instructions
+                return instr.isEmpty ? nil : instr
+            }
             var tempCoords: [CLLocationCoordinate2D] = []
             var tempDistances: [Double] = []
-            for step in route.steps {
-                let instr = step.instructions
-                if !instr.isEmpty {
-                    tempSteps.append(instr)
-                    tempDistances.append(step.distance)
-                    // take first coordinate of the step's polyline if present
-                    if step.polyline.pointCount > 0 {
-                        let coords = step.polyline.coordinates
-                        if let first = coords.first {
-                            tempCoords.append(first)
-                        } else {
-                            tempCoords.append(route.polyline.coordinates.first ?? end)
-                        }
-                    } else {
-                        tempCoords.append(route.polyline.coordinates.first ?? end)
-                    }
+            for step in route.steps where !step.instructions.isEmpty {
+                tempDistances.append(step.distance)
+                if step.polyline.pointCount > 0, let first = step.polyline.coordinates.first {
+                    tempCoords.append(first)
+                } else {
+                    tempCoords.append(polylineCoords.first ?? end)
                 }
             }
-            steps = tempSteps
-            stepCoords = tempCoords
-            stepDistances = tempDistances
-            currentStepIndex = 0
+            let totalDistance = route.distance
+            let eta = route.expectedTravelTime
+
+            DispatchQueue.main.async {
+                routeCoordinates = polylineCoords
+                steps = tempSteps
+                stepCoords = tempCoords
+                stepDistances = tempDistances
+                currentStepIndex = 0
+                routeDistance = totalDistance
+                routeETA = eta
+            }
         }
     }
 
@@ -198,6 +304,7 @@ struct InAppNavigationView: View {
     }
 
     func checkProgress(current: CLLocation) {
+        guard !isSimulating else { return }
         guard currentStepIndex < stepCoords.count else { return }
         let target = stepCoords[currentStepIndex]
         let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
@@ -209,61 +316,137 @@ struct InAppNavigationView: View {
         }
     }
 
-    // Show a list of steps as an overlay
+    // MARK: - Route simulation demo
+    func toggleRouteSimulation() {
+        if isSimulating {
+            stopRouteSimulation()
+        } else {
+            startRouteSimulation()
+        }
+    }
+
+    func startRouteSimulation() {
+        guard !routeCoordinates.isEmpty else { return }
+        simulationIndex = 0
+        currentStepIndex = 0
+        simulatedCoordinate = routeCoordinates[0]
+        isSimulating = true
+        followUserState = true
+        // Speak first instruction when simulation starts
+        if !steps.isEmpty {
+            speakStep(index: 0)
+        }
+        advanceSimulationStep(index: 0)
+    }
+
+    private func advanceSimulationStep(index: Int) {
+        guard isSimulating else { return }
+        let count = routeCoordinates.count
+        guard count > 0 else { stopRouteSimulation(); return }
+        if index >= count {
+            // Ensure we end exactly at the end point
+            simulatedCoordinate = routeCoordinates[count - 1]
+            simulationIndex = count - 1
+            recenterCounter += 1
+            stopRouteSimulation()
+            return
+        }
+        simulationIndex = index
+        simulatedCoordinate = routeCoordinates[index]
+        recenterCounter += 1
+        // Voice over: when simulated position is near next step, speak it
+        if currentStepIndex < stepCoords.count, let currentSim = simulatedCoordinate {
+            let target = stepCoords[currentStepIndex]
+            let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
+            let simLoc = CLLocation(latitude: currentSim.latitude, longitude: currentSim.longitude)
+            if simLoc.distance(from: targetLoc) <= 50 {
+                speakStep(index: currentStepIndex)
+                currentStepIndex += 1
+            }
+        }
+        // 1 second per point
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            advanceSimulationStep(index: index + 1)
+        }
+    }
+
+    func stopRouteSimulation() {
+        isSimulating = false
+        // Leave dot at endpoint when simulation ends (reached end or user tapped stop)
+        if !routeCoordinates.isEmpty {
+            simulatedCoordinate = routeCoordinates[routeCoordinates.count - 1]
+        } else {
+            simulatedCoordinate = nil
+        }
+    }
+
     @ViewBuilder func instructionList() -> some View {
         VStack(spacing: 0) {
             HStack {
                 Text("Directions")
-                    .font(.headline)
+                    .font(KlavikaFont.bold.font(size: 17))
+                    .foregroundColor(AppColor.black)
                 Spacer()
-                Button(action: { showInstructions.toggle() }) {
+                Button(action: { withAnimation(.easeInOut(duration: 0.25)) { showInstructions.toggle() } }) {
                     Image(systemName: showInstructions ? "chevron.down" : "chevron.up")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppColor.celticBlue)
                 }
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
 
             if showInstructions {
-                ScrollView {                
-                    VStack(spacing: 8) {
+                ScrollView {
+                    VStack(spacing: 6) {
                         ForEach(steps.indices, id: \.self) { i in
-                                    let text = steps[i]
-                            HStack {
-                                VStack(alignment: .leading) {
+                            let text = steps[i]
+                            let isCurrent = i == currentStepIndex
+                            HStack(alignment: .top, spacing: 12) {
+                                Text("\(i + 1)")
+                                    .font(KlavikaFont.bold.font(size: 12))
+                                    .foregroundColor(isCurrent ? .white : AppColor.stoneGray)
+                                    .frame(width: 22, height: 22)
+                                    .background(isCurrent ? AppColor.celticBlue : AppColor.mediumGray)
+                                    .clipShape(Circle())
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text(text)
-                                        .font(.subheadline)
-                                        .foregroundColor(i == currentStepIndex ? .blue : .primary)
+                                        .font(KlavikaFont.regular.font(size: 14))
+                                        .foregroundColor(isCurrent ? AppColor.celticBlue : AppColor.black)
                                     Text(distanceText(i))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .font(KlavikaFont.regular.font(size: 12))
+                                        .foregroundColor(AppColor.stoneGray)
                                 }
                                 Spacer()
                                 Button(action: {
-                                    // disable follow-while focusing so the camera stays on the selected step
                                     followUserState = false
-                                    // focus on this step coordinate
+                                    focusCameraDistance = nil
                                     if i < stepCoords.count {
                                         focusCoordinate = stepCoords[i]
                                         focusCounter += 1
                                     }
                                 }) {
                                     Image(systemName: "location")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(AppColor.celticBlue)
                                 }
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.9))
-                            .cornerRadius(8)
-                            .shadow(radius: 1)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .background(isCurrent ? AppColor.celticBlue.opacity(0.08) : Color.white.opacity(0.95))
+                            .cornerRadius(10)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
-                .frame(maxHeight: 260)
+                .frame(maxHeight: 280)
             }
         }
         .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .padding()
+        .cornerRadius(16)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 
     func distanceText(_ index: Int) -> String {

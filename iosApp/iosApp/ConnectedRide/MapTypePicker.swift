@@ -19,6 +19,8 @@ struct BikeRouteMapView: View {
     @State var startLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     @State var endLocation = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     @Binding var startTracking: Bool
+    /// Called when the route is first fitted so the parent can restore this view on "refresh".
+    var onRouteFitted: ((MKCoordinateRegion) -> Void)?
     
     var body: some View {
         if #available(iOS 17.0, *) {
@@ -26,7 +28,7 @@ struct BikeRouteMapView: View {
                 
                 if !routeCoordinates.isEmpty {
                     MapPolyline(coordinates: routeCoordinates)
-                        .stroke(.blue, lineWidth: 5)
+                        .stroke(AppColor.celticBlue, lineWidth: 6)
                 }
                 
                 // Start location annotation
@@ -34,9 +36,9 @@ struct BikeRouteMapView: View {
                     if let image = AppIcon.ConnectedRide.startLocation {
                         Image(uiImage: image)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
                             .clipShape(Circle())
-                            .shadow(radius: 3)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
                 
@@ -45,15 +47,15 @@ struct BikeRouteMapView: View {
                     if let image = AppIcon.ConnectedRide.endLocation {
                         Image(uiImage: image)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 32, height: 32)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
                 
                 if startTracking {
-                    // Annotations for group riders
-                    ForEach(groupRiders, id: \.name) { rider in  // Assuming 'name' is unique; use a unique ID if available
+                    // Annotations for group riders — pin color matches ride status (Connected/Delayed/Stopped)
+                    ForEach(groupRiders, id: \.name) { rider in
                         Annotation("", coordinate: CLLocationCoordinate2D(latitude: rider.currentLat, longitude: rider.currentLong)) {
-                            // Customize the annotation view for riders
                             VStack(spacing: 1) {
                                 AppIcon.Profile.profile
                                     .resizable()
@@ -65,10 +67,11 @@ struct BikeRouteMapView: View {
                                     .clipShape(Circle())
                                 HStack {
                                     Spacer()
-                                    let randomImages = [AppIcon.JoinRide.greenPin, AppIcon.JoinRide.yellowPin, AppIcon.JoinRide.orangePin]  // Array of possible SF Symbol names
-                                    randomImages.randomElement()?
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
+                                    (rider.status == .connected ? AppIcon.JoinRide.greenPin
+                                        : rider.status == .delayed ? AppIcon.JoinRide.yellowPin
+                                        : AppIcon.JoinRide.orangePin)
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
                                 }
                                 .frame(width: 32)
                             }
@@ -104,16 +107,19 @@ struct BikeRouteMapView: View {
             let polyline = route.polyline
             routeCoordinates = polyline.coordinates
             
-            withAnimation {
-                let region = MKCoordinateRegion(polyline.boundingMapRect)
-                let adjustedRegion = MKCoordinateRegion(
-                    center: region.center,
-                    span: MKCoordinateSpan(
-                        latitudeDelta: region.span.latitudeDelta * 1.3,
-                        longitudeDelta: region.span.longitudeDelta * 1.3
-                    )
+            let region = MKCoordinateRegion(polyline.boundingMapRect)
+            let adjustedRegion = MKCoordinateRegion(
+                center: region.center,
+                span: MKCoordinateSpan(
+                    latitudeDelta: region.span.latitudeDelta * 1.3,
+                    longitudeDelta: region.span.longitudeDelta * 1.3
                 )
-                position = .region(adjustedRegion)
+            )
+            DispatchQueue.main.async {
+                withAnimation {
+                    position = .region(adjustedRegion)
+                }
+                onRouteFitted?(adjustedRegion)
             }
         }
     }
