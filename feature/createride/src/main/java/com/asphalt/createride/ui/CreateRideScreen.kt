@@ -143,7 +143,9 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                         clickDone.invoke()
                     } else {
                         if (viewModel.detailsFieldValidation())
-                            viewModel.updateTab(1)
+                            if (viewModel.startDateValidation(context))
+                                if (viewModel.endDateValidation(context))
+                                    viewModel.updateTab(1)
                     }
 
                 },
