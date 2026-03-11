@@ -523,6 +523,13 @@ fun NavigationRoot(
                         )
                     }
 
+                    entry<AppNavKey.MessageUiScreenKey> { key ->
+                        AppNavKey.MessageUiScreenKey(
+                            ridesData = key.ridesData,
+
+                        )
+                    }
+
                     entry<AppNavKey.RideDetails> { key ->
                         RidesDetailsScreen(
                             rideId = key.ridesID,

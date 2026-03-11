@@ -1,6 +1,7 @@
 package com.asphalt.android.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.asphalt.android.model.connectedride.ConnectedRideDTO
 import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.chat.model.ChatParamsModel
@@ -64,6 +65,8 @@ sealed interface AppNavKey : NavKey {
     data class RideProgressNavKey(val ridesData: RidesData) : AppNavKey
 
     @Serializable
+    data class MessageUiScreenKey(val ridesData: ConnectedRideDTO) : AppNavKey
+    @Serializable
     data class ConnectedRideEndNavKey(val ridesData: RidesData,val summaryData: RideSummaryData) : AppNavKey
 
     @Serializable
@@ -96,6 +99,8 @@ sealed interface AppNavKey : NavKey {
     @Serializable
     object CreateAd : AppNavKey
 }
+
+
 
 data class BottomNavItems(
     val key: AppNavKey,
