@@ -113,6 +113,12 @@ fun NavigationRoot(
                     bannerType = state.type
                     bannerMsg = state.successMsg
                 }
+
+                is UIState.INFO -> {
+                    showBanner = true
+                    bannerType = state.type
+                    bannerMsg = state.infoMessage
+                }
             }
 
         }

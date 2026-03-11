@@ -50,11 +50,18 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.location.LocationProvider
+import com.asphalt.android.model.chat.Message
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.BannerType
 import com.asphalt.commonui.PermissionHandler
+import com.asphalt.commonui.StatusBanner
+import com.asphalt.commonui.UIState
+import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayLite25
 import com.asphalt.commonui.theme.NeutralBlack
@@ -73,6 +80,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.maps.android.compose.CameraMoveStartedReason
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -97,8 +109,57 @@ fun CurrentLocationMapScreen(
 
     //val rideId = rideViewModel.getRideId()
     val context = LocalContext.current
-    val rideId = rideViewModel.getRideId()
+    val rideId = ridesData.ridesID
+    var isInitialLoadComplete = false
+    val scope = rememberCoroutineScope()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
+    LaunchedEffect(Unit) {
+        val chatRef = FirebaseDatabase.getInstance().getReference("messages/$rideId")
+        chatRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                isInitialLoadComplete = true
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+        chatRef.limitToLast(1).addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (!isInitialLoadComplete) return
+
+                val msg = snapshot.getValue(MessageRoot::class.java)
+                if (msg?.receiverID == rideViewModel.currentUid && msg?.onGoingRideID == rideId) {
+                    scope.launch {
+                        UIStateHandler.sendEvent(UIState.INFO("New Message from ${msg?.senderName}"))
+                    }
+
+//                    showChatNotification(msg?.receiverName, msg?.text)
+                }
+            }
+
+            override fun onChildChanged(
+                snapshot: DataSnapshot,
+                previousChildName: String?
+            ) {
+
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+            }
+
+            override fun onChildMoved(
+                snapshot: DataSnapshot,
+                previousChildName: String?
+            ) {
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("msg_db", "cancelled_$error")
+
+            }
+        })
+
+    }
     LaunchedEffect("Test") {
         rideViewModel.getPolyLines(
             ridesData.startLatitude,
@@ -199,7 +260,10 @@ fun MapWithCurrentLocation(
             )
         }
     }
-    LaunchedEffect(currentUserConnectedRideData?.currentLat, currentUserConnectedRideData?.currentLong) {
+    LaunchedEffect(
+        currentUserConnectedRideData?.currentLat,
+        currentUserConnectedRideData?.currentLong
+    ) {
         val lat = currentUserConnectedRideData?.currentLat ?: return@LaunchedEffect
         val lng = currentUserConnectedRideData?.currentLong ?: return@LaunchedEffect
 
@@ -291,7 +355,7 @@ fun MapWithCurrentLocation(
                 zoomControlsEnabled = true,      // + / - buttons
                 compassEnabled = true,           // Compass icon
                 myLocationButtonEnabled = false,  // My location button
-                mapToolbarEnabled = true,      // Navigation icon (open in Google Maps)
+//                mapToolbarEnabled = true,      // Navigation icon (open in Google Maps)
 
             )
         ) {

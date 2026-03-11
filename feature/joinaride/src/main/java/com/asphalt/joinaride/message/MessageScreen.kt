@@ -1,12 +1,9 @@
 package com.asphalt.joinaride.message
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,13 +21,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,23 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
-import com.asphalt.android.model.message.MessageRoot
-import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.DarkBrown
@@ -67,19 +51,13 @@ import com.asphalt.commonui.theme.GreenLIGHT25
 import com.asphalt.commonui.theme.LightGreen
 import com.asphalt.commonui.theme.LightPink
 import com.asphalt.commonui.theme.LightYellow
-import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.NeutralBrown
-import com.asphalt.commonui.theme.NeutralGrey
 import com.asphalt.commonui.theme.NeutralWhite
-import com.asphalt.commonui.theme.PaleGreen
-import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
 import com.asphalt.joinaride.viewmodel.MessageViewModel
-import io.ktor.http.invoke
-import io.ktor.util.collections.getValue
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -102,7 +80,7 @@ fun MessageScreenUI(
 
     LaunchedEffect(Unit) {
         viewModel.listenForMessages(
-            onGoingRideId = ridesData?.rideID ?: "",
+            rideId = ridesData?.rideID ?: "",
             recevierId = ridesData?.userID ?: ""
         )
     }

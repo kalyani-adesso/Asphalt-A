@@ -12,15 +12,11 @@ import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.FirebaseDatabase.getInstance
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.getValue
@@ -77,11 +73,11 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     val messages: StateFlow<List<Message>> = _messages
 
     // LISTEN FOR LIVE MESSAGES
-    fun listenForMessages(onGoingRideId: String, recevierId: String) {
+    fun listenForMessages(rideId: String, recevierId: String) {
 
-        val ref = messageRef.database.getReference("messages/$onGoingRideId")
+        val ref = messageRef.database.getReference("messages/$rideId")
 
-        Log.d("TAG", "listenForMessages rideId: $onGoingRideId")
+        Log.d("TAG", "listenForMessages rideId: $rideId")
 
         ref.addValueEventListener(object : ValueEventListener {
 

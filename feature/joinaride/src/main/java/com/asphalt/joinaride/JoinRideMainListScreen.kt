@@ -401,7 +401,7 @@ fun RiderCard(
 //                                viewModel.updateRideStatus(userId = ridesData.createdBy ?: "", rideId = ridesData.ridesID ?: "",
 //                                    status = RIDE_JOINED)
 //                                viewModel.joinRide(joinRide = ridesData)
-                                viewModel.setRideId(ridesData.ridesID ?:"")
+//                                viewModel.setRideId(ridesData.ridesID ?:"")
                                 navigateToConnectedRide.invoke(ridesData)
                             },
                             contentPadding = PaddingValues(all = Dimensions.size0)
@@ -452,7 +452,7 @@ fun RiderCard(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    viewModel.setRideId(ridesData.ridesID ?: "")
+//                                    viewModel.setRideId(ridesData.ridesID ?: "")
 
                                     // if user trying to join another ride previous will end then new ride join logic pending
                                     viewModel.updateRideStatus(

@@ -98,12 +98,7 @@ class JoinRideViewModel(
         getAllRiders()
     }
 
-    fun setRideId(selectedId: String) {
-        _rideId.value = selectedId
-        idRepository.id = selectedId
-    }
 
-    fun getRideId(): String? = idRepository.id
 
     // Called from UI
     fun setSearchQuery(query: String) {

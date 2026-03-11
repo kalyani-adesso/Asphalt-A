@@ -81,7 +81,7 @@ fun ConnectedRideGoogleMapScreen(
         Log.d("TAG", "RidersGroupStatus userData: $userData")
     }
 
-    val rideId = rideViewModel.getRideId()
+    val rideId = ridesData.ridesID
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
 
     if (rideId != null) {

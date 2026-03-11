@@ -205,7 +205,7 @@ fun GroupRidersCard(
                                 shape = CircleShape
                             ),
                             size = Dimensions.padding40,
-                            imageUrl = "ridersList.imgUrl" ?: ""
+                            imageUrl = androidUserVM.getUser(riderData.userID)?.profilePic?:""
                         )
                     }
                     Spacer(Modifier.width(Dimensions.size5))
@@ -310,7 +310,7 @@ fun GroupRidersCard(
                             )
                             Spacer(Modifier.width(Dimensions.size4))
                             Text(
-                                text = riderData?.speedInKph?.toString() ?: "",
+                                text = "${riderData.speedInKph} kph",
                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                 color = NeutralDarkGrey,
                                 modifier = Modifier

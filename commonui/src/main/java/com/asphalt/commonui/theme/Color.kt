@@ -39,6 +39,8 @@ val NeutralDeepBlack = Color(0xFF18273B)
 val PrimaryBrighterLightB33 = Color(0x33006EC7)
 
 val PalePink = Color(0xFFF7DBDE)
+val LightSky05 = Color(0xFFE9F5FF)
+val PrimaryBlue60 = Color(0xFF1785DD)
 val MutedRose = Color(0xFFE3B9BF)
 
 val VividOrange = Color(0xFFFF650C)

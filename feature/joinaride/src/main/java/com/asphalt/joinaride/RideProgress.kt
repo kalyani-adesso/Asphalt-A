@@ -156,7 +156,10 @@ fun RideProgress(
                                     width = Dimensions.size2pt5,
                                     color = GreenLIGHT,
                                     shape = CircleShape
-                                ), size = Dimensions.padding40, imageUrl = "ridersList.imgUrl" ?: ""
+                                ),
+                                size = Dimensions.padding40,
+                                imageUrl = androidUserVM.getUser(androidUserVM.getCurrentUserUID())?.profilePic
+                                    ?: ""
                             )
                             Image(
                                 painter = painterResource(R.drawable.ic_online_icon),
@@ -210,7 +213,7 @@ fun RideProgress(
                         val trackButtonColor = currentUserConnectedRideData?.let {
                             if (it.canTrack) ButtonDefaults.buttonColors(containerColor = VividRed)
                             else ButtonDefaults.buttonColors(containerColor = GreenDark)
-                        }?:ButtonDefaults.buttonColors(containerColor = VividRed)
+                        } ?: ButtonDefaults.buttonColors(containerColor = VividRed)
                         Button(
                             onClick = {
                                 currentUserConnectedRideData?.let {

@@ -42,7 +42,7 @@ fun RidersScreenLoader(
     val loadingDesc = "Initializing navigation and group cordination"
     val logoRes = R.drawable.ic_app_icon
 
-    val rideId = rideViewModel.getRideId()
+    val rideId = ridesData.ridesID
     Log.d("RidersScreenLoader", "RidersScreenLoader: $rideId")
 
 //    if (rideId != null) {

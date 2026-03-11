@@ -19,11 +19,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT25
+import com.asphalt.commonui.theme.LightBlue
 import com.asphalt.commonui.theme.LightGreen
+import com.asphalt.commonui.theme.LightSky05
 import com.asphalt.commonui.theme.MutedRose
 import com.asphalt.commonui.theme.OrangeLight10
 import com.asphalt.commonui.theme.PaleMint
 import com.asphalt.commonui.theme.PalePink
+import com.asphalt.commonui.theme.PrimaryBlue60
+import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.ui.RoundedBox
@@ -41,7 +45,7 @@ fun StatusBanner(
     message: String,
     showBanner: Boolean,
     autoDismissMillis: Long = 2500L,
-    onDismiss:()->Unit
+    onDismiss: () -> Unit
 ) {
 
 
@@ -54,7 +58,7 @@ fun StatusBanner(
 
     val bannerUIElements: BannerUIElements = when (type) {
         BannerType.SUCCESS -> BannerUIElements.SuccessBannerElement
-        BannerType.INFO -> BannerUIElements.SuccessBannerElement
+        BannerType.INFO -> BannerUIElements.InfoBannerElement
         BannerType.ERROR -> BannerUIElements.ErrorBannerElement
     }
 
@@ -88,7 +92,13 @@ fun StatusBanner(
                     radius = Dimensions.radius6,
                     resId = bannerUIElements.iconRes
                 )
-                Text(message, style = TypographyBold.bodySmall, color = bannerUIElements.bodyColor, overflow = TextOverflow.Ellipsis, maxLines = 2)
+                Text(
+                    message,
+                    style = TypographyBold.bodySmall,
+                    color = bannerUIElements.bodyColor,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
+                )
 
             }
         }
@@ -103,6 +113,9 @@ sealed class BannerUIElements(
 ) {
     object SuccessBannerElement :
         BannerUIElements(PaleMint, LightGreen, GreenLIGHT25, R.drawable.ic_tick)
+
+    object InfoBannerElement :
+        BannerUIElements(LightSky05, PrimaryBlue60, PrimaryDarkerLightB75, R.drawable.ic_tick)
 
     object ErrorBannerElement :
         BannerUIElements(PalePink, MutedRose, VividRed, R.drawable.ic_error)
