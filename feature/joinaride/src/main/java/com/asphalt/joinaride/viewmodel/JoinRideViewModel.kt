@@ -48,7 +48,6 @@ class JoinRideViewModel(
     val androidUserVM: AndroidUserVM by inject()
     val plcesRepo: PlacesRepository by inject()
 
-
     // stateflows
     private val _rides = MutableStateFlow<List<RidesData>>(emptyList())
     val rides = _rides.asStateFlow()

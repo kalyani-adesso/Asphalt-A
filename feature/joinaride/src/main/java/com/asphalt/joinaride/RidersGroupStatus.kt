@@ -31,6 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.asphalt.android.model.connectedride.ConnectedRideDTO
+import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
@@ -64,17 +68,21 @@ import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.util.PhoneCallUtils
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
+import com.asphalt.joinaride.message.MessageScreenUI
 import com.asphalt.joinaride.viewmodel.JoinRideViewModel
+import com.asphalt.joinaride.viewmodel.MessageViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RidersGroupStatus(
+    ridesData: RidesData,
     viewModel: JoinRideViewModel = koinViewModel(),
     androidUserVM: AndroidUserVM = koinViewModel(),
 
     ) {
     // Remember scroll state for the vertical scroll
     val scrollState = rememberScrollState()
+
 
 //    val rideUsers by viewModel.rideUsers.collectAsState()
 
@@ -147,13 +155,22 @@ fun RidersGroupStatus(
 @Composable
 fun GroupRidersCard(
 //    ridersList: List<ConnectedRideDTO>,
-    riderData: ConnectedRideDTO?,
+    riderData: ConnectedRideDTO,
     viewModel: JoinRideViewModel = koinViewModel(),
-    androidUserVM: AndroidUserVM = koinViewModel()
+    androidUserVM: AndroidUserVM = koinViewModel(),
 ) {
 
     val currentUser = androidUserVM.userState.collectAsState(null)
     val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        MessageScreenUI(
+            ridesData = riderData,
+            onCancel = { showDialog = false }
+        )
+    }
 
     Card(
         modifier = Modifier
@@ -193,9 +210,9 @@ fun GroupRidersCard(
                     }
                     Spacer(Modifier.width(Dimensions.size5))
                     Column(modifier = Modifier) {
-                        Row() {
+                        Row {
                             val name = androidUserVM.getUser(riderData?.userID ?: "")?.name
-
+                            Log.d("TAG", "GroupRidersCard name: $name")
                             Text(
                                 text = name ?: "",
                                 style = TypographyBold.bodySmall,
@@ -216,8 +233,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                      top = Dimensions.size5,
-                                                //                      bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -242,8 +257,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                                            top = Dimensions.size5,
-                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
@@ -270,8 +283,6 @@ fun GroupRidersCard(
                                             .padding(
                                                 start = Dimensions.size5,
                                                 end = Dimensions.size5,
-                                                //                                            top = Dimensions.size5,
-                                                //                                             bottom =  Dimensions.size2pt5
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
 
@@ -351,7 +362,11 @@ fun GroupRidersCard(
                             modifier = Modifier
                                 .clickable {
                                     // onDeleteBike.invoke()
+                                    Log.d("TAG", "GroupRidersCard: button clicked")
+                                    showDialog = true
+
                                 }
+
                         ) {
                             ColorIconRounded(
                                 backColor = PrimaryBrighterLightW75,

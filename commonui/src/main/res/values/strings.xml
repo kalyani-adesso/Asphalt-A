@@ -268,11 +268,16 @@
     <string name="unread">Unread</string>
     <string name="groups">Groups</string>
     <string name="favorites">Favorites</string>
+    <string name="start_cannot_past">Invalid date range: Start date cannot be in the past</string>
+    <string name="start_cannot_later">Invalid date range: Start date must be before the end date</string>
+    <string name="end_cannot_past">Invalid date range: End date cannot be in the past.</string>
+    <string name="end_cannot_before_start">Invalid date range: End date must be after the start date.</string>
 
 
 
 
     <string name="rejoinRide">Rejoin Ride</string>
+    <string name="send_reply">SEND REPLY</string>
     <string name="coming_soon">Coming Soon...</string>
 
 

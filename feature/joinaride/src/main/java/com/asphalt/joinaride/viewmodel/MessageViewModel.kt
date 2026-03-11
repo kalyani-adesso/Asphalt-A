@@ -1,40 +1,114 @@
 package com.asphalt.joinaride.viewmodel
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.asphalt.android.model.chat.Message
+import com.asphalt.android.model.message.MessageRoot
+import com.asphalt.android.repository.rides.RidesRepository
+import com.asphalt.android.viewmodels.AndroidUserVM
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.FirebaseDatabase.getInstance
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import kotlin.getValue
 
-class MessageViewModel : ViewModel() {
+class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel(), KoinComponent {
 
-    private val _customMessage = MutableStateFlow("")
-    val customMessage = _customMessage.asStateFlow()
-
-    // To trigger Snackbar message event
-    private val _sentMessageEvent = MutableSharedFlow<String>()
-    val sentMessageEvent = _sentMessageEvent.asSharedFlow()
-
-    // Update the custom input message
-    fun onCustomMessageChange(newMsg: String) {
-        _customMessage.value = newMsg
+    val androidUserVM: AndroidUserVM by inject()
+    private val messageRef = getInstance().getReference("messages")
+    val currentUid: String?
+        get() = androidUserVM.userState.value?.uid
+    val currentUser: String?
+        get() = androidUserVM.userState.value?.name
+    var customMessage by mutableStateOf("")
+        private set
+    private val _messagesList = MutableStateFlow<List<MessageRoot>>(emptyList())
+    val messagesList: StateFlow<List<MessageRoot>> = _messagesList
+    fun onQuickMessageClick(message: String) {
+        customMessage = message
     }
+    fun onCustomMessageChange(message: String) {
+        customMessage = message
+    }
+    fun sendMessage(
+        senderID: String, // current user id
+        senderName: String, // current user name
+        receiverID: String, // riderId who joined
+        receiverName: String, // ridername
+        onGoingRideID: String, // ongoingRideId
+        isRideOnGoing: Boolean, // true
+        message: String
+    ) {
 
-    // Called when user taps send or quick message button
-    fun sendMessage(message: String) {
-        if (message.isNotBlank()) {
-            // In real app, send message to server here
-            viewModelScope.launch {
-                _sentMessageEvent.emit(message)
-            }
-            _customMessage.value = "" // reset input
+        if (message.isBlank()) return
+
+        viewModelScope.launch {
+
+            val messageRoot = MessageRoot(
+                senderID = senderID,
+                senderName = senderName,
+                receiverID = receiverID,
+                receiverName = receiverName,
+                message = message,
+                onGoingRideID = onGoingRideID,
+                timeStamp = System.currentTimeMillis(),
+                isRideOnGoing = isRideOnGoing,
+            )
+            // api called
+            ridesRepository.sendMessage(messageRoot)
+            // clear input
+            customMessage = ""
         }
     }
+    private val _messages = MutableStateFlow<List<Message>>(emptyList())
+    val messages: StateFlow<List<Message>> = _messages
 
-    // Called on cancel, just clear input
-    fun cancel() {
-        _customMessage.value = ""
+    // LISTEN FOR LIVE MESSAGES
+    fun listenForMessages(onGoingRideId: String, recevierId: String) {
+
+        val ref = messageRef.database.getReference("messages/$onGoingRideId")
+
+        Log.d("TAG", "listenForMessages rideId: $onGoingRideId")
+
+        ref.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val list = mutableListOf<MessageRoot>()
+
+                Log.d("TAG", "onDataChange snapshot: $snapshot")
+
+                for (child in snapshot.children) {
+
+                    val msg = child.getValue(MessageRoot::class.java)
+                    Log.d("TAG", "Parsed message: $msg")
+
+                    msg?.let {
+                        if ((it.receiverID == recevierId && it.senderID == currentUid) ||
+                            (it.receiverID == currentUid && it.senderID == recevierId))  {
+                            list.add(it)
+                        }
+                    }
+                }
+                _messagesList.value = list.sortedBy { it.timeStamp }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("TAG", "listenForMessages cancelled", error.toException())
+            }
+        })
     }
 }

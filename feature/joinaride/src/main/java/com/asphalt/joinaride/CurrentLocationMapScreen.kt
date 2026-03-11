@@ -73,6 +73,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.CameraMoveStartedReason
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -170,7 +171,7 @@ fun MapWithCurrentLocation(
     var isLoading by remember { mutableStateOf(true) }
     var mapLoaded by remember { mutableStateOf(false) }
     val currentUserConnectedRideData by rideViewModel.currentUserConnectedRideData.collectAsStateWithLifecycle()
-
+    var isFollowingUser by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState()
     LaunchedEffect(Unit) {
@@ -184,22 +185,53 @@ fun MapWithCurrentLocation(
         )
 
     }
+    LaunchedEffect(mapLoaded) {
+        if (mapLoaded) {
+            val boundsBuilder = LatLngBounds.Builder()
+            boundsBuilder.include(LatLng(ridesData.startLatitude, ridesData.startLongitude))
+            boundsBuilder.include(LatLng(ridesData.endLatitude, ridesData.endLongitude))
 
-    LaunchedEffect(riders) {
-        if (riders.isEmpty()) return@LaunchedEffect
+            // Include user if available
+            userLocation?.let { boundsBuilder.include(it) }
 
-        val bounds = LatLngBounds.Builder()
-
-        riders.forEach {
-            bounds.include(LatLng(it.currentLat, it.currentLong))
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200)
+            )
         }
-
-        userLocation?.let { bounds.include(it) }
-
-//        cameraPositionState.animate(
-//            CameraUpdateFactory.newLatLngBounds(bounds.build(), 120)
-//        )
     }
+    LaunchedEffect(currentUserConnectedRideData?.currentLat, currentUserConnectedRideData?.currentLong) {
+        val lat = currentUserConnectedRideData?.currentLat ?: return@LaunchedEffect
+        val lng = currentUserConnectedRideData?.currentLong ?: return@LaunchedEffect
+
+        if (isFollowingUser) {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 16f)
+            )
+        }
+    }
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (cameraPositionState.isMoving) {
+            if (cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+                isFollowingUser = false
+            }
+        }
+    }
+
+//    LaunchedEffect(riders) {
+//        if (riders.isEmpty()) return@LaunchedEffect
+//
+//        val bounds = LatLngBounds.Builder()
+//
+//        riders.forEach {
+//            bounds.include(LatLng(it.currentLat, it.currentLong))
+//        }
+//
+//        userLocation?.let { bounds.include(it) }
+//
+////        cameraPositionState.animate(
+////            CameraUpdateFactory.newLatLngBounds(bounds.build(), 120)
+////        )
+//    }
 
     // Get current location
     LaunchedEffect(Unit) {
@@ -427,6 +459,7 @@ fun MapWithCurrentLocation(
             // Spacer(modifier = Modifier.weight(1f))
             GradientButton(
                 onClick = {
+                    isFollowingUser = true
                     refreshScope.launch {
                         currentUserConnectedRideData?.let {
                             cameraPositionState.animate(
@@ -434,7 +467,7 @@ fun MapWithCurrentLocation(
                                     LatLng(
                                         it.currentLat,
                                         it.currentLong
-                                    ), 14f
+                                    ), 16f
                                 )
                             )
                         }
