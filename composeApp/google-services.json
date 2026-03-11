@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "81829881241",
-    "project_id": "asphalt-a-d59cb",
-    "storage_bucket": "asphalt-a-d59cb.firebasestorage.app"
+    "project_number": "787946739615",
+    "project_id": "riders-club-5910a",
+    "storage_bucket": "riders-club-5910a.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:81829881241:android:5215e6e7bb1bc98e4e5f08",
+        "mobilesdk_app_id": "1:787946739615:android:aa8c14774eb03bc4e58faa",
         "android_client_info": {
           "package_name": "com.asphalt.android"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAEtdzmzz_uCRRpzefvE5U5UCPye0M7nBE"
+          "current_key": "AIzaSyCIQs0ErnsTDXlxP8zBUsSY88YbIBQhWv0"
         }
       ],
       "services": {
