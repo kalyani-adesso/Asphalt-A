@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.asphalt.android.model.rides.RidesData
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.AppLoader
 import com.asphalt.commonui.R
@@ -19,6 +20,7 @@ import kotlinx.coroutines.delay
 fun EndRidersScreenLoader(
     setTopAppBarState: (AppBarState) -> Unit,
     modifier: Modifier = Modifier,
+    ridesData: RidesData,
     onNavigateToSummaryEndRide : () -> Unit) {
 
     var isLoading by remember { mutableStateOf(true) }

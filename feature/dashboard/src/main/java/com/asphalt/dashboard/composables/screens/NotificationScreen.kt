@@ -3,6 +3,7 @@ package com.asphalt.dashboard.composables.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.AppBarState
@@ -34,6 +36,7 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.VividOrange
 import com.asphalt.commonui.ui.RoundedBox
+import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.commonui.utils.ComposeUtils.ColorIconRounded
 import com.asphalt.dashboard.data.NotificationData
 import com.asphalt.dashboard.viewmodels.NotificationViewModel
@@ -54,10 +57,19 @@ fun NotificationScreen(
                 .background(NeutralWhite)
                 .padding(top = Dimensions.size30)
         ) {
+            if (notificationList.value.isNotEmpty())
             items(notificationList.value) { notificationItem ->
                 NotificationItem(notificationItem, viewModel)
                 Spacer(Modifier.height(Dimensions.spacing15))
             }
+            else
+                item {
+                    Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center){
+                        ComposeUtils.SectionTitle(stringResource(R.string.no_data))
+
+                    }
+
+                }
         }
 
     }

@@ -80,6 +80,7 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
                     _emailTextMutableState.value = ""
                     _passwordTextMutableState.value = ""
                     isEmailVaild.value = false
+                    isrememberMe.value = false
                     updateMessage(false)
                     updateLoader(false)
                     isLoginSuccess.value = true

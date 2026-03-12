@@ -22,7 +22,7 @@ abstract class BaseAPIService(private val client: KtorClient) {
             APIResult.Success(result)
         } catch (e: JsonConvertException) {
             // Handle JSON/Serialization errors specifically
-            APIResult.Error(exception = e, code = 400)
+            APIResult.Error(exception = e, code = APIConstants.JSON_EXCEPTION_CODE)
         } catch (e: ClientRequestException) {
             // Handle 4xx HTTP errors
             APIResult.Error(exception = e, code = e.response.status.value)
@@ -67,6 +67,10 @@ abstract class BaseAPIService(private val client: KtorClient) {
 
     protected suspend fun getPlaces(url: String): HttpResponse {
         return client.getClient(APIConstants.BASE_URL_PlACES, true).get(url)
+    }
+
+    protected suspend fun getPolyLines(url: String): HttpResponse {
+        return client.getClient(APIConstants.POLY_LINE_API, true).get(url)
     }
 
     protected fun buildUrl(url: String): String {

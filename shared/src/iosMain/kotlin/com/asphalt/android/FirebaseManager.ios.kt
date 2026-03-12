@@ -1,83 +1,147 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package com.asphalt.android
 
+import cocoapods.FirebaseDatabase.*
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import cocoapods.FirebaseDatabase.FIRDatabase
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSNumber
+import platform.Foundation.numberWithLongLong
+import cocoapods.FirebaseDatabase.FIRServerValue
 
-
+@OptIn(ExperimentalForeignApi::class)
 class IosDatabaseReference(
-    private val nativeRef: IDatabaseReference
+    private val nativeRef: FIRDatabaseReference
 ) : IDatabaseReference {
+
     override fun push(): IDatabaseReference {
-        TODO("Not yet implemented")
+        return IosDatabaseReference(nativeRef.childByAutoId())
     }
 
     override val key: String?
-        get() = TODO("Not yet implemented")
+        get() = nativeRef.key
 
     override fun setValue(value: Any?) {
-        TODO("Not yet implemented")
+        val finalValue = when (value) {
+            is Boolean -> value
+            is Number -> value
+            is String -> value.lowercase() == "true" || value == "1"
+            else -> false
+        }
+        nativeRef.setValue(finalValue)
     }
 
     override fun child(path: String): IDatabaseReference {
-        TODO("Not yet implemented")
-    }
-
-    override fun runTransaction(updateFunction: (DataSnapshot) -> TransactionResult) {
-        TODO("Not yet implemented")
+        return IosDatabaseReference(nativeRef.child(path))
     }
 
     override fun updateChildren(updates: Map<String, Any?>) {
-        TODO("Not yet implemented")
+        nativeRef.updateChildValues(updates as Map<Any?, *>)
     }
 
-    override fun observeValue(): Flow<DataSnapshot> {
-        TODO("Not yet implemented")
+    override fun runTransaction(updateFunction: (DataSnapshot) -> TransactionResult) {
+
+        nativeRef.runTransactionBlock { mutableData ->
+
+            val safeData = mutableData!!
+
+            val snapshot = DataSnapshot(
+                value = safeData.value,
+                _key = safeData.key,
+                nativeChildren = null
+            )
+
+            val result = updateFunction(snapshot)
+
+            if (result.isSuccess) {
+                safeData.value = result.newData
+                FIRTransactionResult.successWithValue(safeData)
+            } else {
+                FIRTransactionResult.abort()
+            }
+        }
     }
-}
 
 
+    override fun observeValue(): Flow<DataSnapshot> = callbackFlow {
 
-actual class TransactionResult {
-    actual companion object {
-        actual fun success(value: Any?): TransactionResult {
-            TODO("Not yet implemented")
+        val handle = nativeRef.observeEventType(
+            FIRDataEventType.FIRDataEventTypeValue
+        ) { snapshot ->
+
+            trySend(DataSnapshot(snapshot))
         }
 
-        actual fun abort(): TransactionResult {
-            TODO("Not yet implemented")
+        awaitClose {
+            nativeRef.removeObserverWithHandle(handle)
         }
     }
-}
 
+
+
+}
 actual class PlatformDatabase : IFirebaseDatabase {
+
     @OptIn(ExperimentalForeignApi::class)
     actual override fun getReference(path: String?): IDatabaseReference {
+
         val nativeRef = if (path == null) {
             FIRDatabase.database().reference()
         } else {
             FIRDatabase.database().referenceWithPath(path)
         }
-        return IosDatabaseReference(nativeRef as IDatabaseReference)
+
+        return IosDatabaseReference(nativeRef)
     }
 }
+
+actual class DataSnapshot constructor(
+    private val value: Any?,
+    private val _key: String?,
+    private val nativeChildren: List<FIRDataSnapshot>? = null
+) {
+
+    constructor(native: FIRDataSnapshot?) : this(
+        value = native?.value,
+        _key = native?.key,
+        nativeChildren = buildList {
+            val children = native?.children
+            while (true) {
+                val next = children?.nextObject() as? FIRDataSnapshot ?: break
+                add(next)
+            }
+        }
+    )
+
+    actual fun getValue(): Any? = value
+
+    actual val key: String?
+        get() = _key
+
+    actual val children: List<DataSnapshot>
+        get() = nativeChildren?.map { DataSnapshot(it) } ?: emptyList()
+}
+actual class TransactionResult(
+    val isSuccess: Boolean,
+    val newData: Any? = null
+) {
+    actual companion object {
+        actual fun success(value: Any?): TransactionResult =
+            TransactionResult(true, value)
+
+        actual fun abort(): TransactionResult =
+            TransactionResult(false, null)
+    }
+}
+
 
 actual object FirebaseServerValue {
     actual val TIMESTAMP: Any
-        get() = TODO("Not yet implemented")
+        get() = FIRServerValue.timestamp()
 
     actual fun increment(value: Int): Any {
-        TODO("Not yet implemented")
+        // Use NSNumber factory
+        return FIRServerValue.increment(NSNumber.numberWithLongLong(value.toLong()))
     }
-}
-
-actual class DataSnapshot {
-    actual fun getValue(): Any? {
-        TODO("Not yet implemented")
-    }
-
-    actual val key: String?
-        get() = TODO("Not yet implemented")
-    actual val children: List<DataSnapshot>
-        get() = TODO("Not yet implemented")
 }

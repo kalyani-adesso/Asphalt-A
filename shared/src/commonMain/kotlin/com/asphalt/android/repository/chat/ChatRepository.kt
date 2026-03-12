@@ -17,34 +17,37 @@ class ChatRepository {
     }
 
 
-fun createOrGet1v1Chat(userAId: String, userBId: String) {
-    val chatRoomId = getCanonicalChatId(userAId, userBId)
-    val chatRef = database.getReference("chats").child(chatRoomId)
+    fun createOrGet1v1Chat(userAId: String, userBId: String) {
+        val chatRoomId = getCanonicalChatId(userAId, userBId)
+        val chatRef = database.getReference("chats").child(chatRoomId)
 
-    chatRef.runTransaction { currentSnapshot ->
-        val existingData = currentSnapshot.getValue() as? Map<*, *>
-        if (existingData.isNullOrEmpty())  {
-            val newChatData = mapOf(
-                "type" to "private",
-                "members" to mapOf(userAId to true, userBId to true)
-            )
-            return@runTransaction TransactionResult.success(newChatData)
-        } else {
-            val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
-            return@runTransaction TransactionResult.success(existingData)
-        }
-    }
-}
-    fun createOrGetGroupChat(memberList:List<String>,rideID: String,rideTitle:String) {
-        val chatRef = database.getReference("chats").child(rideID)
-        val membersMap = memberList.associateWith { true }
         chatRef.runTransaction { currentSnapshot ->
             val existingData = currentSnapshot.getValue() as? Map<*, *>
-            if (existingData.isNullOrEmpty()){
+            if (existingData.isNullOrEmpty()) {
+                val newChatData = mapOf(
+                    "type" to "private",
+                    "members" to mapOf(userAId to true, userBId to true)
+                )
+                return@runTransaction TransactionResult.success(newChatData)
+            } else {
+                val existingData = currentSnapshot.getValue() as? Map<String, Any> ?: emptyMap()
+                return@runTransaction TransactionResult.success(existingData)
+            }
+        }
+    }
+
+    fun createOrGetGroupChat(memberList: List<String>, rideID: String, rideTitle: String) {
+        val chatRef = database.getReference("chats").child(rideID)
+        val membersMap = memberList.associateWith { true }
+        val favoritesMap = memberList.associateWith { false }
+        chatRef.runTransaction { currentSnapshot ->
+            val existingData = currentSnapshot.getValue() as? Map<*, *>
+            if (existingData.isNullOrEmpty()) {
                 val newChatData = mapOf(
                     "name" to rideTitle,
                     "type" to "group",
-                    "members" to membersMap
+                    "members" to membersMap,
+                    "favorite_by" to favoritesMap
                 )
                 return@runTransaction TransactionResult.success(newChatData)
             } else {
@@ -55,7 +58,7 @@ fun createOrGet1v1Chat(userAId: String, userBId: String) {
     }
 
 
-    fun sendMessage(chatRoomId: String, senderId: String,recipientId:String, text: String) {
+    fun sendMessage(chatRoomId: String, senderId: String, recipientId: String, text: String) {
         val messagesRef = database.getReference("chats/$chatRoomId/messages").push()
         val messageId = messagesRef.key ?: return
 
@@ -78,7 +81,13 @@ fun createOrGet1v1Chat(userAId: String, userBId: String) {
 
         database.getReference(null).updateChildren(updates)
     }
-    fun sendGroupMessage(rideId: String, senderId: String, text: String, allMemberIds: List<String>) {
+
+    fun sendGroupMessage(
+        rideId: String,
+        senderId: String,
+        text: String,
+        allMemberIds: List<String>
+    ) {
         val messageId = database.getReference("chats/$rideId/messages").push().key ?: return
         val timestamp = FirebaseServerValue.TIMESTAMP
 
@@ -98,6 +107,7 @@ fun createOrGet1v1Chat(userAId: String, userBId: String) {
 
         database.getReference(null).updateChildren(updates)
     }
+
     private fun mapSnapshotToMessages(snapshot: DataSnapshot): List<Message> {
         return snapshot.children.mapNotNull { child ->
             val map = child.getValue() as? Map<String, Any?> ?: return@mapNotNull null
@@ -114,8 +124,7 @@ fun createOrGet1v1Chat(userAId: String, userBId: String) {
 
     fun getMessages(chatRoomId: String): Flow<List<Message>> {
         return database.getReference("chats/$chatRoomId/messages")
-            .observeValue().map {
-                snapshot ->
+            .observeValue().map { snapshot ->
                 mapSnapshotToMessages(snapshot)
 
             }
@@ -126,21 +135,49 @@ fun createOrGet1v1Chat(userAId: String, userBId: String) {
             .observeValue().map { snapshot ->
                 snapshot.children.mapNotNull { child ->
                     val map = child.getValue() as? Map<String, Any?> ?: return@mapNotNull null
-                    val members = map["members"] as? Map<String, Boolean> ?: emptyMap()
+                    val membersRaw = map["members"] as? Map<String, Any?> ?: emptyMap()
+
+                    val members = membersRaw.mapValues { (_, value) ->
+                        when (value) {
+                            is Boolean -> value
+                            is Number -> value.toInt() == 1
+                            else -> false
+                        }
+                    }
+                    val favoriteByRaw = map["favorite_by"] as? Map<String, Any?> ?: emptyMap()
+
+                    val favoriteBy = favoriteByRaw.mapValues { (_, value) ->
+                        when (value) {
+                            is Boolean -> value
+                            is Number -> value.toInt() == 1
+                            else -> false
+                        }
+                    }
+
 
                     if (members.containsKey(myUserId)) {
                         ChatRoom(
                             id = child.key ?: "",
-                            name = map["name"]as? String ?: "" ,
-                            type = map["type"]as? String ?: "" ,
+                            name = map["name"] as? String ?: "",
+                            type = map["type"] as? String ?: "",
                             lastMessage = map["lastMessage"] as? String ?: "",
                             lastTimestamp = map["lastTimestamp"] as? Long ?: 0L,
                             unreadCounts = map["unreadCounts"] as? Map<String, Long> ?: emptyMap(),
-                            members=members
+                            members = members,
+                            isFavorite = getIsFavoriteByUser(myUserId, favoriteBy)
                         )
                     } else null
                 }.sortedByDescending { it.lastTimestamp }
             }
+    }
+
+    private fun getIsFavoriteByUser(myUserId: String, favoriteBy: Map<String, Boolean>?): Boolean {
+        return favoriteBy?.get(myUserId) ?: false
+    }
+
+     fun toggleFavorite(userId: String, chatRoomId: String, isFavorite: Boolean) {
+        val ref = database.getReference("chats/$chatRoomId/favorite_by/$userId")
+        ref.setValue(isFavorite)
     }
 
     fun markAsRead(chatRoomId: String, myUserId: String) {

@@ -26,7 +26,7 @@ actual class AuthenticatorImpl {
             )
 
             val dbRef = FirebaseDatabase.getInstance()
-                .getReference(Constants.FIREBASE_DB)
+                .getReference(Constants.FIREBASE_DB_USERS)
                 .child(uId)
 
             dbRef.setValue(userValues).await()
@@ -59,7 +59,7 @@ actual class AuthenticatorImpl {
             val id = user?.uid ?: return AuthResultimpl(false, "User ID not found")
 
             val userRef = FirebaseDatabase.getInstance()
-                .getReference(Constants.FIREBASE_DB)
+                .getReference(Constants.FIREBASE_DB_USERS)
                 .child(id)
 
             val dataSnapshot = userRef.get().await()

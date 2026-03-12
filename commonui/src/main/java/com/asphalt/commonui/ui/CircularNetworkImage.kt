@@ -1,5 +1,6 @@
 package com.asphalt.commonui.ui
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +38,9 @@ fun CircularNetworkImage(
     onClick: (() -> Unit)? = null,
 ) {
     val ctx = LocalContext.current
+    val decodedBitmap = remember(imageUrl) {
+        ImageUtils.decodeBase64ToBitmap(imageUrl)
+    }
     Surface(
         modifier = modifier
             .size(size)
@@ -51,7 +56,7 @@ fun CircularNetworkImage(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(ctx).data(
-                    ImageUtils.decodeBase64ToBitmap(imageUrl)
+                    decodedBitmap
                 ).crossfade(true).build(),
                 placeholder = placeholderPainter,
                 error = placeholderPainter,

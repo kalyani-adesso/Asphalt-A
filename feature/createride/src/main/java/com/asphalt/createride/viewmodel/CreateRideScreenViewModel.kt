@@ -4,9 +4,11 @@ import android.content.Context
 import android.icu.util.Calendar
 import android.location.Location
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -71,6 +73,15 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
      }*/
 
     val searchQuery = mutableStateOf("")
+
+    fun isSoloRide(): Boolean {
+        if (_rideDetailsMutableState.value.rideType == "Solo Ride") {
+            return true
+        } else {
+            return false
+        }
+        // return _rideDetailsMutableState.value.rideType ?: ""
+    }
 
     fun onSearchQueryChanged(query: String) {
         searchQuery.value = query
@@ -261,7 +272,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             arrayListOf(
                 RideType(Constants.SOLO_RIDE, context.getString(R.string.solo_ride)),
                 RideType(Constants.GROUP_RIDE, context.getString(R.string.group_ride)),
-                RideType(Constants.OPEN_EVENT, context.getString(R.string.open_event))
+//                RideType(Constants.OPEN_EVENT, context.getString(R.string.open_event))
             )
         return type
     }
@@ -395,69 +406,68 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
 
         }
 
-
-        /* var list = arrayListOf(
-
-             RidersList(
-                 id = 1,
-                 name = "Harikumar S",
-                 job = "Mechanic",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             ),
-             RidersList(
-                 id = 2,
-                 name = "Sreedev",
-                 job = "",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-
-             ),
-             RidersList(
-                 id = 3,
-                 name = "Vyshak ",
-                 job = "",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             ),
-             RidersList(
-                 id = 4,
-                 name = "Jerin John",
-                 job = "",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             ),
-             RidersList(
-                 id = 5,
-                 name = "Vipin Raj",
-                 job = "Mechanic",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             ),
-             RidersList(
-                 id = 6,
-                 name = "Pramod Selvaraj",
-                 job = "",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             ),
-             RidersList(
-                 id = 7,
-                 name = "Vinu V John",
-                 job = "",
-                 bike = "Unicorn",
-                 isSelect = false,
-                 imgUrl = "https://picsum.photos/id/1/200/300"
-             )
-         )
-         return list;*/
-
     }
 
+    fun startDateValidation(context: Context): Boolean {
+        val currentDate = Calendar.getInstance().timeInMillis
+
+
+        var starDate = Utils.getDate(
+            _rideDetailsMutableState.value.dateMils ?: 0,
+            _rideDetailsMutableState.value.hour ?: 0,
+            _rideDetailsMutableState.value.mins ?: 0,
+            _rideDetailsMutableState.value.isAm
+        )
+
+        var endDate = Utils.getDate(
+            _rideDetailsMutableState.value.endDateMils ?: 0,
+            _rideDetailsMutableState.value.endHour ?: 0,
+            _rideDetailsMutableState.value.endMins ?: 0,
+            _rideDetailsMutableState.value.isEndAm
+        )
+
+        if (starDate < currentDate) {
+            Toast.makeText(context, context.getString(R.string.start_cannot_past), Toast.LENGTH_SHORT).show()
+            return false
+            //
+
+        } else if (starDate > endDate) {
+            Toast.makeText(context, context.getString(R.string.start_cannot_later), Toast.LENGTH_SHORT).show()
+            return false
+            //
+        }
+
+        return true
+    }
+
+    fun endDateValidation(context: Context): Boolean {
+        val currentDate = Calendar.getInstance().timeInMillis
+
+
+        var starDate = Utils.getDate(
+            _rideDetailsMutableState.value.dateMils ?: 0,
+            _rideDetailsMutableState.value.hour ?: 0,
+            _rideDetailsMutableState.value.mins ?: 0,
+            _rideDetailsMutableState.value.isAm
+        )
+
+        var endDate = Utils.getDate(
+            _rideDetailsMutableState.value.endDateMils ?: 0,
+            _rideDetailsMutableState.value.endHour ?: 0,
+            _rideDetailsMutableState.value.endMins ?: 0,
+            _rideDetailsMutableState.value.isEndAm
+        )
+
+        if (endDate < currentDate) {
+            Toast.makeText(context, context.getString(R.string.end_cannot_past), Toast.LENGTH_SHORT).show()
+            return false
+            //
+        } else if (endDate < starDate) {
+            Toast.makeText(context, context.getString(R.string.end_cannot_before_start), Toast.LENGTH_SHORT).show()
+            return false
+            //
+        }
+
+        return true
+    }
 }

@@ -63,7 +63,7 @@ fun CreateRideScreen(
             title = stringResource(R.string.create_a_ride),
             actions = {
                 Text(
-                    text = "Step ${viewModel.tabSelectState.value}/5",
+                    text = "Step ${viewModel.tabSelectState.value}/${if (viewModel.isSoloRide()) 4 else 5}",
                     style = Typography.bodyMedium
                 )
                 Spacer(Modifier.width(Dimensions.padding16))
@@ -96,7 +96,7 @@ fun CreateRideScreen(
                 if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
                     ShareSection()
                 if (viewModel.tabSelectState.value != Constants.TAB_PARTICIPANT)
-                Spacer(Modifier.height(Dimensions.size132))
+                    Spacer(Modifier.height(Dimensions.size132))
             }
             BottomButtons(viewModel, clickDone)
             // Fixed bottom button
@@ -143,10 +143,13 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                         clickDone.invoke()
                     } else {
                         if (viewModel.detailsFieldValidation())
-                            viewModel.updateTab(1)
+                            if (viewModel.startDateValidation(context))
+                                if (viewModel.endDateValidation(context))
+                                    viewModel.updateTab(1)
                     }
 
-                }, buttonHeight = Dimensions.size50,
+                },
+                buttonHeight = Dimensions.size50,
             ) {
                 ComposeUtils.DefaultButtonContent(
                     if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
@@ -175,8 +178,8 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                         }
                     }, contentPaddingValues = PaddingValues(
                         Dimensions.size0
-                    )
-                , buttonHeight = Dimensions.size50) {
+                    ), buttonHeight = Dimensions.size50
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -215,8 +218,8 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
 
                     }, contentPadding = PaddingValues(
                         Dimensions.size0
-                    )
-                , buttonHeight = Dimensions.size50) {
+                    ), buttonHeight = Dimensions.size50
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,

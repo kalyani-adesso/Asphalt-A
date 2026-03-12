@@ -8,6 +8,7 @@ sealed interface UIState {
     object DismissLoader : UIState
     data class Error(val errorMsg: String, val type: BannerType = BannerType.ERROR) : UIState
     data class SUCCESS(val successMsg: String, val type: BannerType = BannerType.SUCCESS) : UIState
+    data class INFO(val infoMessage: String, val type: BannerType = BannerType.INFO) : UIState
 }
 
 object UIStateHandler {

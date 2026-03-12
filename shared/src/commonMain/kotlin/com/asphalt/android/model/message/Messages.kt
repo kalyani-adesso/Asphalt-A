@@ -15,7 +15,7 @@ data class MessageRoot(
     val receiverID: String? = null,
 
     @SerialName("receiverName")
-    val receiverName: String? = null,
+    var receiverName: String? = null,
 
     @SerialName("message")
     val message: String? = null,

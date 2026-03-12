@@ -1,6 +1,7 @@
 package com.asphalt.chat.screen
 
 import android.annotation.SuppressLint
+import android.icu.text.ListFormatter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -114,7 +115,7 @@ fun ChatListingScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextField(
-                    value =text,
+                    value = text,
                     onValueChange = { viewModel.updateSearchQuery(it) },
                     placeholder = {
                         Text(
@@ -307,8 +308,8 @@ fun ChatList(
                             shape = CircleShape
                         ),
                         size = Dimensions.padding40,
-                        imageUrl =  if (chatRoom.type.equals(Constants.GROUP_CHAT)) {
-                             ""
+                        imageUrl = if (chatRoom.type.equals(Constants.GROUP_CHAT)) {
+                            ""
                         } else {
                             androidUserVM.getUser(
                                 chatRoom.getOtherUserId(androidUserVM.getCurrentUserUID())
@@ -349,14 +350,35 @@ fun ChatList(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
-                            Text(
-                                text = Utils.getTime(chatRoom.lastTimestamp),
-                                style = Typography.bodySmall,
-                                color = NeutralDarkGrey,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                fontSize = Dimensions.textSize12
-                            )
+                            Row() {
+                                Image(
+                                    painter = if (chatRoom.isFavorite)
+                                        painterResource(R.drawable.ic_favorite_golden) else
+                                        painterResource(R.drawable.ic_favorite_icon_gray),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .width(Dimensions.size20)
+                                        .height(
+                                            Dimensions.size20
+                                        )
+                                        .clickable {
+                                            viewModel.updateFavorite(
+                                                !chatRoom.isFavorite,
+                                                chatRoom.id
+                                            )
+                                        }
+                                )
+                                Spacer(modifier = Modifier.width(Dimensions.size10))
+
+                                Text(
+                                    text = Utils.getTime(chatRoom.lastTimestamp),
+                                    style = Typography.bodySmall,
+                                    color = NeutralDarkGrey,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontSize = Dimensions.textSize12
+                                )
+                            }
                         }
                         if (false) {
                             Spacer(Modifier.height(Dimensions.size5))
@@ -384,26 +406,30 @@ fun ChatList(
                                 overflow = TextOverflow.Ellipsis,
                                 fontSize = Dimensions.textSize12
                             )
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(Dimensions.size20)
-                                    .clip(CircleShape)
-                                    .background(VividRed)
-                            ) {
-                                Text(
-                                    text = if (chatRoom.unreadCounts.isNotEmpty()) {
-                                        "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}"
-                                    } else {
-                                        "0"
-                                    },
-                                    style = TypographyBold.bodySmall,
-                                    color = NeutralWhite,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontSize = Dimensions.textSize12
-                                )
-                            }
+                            if(chatRoom.unreadCounts.isNotEmpty())
+                                chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]?.let {
+                                    if(it > 0L)
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .size(Dimensions.size20)
+                                                .clip(CircleShape)
+                                                .background(VividRed)
+                                        ) {
+                                            Text(
+                                                text = if (chatRoom.unreadCounts.isNotEmpty()) {
+                                                    "${chatRoom.unreadCounts[androidUserVM.getCurrentUserUID()]}"
+                                                } else {
+                                                    "0"
+                                                },
+                                                style = TypographyBold.bodySmall,
+                                                color = NeutralWhite,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                fontSize = Dimensions.textSize12
+                                            )
+                                        }
+                                }
                         }
                     }
                 }

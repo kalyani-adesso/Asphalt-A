@@ -9,10 +9,11 @@ import SwiftUI
 
 struct ChatRowView: View {
     let chat: Chat
-
+    let onFavouriteTapped: () -> Void
+    
     var body: some View {
         HStack(spacing: 12) {
-
+            
             ZStack(alignment: .bottomTrailing) {
                 AppImage.Profile.profile.resizable()
                     .frame(width: 37, height: 37)
@@ -21,34 +22,45 @@ struct ChatRowView: View {
                         RoundedRectangle(cornerRadius: 32.5)
                             .stroke(AppColor.green, lineWidth: 2.5)
                     )
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 13, height: 13)
-                        .offset(x: 2, y: 2)
-                        .overlay(
-                            Circle()
-                                .offset(x: 2, y: 2)
-                                .stroke(Color.white, lineWidth: 1.5)
-                        )
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 13, height: 13)
+                    .offset(x: 2, y: 2)
+                    .overlay(
+                        Circle()
+                            .offset(x: 2, y: 2)
+                            .stroke(Color.white, lineWidth: 1.5)
+                    )
             }
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(chat.name)
                     .font(KlavikaFont.bold.font(size: 14))
                     .foregroundColor(AppColor.black)
-
+                
                 Text(chat.lastMessage)
                     .font(KlavikaFont.regular.font(size: 13))
                     .foregroundColor(AppColor.stoneGray)
                     .lineLimit(1)
             }
-
+            
             Spacer()
-
+            
             VStack(alignment: .trailing, spacing: 6) {
-                Text(chat.time)
-                    .font(KlavikaFont.regular.font(size: 11))
-                    .foregroundColor(AppColor.stoneGray)
+                HStack(spacing: 8) {
+                    
+                    Button {
+                        onFavouriteTapped()
+                    } label: {
+                        Image(systemName: chat.isFavourite ? "star.fill" : "star")
+                            .foregroundColor(.yellow)
+                    }
+                    
+                    Text(chat.time)
+                        .font(KlavikaFont.regular.font(size: 11))
+                        .foregroundColor(AppColor.stoneGray)
+                }
+                
                 
                 if chat.unreadCount > 0 {
                     Text("\(chat.unreadCount)")
@@ -70,13 +82,3 @@ struct ChatRowView: View {
         )
     }
 }
-
-#Preview {
-    ChatRowView(chat: Chat(name: "Sooraj",
-                           lastMessage: "See you at the meeting point!",
-                           time: "10:45 AM",
-                           unreadCount: 2,
-                           isGroup: false))
-}
-
-

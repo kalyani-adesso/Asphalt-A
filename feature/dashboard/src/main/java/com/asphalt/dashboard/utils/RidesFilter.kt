@@ -19,7 +19,10 @@ object RidesFilter {
 
             val rideStatus: String? = when {
                 ride.createdBy == userId -> {
-                    if (ride.participants.isNullOrEmpty()) {
+                    if(ride.rideStatus== APIConstants.END_RIDE){
+                     null
+                    }
+                    else if (ride.participants.isNullOrEmpty()) {
                         UPCOMING
                     } else {
                         val participant =
@@ -38,7 +41,7 @@ object RidesFilter {
                     val participant = ride.participants.find { it.userId == userId }
                     participant?.let {
                         when (it.inviteStatus) {
-                            APIConstants.RIDE_ACCEPTED -> UPCOMING
+                            APIConstants.RIDE_JOINED, APIConstants.RIDE_ACCEPTED -> UPCOMING
                             else -> null
                         }
                     }

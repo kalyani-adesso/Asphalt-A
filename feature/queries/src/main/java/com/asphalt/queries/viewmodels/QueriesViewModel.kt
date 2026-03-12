@@ -40,10 +40,14 @@ class QueriesVM(
     private val userList
         get() = androidUserVM.userList
 
-    fun getCurrentUserData(): UserDomain? {
 
-        return UserDataHelper.getUserDataFromCurrentList(userList.value, currentUid ?: "")
-    }
+    val currentUser: StateFlow<UserDomain?> = combine(userList, MutableStateFlow(currentUid)) { list, uid ->
+        UserDataHelper.getUserDataFromCurrentList(list, uid)
+    }.stateIn(
+        viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
 
     private val _answerToQuery = MutableStateFlow("")

@@ -5,28 +5,40 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import androidx.core.content.ContextCompat
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.scale
+import com.google.android.gms.maps.model.BitmapDescriptor
+import androidx.core.graphics.createBitmap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 object ImageUtils {
+
+    fun bitmapDescriptorFromVector(
+        context: Context,
+        vectorResId: Int
+    ): BitmapDescriptor? {
+        val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
+        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        val bm = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+        val canvas = android.graphics.Canvas(bm)
+        drawable.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bm)
+    }
     fun uriToBase64Blob(context: Context, uri: Uri, maxWidth: Int = 1024): String? {
         return try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                // 1. Decode with bounds to avoid OutOfMemory errors
                 val options = BitmapFactory.Options().apply { inJustDecodeBounds = false }
                 val originalBitmap = BitmapFactory.decodeStream(inputStream, null, options) ?: return null
 
-                // 2. Scale down the image (High-res phone photos are too big for RTDB)
                 val ratio = originalBitmap.width.toFloat() / originalBitmap.height.toFloat()
                 val targetHeight = (maxWidth / ratio).toInt()
                 val scaledBitmap = originalBitmap.scale(maxWidth, targetHeight)
 
-                // 3. Compress to JPEG
                 val outputStream = ByteArrayOutputStream()
                 scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
                 val bytes = outputStream.toByteArray()
 
-                // 4. Encode to Base64 (The "BLOB")
                 Base64.encodeToString(bytes, Base64.NO_WRAP)
             }
         } catch (e: Exception) {
