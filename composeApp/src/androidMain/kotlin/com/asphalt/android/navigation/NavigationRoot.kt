@@ -1,6 +1,7 @@
 package com.asphalt.android.navigation
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -96,6 +97,7 @@ fun NavigationRoot(
     var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
     val density = LocalDensity.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
 
     LaunchedEffect(Unit) {
 
@@ -206,6 +208,7 @@ fun NavigationRoot(
         topAppBarState = newState
     }
 
+
     fun manageSelectKeyOnBackPress() {
         if (backStack.isNotEmpty()) {
             val closestTabKey = backStack.reversed().firstOrNull { it in bottomNavItems }
@@ -218,23 +221,38 @@ fun NavigationRoot(
 
     fun onBackPressed() {
         println("Back Nav from ${backStack.lastOrNull()}")
-        if (backStack.size > 1) {
-            val key = backStack.lastOrNull()
-
-            when (key) {
-                is RegistrationPasswordNavKey -> {
-                    backStack.removeLastOrNull()
-                    backStack.add(RegistrationCodeNavKey(id = key.id))
-                }
-
-                else -> {
-                    backStack.removeLastOrNull()
-                    manageSelectKeyOnBackPress()
-                }
+        if (drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
             }
         } else {
-            backStack.removeLastOrNull()
-            manageSelectKeyOnBackPress()
+            if (backStack.size > 1) {
+                val key = backStack.lastOrNull()
+
+                when (key) {
+                    is RegistrationPasswordNavKey -> {
+                        backStack.removeLastOrNull()
+                        backStack.add(RegistrationCodeNavKey(id = key.id))
+                    }
+
+                    else -> {
+                        backStack.removeLastOrNull()
+                        manageSelectKeyOnBackPress()
+                    }
+                }
+            } else {
+                backStack.removeLastOrNull()
+                manageSelectKeyOnBackPress()
+            }
+        }
+    }
+    BackHandler {
+        if (drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        } else {
+            onBackPressed()
         }
     }
 
