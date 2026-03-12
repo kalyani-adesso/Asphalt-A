@@ -38,6 +38,7 @@ struct InAppNavigationView: View {
     @State private var isSimulating: Bool = false
     @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
     @State private var simulationIndex: Int = 0
+    @State private var routeError: String? = nil
 
     /// User position shown on map: simulated during demo; otherwise real location so the navigate icon stays visible when recentering.
     private var displayUserCoordinate: CLLocationCoordinate2D? {
@@ -118,6 +119,29 @@ struct InAppNavigationView: View {
                         .padding(.horizontal, 40)
                         Spacer().frame(height: 120)
                     }
+                }
+
+                if let errorText = routeError {
+                    VStack {
+                        Spacer()
+                        HStack(spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.yellow)
+                            Text(errorText)
+                                .font(KlavikaFont.regular.font(size: 13))
+                                .foregroundColor(AppColor.black)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 28)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.25), value: routeError)
                 }
 
                 // Top-left control column
@@ -248,6 +272,7 @@ struct InAppNavigationView: View {
 
     func calculateRoute() {
         isCalculatingRoute = true
+        routeError = nil
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: start))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: end))
@@ -258,7 +283,16 @@ struct InAppNavigationView: View {
             DispatchQueue.main.async {
                 isCalculatingRoute = false
             }
-            guard let route = response?.routes.first else { return }
+            guard let route = response?.routes.first else {
+                DispatchQueue.main.async {
+                    if let error = error {
+                        routeError = "Unable to calculate route: \(error.localizedDescription)"
+                    } else {
+                        routeError = "Unable to calculate route between these points."
+                    }
+                }
+                return
+            }
             let polylineCoords = route.polyline.coordinates
             let tempSteps: [String] = route.steps.compactMap { step in
                 let instr = step.instructions

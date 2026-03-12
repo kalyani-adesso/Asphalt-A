@@ -368,8 +368,16 @@ struct ConnectedRideMapView: View {
                 return
             }
             Task { @MainActor in
-                await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                
+                let lat = locationManager.lastLocation?.coordinate.latitude ?? 0.0
+                let long = locationManager.lastLocation?.coordinate.longitude ?? 0.0
+                let speed = locationManager.speedInKph ?? 0.0
+                viewModel.sendHeartbeatIfNeeded(
+                    rideId: rideModel.rideId,
+                    userId: MBUserDefaults.userIdStatic ?? "",
+                    currentLat: lat,
+                    currentLong: long,
+                    speed: speed
+                )
             }
         }
     }
