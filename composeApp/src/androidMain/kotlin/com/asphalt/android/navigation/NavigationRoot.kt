@@ -1,5 +1,6 @@
 package com.asphalt.android.navigation
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -533,7 +534,7 @@ fun NavigationRoot(
                         AppNavKey.MessageUiScreenKey(
                             ridesData = key.ridesData,
 
-                        )
+                            )
                     }
 
                     entry<AppNavKey.RideDetails> { key ->
@@ -611,11 +612,39 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /*  scope.launch {
+                          backStack.add(AppNavKey.CreateAd)
+                          drawerState.close()
+                      }*/
+                }
+
+                Constants.SETTINGS_CLICK -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /* scope.launch {
+                         Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                         //backStack.add(AppNavKey.CreateAd)
+                         drawerState.close()
+                     }*/
+                }
+
+                Constants.REFER_FRIEND -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /*scope.launch {
+
+                        //backStack.add(AppNavKey.CreateAd)
+                        drawerState.close()
+                    }*/
+                }
+
+                Constants.CONNECTED_RIDE_CLICK -> {
                     scope.launch {
-                        backStack.add(AppNavKey.CreateAd)
+                        backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
                         drawerState.close()
                     }
                 }
+
+
             }
 
         }, isGestureEnabled) {
