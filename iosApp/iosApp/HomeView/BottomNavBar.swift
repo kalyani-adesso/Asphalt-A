@@ -133,6 +133,8 @@ struct BottomNavBar: View {
                 
                 .navigationDestination(isPresented: $showSlideBar, destination: {
                     NavigationSlideBar()
+                        .environmentObject(homeViewModel)
+                        .environmentObject(upcomingRideViewModel)
                 })
                 .navigationDestination(isPresented: $showNotification, destination: {
                     NotificationView()
@@ -143,6 +145,8 @@ struct BottomNavBar: View {
                 }
             }
         }
+        .environmentObject(homeViewModel)
+        .environmentObject(upcomingRideViewModel)
         .task {
             await createRideVM.getActiveJoinedRide()
             await MainActor.run {

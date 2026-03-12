@@ -13,13 +13,22 @@ struct TopNavBar: View {
     @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
         HStack(alignment: .center , spacing: 20) {
-            viewModel.profileImage.resizable()
-                .frame(width: 63, height: 63)
-                .clipShape(Circle())
-                .overlay(
-                    RoundedRectangle(cornerRadius: 32.5)
-                        .stroke(AppColor.lightGray, lineWidth: 2.5)
-                )
+            Group {
+                if viewModel.isLoading {
+                    AppIcon.Profile.profile
+                        .resizable()
+                } else {
+                    viewModel.profileImage
+                        .resizable()
+                }
+            }
+            .frame(width: 63, height: 63)
+            .scaledToFill()
+            .clipShape(Circle())
+            .overlay(
+                RoundedRectangle(cornerRadius: 32.5)
+                    .stroke(AppColor.lightGray, lineWidth: 2.5)
+            )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text("Hello")

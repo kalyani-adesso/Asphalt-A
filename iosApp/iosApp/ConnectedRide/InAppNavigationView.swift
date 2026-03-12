@@ -12,6 +12,8 @@ import AVFoundation
 struct InAppNavigationView: View {
     let start: CLLocationCoordinate2D
     let end: CLLocationCoordinate2D
+    /// Shared ConnectedRideViewModel so we can show live participant pins during navigation.
+    @ObservedObject var connectedRideViewModel: ConnectedRideViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var routeCoordinates: [CLLocationCoordinate2D] = []
     @State private var steps: [String] = []
@@ -32,16 +34,32 @@ struct InAppNavigationView: View {
     @State private var routeETA: TimeInterval = 0
     private let synthesizer = AVSpeechSynthesizer()
     @StateObject private var speechDelegate = SpeechDelegate()
-    // Route simulation demo
+    /// Whether voice guidance is enabled; when off, no new instructions are spoken.
+    @State private var isVoiceEnabled: Bool = true
+    // Route simulation demo (for previewing navigation without moving)
     @State private var isSimulating: Bool = false
     @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
     @State private var simulationIndex: Int = 0
+    @State private var routeError: String? = nil
 
-    /// User position shown on map: simulated during demo, or endpoint after demo ends, otherwise real location.
+    /// User position shown on map: simulated during demo; otherwise real location so the navigate icon stays visible when recentering.
     private var displayUserCoordinate: CLLocationCoordinate2D? {
         if isSimulating { return simulatedCoordinate }
-        if let sim = simulatedCoordinate { return sim } // show endpoint after simulation ends
-        return locationManager.lastLocation?.coordinate
+        // Prefer real location when not simulating so the blue dot appears on the visible map when user taps navigate.
+        if let loc = locationManager.lastLocation?.coordinate { return loc }
+        return simulatedCoordinate
+    }
+
+    /// Route to draw: trimmed from user position to end when user position is known (polyline shortens as rider moves).
+    private var displayedRouteCoordinates: [CLLocationCoordinate2D] {
+        guard !routeCoordinates.isEmpty else { return [] }
+        // In simulation demo, when paused or finished (isSimulating == false but we still have a simulatedCoordinate),
+        // show the full route from START → END so the user clearly sees the entire navigation path.
+        if !isSimulating, simulatedCoordinate != nil {
+            return routeCoordinates
+        }
+        guard let user = displayUserCoordinate else { return routeCoordinates }
+        return trimRouteFromUserPosition(routeCoordinates, user: user)
     }
 
     var body: some View {
@@ -76,10 +94,11 @@ struct InAppNavigationView: View {
             .background(Color(UIColor.systemBackground))
 
             ZStack(alignment: .top) {
-                InAppMapView(routeCoordinates: routeCoordinates,
+                InAppMapView(routeCoordinates: displayedRouteCoordinates,
                              startCoordinate: start,
                              endCoordinate: end,
                              userCoordinate: displayUserCoordinate,
+                             participants: connectedRideViewModel.groupRiders,
                              followUser: followUserState,
                              cameraAltitude: 200,
                              mapType: mapType,
@@ -109,38 +128,63 @@ struct InAppNavigationView: View {
                     }
                 }
 
+                if let errorText = routeError {
+                    VStack {
+                        Spacer()
+                        HStack(spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.yellow)
+                            Text(errorText)
+                                .font(KlavikaFont.regular.font(size: 13))
+                                .foregroundColor(AppColor.black)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 28)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.25), value: routeError)
+                }
+
                 // Top-left control column
                 HStack {
                         VStack(spacing: 12) {
                             Button(action: {
-                                if speechDelegate.isSpeaking {
+                                // Toggle voice guidance on/off.
+                                isVoiceEnabled.toggle()
+                                if !isVoiceEnabled, synthesizer.isSpeaking {
                                     synthesizer.stopSpeaking(at: .immediate)
-                                } else {
+                                } else if isVoiceEnabled {
+                                    // Optional: speak current step once when turning on.
                                     startVoiceGuidance()
                                 }
                             }) {
-                                Image(systemName: speechDelegate.isSpeaking ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                                Image(systemName: isVoiceEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
                                     .font(.system(size: 18))
                                     .foregroundColor(.white)
                                     .frame(width: 44, height: 44)
                                     .background(
-                                        steps.isEmpty ? AppColor.stoneGray.opacity(0.5) : (speechDelegate.isSpeaking ? Color.red : AppColor.celticBlue)
+                                        steps.isEmpty
+                                        ? AppColor.stoneGray.opacity(0.5)
+                                        : (isVoiceEnabled ? AppColor.celticBlue : AppColor.stoneGray)
                                     )
                                     .clipShape(Circle())
                             }
                             .disabled(steps.isEmpty)
 
                         Button(action: {
-                            if isSimulating {
-                                followUserState = true
-                                recenterCounter += 1
-                            } else if simulatedCoordinate != nil {
-                                // Simulation stopped – show start point (default zoom)
+                            // In simulation demo mode, recenter to the route START so the user always sees navigation from the beginning.
+                            if !routeCoordinates.isEmpty, simulatedCoordinate != nil {
                                 followUserState = false
-                                focusCoordinate = start
-                                focusCameraDistance = nil
+                                focusCoordinate = routeCoordinates.first ?? start
                                 focusCounter += 1
                             } else {
+                                // Normal behavior: recenter on live user location.
                                 followUserState = true
                                 recenterCounter += 1
                             }
@@ -247,6 +291,7 @@ struct InAppNavigationView: View {
 
     func calculateRoute() {
         isCalculatingRoute = true
+        routeError = nil
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: start))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: end))
@@ -257,7 +302,16 @@ struct InAppNavigationView: View {
             DispatchQueue.main.async {
                 isCalculatingRoute = false
             }
-            guard let route = response?.routes.first else { return }
+            guard let route = response?.routes.first else {
+                DispatchQueue.main.async {
+                    if let error = error {
+                        routeError = "Unable to calculate route: \(error.localizedDescription)"
+                    } else {
+                        routeError = "Unable to calculate route between these points."
+                    }
+                }
+                return
+            }
             let polylineCoords = route.polyline.coordinates
             let tempSteps: [String] = route.steps.compactMap { step in
                 let instr = step.instructions
@@ -289,12 +343,14 @@ struct InAppNavigationView: View {
     }
 
     func startVoiceGuidance() {
+        guard isVoiceEnabled else { return }
         guard !steps.isEmpty else { return }
         // speak the first step immediately
         speakStep(index: currentStepIndex)
     }
 
     func speakStep(index: Int) {
+        guard isVoiceEnabled else { return }
         guard index >= 0 && index < steps.count else { return }
         let text = steps[index]
         if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
@@ -310,7 +366,7 @@ struct InAppNavigationView: View {
         let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
         let distance = current.distance(from: targetLoc)
         // when within 30 meters, speak next step and advance
-        if distance <= 30 {
+        if distance <= 30, isVoiceEnabled {
             speakStep(index: currentStepIndex)
             currentStepIndex += 1
         }
@@ -319,24 +375,34 @@ struct InAppNavigationView: View {
     // MARK: - Route simulation demo
     func toggleRouteSimulation() {
         if isSimulating {
-            stopRouteSimulation()
+            pauseRouteSimulation()
         } else {
-            startRouteSimulation()
+            // If we already have a simulated position, resume from that point.
+            // Otherwise, start from the beginning of the route.
+            if simulatedCoordinate != nil {
+                startRouteSimulation(from: simulationIndex)
+            } else {
+                startRouteSimulation(from: 0)
+            }
         }
     }
 
-    func startRouteSimulation() {
+    func startRouteSimulation(from startIndex: Int) {
         guard !routeCoordinates.isEmpty else { return }
-        simulationIndex = 0
-        currentStepIndex = 0
-        simulatedCoordinate = routeCoordinates[0]
+        let clampedIndex = max(0, min(startIndex, routeCoordinates.count - 1))
+        simulationIndex = clampedIndex
+        // Only reset instructions when starting from the very beginning.
+        if clampedIndex == 0 {
+            currentStepIndex = 0
+        }
+        simulatedCoordinate = routeCoordinates[clampedIndex]
         isSimulating = true
         followUserState = true
-        // Speak first instruction when simulation starts
-        if !steps.isEmpty {
+        // Speak first instruction only when starting from the beginning.
+        if isVoiceEnabled, !steps.isEmpty && currentStepIndex == 0 {
             speakStep(index: 0)
         }
-        advanceSimulationStep(index: 0)
+        advanceSimulationStep(index: clampedIndex)
     }
 
     private func advanceSimulationStep(index: Int) {
@@ -355,7 +421,7 @@ struct InAppNavigationView: View {
         simulatedCoordinate = routeCoordinates[index]
         recenterCounter += 1
         // Voice over: when simulated position is near next step, speak it
-        if currentStepIndex < stepCoords.count, let currentSim = simulatedCoordinate {
+        if isVoiceEnabled, currentStepIndex < stepCoords.count, let currentSim = simulatedCoordinate {
             let target = stepCoords[currentStepIndex]
             let targetLoc = CLLocation(latitude: target.latitude, longitude: target.longitude)
             let simLoc = CLLocation(latitude: currentSim.latitude, longitude: currentSim.longitude)
@@ -370,9 +436,15 @@ struct InAppNavigationView: View {
         }
     }
 
+    /// Pauses the simulation, preserving the current simulated coordinate so it can be resumed.
+    func pauseRouteSimulation() {
+        isSimulating = false
+        // Do not change simulatedCoordinate here; we want recenter to keep focusing on last position.
+    }
+
+    /// Called when the simulated route naturally finishes; leaves dot at endpoint.
     func stopRouteSimulation() {
         isSimulating = false
-        // Leave dot at endpoint when simulation ends (reached end or user tapped stop)
         if !routeCoordinates.isEmpty {
             simulatedCoordinate = routeCoordinates[routeCoordinates.count - 1]
         } else {
@@ -474,13 +546,5 @@ class SpeechDelegate: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
         DispatchQueue.main.async { self.isSpeaking = false }
-    }
-}
-
-// `MKPolyline.coordinates` extension already exists in `PolylineMapView.swift`.
-@available(iOS 17.0, *)
-struct InAppNavigationView_Previews: PreviewProvider {
-    static var previews: some View {
-        InAppNavigationView(start: CLLocationCoordinate2D(latitude: 19.0760, longitude: 72.8777), end: CLLocationCoordinate2D(latitude: 19.2183, longitude: 72.9781))
     }
 }

@@ -29,7 +29,11 @@ struct JoinRideModel: Identifiable,Hashable {
     let endLat:Double
     let endLong:Double
     let rideJoined:Bool
-    let participants: [ParticipantData]? 
+    let participants: [ParticipantData]?
+    /// When true, navigation (in-app, Apple Maps, Google Maps) should use assembly → end route.
+    let hasAssemblyPoint: Bool
+    let assemblyLat: Double?
+    let assemblyLon: Double?
 }
 
 @MainActor
@@ -139,7 +143,10 @@ extension JoinRideViewModel {
                         endLat: ride.endLatitude,
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus,
-                        participants: participants
+                        participants: participants,
+                        hasAssemblyPoint: ride.hasAssemblyPoint,
+                        assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil,
+                        assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil
                     )
                     joinRideModels.append(model)
                 

@@ -122,7 +122,7 @@ struct ConnectedRideMapView: View {
                         Section {
                             VStack {
                                 ZStack(alignment: .topLeading) {
-                                    BikeRouteMapView(position: $position, currentMapStyle: viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack, onRouteFitted: { initialMapRegion = $0 })
+                                    BikeRouteMapView(position: $position, currentMapStyle: viewModel.currentMapStyle, rideModel: rideModel, groupRiders: viewModel.groupRiders, startTracking: $startTrack, userLocation: startTrack ? locationManager.lastLocation?.coordinate : nil, onRouteFitted: { initialMapRegion = $0 })
                                         .cornerRadius(12)
                                         .ignoresSafeArea(edges: .top)
                                     VStack {
@@ -204,7 +204,7 @@ struct ConnectedRideMapView: View {
                                     ForEach(viewModel.groupRiders.indices, id: \.self) { index in
                                         let rider = viewModel.groupRiders[index]
                                         let _ = viewModel.groupStatusTick
-                                        GroupRiderView(title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                        GroupRiderView(profileImageName: rider.profileImageName, title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
                                             selectedRiderName = viewModel.groupRiders[index].name
                                             viewModel.messageIndex = val
                                         })
@@ -368,8 +368,16 @@ struct ConnectedRideMapView: View {
                 return
             }
             Task { @MainActor in
-                await viewModel.reJoinRide(rideId: rideModel.rideId, userId: MBUserDefaults.userIdStatic ?? "", currentLat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, currentLong: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
-                
+                let lat = locationManager.lastLocation?.coordinate.latitude ?? 0.0
+                let long = locationManager.lastLocation?.coordinate.longitude ?? 0.0
+                let speed = locationManager.speedInKph ?? 0.0
+                viewModel.sendHeartbeatIfNeeded(
+                    rideId: rideModel.rideId,
+                    userId: MBUserDefaults.userIdStatic ?? "",
+                    currentLat: lat,
+                    currentLong: long,
+                    speed: speed
+                )
             }
         }
     }
@@ -476,21 +484,15 @@ struct ConnectedRideMapView: View {
                     showInAppNavigation = true
                 }
                 Button("Open in Apple Maps") {
-                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                    openInAppleMaps(start: startCoord, end: endCoord)
+                    openInAppleMaps(start: navigationStartCoordinate(), end: navigationEndCoordinate())
                 }
                 Button("Open in Google Maps") {
-                    let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                    let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                    openInGoogleMaps(start: startCoord, end: endCoord)
+                    openInGoogleMaps(start: navigationStartCoordinate(), end: navigationEndCoordinate())
                 }
                 Button("Cancel", role: .cancel) { }
             }
             .sheet(isPresented: $showInAppNavigation) {
-                let startCoord = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
-                let endCoord = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                InAppNavigationView(start: startCoord, end: endCoord)
+                InAppNavigationView(start: navigationStartCoordinate(), end: navigationEndCoordinate(), connectedRideViewModel: viewModel)
             }
         }
         .frame(width: 130)
@@ -520,6 +522,21 @@ struct ConnectedRideMapView: View {
         withAnimation(.easeInOut(duration: 0.4)) {
             position = .camera(MapCamera(centerCoordinate: userLocation, distance: 300))
         }
+    }
+
+    // MARK: - Navigation coordinates (assembly point → end when present)
+    /// Start for navigation: assembly point when ride has one, else user location or ride start.
+    private func navigationStartCoordinate() -> CLLocationCoordinate2D {
+        if rideModel.hasAssemblyPoint,
+           let lat = rideModel.assemblyLat,
+           let lon = rideModel.assemblyLon {
+            return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        }
+        return locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
+    }
+
+    private func navigationEndCoordinate() -> CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
     }
 
     // MARK: - Navigation option handlers
@@ -662,6 +679,7 @@ struct ActiveRiderView: View {
 }
 
 struct GroupRiderView: View {
+    let profileImageName: String?
     let title: String
     let status:String
     let speed: String
@@ -672,10 +690,7 @@ struct GroupRiderView: View {
     var body: some View {
         HStack {
             HStack(spacing: 16) {
-                AppIcon.Profile.profile
-                    .resizable()
-                    .clipShape(Circle())
-                    .frame(width: 37, height: 37)
+                ProfileImageView(profileImageName: profileImageName, size: CGSize(width: 37, height: 37))
                     .overlay(Circle().stroke(statusPinColor, lineWidth: 1.5))
                     .padding(.leading, 18)
                 

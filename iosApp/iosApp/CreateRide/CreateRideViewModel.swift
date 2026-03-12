@@ -251,7 +251,10 @@ extension CreateRideViewModel {
                     endLat: ride.endLatitude,
                     endLong: ride.endLongitude,
                     rideJoined: isJoined,
-                    participants: ride.participants
+                    participants: ride.participants,
+                    hasAssemblyPoint: ride.hasAssemblyPoint,
+                    assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil,
+                    assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil
                 )
                 self.isRideLoading = false
                 break

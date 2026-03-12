@@ -131,6 +131,9 @@ struct HomeView: View {
             
             viewModel.isRideLoading = false
         }
+        .task {
+            await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+        }
         .refreshable {
             await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
