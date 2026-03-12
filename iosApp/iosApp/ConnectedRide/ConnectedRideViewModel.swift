@@ -412,7 +412,10 @@ extension ConnectedRideViewModel {
                                 }
 
                                 _ = self.getRideStatus()
-                                let epochMillis = self.epochMillisFromOngoing(ongoingRide)
+                                var epochMillis = self.epochMillisFromOngoing(ongoingRide)
+                                if epochMillis <= 0 {
+                                    epochMillis = Int64(now * 1000)
+                                }
                                 let timeSinceUpdate = self.formatTime(from: epochMillis)
                                 let status = self.riderStatusFromOngoing(ongoingRide)
                                 let lat = ongoingRide.currentLat
