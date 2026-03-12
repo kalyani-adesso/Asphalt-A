@@ -166,7 +166,6 @@ extension CreateRideViewModel {
                 
                 let filteredParticpants = domainList
                     .filter { $0.uid != self.currentUserId }
-                    .filter {$0.primaryBike != ""}
                     .map { user in
                         Participant(
                             id: user.uid,
@@ -183,6 +182,7 @@ extension CreateRideViewModel {
                     self.participants = filteredParticpants
                     self.isRideLoading = false
                 }
+                print("participants: \(self.participants)")
                 
             } else if let error = error {
                 print("Error fetching users: \(error)")
