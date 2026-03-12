@@ -29,22 +29,20 @@ struct ActionButtonView: View {
                             foregroundColor: AppColor.celticBlue,
                             showShadow: false,
                             borderColor: AppColor.celticBlue,onTap: {
-                    // Navigate immediately; don't block UI on network.
-                    showJoinRide = true
-                    
-                    Task {
-                        await viewModel.getActiveJoinedRide()
-                        await MainActor.run {
-                            if viewModel.activeRide?.rideJoined == true {
-                                showJoinRide = false
-                                showConnectedRide = true
-                            }
-                        }
+                    // Use cached activeRide for instant navigation; keep background refresh elsewhere.
+                    if viewModel.activeRide?.rideJoined == true {
+                        showConnectedRide = true
+                    } else {
+                        showJoinRide = true
                     }
                 })
             }
         }
         .padding(.vertical,10)
+        // Preload active ride once when the home action bar appears, so Join Ride tap is usually instant.
+        .task {
+            await viewModel.getActiveJoinedRide()
+        }
         .navigationDestination(isPresented: $isPresented, destination: {
             CreateRideView(upcomingRideVM: upcomingRideViewModel, homeVM: homeViewModel)
                 .environmentObject(viewModel)

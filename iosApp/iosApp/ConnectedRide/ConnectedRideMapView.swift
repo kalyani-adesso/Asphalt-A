@@ -32,6 +32,11 @@ struct ConnectedRideMapView: View {
     @State private var index: Int = 0
     @State private var showNavigationOptions: Bool = false
     @State private var showInAppNavigation: Bool = false
+    // Smoothed speed & movement state for timer / UI
+    @State private var speedSamples: [Double] = []
+    @State private var isMoving: Bool = false
+    @State private var movingTicks: Int = 0
+    @State private var stoppedTicks: Int = 0
     var rideModel: JoinRideModel
 
     /// Display name for "Ride in Progress" card; fallback when userNameStatic is empty (e.g. after ride stopped).
@@ -299,10 +304,13 @@ struct ConnectedRideMapView: View {
                             } else {
                                 startOngoingRideTimer()
                             }
-                            viewModel.onLocationUpdate(lat: locationManager.lastLocation?.coordinate.latitude ?? 0.0, long: locationManager.lastLocation?.coordinate.longitude ?? 0.0, speed: locationManager.speedInKph ?? 0.0)
+                            let rawSpeed = locationManager.speedInKph ?? 0.0
+                            viewModel.onLocationUpdate(lat: locationManager.lastLocation?.coordinate.latitude ?? 0.0,
+                                                       long: locationManager.lastLocation?.coordinate.longitude ?? 0.0,
+                                                       speed: rawSpeed)
                             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                                 DispatchQueue.main.async {
-                                    self.elapsedSeconds += 1
+                                    updateSpeedAndTimer()
                                 }
                             }
                         }
@@ -395,6 +403,46 @@ struct ConnectedRideMapView: View {
         self.timer?.invalidate()
         self.timer = nil
     }
+
+    /// Updates smoothed speed and controls when the ride timer should advance.
+    /// - Uses a small rolling window and hysteresis to avoid flicker when GPS jitter or stop‑and‑go traffic occur.
+    private func updateSpeedAndTimer() {
+        // 1. Read raw speed from location manager
+        let rawSpeed = locationManager.speedInKph ?? 0.0
+
+        // 2. Apply a deadband: treat very low speeds as 0 to ignore jitter
+        let speedWithDeadband = rawSpeed < 3.0 ? 0.0 : rawSpeed
+
+        // 3. Maintain a short rolling window (last 5 samples)
+        speedSamples.append(speedWithDeadband)
+        if speedSamples.count > 5 {
+            speedSamples.removeFirst(speedSamples.count - 5)
+        }
+
+        let avgSpeed = speedSamples.isEmpty ? 0.0 : speedSamples.reduce(0, +) / Double(speedSamples.count)
+
+        // 4. Hysteresis for movement state:
+        //    - require 3 consecutive "moving" ticks to start
+        //    - require 5 consecutive "stopped" ticks to stop
+        if avgSpeed > 0 {
+            movingTicks += 1
+            stoppedTicks = 0
+            if !isMoving, movingTicks >= 3 {
+                isMoving = true
+            }
+        } else {
+            stoppedTicks += 1
+            movingTicks = 0
+            if isMoving, stoppedTicks >= 5 {
+                isMoving = false
+            }
+        }
+
+        // 5. Advance timer only while considered moving
+        if isMoving {
+            elapsedSeconds += 1
+        }
+    }
     
     @ViewBuilder func mapActionButton() -> some View {
         HStack {
@@ -457,8 +505,16 @@ struct ConnectedRideMapView: View {
     }
     
     @ViewBuilder func distanceAndETA() -> some View {
+        // Show smoothed average speed when available, else fall back to raw.
+        let displayedSpeed: Int = {
+            if !speedSamples.isEmpty {
+                let avg = speedSamples.reduce(0, +) / Double(speedSamples.count)
+                return Int(avg.rounded())
+            }
+            return Int(locationManager.speedInKph ?? 0.0)
+        }()
         VStack(alignment: .center) {
-            Text("\(Int(locationManager.speedInKph ?? 0.0))")
+            Text("\(displayedSpeed)")
                 .font(KlavikaFont.bold.font(size: 20))
                 .foregroundStyle(AppColor.black)
             Text("kph")
