@@ -24,7 +24,7 @@ struct iOSApp: App {
                 if isLoggedIn {
                     BottomNavBar()
                 } else if hasSeenOnboarding {
-                    BottomNavBar()
+                    SignInView()
 
                 } else {
                     WelcomeScreen()

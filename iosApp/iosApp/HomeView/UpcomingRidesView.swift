@@ -83,15 +83,17 @@ struct UpcomingRideCard: View {
                             .foregroundColor(AppColor.stoneGray)
                     }
                     Spacer()
-                    Button {
-                        withAnimation(.easeInOut) {
-                               onMessageTap(ride.id)
-                           }
-                    } label: {
-                        AppIcon.Home.message
+                    if ride.riderCount > 1 {
+                        Button {
+                            withAnimation(.easeInOut) {
+                                onMessageTap(ride.id)
+                            }
+                        } label: {
+                            AppIcon.Home.message
+                        }
+                        .buttonStyle(.plain)
+                        
                     }
-                    .buttonStyle(.plain)
-                    
                 }
                 HStack(spacing: 8) {
                     AppIcon.Home.calender
