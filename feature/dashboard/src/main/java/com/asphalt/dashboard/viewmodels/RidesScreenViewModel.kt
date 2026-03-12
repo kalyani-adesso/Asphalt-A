@@ -9,6 +9,7 @@ import com.asphalt.android.helpers.APIHelperUI
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
@@ -42,7 +43,6 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     val showNodata = mutableStateOf(false)
 
 
-
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
     }
@@ -54,7 +54,9 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     fun getRides() {
 
         viewModelScope.launch {
-            val currentTime = Calendar.getInstance().timeInMillis
+            //val currentTime = Calendar.getInstance().timeInMillis
+            val currentTime = Utils.currentDateWithoutTime()
+
             var user = userRepoImpl.getUserDetails()
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
