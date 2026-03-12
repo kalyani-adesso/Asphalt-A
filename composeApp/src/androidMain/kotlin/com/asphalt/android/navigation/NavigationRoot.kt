@@ -1,5 +1,7 @@
 package com.asphalt.android.navigation
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
@@ -47,6 +49,7 @@ import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.ui.BouncingCirclesLoader
+import com.asphalt.commonui.utils.CustomLogoutDialog
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
@@ -95,6 +98,8 @@ fun NavigationRoot(
     var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
     val density = LocalDensity.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
 
@@ -205,6 +210,7 @@ fun NavigationRoot(
         topAppBarState = newState
     }
 
+
     fun manageSelectKeyOnBackPress() {
         if (backStack.isNotEmpty()) {
             val closestTabKey = backStack.reversed().firstOrNull { it in bottomNavItems }
@@ -215,25 +221,63 @@ fun NavigationRoot(
         }
     }
 
-    fun onBackPressed() {
-        println("Back Nav from ${backStack.lastOrNull()}")
-        if (backStack.size > 1) {
-            val key = backStack.lastOrNull()
+    if (showLogoutDialog) {
+        CustomLogoutDialog(
+            showDialog = showLogoutDialog,
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                scope.launch {
+                    // Perform logout operations
+                    CurrentLocationUpdates.stopRideTracking(context)
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    androidUserVM.initialiseUserData()
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    androidUserVM.removeUserData()
 
-            when (key) {
-                is RegistrationPasswordNavKey -> {
-                    backStack.removeLastOrNull()
-                    backStack.add(RegistrationCodeNavKey(id = key.id))
-                }
-
-                else -> {
-                    backStack.removeLastOrNull()
-                    manageSelectKeyOnBackPress()
+                    // Clear navigation and go to Login
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()
                 }
             }
+        )
+    }
+
+    fun onBackPressed() {
+        println("Back Nav from ${backStack.lastOrNull()}")
+        if (drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
         } else {
-            backStack.removeLastOrNull()
-            manageSelectKeyOnBackPress()
+            if (backStack.size > 1) {
+                val key = backStack.lastOrNull()
+
+                when (key) {
+                    is RegistrationPasswordNavKey -> {
+                        backStack.removeLastOrNull()
+                        backStack.add(RegistrationCodeNavKey(id = key.id))
+                    }
+
+                    else -> {
+                        backStack.removeLastOrNull()
+                        manageSelectKeyOnBackPress()
+                    }
+                }
+            } else {
+                backStack.removeLastOrNull()
+                manageSelectKeyOnBackPress()
+            }
+        }
+    }
+    BackHandler {
+        if (drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        } else {
+            onBackPressed()
         }
     }
 
@@ -533,7 +577,7 @@ fun NavigationRoot(
                         AppNavKey.MessageUiScreenKey(
                             ridesData = key.ridesData,
 
-                        )
+                            )
                     }
 
                     entry<AppNavKey.RideDetails> { key ->
@@ -591,7 +635,8 @@ fun NavigationRoot(
         RidersClubSideMenu(drawerState, itemClick = { item ->
             when (item) {
                 Constants.LOGOUT_CLICK -> {
-                    scope.launch {
+                    showLogoutDialog = true
+                    /*scope.launch {
                         CurrentLocationUpdates.stopRideTracking(context)
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
                         androidUserVM.initialiseUserData()
@@ -600,7 +645,7 @@ fun NavigationRoot(
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)
                         drawerState.close()
-                    }
+                    }*/
                 }
 
                 Constants.MESSAGE_CLICK -> {
@@ -611,11 +656,39 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /*  scope.launch {
+                          backStack.add(AppNavKey.CreateAd)
+                          drawerState.close()
+                      }*/
+                }
+
+                Constants.SETTINGS_CLICK -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /* scope.launch {
+                         Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                         //backStack.add(AppNavKey.CreateAd)
+                         drawerState.close()
+                     }*/
+                }
+
+                Constants.REFER_FRIEND -> {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    /*scope.launch {
+
+                        //backStack.add(AppNavKey.CreateAd)
+                        drawerState.close()
+                    }*/
+                }
+
+                Constants.CONNECTED_RIDE_CLICK -> {
                     scope.launch {
-                        backStack.add(AppNavKey.CreateAd)
+                        backStack.add(AppNavKey.JoinRideNavKey(ridesData = RidesData()))
                         drawerState.close()
                     }
                 }
+
+
             }
 
         }, isGestureEnabled) {

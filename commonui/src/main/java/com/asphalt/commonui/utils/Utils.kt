@@ -29,6 +29,7 @@ object Utils {
         val formatter = SimpleDateFormat("MMMM - yyyy", Locale.getDefault())
         return formatter.format(this.time)
     }
+
     fun Int.toCompressedString(): String {
         if (this < 1000) return this.toString()
 
@@ -259,6 +260,7 @@ object Utils {
             lightness = 0.45f
         )
     }
+
     @SuppressLint("DefaultLocale")
     fun formatDuration(startMillis: Long, endMillis: Long): String {
         val diff = endMillis - startMillis
@@ -268,5 +270,16 @@ object Utils {
         val seconds = (diff / 1000) % 60
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    fun currentDateWithoutTime(): Long {
+        val currentTime = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        return currentTime
     }
 }

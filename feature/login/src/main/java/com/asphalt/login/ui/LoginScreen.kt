@@ -88,7 +88,7 @@ fun LoginScreen(
     onSignUpClick: () -> Unit,
     onDashboardNav: () -> Unit,
     onForgotClick: () -> Unit,
-    dataStoreManager: DataStoreManager =  koinInject(),
+    dataStoreManager: DataStoreManager = koinInject(),
 ) {
     val context = LocalContext.current
     //var checked by remember { mutableStateOf(false) }
@@ -390,7 +390,7 @@ fun LoginScreen(
                         text = stringResource(string.forgot_password),
                         style = TypographyMedium.bodySmall,
                         color = PrimaryDarkerLightB75, modifier = Modifier.clickable {
-                        onForgotClick.invoke()
+                            onForgotClick.invoke()
                         }
                     )
                 }
@@ -442,15 +442,27 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_facebook), contentDescription = ""
+                        painter = painterResource(R.drawable.ic_facebook),
+                        contentDescription = "",
+                        modifier = Modifier.clickable {
+                            Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                        }
                     )
                     Spacer(modifier = Modifier.width(Dimensions.spacing10))
                     Image(
-                        painter = painterResource(R.drawable.ic_google), contentDescription = ""
+                        painter = painterResource(R.drawable.ic_google),
+                        contentDescription = "",
+                        modifier = Modifier.clickable {
+                            Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                        }
                     )
                     Spacer(modifier = Modifier.width(Dimensions.spacing10))
                     Image(
-                        painter = painterResource(R.drawable.ic_apple), contentDescription = ""
+                        painter = painterResource(R.drawable.ic_apple),
+                        contentDescription = "",
+                        modifier = Modifier.clickable {
+                            Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.height(Dimensions.spacing30))
@@ -488,9 +500,15 @@ fun LoginPreview() {
 
 
     var dataStoreManager = DataStoreManager(LocalContext.current)
-    var androidVM = AndroidUserVM(UserRepoImpl(),dataStoreManager, UserRepository(UserAPIServiceImpl(
-        KtorClient())))
-    var viewModel: LoginScreenViewModel = LoginScreenViewModel(modelauth, dataStoreManager, androidVM)
+    var androidVM = AndroidUserVM(
+        UserRepoImpl(), dataStoreManager, UserRepository(
+            UserAPIServiceImpl(
+                KtorClient()
+            )
+        )
+    )
+    var viewModel: LoginScreenViewModel =
+        LoginScreenViewModel(modelauth, dataStoreManager, androidVM)
 
     LoginScreen(viewModel, onSignInClick = {
 
