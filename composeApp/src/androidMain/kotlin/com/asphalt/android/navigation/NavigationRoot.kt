@@ -49,6 +49,7 @@ import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.ui.BouncingCirclesLoader
+import com.asphalt.commonui.utils.CustomLogoutDialog
 import com.asphalt.createride.ui.CreateRideScreen
 import com.asphalt.dashboard.composables.screens.DashBoardScreen
 import com.asphalt.dashboard.composables.screens.NotificationScreen
@@ -97,6 +98,7 @@ fun NavigationRoot(
     var bannerType by remember { mutableStateOf(BannerType.SUCCESS) }
     val density = LocalDensity.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -217,6 +219,29 @@ fun NavigationRoot(
                 selectedKey = closestTabKey as AppNavKey
             }
         }
+    }
+
+    if (showLogoutDialog) {
+        CustomLogoutDialog(
+            showDialog = showLogoutDialog,
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                scope.launch {
+                    // Perform logout operations
+                    CurrentLocationUpdates.stopRideTracking(context)
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    androidUserVM.initialiseUserData()
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    androidUserVM.removeUserData()
+
+                    // Clear navigation and go to Login
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()
+                }
+            }
+        )
     }
 
     fun onBackPressed() {
@@ -610,7 +635,8 @@ fun NavigationRoot(
         RidersClubSideMenu(drawerState, itemClick = { item ->
             when (item) {
                 Constants.LOGOUT_CLICK -> {
-                    scope.launch {
+                    showLogoutDialog = true
+                    /*scope.launch {
                         CurrentLocationUpdates.stopRideTracking(context)
                         datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
                         androidUserVM.initialiseUserData()
@@ -619,7 +645,7 @@ fun NavigationRoot(
                         backStack.clear()
                         backStack.add(AppNavKey.LoginScreenNavKey)
                         drawerState.close()
-                    }
+                    }*/
                 }
 
                 Constants.MESSAGE_CLICK -> {
