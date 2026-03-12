@@ -29,13 +29,15 @@ struct ActionButtonView: View {
                             foregroundColor: AppColor.celticBlue,
                             showShadow: false,
                             borderColor: AppColor.celticBlue,onTap: {
+                    // Navigate immediately; don't block UI on network.
+                    showJoinRide = true
+                    
                     Task {
                         await viewModel.getActiveJoinedRide()
                         await MainActor.run {
                             if viewModel.activeRide?.rideJoined == true {
+                                showJoinRide = false
                                 showConnectedRide = true
-                            } else {
-                                showJoinRide = true
                             }
                         }
                     }

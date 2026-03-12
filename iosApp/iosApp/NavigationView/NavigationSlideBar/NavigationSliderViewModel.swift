@@ -29,7 +29,7 @@ struct MenuItemModel: Identifiable, Hashable {
 @MainActor
 final class NavigationSliderViewModel: ObservableObject {
    @Published var sections: [MenuItemModel] = []
-   private var createRideVM = CreateRideViewModel()
+   var createRideVM = CreateRideViewModel()
     init()  {
         // Load data immediately to avoid empty list delay
         loadData()

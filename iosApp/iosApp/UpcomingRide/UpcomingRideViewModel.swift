@@ -217,7 +217,8 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    hasPhotos: ride.images.count > 0, startDate: startDate,
+                    hasPhotos: ride.images.contains { !$0.url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+                    startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
                     endTime: EndRideTime,
@@ -568,7 +569,21 @@ extension UpcomingRideViewModel {
     }
     
     func decodeBase64ToImage(base64: String) -> UIImage? {
-        guard let data = Data(base64Encoded: base64) else { return nil }
+        var s = base64.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Handle common "data:image/...;base64," prefix.
+        if let comma = s.firstIndex(of: ","),
+           s[..<comma].lowercased().contains("base64") {
+            s = String(s[s.index(after: comma)...])
+        }
+        // Some backends send URL-safe base64.
+        s = s.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        // Fix missing padding.
+        let remainder = s.count % 4
+        if remainder != 0 {
+            s.append(String(repeating: "=", count: 4 - remainder))
+        }
+        guard let data = Data(base64Encoded: s, options: [.ignoreUnknownCharacters]) else { return nil }
         return UIImage(data: data)
     }
     
