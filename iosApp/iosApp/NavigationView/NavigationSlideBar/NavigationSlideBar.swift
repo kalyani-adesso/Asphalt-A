@@ -40,6 +40,7 @@ struct MenuItemRow: View {
     let upcomingRide: UpcomingRideViewModel
     @State var itemIsSelected: Bool = false
     @State private var showComingSoonAlert: Bool = false
+    @State private var logoutAlert: Bool = false
     // Use the same key as MBUserDefaults / iOSApp for login state
     @AppStorage(AppStrings.userdefaultKeys.rememberMeData.rawValue)
     private var isLoggedIn: Bool = false
@@ -71,7 +72,7 @@ struct MenuItemRow: View {
             if item.title == AppStrings.NavigationSlider.logout {
                 viewModel.logout {
                     isLoggedIn = false
-                    itemIsSelected = true
+                    logoutAlert = true
                 }
             } else if isComingSoonItem {
                 showComingSoonAlert = true
@@ -83,6 +84,15 @@ struct MenuItemRow: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("This feature will be available soon.")
+        }
+        .alert("Logout", isPresented: $logoutAlert) {
+            Button("Yes", role: .destructive) {
+                itemIsSelected = true
+            }
+            Button("No", role: .cancel) {
+               }
+        } message: {
+            Text("Are you sure you want to log out?")
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {
             item.destination
