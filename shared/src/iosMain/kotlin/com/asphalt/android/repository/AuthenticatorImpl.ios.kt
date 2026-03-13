@@ -12,6 +12,7 @@ import platform.UIKit.UIDevice
 
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.Clock
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual class AuthenticatorImpl actual constructor() {
@@ -35,10 +36,11 @@ actual class AuthenticatorImpl actual constructor() {
             val userValues = mapOf<Any?, Any?>(
                 "email" to user.email,
                 "user_name" to user.name,
-                "device" to UIDevice.currentDevice.model
+                "device" to UIDevice.currentDevice.model,
+                "created_date" to Clock.System.now().toEpochMilliseconds()
             )
 
-            database.child("users").child(userId).updateChildValues(userValues) { dbError: NSError?, _ ->
+            database.child("users").child(userId).setValue(userValues) { dbError: NSError?, _ ->
                 if (dbError != null) {
                     cont.resume(Result.failure(Exception(dbError.localizedDescription ?: "Database update failed")))
                 } else {
