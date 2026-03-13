@@ -442,7 +442,6 @@ fun RiderCard(
                         ) {
                             color = BlueLite25
 
-
                         } else {
                             color = PrimaryDarkerLightB75
                         }
