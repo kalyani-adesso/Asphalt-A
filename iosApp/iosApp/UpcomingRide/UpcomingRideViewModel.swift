@@ -86,7 +86,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var rideDetails: [RideDetailsModel] = []
     @Published var rideFromDeepLink: RideModel? = nil
     @Published var isUploading:Bool = false
-    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [])
+    @Published var joinRideModel = JoinRideModel(userId: "", rideId: "", title: "", organizer: "", description: "", route: "", distance: "", date: "", ridersCount: "", maxRiders: "", riderImage: "", contactNumber: "", startLat: 0.0, startLong: 0.0, endLat: 0.0, endLong: 0.0, rideJoined: false, participants: [], hasAssemblyPoint: false, assemblyLat: nil as Double?, assemblyLon: nil as Double?)
     init() {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
@@ -217,7 +217,8 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    hasPhotos: ride.images.count > 0, startDate: startDate,
+                    hasPhotos: ride.images.contains { !$0.url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+                    startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startRideTime,
                     endTime: EndRideTime,
@@ -437,7 +438,10 @@ class UpcomingRideViewModel: ObservableObject {
                     endLat: ride.endLatitude,
                     endLong: ride.endLongitude,
                     rideJoined: rideJoinedStatus,
-                    participants: finalParticipants
+                    participants: finalParticipants,
+                    hasAssemblyPoint: ride.hasAssemblyPoint,
+                    assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil as Double?,
+                    assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil as Double?
                 )
 
                 // -------------------------
@@ -565,7 +569,21 @@ extension UpcomingRideViewModel {
     }
     
     func decodeBase64ToImage(base64: String) -> UIImage? {
-        guard let data = Data(base64Encoded: base64) else { return nil }
+        var s = base64.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Handle common "data:image/...;base64," prefix.
+        if let comma = s.firstIndex(of: ","),
+           s[..<comma].lowercased().contains("base64") {
+            s = String(s[s.index(after: comma)...])
+        }
+        // Some backends send URL-safe base64.
+        s = s.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        // Fix missing padding.
+        let remainder = s.count % 4
+        if remainder != 0 {
+            s.append(String(repeating: "=", count: 4 - remainder))
+        }
+        guard let data = Data(base64Encoded: s, options: [.ignoreUnknownCharacters]) else { return nil }
         return UIImage(data: data)
     }
     

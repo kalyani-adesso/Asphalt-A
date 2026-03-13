@@ -107,9 +107,7 @@ struct RidePhotosViewerView: View {
             } message: { _ in
                 Text("Are you sure you want to delete this photo?")
             }
-            .task {
-                await loadRidePhotos()
-            }
+           
 
             if isLoading {
                 Color.black.opacity(0.25)
@@ -117,6 +115,11 @@ struct RidePhotosViewerView: View {
                     .zIndex(1)
                 ProgressViewReusable(title: "Loading photos...")
                     .zIndex(2)
+            }
+        }
+        .onAppear {
+            Task {
+                await loadRidePhotos()
             }
         }
     }

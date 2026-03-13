@@ -40,12 +40,12 @@ enum RiderStatus: String {
     }
 
     /// Derives status from last update time (and optional speed) so UI is consistent across clients.
-    /// Same thresholds as getRideStatus(): >120s = Stopped, ≤10s = Connected, else Delayed.
+    /// Same thresholds as getRideStatus(): >300s (~5 min) = Stopped, ≤10s = Connected, else Delayed.
     static func fromLastUpdate(epochMillis: Int64, speedKph: Double = 0) -> RiderStatus {
         let lastUpdate = TimeInterval(epochMillis) / 1000
         let now = Date().timeIntervalSince1970
         let secondsAgo = now - lastUpdate
-        if secondsAgo > 120 {
+        if secondsAgo > 300 {
             return .stopped
         }
         if secondsAgo <= 10 {
@@ -63,6 +63,9 @@ enum TrackingStatus:String {
 struct Rider: Identifiable {
     let id = UUID()
     let name: String
+    /// Optional image name for the rider's avatar (from UserDomain.profilePic).
+    /// Falls back to the default profile icon when nil or empty.
+    let profileImageName: String?
     var speed: Int // Kph
     var status: RiderStatus
     var timeSinceUpdate: String
@@ -105,7 +108,7 @@ struct ConnectedRideMessage: Identifiable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", profileImageName: nil, speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -118,8 +121,9 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var groupStatusTick: Int = 0
     private var groupStatusTimer: Timer?
     private var previousRidersDict: [String: Rider] = [:]
-    /// Cache for user lookups (userId → (name, contact)). Only name/contact; status always comes from snapshot.
-    private var userDetailsCache: [String: (name: String, contact: String)] = [:]
+    /// Cache for user lookups (userId → (name, contact, profileImageName)).
+    /// Status and timestamps always come from the ongoing ride snapshot.
+    private var userDetailsCache: [String: (name: String, contact: String, imageName: String?)] = [:]
     @Published var showPopup: Bool = false
     @Published var popupTitle: String = ""
     @Published var messageIndex:Int = 0
@@ -147,6 +151,12 @@ final class ConnectedRideViewModel: ObservableObject {
 
     // remembers the last coordinate for each user (keyed by userID)
     var lastLocations: [String: CLLocationCoordinate2D] = [:]
+    // heartbeat tuning: how often we *try* to send, and how often we actually send when stationary
+    private let heartbeatIntervalSeconds: TimeInterval = 10        // desired cadence when moving
+    private let stationaryHeartbeatSeconds: TimeInterval = 60      // when mostly stationary, back off
+    private let movementThresholdMeters: CLLocationDistance = 10   // ignore very small jitter
+    private var lastHeartbeatTime: TimeInterval = 0
+    private var lastHeartbeatLocation: CLLocationCoordinate2D?
     
     init () {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
@@ -315,6 +325,46 @@ extension ConnectedRideViewModel {
             }
         }
     }
+
+    /// Decides whether to send a reJoin heartbeat based on movement and time since last send.
+    /// - When the rider is moving (distance > movementThresholdMeters), we aim for ~heartbeatIntervalSeconds.
+    /// - When mostly stationary, we back off to stationaryHeartbeatSeconds to save battery/network.
+    func sendHeartbeatIfNeeded(rideId: String, userId: String, currentLat: Double, currentLong: Double, speed: Double) {
+        let now = Date().timeIntervalSince1970
+        let coord = CLLocationCoordinate2D(latitude: currentLat, longitude: currentLong)
+
+        // First heartbeat: always send, even if we don't yet have a valid location.
+        if lastHeartbeatTime == 0 {
+            lastHeartbeatTime = now
+            lastHeartbeatLocation = coord
+            reJoinRide(rideId: rideId, userId: userId, currentLat: currentLat, currentLong: currentLong, speed: speed)
+            return
+        }
+
+        let timeSinceLast = now - lastHeartbeatTime
+        var movedSignificantly = false
+        if let lastCoord = lastHeartbeatLocation {
+            let lastLoc = CLLocation(latitude: lastCoord.latitude, longitude: lastCoord.longitude)
+            let curLoc = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+            let distance = lastLoc.distance(from: curLoc)
+            movedSignificantly = distance >= movementThresholdMeters
+        }
+
+        let shouldSend: Bool
+        if movedSignificantly {
+            // When moving, stick close to the nominal heartbeat interval.
+            shouldSend = timeSinceLast >= heartbeatIntervalSeconds
+        } else {
+            // When stationary, send less frequently.
+            shouldSend = timeSinceLast >= stationaryHeartbeatSeconds
+        }
+
+        guard shouldSend else { return }
+
+        lastHeartbeatTime = now
+        lastHeartbeatLocation = coord
+        reJoinRide(rideId: rideId, userId: userId, currentLat: currentLat, currentLong: currentLong, speed: speed)
+    }
     
     func updateOrganizerStatus(rideId:String) {
         rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { status, error in
@@ -362,26 +412,31 @@ extension ConnectedRideViewModel {
                                 }
 
                                 _ = self.getRideStatus()
-                                let epochMillis = self.epochMillisFromOngoing(ongoingRide)
+                                var epochMillis = self.epochMillisFromOngoing(ongoingRide)
+                                if epochMillis <= 0 {
+                                    epochMillis = Int64(now * 1000)
+                                }
                                 let timeSinceUpdate = self.formatTime(from: epochMillis)
                                 let status = self.riderStatusFromOngoing(ongoingRide)
                                 let lat = ongoingRide.currentLat
                                 let long = ongoingRide.currentLong
 
-                                let userDetails: (String, String)?
+                                let userDetails: (String, String, String?)?
                                 if let cached = self.userDetailsCache[ongoingRide.userID] {
-                                    userDetails = (cached.name, cached.contact)
+                                    userDetails = (cached.name, cached.contact, cached.imageName)
                                 } else {
                                     userDetails = await self.getAllUsers(createdBy: ongoingRide.userID)
                                     if let details = userDetails {
-                                        self.userDetailsCache[ongoingRide.userID] = (details.0, details.1)
+                                        self.userDetailsCache[ongoingRide.userID] = (details.0, details.1, details.2)
                                     }
                                 }
 
                                 newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
                                 let name = (userDetails?.0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                                let imageName = userDetails?.2
                                 let rider = Rider(
                                     name: name.isEmpty ? "Rider" : name,
+                                    profileImageName: (imageName?.isEmpty == false ? imageName : nil),
                                     speed: Int(ongoingRide.speedInKph),
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,
@@ -501,7 +556,7 @@ extension ConnectedRideViewModel {
         })
     }
     
-    func getAllUsers(createdBy: String) async  -> (String, String)? {
+    func getAllUsers(createdBy: String) async  -> (String, String, String?)? {
         await withCheckedContinuation { continuation in
             userRepository.getAllUsers { result, error in
                 if let success = result as? APIResultSuccess<AnyObject>,
@@ -510,7 +565,8 @@ extension ConnectedRideViewModel {
 
                     let userName = matchedUser.name
                     let contactNumber = matchedUser.contactNumber
-                    continuation.resume(returning: (userName, contactNumber))
+                    let profilePic = matchedUser.profilePic
+                    continuation.resume(returning: (userName, contactNumber, profilePic.isEmpty ? nil : profilePic))
                 } else {
                     continuation.resume(returning: nil)
                 }
@@ -554,8 +610,8 @@ extension ConnectedRideViewModel {
         let timeSinceMsg = now - lastMessageReceivedTime
         let timeSinceMovement = now - lastMovementTime
 
-        // stopped if no server update for over 2 minutes or no movement for 2 minutes
-        if timeSinceMsg > 120 || timeSinceMovement > 120 {
+        // stopped if no server update for over 5 minutes or no movement for 5 minutes
+        if timeSinceMsg > 300 || timeSinceMovement > 300 {
             return .stopped
         }
         
@@ -601,14 +657,24 @@ extension ConnectedRideViewModel {
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
         var diff = Int(Date().timeIntervalSince(date))
         if diff < 0 { diff = 0 }
-        
+
+        // < 1 minute → seconds
         if diff < 60 {
             return "\(diff)s ago"
-        } else if diff < 3600 {
+        }
+
+        // < 1 hour → minutes
+        if diff < 3600 {
             return "\(diff / 60)m ago"
-        } else {
+        }
+
+        // < 1 day → hours
+        if diff < 86_400 {
             return "\(diff / 3600)h ago"
         }
+
+        // ≥ 1 day → days
+        return "\(diff / 86_400)d ago"
     }
 
     

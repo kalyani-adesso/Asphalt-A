@@ -61,7 +61,7 @@ class ProfileViewModel: ObservableObject {
     @Published var emergencyNumber = "--"
     @Published var drivingLicenseNumber: String = "--"
     @Published var isMechanic: Bool = false
-    @Published var profileImage = AppImage.Profile.profile
+    @Published var profileImage = AppIcon.Profile.profile
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
     let vehicleArray: [AppStrings.VehicleType] = AppStrings.VehicleType.allCases
