@@ -282,4 +282,15 @@ object Utils {
 
         return currentTime
     }
+
+    fun currentDateEndOfDay(): Long {
+        val time = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }.timeInMillis
+
+        return time
+    }
 }
