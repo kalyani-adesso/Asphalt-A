@@ -19,6 +19,8 @@ data class ProfileDTO(
     val bikes: Map<String, BikeDTO>? = null,
     @SerialName("profile_image_url")
     val profilePicUrl: String = "",
+    @SerialName("created_date")
+    val accountCreationDate: Long = 0,
 )
 
 @Serializable

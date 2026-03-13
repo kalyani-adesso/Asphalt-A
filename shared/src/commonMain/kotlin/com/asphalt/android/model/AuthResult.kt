@@ -8,6 +8,9 @@ interface LoginResult {
     val name: String?
     val email: String?
     val uid: String?
+    val accountCreatedDate: Long?
+
+
 }
 
 @Serializable
@@ -15,8 +18,11 @@ class AuthResultimpl(
     override val isSuccess: Boolean,
     override val errorMessage: String? = null,
     override val name: String? = null,
-    override val email: String? = null, override val uid: String? = null
+    override val email: String? = null,
+    override val uid: String? = null,
+    override val accountCreatedDate: Long? = null
 ) : LoginResult {
+
 
 }
 
@@ -26,5 +32,6 @@ class CurrentUser(
     val errorMessage: String? = null,
     val name: String? = null,
     val email: String? = null,
-    val uid: String? = null
+    val uid: String? = null,
+    val accountCreatedDate: Long = 0
 )

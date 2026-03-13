@@ -13,7 +13,6 @@ object CurrentLocationUpdates {
             putExtra("ONGOING_RIDE_ID", ongoingRideId)
         }
 
-        // Foreground services require this specific start method
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
         } else {
@@ -22,7 +21,6 @@ object CurrentLocationUpdates {
     }
 
     fun stopRideTracking(context: Context) {
-        // This triggers the Service's onDestroy() method
         val intent = Intent(context, CurrentLocationService::class.java)
         context.stopService(intent)
     }

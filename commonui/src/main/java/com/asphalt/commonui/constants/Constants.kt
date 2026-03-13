@@ -28,6 +28,7 @@ object Constants {
     const val FIREBASE_DB_RIDES = "rides"
     const val Firebase_user_name = "user_name"
     const val Firebase_user_email = "email"
+    const val FirebaseUserCreatedDate = "created_date"
 
 
     //Create Ride Tab Constants
@@ -51,10 +52,13 @@ object Constants {
     const val LOGOUT_CLICK = 1
     const val MESSAGE_CLICK = 2
     const val MARKET_PLACE_CLICK = 3
+    const val SETTINGS_CLICK = 4
+    const val REFER_FRIEND = 5
+    const val CONNECTED_RIDE_CLICK = 6
 
     const val GROUP_CHAT = "group"
-    const val PRIVATE_CHAT ="private"
-    const val SOLO ="Solo Ride"
+    const val PRIVATE_CHAT = "private"
+    const val SOLO = "Solo Ride"
 
 
 }

@@ -37,7 +37,10 @@ fun PlacesVisitedGraph(
     val endDate = placesVisitedGraphViewModel.endDate.collectAsStateWithLifecycle()
     val xValues = placesVisitedGraphViewModel.xValuesList.collectAsStateWithLifecycle()
     val yValues = placesVisitedGraphViewModel.yValueList.collectAsStateWithLifecycle()
-    val isArrowEnabled = placesVisitedGraphViewModel.isArrowEnabled.collectAsStateWithLifecycle()
+    val isForwardArrowEnabled =
+        placesVisitedGraphViewModel.isForwardArrowEnabled.collectAsStateWithLifecycle()
+    val isBackwardArrowEnabled =
+        placesVisitedGraphViewModel.isBackArrowEnabled.collectAsStateWithLifecycle()
     LaunchedEffect(dashboardData) {
         placesVisitedGraphViewModel.populateGraph(dashboardData)
     }
@@ -77,19 +80,22 @@ fun PlacesVisitedGraph(
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.size5)) {
-                ComposeUtils.ArrowView(modifier = Modifier.clickable {
+                ComposeUtils.ArrowView(modifier = Modifier.clickable(enabled = isBackwardArrowEnabled.value) {
                     placesVisitedGraphViewModel.fetchDataPreviousDateRange()
                 }) {
+                    val arrowIcon: Int =
+                        if (isBackwardArrowEnabled.value) R.drawable.ic_prev_enabled
+                        else R.drawable.ic_prev_disabled
                     Image(
-                        painter = painterResource(R.drawable.ic_prev_enabled),
+                        painter = painterResource(arrowIcon),
                         null,
                     )
                 }
-                ComposeUtils.ArrowView(modifier = Modifier.clickable(enabled = isArrowEnabled.value) {
+                ComposeUtils.ArrowView(modifier = Modifier.clickable(enabled = isForwardArrowEnabled.value) {
                     placesVisitedGraphViewModel.fetchDataNextDateRange()
                 }) {
                     val arrowIcon: Int =
-                        if (isArrowEnabled.value)
+                        if (isForwardArrowEnabled.value)
                             R.drawable.ic_next_enabled
                         else
                             R.drawable.ic_next_disabled

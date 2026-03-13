@@ -15,7 +15,7 @@ val dashboardModule = module {
     viewModel { PerMonthRideStatsViewModel() }
     viewModel { DashboardRideInviteViewModel(get(), get()) }
     viewModel { AdventureJourneyViewModel() }
-    viewModel { PlacesVisitedGraphViewModel() }
+    viewModel { PlacesVisitedGraphViewModel(get()) }
     viewModel { NotificationViewModel() }
     viewModel { RidesScreenViewModel(get()) }
     viewModel { RidesDetailsViewModel() }

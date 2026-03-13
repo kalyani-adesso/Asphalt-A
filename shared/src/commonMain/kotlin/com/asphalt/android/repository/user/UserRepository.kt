@@ -24,7 +24,8 @@ class UserRepository(private val apiService: UserAPIService) {
                 profilePic = profileDTO.profilePicUrl,
                 isMechanic = profileDTO.isMechanic,
                 primaryBike = bikeDomain?.let { it.make  + " " + it.model  }.orEmpty(),
-                contactNumber = profileDTO.phoneNumber
+                contactNumber = profileDTO.phoneNumber,
+                accountCreationDate = profileDTO.accountCreationDate
             )
         }
     }

@@ -7,6 +7,7 @@ import com.asphalt.commonui.constants.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
+import kotlin.time.Clock
 
 actual class AuthenticatorImpl {
 
@@ -22,7 +23,8 @@ actual class AuthenticatorImpl {
             val userValues = mapOf<Any?, Any?>(
                 "email" to user.email,
                 "user_name" to user.name,
-                "device" to "Android"
+                "device" to "Android",
+                "created_date" to Clock.System.now().toEpochMilliseconds()
             )
 
             val dbRef = FirebaseDatabase.getInstance()
@@ -67,6 +69,8 @@ actual class AuthenticatorImpl {
             val name = dataSnapshot.child(Constants.Firebase_user_name).getValue(String::class.java)
             val email =
                 dataSnapshot.child(Constants.Firebase_user_email).getValue(String::class.java)
+            val accountCreatedDate =
+                dataSnapshot.child(Constants.FirebaseUserCreatedDate).getValue(Long::class.java)
 
             //Log.d("name","name ${name}")
 
@@ -75,7 +79,8 @@ actual class AuthenticatorImpl {
                 errorMessage = "",
                 name = name,
                 email = email,
-                uid = id
+                uid = id,
+                accountCreatedDate = accountCreatedDate
             )
 
         } catch (e: Exception) {

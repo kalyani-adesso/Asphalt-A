@@ -149,7 +149,10 @@ fun JoinRide(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(R.string.no_data), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(R.string.no_data),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         } else {
             // display riders list
@@ -340,7 +343,9 @@ fun RiderCard(
                             tint = GreenDark,
                         )
                         Spacer(Modifier.width(Dimensions.size5))
-                        val (participantCount, totalCount) = viewModel.getParticipantCounts(ridesData)
+                        val (participantCount, totalCount) = viewModel.getParticipantCounts(
+                            ridesData
+                        )
                         Text(
                             text = "${totalCount}/${participantCount} Riders",
                             style = Typography.titleMedium,
@@ -431,24 +436,27 @@ fun RiderCard(
                             }
                         }
                     } else {
+                        var color = PrimaryDarkerLightB75
+                        if ((completedRideID != null && completedRideID != ridesData.ridesID) ||
+                            (ridesData.startDate?.let { it > Utils.currentDateEndOfDay() } == true)
+                        ) {
+                            color = BlueLite25
+
+                        } else {
+                            color = PrimaryDarkerLightB75
+                        }
                         // join ride button
                         GradientButton(
                             modifier = Modifier.weight(1f),
-                            startColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
-                                BlueLite25
-                            } else {
-                                PrimaryDarkerLightB75
-                            },
-                            endColor = if (completedRideID != null && completedRideID != ridesData.ridesID) {
-                                BlueLite25
-                            } else {
-                                PrimaryDarkerLightB75
-                            },
+                            startColor = color,
+                            endColor = color,
                             onClick = {
-                                if (completedRideID != null && completedRideID != ridesData.ridesID) {
+                                if ((completedRideID != null && completedRideID != ridesData.ridesID) ||
+                                    (ridesData.startDate?.let { it > Utils.currentDateEndOfDay() } == true)
+                                ) {
                                     Toast.makeText(
                                         context,
-                                        "You are already on a ride. Please complete the current ride and then start a new one.",
+                                        "You are already on a ride, or the ride is not scheduled for now.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {

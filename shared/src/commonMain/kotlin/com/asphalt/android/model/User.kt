@@ -23,6 +23,7 @@ data class UserDomain(
     val isMechanic: Boolean,
     val primaryBike: String,
     val contactNumber: String,
+    val accountCreationDate: Long
 )
 
 data class RidersList(
