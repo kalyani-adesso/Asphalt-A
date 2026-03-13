@@ -92,7 +92,8 @@ object RidesFilter {
                     riders = ride.participants.size + 1,// need to count the organizer
                     createdBy = ride.createdBy,
                     createdUSerName = userDomain?.name ?: "",
-                    profileImageUrl = userDomain?.profilePic
+                    profileImageUrl = userDomain?.profilePic,
+                    startDate = ride.startDate
                 )
             } else {
                 null // Skip if participant not found

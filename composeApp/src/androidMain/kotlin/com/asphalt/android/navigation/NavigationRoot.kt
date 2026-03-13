@@ -251,6 +251,11 @@ fun NavigationRoot(
                 drawerState.close()
             }
         } else {
+            val currentKey = backStack.lastOrNull()
+            if (currentKey is AppNavKey.DashboardNavKey) {
+            (context as? android.app.Activity)?.finish()
+            return
+        }
             if (backStack.size > 1) {
                 val key = backStack.lastOrNull()
 

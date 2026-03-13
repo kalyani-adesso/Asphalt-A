@@ -85,6 +85,12 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                         ride.startDate?.let { it < currentTime } ?: false
                     }
                 }
+
+                if (inviteList.isNotEmpty()) {
+                    inviteList.removeAll { ride ->
+                        ride.startDate?.let { it < currentTime } ?: false
+                    }
+                }
                 var ridesList =
                     YourRideRoot(
                         upcoming = upcomiList,

@@ -107,10 +107,10 @@ class EditProfileVM(val profileRepository: ProfileRepository) : ViewModel() {
         }
 
         // Check Driving License
-        if (_editLicense.value.isEmpty()) {
-            _licenseError.value = true
-            isValid = false
-        }
+//        if (_editLicense.value.isEmpty()) {
+//            _licenseError.value = true
+//            isValid = false
+//        }
 
         // Check Emergency Contact Number
         if (_editEmergencyNo.value.isEmpty()) {

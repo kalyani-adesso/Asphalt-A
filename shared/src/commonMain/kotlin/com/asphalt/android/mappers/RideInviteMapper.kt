@@ -5,6 +5,9 @@ package com.asphalt.android.mappers
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.rides.RideInvitesDomain
 import com.asphalt.android.model.rides.RidesData
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -29,7 +32,12 @@ fun List<RidesData>.toRideInviteListDomain(userID: String): List<RideInvitesDoma
     return with(this) {
         mapNotNull { ridesData ->
             ridesData.startDate?.let {
-                if (it > Clock.System.now().toEpochMilliseconds()) {
+                val startOfToday = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+                    .atStartOfDayIn(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds()
+                if (it > startOfToday) {
                     val organiser = ridesData.isOrganiser(userID)
                     if (organiser && ridesData.isRideEndedByOrganiser()) {
                         null
