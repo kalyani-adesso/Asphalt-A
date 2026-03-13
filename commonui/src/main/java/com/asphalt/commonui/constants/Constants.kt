@@ -28,6 +28,7 @@ object Constants {
     const val FIREBASE_DB_RIDES = "rides"
     const val Firebase_user_name = "user_name"
     const val Firebase_user_email = "email"
+    const val FirebaseUserCreatedDate = "created_date"
 
 
     //Create Ride Tab Constants
