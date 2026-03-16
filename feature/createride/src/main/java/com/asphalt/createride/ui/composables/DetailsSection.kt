@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asphalt.commonui.R
@@ -81,7 +80,9 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
             viewModel.updateTime(hr, min, isAm, time_text)
             viewModel.showTimePicker(false)
             viewModel._showRideTimeError.value = false
-        })
+        },viewModel.rideDetailsState.value.hour,
+            viewModel.rideDetailsState.value.mins,
+            viewModel.rideDetailsState.value.isAm)
     }
 
     if (viewModel.show_datePicker.value) {
@@ -96,20 +97,26 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     }
 //End Date
     if (viewModel.show_EndTimePicker.value) {
-        CustomTimePickerDialog(onDismiss = {
-            viewModel.showEndTimePicker(false)
-        }, onTimeSelected = { hr, min, isAm ->
-            var time_text = "$hr:${String.format("%02d", min)} ${
-                if (isAm) {
-                    am
-                } else {
-                    pm
-                }
-            }"
-            viewModel.updateEndTime(hr, min, isAm, time_text)
-            viewModel.showEndTimePicker(false)
-            viewModel._showRideEndTimeError.value = false
-        })
+        CustomTimePickerDialog(
+            onDismiss = {
+                viewModel.showEndTimePicker(false)
+            },
+            onTimeSelected = { hr, min, isAm ->
+                var time_text = "$hr:${String.format("%02d", min)} ${
+                    if (isAm) {
+                        am
+                    } else {
+                        pm
+                    }
+                }"
+                viewModel.updateEndTime(hr, min, isAm, time_text)
+                viewModel.showEndTimePicker(false)
+                viewModel._showRideEndTimeError.value = false
+            },
+            hour = viewModel.rideDetailsState.value.endHour ,
+            mins = viewModel.rideDetailsState.value.endMins ,
+            isAm = viewModel.rideDetailsState.value.isEndAm
+        )
     }
 
     if (viewModel.show_EndDatePicker.value) {
