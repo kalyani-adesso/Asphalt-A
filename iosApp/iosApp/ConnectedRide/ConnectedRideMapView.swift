@@ -173,6 +173,7 @@ struct ConnectedRideMapView: View {
                                         guard success else { return }
                                         viewModel.endRideSummary(ride: rideModel, userID: MBUserDefaults.userIdStatic ?? "") {
                                             DispatchQueue.main.async {
+                                                // Keep end-ride duration consistent with the top timer.
                                                 viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
                                                 MBUserDefaults.isRideJoinedID = nil
                                                 stopTimer()
@@ -209,7 +210,8 @@ struct ConnectedRideMapView: View {
                                     ForEach(viewModel.groupRiders.indices, id: \.self) { index in
                                         let rider = viewModel.groupRiders[index]
                                         let _ = viewModel.groupStatusTick
-                                        GroupRiderView(profileImageName: rider.profileImageName, title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.lastUpdateEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
+                                        // Show duration in current status so it doesn't reset every heartbeat.
+                                        GroupRiderView(profileImageName: rider.profileImageName, title: rider.name, status: rider.status.rawValue, speed: "\(rider.speed) km", subTitle: viewModel.formatTime(from: rider.statusSinceEpochMillis), index: index, showMessagePopup: $showMessagePopup,onMessageTap: { val in
                                             selectedRiderName = viewModel.groupRiders[index].name
                                             viewModel.messageIndex = val
                                         })
