@@ -99,7 +99,6 @@ class JoinRideViewModel(
     }
 
 
-
     // Called from UI
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -260,6 +259,8 @@ class JoinRideViewModel(
     var endRideID: String? = null
     private var _ongoingRideUpdate = MutableStateFlow("")
     var ongoingRideUpdate = _ongoingRideUpdate.asStateFlow()
+    private var observeRetryCount = 0
+    private val MAX_RETRIES = 3
 
     // Observe all riders in real-time
     fun observeRideLocations(rideId: String) {
@@ -273,7 +274,7 @@ class JoinRideViewModel(
         rideListener = object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
-
+                observeRetryCount = 0
                 if (!snapshot.exists()) {
                     _joinedUsers.value = emptyList()
                     return
@@ -315,8 +316,24 @@ class JoinRideViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                rideListener?.let {
-                    rideListener?.let { rideRef?.removeEventListener(it) }
+                Log.e("Firebase", "Listener cancelled: ${error.message}")
+
+                rideListener?.let { rideRef?.removeEventListener(it) }
+                rideListener = null
+
+                if (observeRetryCount < MAX_RETRIES) {
+                    observeRetryCount++
+                    val delayMillis = (1000L * (1 shl observeRetryCount))
+                    viewModelScope.launch {
+                        Log.d(
+                            "Firebase",
+                            "Retrying listener in ${delayMillis}ms (Attempt $observeRetryCount)"
+                        )
+                        delay(delayMillis)
+                        observeRideLocations(rideId)
+                    }
+                } else {
+                    Log.e("Firebase", "Max retries reached. Cannot connect to ride.")
                 }
             }
         }
@@ -431,7 +448,8 @@ class JoinRideViewModel(
         }
 
         // Add +1 to total only if rideStatus is 3 or 4
-        val total = participantCountWithStatus + if (ridesData.rideStatus == 3 || ridesData.rideStatus == 4) 1 else 0
+        val total =
+            participantCountWithStatus + if (ridesData.rideStatus == 3 || ridesData.rideStatus == 4) 1 else 0
 
         // Return: first = size + 1, second = total as calculated
         return Pair(list.size + 1, total)
