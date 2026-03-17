@@ -21,18 +21,19 @@ class HomeViewModel: ObservableObject {
     @Published var journeySlices: [JourneySlice] = []
     @Published var stats: [RideStat] = []
     @Published var userName: String = ""
+    @Published var userCreatedDate: Date? = nil
     
- 
+    
     // MARK: - Bar chart
     @Published var selectedMonth: PlacesMonth? = nil
     @Published var placesByMonth: [PlacesMonth] = []
     
     struct PlacesMonth: Identifiable, Equatable {
         var id = UUID()
-          var month: String
-          var year: Int
-          var placesCount: Int
-          var monthIndex: Int
+        var month: String
+        var year: Int
+        var placesCount: Int
+        var monthIndex: Int
     }
     
     
@@ -56,6 +57,14 @@ class HomeViewModel: ObservableObject {
                 if let currentUser = try await userRepo.getUserDetails() {
                     self.userName = currentUser.name ?? ""
                     MBUserDefaults.userNameStatic = currentUser.name ?? ""
+                    let createdMillis = currentUser.accountCreatedDate
+                    print("Swift received:", currentUser.accountCreatedDate)
+                    if  createdMillis > 0 {
+                        self.userCreatedDate = Date(timeIntervalSince1970: TimeInterval(createdMillis) / 1000)
+                        print("User created date:", self.userCreatedDate ?? "nil")
+                          print("First available month:", self.firstAvailableMonth ?? "nil")
+                    }
+                    
                 }
             } catch {
                 print("Error fetching user: \(error)")
@@ -84,7 +93,7 @@ class HomeViewModel: ObservableObject {
         }
         
     }
-
+    
     
     
     @MainActor
@@ -174,7 +183,7 @@ class HomeViewModel: ObservableObject {
             return "\(meters)"
         }
     }
-
+    
     
     
     func getJourneySlices(for range: String) -> [JourneySlice] {
@@ -204,18 +213,18 @@ class HomeViewModel: ObservableObject {
     // MARK: - Bar chart
     func generatePlacesByMonth() {
         var result: [PlacesMonth] = []
-
+        
         for item in dashboardData {
             let m = Int(item.monthYear.month)
             let y = Int(item.monthYear.year)
-
+            
             let monthName = DateFormatter().monthSymbols[m - 1].prefix(3).capitalized
-
+            
             let uniquePlaces = item.perMonthData.filter {
                 !($0.endLocation ?? "").trimmingCharacters(in: .whitespaces).isEmpty
             }.count
-
-
+            
+            
             result.append(
                 PlacesMonth(
                     month: String(monthName),
@@ -226,10 +235,10 @@ class HomeViewModel: ObservableObject {
             )
         }
         let sorted = result.sorted {
-               if $0.year == $1.year { return $0.monthIndex < $1.monthIndex }
-               return $0.year < $1.year
-           }
-
+            if $0.year == $1.year { return $0.monthIndex < $1.monthIndex }
+            return $0.year < $1.year
+        }
+        
         // Sort chronologically
         self.placesByMonth = result.sorted {
             if $0.year == $1.year {
@@ -238,7 +247,15 @@ class HomeViewModel: ObservableObject {
             return $0.year < $1.year
         }
     }
-
+    var firstAvailableMonth: Date? {
+        guard let created = userCreatedDate else { return nil }
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: created)
+        
+        return calendar.date(from: components)
+    }
+    
     
 }
 extension Notification.Name {

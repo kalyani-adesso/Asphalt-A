@@ -5,9 +5,11 @@ import com.asphalt.android.model.LoginResult
 import com.asphalt.android.model.User
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseAuth.FIRAuthDataResult
+import cocoapods.FirebaseDatabase.FIRDataEventType
 import cocoapods.FirebaseDatabase.FIRDatabase
 import platform.Foundation.NSError
 import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.Foundation.NSNumber
 import platform.UIKit.UIDevice
 
 import kotlin.coroutines.resume
@@ -49,30 +51,58 @@ actual class AuthenticatorImpl actual constructor() {
             }
         }
     }
-    
-    actual suspend fun signIn(email: String, password: String): LoginResult = suspendCancellableCoroutine { cont ->
-        auth.signInWithEmail(email = email, password = password) { result: FIRAuthDataResult?, error: NSError? ->
-            if (error != null) {
-                cont.resume(AuthResultimpl(false, error.localizedDescription ?: "Unknown error"))
-                return@signInWithEmail
-            }
 
-            val user = result?.user()
-            if (user != null) {
-                val loginResult = AuthResultimpl(
-                    isSuccess = true,
-                    errorMessage = null,
-                    name = user.displayName(),
-                    email = user.email(),
-                    uid = user.uid()
-                )
-                cont.resume(loginResult)
-            } else {
-                cont.resume(AuthResultimpl(false, "Sign-in succeeded but user object was null."))
+    actual suspend fun signIn(email: String, password: String): LoginResult =
+        suspendCancellableCoroutine { cont ->
+
+            auth.signInWithEmail(email = email, password = password) { result, error ->
+                if (error != null) {
+                    cont.resume(AuthResultimpl(false, error.localizedDescription ?: "Unknown error"))
+                    return@signInWithEmail
+                }
+
+                val user = result?.user()
+                if (user == null) {
+                    cont.resume(AuthResultimpl(false, "User object is null"))
+                    return@signInWithEmail
+                }
+
+                val dbRef = FIRDatabase.database().reference().child("users").child(user.uid())
+
+                // Fetch the data using `observeSingleEventOfType` with .Value
+                dbRef.observeSingleEventOfType(FIRDataEventType.FIRDataEventTypeValue) { snapshot, error ->
+
+                    val data = snapshot?.value as? Map<Any?, *>
+                    val name = data?.get("user_name") as? String
+                    val emailValue = data?.get("email") as? String
+                    val rawCreatedDate = data?.get("created_date")
+
+                    val accountCreatedDate: Long = when (rawCreatedDate) {
+                        is Long -> rawCreatedDate
+                        is Int -> rawCreatedDate.toLong()
+                        is Double -> rawCreatedDate.toLong()
+                        is NSNumber -> rawCreatedDate.longLongValue
+                        is String -> rawCreatedDate.toLongOrNull() ?: 0L
+                        else -> 0L
+                    }
+                    println("RAW SNAPSHOT: ${snapshot?.value}")
+                    println("TYPE: ${snapshot?.value?.let { it::class }}")
+                    println("CREATED DATE RAW: $rawCreatedDate")
+                    println("CREATED DATE TYPE: ${rawCreatedDate?.let { it::class }}")
+
+                    cont.resume(
+                        AuthResultimpl(
+                            isSuccess = true,
+                            errorMessage = null,
+                            name = name,
+                            email = emailValue,
+                            uid = user.uid(),
+                            accountCreatedDate = accountCreatedDate
+                        )
+                    )
+                }
             }
         }
-    }
-
     actual suspend fun resetPassword(email: String): Result<String> {
         return suspendCancellableCoroutine { continuation ->
             auth.sendPasswordResetWithEmail(email) { error: NSError? ->

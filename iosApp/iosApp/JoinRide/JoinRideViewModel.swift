@@ -34,6 +34,17 @@ struct JoinRideModel: Identifiable,Hashable {
     let hasAssemblyPoint: Bool
     let assemblyLat: Double?
     let assemblyLon: Double?
+    var isFutureRide: Bool {
+        guard let rideDate = Self.parseDate(from: date) else { return false }
+        return rideDate > Date()
+    }
+
+    private static func parseDate(from string: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: string)
+    }
 }
 
 @MainActor
@@ -163,7 +174,6 @@ extension JoinRideViewModel {
             print("Failed to fetch rides: \(error.localizedDescription)")
         }
     }
-    
     private func getAllRidesAsync() async throws -> [RidesData] {
         try await withCheckedThrowingContinuation { continuation in
             rideRepository.getAllRide { result, error in

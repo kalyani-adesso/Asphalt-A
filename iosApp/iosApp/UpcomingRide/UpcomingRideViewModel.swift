@@ -111,6 +111,7 @@ class UpcomingRideViewModel: ObservableObject {
             
             let currentUserID = MBUserDefaults.userIdStatic ?? ""
             let now = Date()
+            let todayStart = Calendar.current.startOfDay(for: now)
             
             var upcoming: [RideModel] = []
             var history: [RideModel] = []
@@ -120,10 +121,11 @@ class UpcomingRideViewModel: ObservableObject {
                 guard let startEpoch = ride.startDate else { continue }
                 
                 let startDate = Date(timeIntervalSince1970: Double(startEpoch.int64Value) / 1000)
-               
-                guard let EndEpoch = ride.endDate else { continue }
+                if startDate < todayStart { continue }
                 
+                guard let EndEpoch = ride.endDate else { continue }
                 let EndDate = Date(timeIntervalSince1970: Double(EndEpoch.int64Value) / 1000)
+                
                 if EndDate.addingTimeInterval(60) < now { continue }
                 
                 let startText = formatDate(startDate)
@@ -334,7 +336,6 @@ class UpcomingRideViewModel: ObservableObject {
             print("Error fetching users:", error)
         }
     }
-    
     
     @MainActor
     func deleteRide(rideId: String)  async {
