@@ -10,8 +10,8 @@ import SwiftUI
 struct NavigationSlideBar: View {
     @StateObject private var viewModel = NavigationSliderViewModel()
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject private var home: HomeViewModel
-    @EnvironmentObject private var upcomingRide: UpcomingRideViewModel
+    @StateObject private var home = HomeViewModel()
+    @StateObject private var upcomingRide = UpcomingRideViewModel()
     @State var showHome: Bool = false
     var body: some View {
         AppToolBar(showBack: false){
@@ -107,8 +107,4 @@ struct logoutSection:ViewModifier {
             content
         }
     }
-}
-
-#Preview {
-    NavigationSlideBar()
 }

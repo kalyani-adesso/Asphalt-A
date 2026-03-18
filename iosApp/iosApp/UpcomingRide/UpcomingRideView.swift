@@ -526,6 +526,7 @@ struct UpComingView: View {
                                 .stroke(AppColor.celticBlue, lineWidth: 1))
                             
                         }
+                        .buttonStyle(.plain)
                         
                         Button(action: {
                             shareRideDetails(ride)
@@ -542,6 +543,7 @@ struct UpComingView: View {
                             .overlay(RoundedRectangle(cornerRadius: 10)
                                 .stroke(AppColor.celticBlue, lineWidth: 1))
                         }
+                        .buttonStyle(.plain)
                     case .history:
                         VStack(alignment: .leading, spacing: 20){
                             if ride.hasPhotos {
