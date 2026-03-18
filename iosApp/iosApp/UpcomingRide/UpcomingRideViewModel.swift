@@ -51,7 +51,6 @@ struct RideModel: Identifiable,Hashable {
     let startTime: String?
     let endTime: String?
     let ratings: Int?
-    let imageData:[ImageData]?
     let participants: [ParticipantData]?
 }
 
@@ -80,7 +79,7 @@ class UpcomingRideViewModel: ObservableObject {
     @Published var hasPhotos: Bool = false
     @Published var upcomingInvitesRide: [RideModel] = []
     private var rideAPIService: RidesApIService
-    private var rideRepository: RidesRepository
+     var rideRepository: RidesRepository
     private let userRepo: UserRepository
     @Published  var participants: [Participant] = []
     @Published var rideDetails: [RideDetailsModel] = []
@@ -128,7 +127,7 @@ class UpcomingRideViewModel: ObservableObject {
             let todayStart = Calendar.current.startOfDay(for: Date())
             
             //  Map RidesData -> RideModel
-            let rides: [RideModel] = rideArray.compactMap { ride in
+            let rides: [RideModel] = rideArray.compactMap {  ride -> RideModel?  in
                 guard let startEpoch = ride.startDate,
                       let endEpoch = ride.endDate else { return nil }
                 
@@ -152,12 +151,18 @@ class UpcomingRideViewModel: ObservableObject {
                 var rideStatus: RideStatus
                 var rideViewAction: RideViewAction
                 
+                let imageCount = Int(truncating: (ride.imageCount ?? 0) as NSNumber)
+                let hasPhotos = imageCount > 0
+                
                 if ride.createdBy == currentUserID {
                     // Ride created by me
-                    if isPastRide {
+                        
+                    if  ride.rideStatus == 4  || isPastRide {
                         rideAction = .history
                         rideStatus = .complete
                         rideViewAction = .addPhotos
+                        
+                        rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
                     } else {
                         rideAction = .upcoming
                         rideStatus = participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
@@ -177,13 +182,13 @@ class UpcomingRideViewModel: ObservableObject {
                         } else {
                             rideAction = .history
                             rideStatus = .complete
-                            rideViewAction = .addPhotos
+                            rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
                         }
                     case 2: return nil
                     case 4:
                         rideAction = .history
                         rideStatus = .complete
-                        rideViewAction = .addPhotos
+                        rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
                     default: return nil
                     }
                 } else { return nil }
@@ -194,8 +199,6 @@ class UpcomingRideViewModel: ObservableObject {
                 let dateString = "\(startText) - \(endText)"
                 let startTime = Self.timeFormatter.string(from: startDate)
                 let endTime = Self.timeFormatter.string(from: endDate)
-                
-                let hasPhotos = ride.images.contains { !$0.url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
                 
                 // Ratings for current user
                 let myRating: Int? = (ride.ratings as? [RatingsData])?.first(where: { $0.userId == currentUserID }).map { Int($0.stars) }
@@ -211,18 +214,17 @@ class UpcomingRideViewModel: ObservableObject {
                     date: dateString,
                     riderCount: participantCount,
                     createdBy: ride.createdBy ?? "",
-                    hasPhotos: hasPhotos,
+                    hasPhotos: imageCount > 0,
                     startDate: startDate,
                     participantAcceptedCount: participantAcceptedCount,
                     startTime: startTime,
                     endTime: endTime,
                     ratings: myRating,
-                    imageData: ride.images,
                     participants: participants
                 )
             }
             
-            // 5️⃣ Separate rides into sections
+            //  Separate rides into sections
             self.upcomingRides = rides.filter { $0.rideAction == .upcoming }.sorted { $0.startDate < $1.startDate }
             self.historyRides = rides.filter { $0.rideAction == .history }.sorted { $0.startDate > $1.startDate }
             self.inviteRides = rides.filter { $0.rideAction == .invities }.sorted { $0.startDate < $1.startDate }
@@ -514,7 +516,7 @@ class UpcomingRideViewModel: ObservableObject {
             startTime: nil,
             endTime: nil,
             ratings: nil,
-            imageData: nil, participants: []
+participants: []
         )
     }
 }
@@ -536,7 +538,7 @@ extension UpcomingRideViewModel {
     @MainActor
     func uploadImages(images:[UIImage], rideId:String) async throws -> String {
         print("Images Count:\(images.count)")
-        var encoadedImages:[String] = [""]
+        var encoadedImages:[String] = []
         for eachImage in images {
             if let encodedImage = encodeImageToBase64(image: eachImage) {
                 encoadedImages.append(encodedImage)
@@ -555,6 +557,7 @@ extension UpcomingRideViewModel {
                     Task { @MainActor in
                         print("Image uploaded successfully:\(images.count)")
                         self.isUploading = false
+                        self.rideRepository.updateImageCount(count : Int32(images.count) , rideId: rideId)
                         continuation.resume(returning: "success")
                     }
                 }
@@ -587,15 +590,20 @@ extension UpcomingRideViewModel {
         return UIImage(data: data)
     }
     
-    func deleteRidePhoto(rideId: String, photoId: String) async throws {
+    @MainActor
+    
+    func deleteRidePhoto(rideId: String, photoId: String,currentCount: Int) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             rideRepository.deleteImage(rideId: rideId, imageId: photoId, completionHandler: { result, error in
                 if let error = error {
                     print("Error deleting photo: \(error)")
                     continuation.resume(throwing: error)
                 } else {
-                    print("Photo deleted successfully")
-                    continuation.resume()
+                    Task { @MainActor in
+                        try? await  self.rideRepository.updateImageCount(count: -1,rideId: rideId)
+                        print("Photo deleted successfully")
+                        continuation.resume()
+                    }
                 }
             })
         }
