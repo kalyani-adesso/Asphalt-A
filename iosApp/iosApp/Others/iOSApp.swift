@@ -30,6 +30,7 @@ struct iOSApp: App {
                     WelcomeScreen()
                 }
             }
+            .preferredColorScheme(.light)
             .onOpenURL { url in
                 let rideId: String? = {
                     if !url.lastPathComponent.isEmpty { return url.lastPathComponent }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct UpcomingRideView: View {
     @ObservedObject var viewModel : UpcomingRideViewModel
@@ -525,9 +526,10 @@ struct UpComingView: View {
                                 .stroke(AppColor.celticBlue, lineWidth: 1))
                             
                         }
+                        .buttonStyle(.plain)
                         
                         Button(action: {
-                            
+                            shareRideDetails(ride)
                         }) {
                             HStack(spacing: 10){
                                 AppIcon.YourRides.share
@@ -541,6 +543,7 @@ struct UpComingView: View {
                             .overlay(RoundedRectangle(cornerRadius: 10)
                                 .stroke(AppColor.celticBlue, lineWidth: 1))
                         }
+                        .buttonStyle(.plain)
                     case .history:
                         VStack(alignment: .leading, spacing: 20){
                             if ride.hasPhotos {
@@ -673,6 +676,23 @@ struct UpComingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(rideColor)
             )
+    }
+
+    // MARK: - Sharing (WhatsApp)
+    private func shareRideDetails(_ ride: RideModel) {
+        var details = "\(ride.title)\n"
+        details += "\(ride.routeStart) → \(ride.routeEnd)\n"
+        details += "Date: \(ride.date)\n"
+        if let start = ride.startTime, !start.isEmpty { details += "Start: \(start)\n" }
+        if let end = ride.endTime, !end.isEmpty { details += "End: \(end)\n" }
+        details += "Riders: \(ride.riderCount)\n"
+        details += "Status: \(ride.status.rawValue)\n"
+
+        let encoded = details.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "https://api.whatsapp.com/send?text=\(encoded)"
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 }
 
