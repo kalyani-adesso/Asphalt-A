@@ -47,9 +47,10 @@ fun CustomTimePickerDialog(
 ) {
     val calendar = remember {
         if (hour != null && mins != null) Calendar.getInstance().apply {
-            set(Calendar.HOUR, hour)
+            val safeHour = if (hour == 12) 0 else hour
+            set(Calendar.HOUR, safeHour)
             set(Calendar.MINUTE, mins)
-            set(Calendar.AM_PM, if (isAm) 0 else 1)
+            set(Calendar.AM_PM, if (isAm) Calendar.AM else Calendar.PM)
         } else Calendar.getInstance()
     }
     val initialHour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
