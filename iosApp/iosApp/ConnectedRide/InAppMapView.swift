@@ -26,6 +26,8 @@ struct InAppMapView: View {
     var recenterCounter: Int
     var focusCoordinate: CLLocationCoordinate2D?
     var focusCounter: Int
+    /// Increment to force re-fitting camera to route (reliable on first load across devices).
+    var fitRouteCounter: Int
 
     @State private var position: MapCameraPosition = .automatic
     @State private var hasFittedRoute = false
@@ -109,6 +111,11 @@ struct InAppMapView: View {
                 fitMapToRoute()
                 hasFittedRoute = true
             }
+        }
+        .onChange(of: fitRouteCounter) { _ in
+            guard !routeCoordinates.isEmpty else { return }
+            fitMapToRoute()
+            hasFittedRoute = true
         }
         .onChange(of: recenterCounter) { _ in
             recenter()

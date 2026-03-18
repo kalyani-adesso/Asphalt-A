@@ -19,7 +19,10 @@ struct PlacesVisitedView: View {
                     Text(AppStrings.Placesvisited.title.rawValue)
                         .font(KlavikaFont.bold.font(size: 16))
                     
-                    Text(CalendarFormat().dateRangeText(monthOffset: monthOffset))
+                    Text(CalendarFormat().dateRangeText(
+                        monthOffset: monthOffset,
+                        createdDate: home.userCreatedDate
+                    ))
                         .font(KlavikaFont.bold.font(size: 12))
                         .foregroundColor(AppColor.stoneGray)
                 }
@@ -27,6 +30,12 @@ struct PlacesVisitedView: View {
                 HStack(spacing: 10) {
                     Button(action: {
                         withAnimation {
+                            let calendar = Calendar.current
+                            let newDate = calendar.date(byAdding: .month, value: monthOffset - 1, to: Date())!
+                            
+                            if let first = home.firstAvailableMonth, newDate < first {
+                                return
+                            }
                             monthOffset -= 1
                             updateVisiblePlaces()
                         }
@@ -38,6 +47,8 @@ struct PlacesVisitedView: View {
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
+                    .disabled(isAtFirstMonth)
+                    .opacity(isAtFirstMonth ? 0.3 : 1)
                     Button(action: {
                         withAnimation {
                             if monthOffset < 0 {
@@ -98,7 +109,7 @@ struct PlacesVisitedView: View {
                     AxisValueLabel()
                 }
             }
-
+            
             .chartXAxis {
                 AxisMarks(values: .automatic) { value in
                     AxisValueLabel()
@@ -132,6 +143,7 @@ struct PlacesVisitedView: View {
             updateVisiblePlaces()
         }
         .onAppear {
+            home.loadUserName()
             updateVisiblePlaces()
         }
         .padding()
@@ -145,28 +157,51 @@ struct PlacesVisitedView: View {
         let baseDate = calendar.date(byAdding: .month, value: monthOffset, to: Date()) ?? Date()
         
         visiblePlaces = (0..<6).compactMap { i in
-            if let monthDate = calendar.date(byAdding: .month, value: Int(-i), to: baseDate) {
+            guard let monthDate = calendar.date(byAdding: .month, value: -i, to: baseDate) else { return nil }
+            
+            if let first = home.firstAvailableMonth {
+                let components = calendar.dateComponents([.year, .month], from: monthDate)
+                let normalizedMonth = calendar.date(from: components)!
                 
-                let m = calendar.component(.month, from: monthDate)
-                let y = calendar.component(.year, from: monthDate)
-                let short = formatter.string(from: monthDate)
-                
-                if let dataPoint = home.placesByMonth.first(where: {
-                    $0.monthIndex == m && $0.year == y
-                }) {
-                    return dataPoint
-                } else {
-                    return HomeViewModel.PlacesMonth(
-                        month: short,
-                        year: y,
-                        placesCount: 0, monthIndex: m
-                    )
+                if normalizedMonth < first {
+                    return nil
                 }
             }
-            return nil
+            
+            let m = calendar.component(.month, from: monthDate)
+            let y = calendar.component(.year, from: monthDate)
+            let short = formatter.string(from: monthDate)
+            
+            if let dataPoint = home.placesByMonth.first(where: {
+                $0.monthIndex == m && $0.year == y
+            }) {
+                return dataPoint
+            } else {
+                return HomeViewModel.PlacesMonth(
+                    month: short,
+                    year: y,
+                    placesCount: 0,
+                    monthIndex: m
+                )
+            }
         }
         .reversed()
     }
+    private var isAtFirstMonth: Bool {
+        guard let first = home.firstAvailableMonth else { return false }
+        
+        let calendar = Calendar.current
+        
+        guard let previousMonth = calendar.date(byAdding: .month, value: monthOffset - 1, to: Date()) else {
+            return false
+        }
+        
+        let prevComponents = calendar.dateComponents([.year, .month], from: previousMonth)
+        let prevNormalized = calendar.date(from: prevComponents)!
+        
+        return prevNormalized < first
+    }
+    
 }
 
 

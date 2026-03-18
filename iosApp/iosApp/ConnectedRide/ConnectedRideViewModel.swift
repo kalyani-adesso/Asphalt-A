@@ -71,6 +71,9 @@ struct Rider: Identifiable {
     var timeSinceUpdate: String
     /// Epoch milliseconds of last update; used to show live "Xs ago" in group section.
     let lastUpdateEpochMillis: Int64
+    /// Epoch milliseconds when the rider entered the current `status`.
+    /// Used to show "Connected/Delayed/Stopped for Xs" without resetting on every heartbeat.
+    let statusSinceEpochMillis: Int64
     var contactNumber: String
     var currentLat:Double
     var currentLong:Double
@@ -108,7 +111,7 @@ struct ConnectedRideMessage: Identifiable {
 
 final class ConnectedRideViewModel: ObservableObject {
     @Published var rideCompleteModel: [RideCompleteModel] = []
-    @Published var activeRider: [Rider] = [Rider(name: "Aromal", profileImageName: nil, speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
+    @Published var activeRider: [Rider] = [Rider(name: "Aromal", profileImageName: nil, speed: 55, status: .active, timeSinceUpdate: "Tracking", lastUpdateEpochMillis: 0, statusSinceEpochMillis: 0, contactNumber: "",currentLat: 0.0,currentLong: 0.0,rideId: "",receiverId: "")]
     @Published var groupRiders: [Rider] = []
     @Published var isGroupNavigationActive: Bool = true
     @Published var ongoingRideId = ""
@@ -121,6 +124,8 @@ final class ConnectedRideViewModel: ObservableObject {
     @Published var groupStatusTick: Int = 0
     private var groupStatusTimer: Timer?
     private var previousRidersDict: [String: Rider] = [:]
+    /// Track when each rider entered their current status (keyed by userId).
+    private var statusSinceByUserId: [String: Int64] = [:]
     /// Cache for user lookups (userId → (name, contact, profileImageName)).
     /// Status and timestamps always come from the ongoing ride snapshot.
     private var userDetailsCache: [String: (name: String, contact: String, imageName: String?)] = [:]
@@ -434,6 +439,16 @@ extension ConnectedRideViewModel {
                                 newLastLocations[ongoingRide.userID] = CLLocationCoordinate2D(latitude: lat, longitude: long)
                                 let name = (userDetails?.0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                                 let imageName = userDetails?.2
+                                // Track how long the rider has been in the same status.
+                                let previousStatus = self.previousRidersDict[ongoingRide.userID]?.status
+                                let statusSince: Int64 = {
+                                    if previousStatus == status, let existing = self.statusSinceByUserId[ongoingRide.userID] {
+                                        return existing
+                                    }
+                                    self.statusSinceByUserId[ongoingRide.userID] = epochMillis
+                                    return epochMillis
+                                }()
+
                                 let rider = Rider(
                                     name: name.isEmpty ? "Rider" : name,
                                     profileImageName: (imageName?.isEmpty == false ? imageName : nil),
@@ -441,6 +456,7 @@ extension ConnectedRideViewModel {
                                     status: status,
                                     timeSinceUpdate: timeSinceUpdate,
                                     lastUpdateEpochMillis: epochMillis,
+                                    statusSinceEpochMillis: statusSince,
                                     contactNumber: userDetails?.1 ?? "",
                                     currentLat: lat,
                                     currentLong: long,
@@ -461,7 +477,8 @@ extension ConnectedRideViewModel {
                                 }
                                 self.detectRiderChanges(newRiders: updatedRiders)
                                 self.groupRiders = updatedRiders
-                                self.previousRidersDict = Dictionary(uniqueKeysWithValues: updatedRiders.map { ($0.contactNumber, $0) })
+                                // Key by backend userId so status tracking and diffs are stable.
+                                self.previousRidersDict = Dictionary(uniqueKeysWithValues: updatedRiders.map { ($0.receiverId, $0) })
                                 if updatedRiders.isEmpty {
                                     self.stopGroupStatusTimer()
                                 } else {
@@ -489,7 +506,8 @@ extension ConnectedRideViewModel {
     }
     
     func detectRiderChanges(newRiders: [Rider]) {
-        let newDict = Dictionary(uniqueKeysWithValues: newRiders.map { ($0.contactNumber, $0) })
+        // Key by backend userId so join/leave/status diffing is stable.
+        let newDict = Dictionary(uniqueKeysWithValues: newRiders.map { ($0.receiverId, $0) })
         let oldDict = previousRidersDict
 
         //Detect NEW riders joining
@@ -505,7 +523,8 @@ extension ConnectedRideViewModel {
         //Detect STATUS change
         for (id, newRider) in newDict {
             if let old = oldDict[id], old.status != newRider.status {
-                showPopup(title: "\(newRider.name) has been \(newRider.status) for a while")
+                let duration = formatTime(from: newRider.statusSinceEpochMillis)
+                showPopup(title: "\(newRider.name) is \(newRider.status.rawValue) for \(duration)")
             }
         }
     }

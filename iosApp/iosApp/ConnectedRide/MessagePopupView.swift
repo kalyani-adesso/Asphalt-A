@@ -16,6 +16,7 @@ struct MessagePopupView: View {
     @FocusState private var isCustomFocused: Bool
     @Binding var showMessageNotification: Bool
     @Binding var riderName: String
+    @State private var keyboardHeight: CGFloat = 0
 
     private let quickMessages = [
         "All good!",
@@ -45,10 +46,36 @@ struct MessagePopupView: View {
                 ButtonsView
             }
             .padding()
-            .frame(width: 342)
-            .fixedSize(horizontal: false, vertical: true)
+            .frame(
+                width: 342,
+                height: UIScreen.main.bounds.height * 0.7 - keyboardHeight * 0.4
+            )
             .background(Color.white)
             .cornerRadius(22)
+            .offset(y: keyboardHeight > 0 ? -20 : 0)
+            .animation(.easeOut(duration: 0.25), value: keyboardHeight)
+            .onAppear {
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillShowNotification,
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                        keyboardHeight = frame.height
+                    }
+                }
+
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillHideNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    keyboardHeight = 0
+                }
+            }
+            .onDisappear {
+                NotificationCenter.default.removeObserver(self)
+            }
         }
         .task {
             await viewModel.receiveMessage(rideId: viewModel.rider?.rideId ?? "")

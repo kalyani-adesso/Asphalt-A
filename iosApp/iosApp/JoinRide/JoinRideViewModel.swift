@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import shared
+import CoreLocation
 
 struct JoinRideModel: Identifiable,Hashable {
     let id = UUID()
@@ -34,6 +35,18 @@ struct JoinRideModel: Identifiable,Hashable {
     let hasAssemblyPoint: Bool
     let assemblyLat: Double?
     let assemblyLon: Double?
+    var isFutureRide: Bool {
+        guard let rideDate = Self.parseDate(from: date) else { return false }
+        let calendar = Calendar.current
+        return !calendar.isDateInToday(rideDate) && rideDate > Date()
+    }
+
+     static func parseDate(from string: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: string)
+    }
 }
 
 @MainActor
@@ -125,6 +138,19 @@ extension JoinRideViewModel {
 
 
 
+                    let distanceKm: Int = {
+                        if ride.rideDistance > 0 {
+                            return Int(ride.rideDistance)
+                        }
+                        // Fallback: estimate distance from coordinates if backend distance is missing/0.
+                        let start = CLLocation(latitude: ride.startLatitude, longitude: ride.startLongitude)
+                        let end = CLLocation(latitude: ride.endLatitude, longitude: ride.endLongitude)
+                        let km = start.distance(from: end) / 1000
+                        return max(Int(km.rounded()), 0)
+                    }()
+
+                    let distanceText: String = distanceKm > 0 ? "\(distanceKm) km" : "--"
+
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
@@ -132,7 +158,7 @@ extension JoinRideViewModel {
                         organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
-                        distance: "\(Int(ride.rideDistance)) km",
+                        distance: distanceText,
                         date: dateString,
                         ridersCount: "\(joinedCount)",
                         maxRiders: "\(ride.participants.count)",
@@ -163,7 +189,6 @@ extension JoinRideViewModel {
             print("Failed to fetch rides: \(error.localizedDescription)")
         }
     }
-    
     private func getAllRidesAsync() async throws -> [RidesData] {
         try await withCheckedThrowingContinuation { continuation in
             rideRepository.getAllRide { result, error in
