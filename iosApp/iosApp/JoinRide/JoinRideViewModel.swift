@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import shared
+import CoreLocation
 
 struct JoinRideModel: Identifiable,Hashable {
     let id = UUID()
@@ -125,6 +126,19 @@ extension JoinRideViewModel {
 
 
 
+                    let distanceKm: Int = {
+                        if ride.rideDistance > 0 {
+                            return Int(ride.rideDistance)
+                        }
+                        // Fallback: estimate distance from coordinates if backend distance is missing/0.
+                        let start = CLLocation(latitude: ride.startLatitude, longitude: ride.startLongitude)
+                        let end = CLLocation(latitude: ride.endLatitude, longitude: ride.endLongitude)
+                        let km = start.distance(from: end) / 1000
+                        return max(Int(km.rounded()), 0)
+                    }()
+
+                    let distanceText: String = distanceKm > 0 ? "\(distanceKm) km" : "--"
+
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
@@ -132,7 +146,7 @@ extension JoinRideViewModel {
                         organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
-                        distance: "\(Int(ride.rideDistance)) km",
+                        distance: distanceText,
                         date: dateString,
                         ridersCount: "\(joinedCount)",
                         maxRiders: "\(ride.participants.count)",

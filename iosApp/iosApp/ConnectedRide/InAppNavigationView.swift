@@ -23,6 +23,7 @@ struct InAppNavigationView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var mapType: MKMapType = .standard
     @State private var recenterCounter: Int = 0
+    @State private var fitRouteCounter: Int = 0
     @State private var focusCoordinate: CLLocationCoordinate2D? = nil
     @State private var focusCounter: Int = 0
     /// When focusing on start (after simulation stopped), use larger distance to zoom out.
@@ -104,7 +105,8 @@ struct InAppNavigationView: View {
                              mapType: mapType,
                              recenterCounter: recenterCounter,
                              focusCoordinate: focusCoordinate,
-                             focusCounter: focusCounter)
+                             focusCounter: focusCounter,
+                             fitRouteCounter: fitRouteCounter)
                     .edgesIgnoringSafeArea(.all)
 
                 if isCalculatingRoute {
@@ -338,6 +340,8 @@ struct InAppNavigationView: View {
                 currentStepIndex = 0
                 routeDistance = totalDistance
                 routeETA = eta
+                // Force a camera fit after route is set (fixes overly-zoomed-out initial view on some devices).
+                fitRouteCounter += 1
             }
         }
     }
