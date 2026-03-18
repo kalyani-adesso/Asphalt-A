@@ -166,6 +166,8 @@ struct RideDetailsView: View {
                 ) {
                     activeChat = nil
                 }
+                .ignoresSafeArea()
+                       .zIndex(1)
             }
         }
         

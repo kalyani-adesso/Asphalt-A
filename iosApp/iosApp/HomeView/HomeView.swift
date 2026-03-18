@@ -119,24 +119,19 @@ struct HomeView: View {
             }
         }
         .task {
-            viewModel.isRideLoading = true
-            
-            async let rides: () = viewModel.fetchAllUsers()
-            async let allRides: () = viewModel.fetchAllRides()
+            await viewModel.fetchAllUsers()
+            await viewModel.fetchAllRides()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
-            async let stats: () =  home.updateStatsFor(month: month, year: year)
-            
-            _ = await (rides, allRides, stats)
-            
-            viewModel.isRideLoading = false
+           await home.updateStatsFor(month: month, year: year)
         }
         .task {
             await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
         }
         .refreshable {
-            await viewModel.fetchAllRides()
             await viewModel.fetchAllUsers()
+            await viewModel.fetchAllRides()
+         
         }
     }
     

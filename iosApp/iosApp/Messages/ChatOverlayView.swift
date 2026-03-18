@@ -12,6 +12,8 @@ struct ChatOverlayView: View {
     let chat: ActiveChat
     @ObservedObject var viewModel: MessagesViewModel
     var onClose: () -> Void
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var safeAreaTop: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -41,14 +43,54 @@ struct ChatOverlayView: View {
             }
             .frame(
                 width: UIScreen.main.bounds.width - 32,
-                height: UIScreen.main.bounds.height * 0.6
+                height: popupHeight
             )
             .background(AppColor.backgroundLight)
             .cornerRadius(22)
             .shadow(radius: 20)
+            .offset(y: -keyboardHeight / 2)
+            .animation(.easeOut(duration: 0.25), value: keyboardHeight)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear {
+                            safeAreaTop = geo.safeAreaInsets.top
+                        }
+                }
+            )
+            .onAppear {
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillShowNotification,
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                        keyboardHeight = frame.height
+                    }
+                }
+
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillHideNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    keyboardHeight = 0
+                }
+            }
+            .onDisappear {
+                NotificationCenter.default.removeObserver(self)
+            }
         }
     }
-
+    var popupHeight: CGFloat {
+        let baseHeight = UIScreen.main.bounds.height * 0.6
+        
+        if keyboardHeight > 0 {
+            return max(baseHeight - keyboardHeight * 0.3, 300)
+        } else {
+            return baseHeight
+        }
+    }
     private var header: some View {
         HStack(spacing: 12) {
 
