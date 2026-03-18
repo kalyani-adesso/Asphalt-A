@@ -37,10 +37,11 @@ struct JoinRideModel: Identifiable,Hashable {
     let assemblyLon: Double?
     var isFutureRide: Bool {
         guard let rideDate = Self.parseDate(from: date) else { return false }
-        return rideDate > Date()
+        let calendar = Calendar.current
+        return !calendar.isDateInToday(rideDate) && rideDate > Date()
     }
 
-    private static func parseDate(from string: String) -> Date? {
+     static func parseDate(from string: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
         formatter.locale = Locale(identifier: "en_US_POSIX")

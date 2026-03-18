@@ -58,11 +58,8 @@ class HomeViewModel: ObservableObject {
                     self.userName = currentUser.name ?? ""
                     MBUserDefaults.userNameStatic = currentUser.name ?? ""
                     let createdMillis = currentUser.accountCreatedDate
-                    print("Swift received:", currentUser.accountCreatedDate)
                     if  createdMillis > 0 {
                         self.userCreatedDate = Date(timeIntervalSince1970: TimeInterval(createdMillis) / 1000)
-                        print("User created date:", self.userCreatedDate ?? "nil")
-                          print("First available month:", self.firstAvailableMonth ?? "nil")
                     }
                     
                 }
