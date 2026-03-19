@@ -26,11 +26,11 @@ import java.time.LocalDate
 import java.util.Calendar
 
 @Composable
-fun DatePickerSample(onCancel: () -> Unit, onOkClick: (timeMils: Long?) -> Unit) {
+fun DatePickerSample(onCancel: () -> Unit, selectDate:Long?,onOkClick: (timeMils: Long?) -> Unit) {
     //val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
     var pickedDate by remember { mutableStateOf<LocalDate?>(null) }
 
-    val calendar = remember {
+    /*val calendar = remember {
         Calendar.getInstance().apply {
             // Set to start of day (optional)
             //set(Calendar.HOUR_OF_DAY, 0)
@@ -38,9 +38,18 @@ fun DatePickerSample(onCancel: () -> Unit, onOkClick: (timeMils: Long?) -> Unit)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
+    }*/
+
+    val initialMillis = selectDate ?: run {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        calendar.timeInMillis
     }
-    val currentDateMillis = calendar.timeInMillis
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = currentDateMillis)
+    //val currentDateMillis = calendar.timeInMillis
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
     DatePickerDialog(
         onDismissRequest = { onCancel.invoke()/*showDatePicker = false*/ },
         confirmButton = {

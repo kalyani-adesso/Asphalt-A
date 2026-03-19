@@ -1,5 +1,6 @@
 package com.asphalt.createride.ui.composables
 
+import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -88,7 +89,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     if (viewModel.show_datePicker.value) {
         DatePickerSample(onCancel = {
             viewModel.showDatePicker(false)
-        }, onOkClick = { timeMils ->
+        },viewModel.rideDetailsState.value.dateMils,onOkClick = { timeMils ->
             viewModel.updateDate(timeMils, Utils.convertMillisToFormattedDate(timeMils))
             //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
             viewModel.showDatePicker(false)
@@ -122,7 +123,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     if (viewModel.show_EndDatePicker.value) {
         DatePickerSample(onCancel = {
             viewModel.showEndDatePicker(false)
-        }, onOkClick = { timeMils ->
+        },viewModel.rideDetailsState.value.endDateMils,onOkClick = { timeMils ->
             viewModel.updateEndDate(timeMils, Utils.convertMillisToFormattedDate(timeMils))
             //datepicker = Utils.convertMillisToFormattedDate(timeMils) //timeMils?.toString() ?: ""
             viewModel.showEndDatePicker(false)
