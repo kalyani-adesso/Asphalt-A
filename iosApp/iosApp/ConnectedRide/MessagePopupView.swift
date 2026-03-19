@@ -113,39 +113,53 @@ struct MessagePopupView: View {
         ScrollView {
             VStack(spacing: 12) {
                 ForEach(viewModel.chatMessages) { msg in
-                    VStack(alignment: .leading, spacing: 8) {
+                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        
                         HStack(spacing: 12) {
                             AppImage.Profile.profile
                                 .resizable()
                                 .frame(width: 36, height: 36)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(msg.isCurrentUser ? AppColor.celticBlue : AppColor.green, lineWidth: 2))
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            msg.isCurrentUser ? AppColor.celticBlue : AppColor.green,
+                                            lineWidth: 2
+                                        )
+                                )
                             
-                            HStack(spacing: 2) {
+                           
                                 Text(msg.senderName)
                                     .font(KlavikaFont.bold.font(size: 16))
                                     .foregroundColor(AppColor.black)
-                                Spacer()
+                            Spacer()
                                 HStack(spacing: 4) {
                                     Image(systemName: "clock")
                                         .font(.system(size: 12))
                                         .foregroundColor(.gray)
+                                    
                                     Text(msg.timestamp)
                                         .font(KlavikaFont.regular.font(size: 12))
                                         .foregroundColor(.gray)
                                 }
-                            }
+                            
+                            
                             Spacer()
                         }
-                        
+
                         Text(msg.message)
                             .font(KlavikaFont.regular.font(size: 15))
                             .foregroundColor(AppColor.black)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(msg.isCurrentUser ? AppColor.lightBlue : AppColor.lightGreen)
-                            .cornerRadius(10)
                     }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        msg.isCurrentUser
+                        ? AppColor.lightBlue
+                        : AppColor.lightGreen
+                    )
+                    .cornerRadius(14)
                     .padding(.horizontal)
                 }
             }
