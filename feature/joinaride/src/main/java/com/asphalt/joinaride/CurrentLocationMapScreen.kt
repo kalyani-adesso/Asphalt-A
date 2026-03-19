@@ -104,7 +104,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CurrentLocationMapScreen(
     locationProvider: LocationProvider,
     ridesData: RidesData,
-    rideViewModel: JoinRideViewModel = koinViewModel(),
+    rideViewModel: JoinRideViewModel,
 ) {
 
     //val rideId = rideViewModel.getRideId()
@@ -408,7 +408,7 @@ fun MapWithCurrentLocation(
                         position = LatLng(rider.currentLat, rider.currentLong)
                     )
                     val userHeading = currentUserConnectedRideData?.bearing ?: 0f
-                    val correctedRotation = (userHeading.toFloat() - 35f + 360) % 360
+                    val correctedRotation = (userHeading - 35f + 360) % 360
                     if (rider.canTrack) {
                         if (rider.userID == currentUserConnectedRideData?.userID) {
                             Marker(

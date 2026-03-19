@@ -175,36 +175,39 @@ struct RidePhotosViewerView: View {
 
     private func loadRidePhotos() async {
         await MainActor.run { isLoading = true }
-        await Task.yield()
 
-        guard let rideIndex = viewModel.rides.firstIndex(where: { $0.id == rideId }) else {
-            await MainActor.run { isLoading = false }
-            return
-        }
-        let ride = viewModel.rides[rideIndex]
-        guard let imageDataList = ride.imageData else {
-            await MainActor.run { ridePhotos = []; isLoading = false }
-            return
-        }
-
-        var validPhotos: [RidePhotoItem] = []
-        for item in imageDataList {
-            guard let img = item as? ImageData, !img.url.isEmpty else { continue }
-            guard viewModel.decodeBase64ToImage(base64: img.url) != nil else { continue }
-            validPhotos.append(RidePhotoItem(id: img.imageID, url: img.url))
-        }
-
-        await MainActor.run {
-            ridePhotos = validPhotos
-            isLoading = false
+        viewModel.rideRepository.fetchImages(rideId: rideId) { result, error in
+            
+            DispatchQueue.main.async {
+                if let success = result as? APIResultSuccess<AnyObject> {
+                    
+                    let images = success.data as? [ImageData] ?? []
+                    
+                    let validPhotos: [RidePhotoItem] = images.compactMap { img in
+                        guard !img.url.isEmpty else { return nil }
+                        guard viewModel.decodeBase64ToImage(base64: img.url) != nil else { return nil }
+                        
+                        return RidePhotoItem(
+                            id: img.imageID,
+                            url: img.url
+                        )
+                    }
+                    
+                    self.ridePhotos = validPhotos
+                }
+                else if let failure = result as? APIResultError {
+                    print("Error fetching images:")
+                }
+                
+                self.isLoading = false
+            }
         }
     }
-
     private func deletePhoto(_ photo: RidePhotoItem) {
         Task {
             await MainActor.run { isLoading = true }
             do {
-                try await viewModel.deleteRidePhoto(rideId: rideId, photoId: photo.id)
+                try await viewModel.deleteRidePhoto(rideId: rideId, photoId: photo.id,  currentCount: ridePhotos.count)
                 await MainActor.run {
                     ridePhotos.removeAll { $0.id == photo.id }
                     showDeleteConfirmation = false

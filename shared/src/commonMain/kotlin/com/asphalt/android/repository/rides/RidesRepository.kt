@@ -1,5 +1,7 @@
 package com.asphalt.android.repository.rides
 
+import com.asphalt.android.FirebaseServerValue
+import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.mapApiResult
 import com.asphalt.android.mappers.mapAndGroupMonthData
@@ -60,7 +62,8 @@ class RidesRepository(val apiService: RidesApIService) {
             UserInvites(acceptInvite = inviteStatus)
         )
     }
-    fun getRidesDataList( data:Map<String, CreateRideRoot>?):List<RidesData>{
+
+    fun getRidesDataList(data: Map<String, CreateRideRoot>?): List<RidesData> {
         return data.toRides()
     }
 
@@ -93,9 +96,8 @@ class RidesRepository(val apiService: RidesApIService) {
                     RatingsData(stars = data.stars, userId = id)
                 } ?: emptyList(),
                 rideType = rowData.rideType,
-                images = rowData.images?.map { (id, data) ->
-                    ImageData(url = data.url, imageID = id)
-                } ?: emptyList()
+                imageCount = rowData.imageCount
+
 
             )
         } ?: emptyList()
@@ -244,8 +246,22 @@ class RidesRepository(val apiService: RidesApIService) {
         return apiService.uploadImages(rideId, images)
     }
 
-    suspend fun deleteImage(rideId: String,imageId:String): APIResult<Unit> {
-        return apiService.deleteImage(rideId,imageId)
+    suspend fun deleteImage(rideId: String, imageId: String): APIResult<Unit> {
+        return apiService.deleteImage(rideId, imageId)
+    }
+
+    suspend fun fetchImages(rideId: String): APIResult<List<ImageData>> {
+        return apiService.fetchImages(rideId).mapApiResult { response ->
+            response.map { (id, data) ->
+                ImageData(url = data.url, imageID = id)
+            }
+        }
+    }
+
+    fun updateImageCount(count:Int,rideId: String){
+        val update = mapOf("image_count" to FirebaseServerValue.increment(count))
+        PlatformDatabase().getReference(APIConstants.RIDES_URL).child(rideId)
+            .updateChildren(update)
     }
 
     fun mapSnapshotToRide(id: String, data: Any?): CreateRideRoot? {

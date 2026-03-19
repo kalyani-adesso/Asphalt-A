@@ -76,7 +76,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun RidersGroupStatus(
     ridesData: RidesData,
-    viewModel: JoinRideViewModel = koinViewModel(),
+    viewModel: JoinRideViewModel,
     androidUserVM: AndroidUserVM = koinViewModel(),
 
     ) {

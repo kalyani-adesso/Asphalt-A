@@ -7,6 +7,7 @@ import com.asphalt.android.model.connectedride.ConnectedRideRoot
 import com.asphalt.android.model.connectedride.FirebasePushResponse
 import com.asphalt.android.model.rides.CreateRideRoot
 import  com.asphalt.android.model.message.MessageRoot
+import com.asphalt.android.model.rides.Images
 import com.asphalt.android.model.rides.UserInvites
 import com.asphalt.android.model.rides.Ratings
 
@@ -63,4 +64,5 @@ interface RidesApIService {
     ): APIResult<Unit>
 
     suspend fun deleteImage(ridesID: String, imageID: String): APIResult<Unit>
+    suspend fun fetchImages(rideId: String): APIResult<Map<String, Images>>
 }

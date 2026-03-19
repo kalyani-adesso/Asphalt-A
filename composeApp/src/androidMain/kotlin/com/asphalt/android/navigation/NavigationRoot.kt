@@ -522,15 +522,15 @@ fun NavigationRoot(
                         )
                     }
 
-                    entry<AppNavKey.RideProgressNavKey> { key ->
-
-                        RideProgress(
-                            ridesData = key.ridesData,
-                            onClickEndRide = {
-                                backStack.remove(AppNavKey.RideProgressNavKey(ridesData = key.ridesData))
-                                // backStack.add(AppNavKey.ConnectedRideNavKey)
-                            })
-                    }
+//                    entry<AppNavKey.RideProgressNavKey> { key ->
+//
+//                        RideProgress(
+//                            ridesData = key.ridesData,
+//                            onClickEndRide = {
+//                                backStack.remove(AppNavKey.RideProgressNavKey(ridesData = key.ridesData))
+//                                // backStack.add(AppNavKey.ConnectedRideNavKey)
+//                            })
+//                    }
                     entry<AppNavKey.EndRideLoaderNavKey> { key ->
                         EndRidersScreenLoader(
                             ridesData = key.ridesData,

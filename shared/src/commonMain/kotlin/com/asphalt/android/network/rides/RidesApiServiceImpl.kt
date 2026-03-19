@@ -1,5 +1,6 @@
 package com.asphalt.android.network.rides
 
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.constants.APIConstants.END_RIDE_SUMMARY_URL
 import com.asphalt.android.constants.APIConstants.IMAGES
 import com.asphalt.android.constants.APIConstants.MESSAGES
@@ -16,6 +17,7 @@ import com.asphalt.android.model.connectedride.RatingRequest
 import com.asphalt.android.model.dashboard.DashboardDTO
 import com.asphalt.android.model.message.MessageRoot
 import com.asphalt.android.model.rides.CreateRideRoot
+import com.asphalt.android.model.rides.Images
 import com.asphalt.android.model.rides.Ratings
 import com.asphalt.android.model.rides.UrlNode
 import com.asphalt.android.model.rides.UserInvites
@@ -156,16 +158,23 @@ class RidesApiServiceImpl(client: KtorClient) : BaseAPIService(client), RidesApI
             key to UrlNode(image)
         }
         return safeApiCall {
-            patch(imagesMap, "$RIDES_URL/$ridesId$IMAGES").body()
+            patch(imagesMap, "$RIDES_IMAGES_URL/$ridesId").body()
         }
     }
+
 
     override suspend fun deleteImage(
         ridesID: String,
         imageID: String
     ): APIResult<Unit> {
         return safeApiCall {
-            delete("$RIDES_URL/$ridesID$IMAGES/$imageID").body()
+            delete("$RIDES_IMAGES_URL/$ridesID/$imageID").body()
+        }
+    }
+
+    override suspend fun fetchImages(rideId: String): APIResult<Map<String, Images>> {
+        return safeApiCall {
+            get("$RIDES_IMAGES_URL/$rideId").body()
         }
     }
 
