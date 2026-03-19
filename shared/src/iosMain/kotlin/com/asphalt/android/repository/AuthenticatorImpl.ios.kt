@@ -126,6 +126,10 @@ actual class AuthenticatorImpl actual constructor() {
             Result.failure(Exception("Error signing out: ${e.message}", e))
         }
     }
+
+    actual suspend fun getToken(): Result<String> {
+        TODO("Not yet implemented")
+    }
 }
 
 

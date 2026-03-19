@@ -9,5 +9,6 @@ expect class AuthenticatorImpl() {
     suspend fun signIn(email: String, password: String): LoginResult
     suspend fun resetPassword(email: String): Result<String>
     suspend fun logout(): Result<String>
+    suspend fun getToken(): Result<String>
 }
 
