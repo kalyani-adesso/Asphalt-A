@@ -352,7 +352,7 @@ fun MapWithCurrentLocation(
                 tiltGesturesEnabled = true,
                 rotationGesturesEnabled = true,
                 scrollGesturesEnabled = true,
-                zoomControlsEnabled = true,      // + / - buttons
+                zoomControlsEnabled = false,      // + / - buttons
                 compassEnabled = true,           // Compass icon
                 myLocationButtonEnabled = false,  // My location button
 //                mapToolbarEnabled = true,      // Navigation icon (open in Google Maps)
@@ -517,8 +517,8 @@ fun MapWithCurrentLocation(
 
         Row(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
+                .align(Alignment.BottomEnd)
+                .padding(Dimensions.padding16),
         ) {
             // Spacer(modifier = Modifier.weight(1f))
             GradientButton(
@@ -539,8 +539,8 @@ fun MapWithCurrentLocation(
 
                 },
                 buttonRadius = Dimensions.size10,
-                buttonHeight = Dimensions.radius40,
-                contentPadding = PaddingValues(0.dp)
+                buttonHeight = Dimensions.size50,
+                contentPadding = PaddingValues(horizontal = Dimensions.size35, vertical = Dimensions.padding13)
             ) {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_refresh),
@@ -559,8 +559,8 @@ fun MapWithCurrentLocation(
 
                 },
                 buttonRadius = Dimensions.size10,
-                buttonHeight = Dimensions.radius40,
-                contentPadding = PaddingValues(0.dp)
+                buttonHeight = Dimensions.size50,
+                contentPadding = PaddingValues(horizontal = Dimensions.size35, vertical = Dimensions.padding13)
             ) {
                 Image(
                     painter = painterResource(com.asphalt.commonui.R.drawable.ic_navigate),
