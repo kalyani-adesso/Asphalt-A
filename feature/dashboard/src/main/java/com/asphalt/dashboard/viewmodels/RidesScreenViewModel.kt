@@ -75,11 +75,7 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
                 historyList.addAll(history)
-                if (inviteList.isNotEmpty()) {
-                    updateInviteStatus(true)
-                } else {
-                    updateInviteStatus(false)
-                }
+
                 if (upcomiList.isNotEmpty()) {
                     upcomiList.removeAll { ride ->
                         ride.startDate?.let { it < currentTime } ?: false
@@ -90,6 +86,11 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                     inviteList.removeAll { ride ->
                         ride.startDate?.let { it < currentTime } ?: false
                     }
+                }
+                if (inviteList.isNotEmpty()) {
+                    updateInviteStatus(true)
+                } else {
+                    updateInviteStatus(false)
                 }
                 var ridesList =
                     YourRideRoot(
