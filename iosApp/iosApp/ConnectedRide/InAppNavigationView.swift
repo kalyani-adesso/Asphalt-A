@@ -42,6 +42,9 @@ struct InAppNavigationView: View {
     @State private var simulatedCoordinate: CLLocationCoordinate2D? = nil
     @State private var simulationIndex: Int = 0
     @State private var routeError: String? = nil
+    @State private var isRerouting: Bool = false
+    @State private var lastNavRerouteAt: Date?
+    @State private var lastNavOffRouteCheckAt: Date?
 
     /// User position shown on map: simulated during demo; otherwise real location so the navigate icon stays visible when recentering.
     private var displayUserCoordinate: CLLocationCoordinate2D? {
@@ -130,16 +133,45 @@ struct InAppNavigationView: View {
                     }
                 }
 
+                if isRerouting && !isCalculatingRoute {
+                    VStack {
+                        Spacer()
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .scaleEffect(0.9)
+                                .tint(AppColor.celticBlue)
+                            Text("Updating route…")
+                                .font(KlavikaFont.medium.font(size: 13))
+                                .foregroundColor(AppColor.stoneGray)
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(10)
+                        .padding(.bottom, 100)
+                    }
+                }
+
                 if let errorText = routeError {
                     VStack {
                         Spacer()
-                        HStack(spacing: 10) {
+                        HStack(alignment: .top, spacing: 10) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.yellow)
                             Text(errorText)
                                 .font(KlavikaFont.regular.font(size: 13))
                                 .foregroundColor(AppColor.black)
-                            Spacer()
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 0)
+                            Button {
+                                routeError = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Dismiss")
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
@@ -266,9 +298,10 @@ struct InAppNavigationView: View {
                         synthesizer.stopSpeaking(at: .immediate)
                     }
                 }
-                .onChange(of: locationManager.lastLocation) { newLoc in
+                .onChange(of: locationManager.lastLocation) { _, newLoc in
                     guard let loc = newLoc else { return }
                     checkProgress(current: loc)
+                    evaluateRerouteIfNeeded(current: loc)
                 }
         }
     }
@@ -291,26 +324,47 @@ struct InAppNavigationView: View {
         return parts.joined(separator: " · ")
     }
 
-    func calculateRoute() {
-        isCalculatingRoute = true
+    /// - Parameters:
+    ///   - sourceOverride: Current GPS for reroute; `nil` uses original navigation start.
+    ///   - fitCameraToRoute: `false` when rerouting mid-ride to reduce map jumps.
+    func calculateRoute(sourceOverride: CLLocationCoordinate2D? = nil, fitCameraToRoute: Bool = true) {
+        let isReroute = sourceOverride != nil
+        let sourceCoord = sourceOverride ?? start
+
+        if isReroute {
+            guard !isRerouting, !isCalculatingRoute else { return }
+            isRerouting = true
+        } else {
+            isCalculatingRoute = true
+        }
         routeError = nil
+
+        guard isPlausibleRoutingCoordinate(latitude: sourceCoord.latitude, longitude: sourceCoord.longitude),
+              isPlausibleRoutingCoordinate(latitude: end.latitude, longitude: end.longitude) else {
+            if isReroute {
+                isRerouting = false
+            } else {
+                isCalculatingRoute = false
+            }
+            routeError = "Start or end location is missing or invalid. Check the ride details and try again."
+            #if DEBUG
+            print("[InAppNavigation] invalid coords source=(\(sourceCoord.latitude),\(sourceCoord.longitude)) end=(\(end.latitude),\(end.longitude))")
+            #endif
+            return
+        }
+
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: start))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: sourceCoord))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: end))
         request.transportType = .automobile
 
         let directions = MKDirections(request: request)
         directions.calculate { response, error in
-            DispatchQueue.main.async {
-                isCalculatingRoute = false
-            }
             guard let route = response?.routes.first else {
                 DispatchQueue.main.async {
-                    if let error = error {
-                        routeError = "Unable to calculate route: \(error.localizedDescription)"
-                    } else {
-                        routeError = "Unable to calculate route between these points."
-                    }
+                    isCalculatingRoute = false
+                    isRerouting = false
+                    routeError = friendlyDirectionsErrorMessage(error: error, isReroute: isReroute)
                 }
                 return
             }
@@ -333,6 +387,8 @@ struct InAppNavigationView: View {
             let eta = route.expectedTravelTime
 
             DispatchQueue.main.async {
+                isCalculatingRoute = false
+                isRerouting = false
                 routeCoordinates = polylineCoords
                 steps = tempSteps
                 stepCoords = tempCoords
@@ -340,10 +396,43 @@ struct InAppNavigationView: View {
                 currentStepIndex = 0
                 routeDistance = totalDistance
                 routeETA = eta
-                // Force a camera fit after route is set (fixes overly-zoomed-out initial view on some devices).
-                fitRouteCounter += 1
+                routeError = nil
+                if fitCameraToRoute {
+                    fitRouteCounter += 1
+                }
+                if isReroute, isVoiceEnabled, let first = tempSteps.first {
+                    if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
+                    let utterance = AVSpeechUtterance(string: "Route updated. \(first)")
+                    utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.languageCode ?? "en-US")
+                    synthesizer.speak(utterance)
+                }
             }
         }
+    }
+
+    /// Debounced reroute when the user leaves the current polyline (same destination).
+    private func evaluateRerouteIfNeeded(current: CLLocation) {
+        guard !isSimulating else { return }
+        guard !routeCoordinates.isEmpty else { return }
+        guard !isRerouting, !isCalculatingRoute else { return }
+
+        let now = Date()
+        if let t = lastNavOffRouteCheckAt,
+           now.timeIntervalSince(t) < ConnectedRideReroutePolicy.navMinSecondsBetweenChecks { return }
+        lastNavOffRouteCheckAt = now
+
+        let user = current.coordinate
+        let deviation = crossTrackDistanceMeters(from: user, along: routeCoordinates)
+        guard deviation > ConnectedRideReroutePolicy.offRouteMeters else { return }
+        if let t = lastNavRerouteAt,
+           now.timeIntervalSince(t) < ConnectedRideReroutePolicy.minSecondsBetweenReroutes { return }
+        guard isPlausibleRoutingCoordinate(latitude: user.latitude, longitude: user.longitude) else { return }
+
+        lastNavRerouteAt = now
+        #if DEBUG
+        print("[InAppNavigation] rerouting — deviation \(Int(deviation)) m from polyline")
+        #endif
+        calculateRoute(sourceOverride: user, fitCameraToRoute: false)
     }
 
     func startVoiceGuidance() {

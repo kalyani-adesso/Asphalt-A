@@ -101,7 +101,8 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
                 else if isAssembly {
                     self.ride.assemblyPoint = placeName
                     self.ride.assemblyLat = item.placemark.coordinate.latitude
-                    self.ride.assemblyLon = item.placemark.coordinate.latitude
+                    // Was incorrectly using latitude here — breaks assembly routing / polylines.
+                    self.ride.assemblyLon = item.placemark.coordinate.longitude
                 }
                 else if isDestination {
                     self.ride.endLocation = placeName

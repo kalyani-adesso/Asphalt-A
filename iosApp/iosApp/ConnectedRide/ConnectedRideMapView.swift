@@ -34,6 +34,8 @@ struct ConnectedRideMapView: View {
     @State private var showInAppNavigation: Bool = false
     // Smoothed speed & movement state for timer / UI
     @State private var speedSamples: [Double] = []
+    /// Drives both map badge + Ride in Progress row (`List` can skip refreshing rows on `locationManager` alone).
+    @State private var displayedSpeedKph: Int = 0
     @State private var isMoving: Bool = false
     @State private var movingTicks: Int = 0
     @State private var stoppedTicks: Int = 0
@@ -44,6 +46,18 @@ struct ConnectedRideMapView: View {
         let name = MBUserDefaults.userNameStatic ?? ""
         if !name.isEmpty { return name }
         return rideModel.userId == MBUserDefaults.userIdStatic ? rideModel.organizer : "Rider"
+    }
+
+    /// Recomputes the speed integer shown on the map and in Ride in Progress (keep in sync).
+    private func syncDisplayedSpeedKph() {
+        let next: Int
+        if !speedSamples.isEmpty {
+            let avg = speedSamples.reduce(0, +) / Double(speedSamples.count)
+            next = Int(avg.rounded())
+        } else {
+            next = Int((locationManager.speedInKph ?? 0.0).rounded())
+        }
+        displayedSpeedKph = next
     }
 
     var body: some View {
@@ -161,7 +175,7 @@ struct ConnectedRideMapView: View {
                             VStack(spacing: 18) {
                                 ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
                                 
-                                ActiveRiderView(title: currentUserDisplayName, speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+                                ActiveRiderView(title: currentUserDisplayName, speed: "\(displayedSpeedKph) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
                                 
                                 Button(action: {
                                     if rideModel.userId != MBUserDefaults.userIdStatic {
@@ -310,11 +324,15 @@ struct ConnectedRideMapView: View {
                             viewModel.onLocationUpdate(lat: locationManager.lastLocation?.coordinate.latitude ?? 0.0,
                                                        long: locationManager.lastLocation?.coordinate.longitude ?? 0.0,
                                                        speed: rawSpeed)
+                            syncDisplayedSpeedKph()
                             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                                 DispatchQueue.main.async {
                                     updateSpeedAndTimer()
                                 }
                             }
+                        }
+                        .onChange(of: locationManager.speedInKph ?? -1.0) { _, _ in
+                            syncDisplayedSpeedKph()
                         }
                         .onChange(of: showMessageNotification) { isShowing in
                             if isShowing {
@@ -444,6 +462,8 @@ struct ConnectedRideMapView: View {
         if isMoving {
             elapsedSeconds += 1
         }
+
+        syncDisplayedSpeedKph()
     }
     
     @ViewBuilder func mapActionButton() -> some View {
@@ -507,16 +527,8 @@ struct ConnectedRideMapView: View {
     }
     
     @ViewBuilder func distanceAndETA() -> some View {
-        // Show smoothed average speed when available, else fall back to raw.
-        let displayedSpeed: Int = {
-            if !speedSamples.isEmpty {
-                let avg = speedSamples.reduce(0, +) / Double(speedSamples.count)
-                return Int(avg.rounded())
-            }
-            return Int(locationManager.speedInKph ?? 0.0)
-        }()
         VStack(alignment: .center) {
-            Text("\(displayedSpeed)")
+            Text("\(displayedSpeedKph)")
                 .font(KlavikaFont.bold.font(size: 20))
                 .foregroundStyle(AppColor.black)
             Text("kph")
@@ -583,11 +595,13 @@ struct ConnectedRideMapView: View {
     }
 
     // MARK: - Navigation coordinates (assembly point → end when present)
-    /// Start for navigation: assembly point when ride has one, else user location or ride start.
+    /// Start for navigation: valid assembly when ride has one, else user location or ride start.
+    /// Ignores assembly (0,0) or corrupt coords so we don't route from the Atlantic / "null island".
     private func navigationStartCoordinate() -> CLLocationCoordinate2D {
         if rideModel.hasAssemblyPoint,
            let lat = rideModel.assemblyLat,
-           let lon = rideModel.assemblyLon {
+           let lon = rideModel.assemblyLon,
+           isPlausibleRoutingCoordinate(latitude: lat, longitude: lon) {
             return CLLocationCoordinate2D(latitude: lat, longitude: lon)
         }
         return locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
