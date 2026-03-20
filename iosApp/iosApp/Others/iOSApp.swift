@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseCore
+import shared
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -17,7 +18,9 @@ struct iOSApp: App {
 
     @AppStorage("com.adesso.rider.club.rememberMeData") private var isLoggedIn: Bool = false
     @AppStorage("com.adesso.rider.club.hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
-
+    init() {
+        KoinHelperKt.doInitKoin()
+    }
     var body: some Scene {
         WindowGroup {
             NavigationStack {

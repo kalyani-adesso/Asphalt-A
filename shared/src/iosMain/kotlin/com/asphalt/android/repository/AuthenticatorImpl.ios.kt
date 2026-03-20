@@ -127,9 +127,32 @@ actual class AuthenticatorImpl actual constructor() {
         }
     }
 
-    actual suspend fun getToken(): Result<String> {
-        TODO("Not yet implemented")
-    }
+    actual suspend fun getToken(): Result<String> =
+        suspendCancellableCoroutine { continuation ->
+
+            val user = FIRAuth.auth().currentUser()
+
+            if (user == null) {
+                continuation.resume(Result.failure(Exception("User not logged in")))
+                return@suspendCancellableCoroutine
+            }
+
+            user.getIDTokenForcingRefresh(false) { token, error ->
+
+                if (error != null) {
+                    continuation.resume(
+                        Result.failure(Exception(error.localizedDescription))
+                    )
+                    return@getIDTokenForcingRefresh
+                }
+
+                if (token != null) {
+                    continuation.resume(Result.success(token))
+                } else {
+                    continuation.resume(Result.failure(Exception("Token is null")))
+                }
+            }
+        }
 }
 
 
