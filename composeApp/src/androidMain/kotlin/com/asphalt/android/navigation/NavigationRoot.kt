@@ -36,6 +36,7 @@ import com.asphalt.android.datastore.DataStoreManager
 import com.asphalt.android.location.AndroidLocationProvider
 import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.navigation.AppNavKey.SplashKey
+import com.asphalt.android.repository.AuthenticatorImpl
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.chat.screen.ChatListingScreen
 import com.asphalt.chat.screen.ChatScreen
@@ -86,7 +87,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Suppress("FunctionName")
 @Composable
 fun NavigationRoot(
-    androidUserVM: AndroidUserVM = koinViewModel()
+    androidUserVM: AndroidUserVM = koinViewModel(),
+    authenticatorImpl: AuthenticatorImpl = koinInject()
 ) {
     val backStack = rememberNavBackStack(SplashKey)
     val datastore: DataStoreManager = koinInject()
@@ -234,6 +236,7 @@ fun NavigationRoot(
                     androidUserVM.initialiseUserData()
                     datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
                     androidUserVM.removeUserData()
+                    authenticatorImpl.logout()
 
                     // Clear navigation and go to Login
                     backStack.clear()

@@ -99,6 +99,33 @@ actual class AuthenticatorImpl {
     }
 
     actual suspend fun logout(): Result<String> {
-        TODO("Not yet implemented")
+        return try {
+            FirebaseAuth.getInstance().signOut()
+            Result.success("Logged out successfully")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    actual suspend fun getToken(): Result<String> {
+        return try {
+            val user = FirebaseAuth.getInstance().currentUser
+
+            if (user != null) {
+
+                val tokenResult = user.getIdToken(false).await()
+                val token = tokenResult.token
+
+                if (token != null) {
+                    Result.success(token)
+                } else {
+                    Result.failure(Exception("Token returned null from Firebase"))
+                }
+            } else {
+                Result.failure(Exception("User is not logged in"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
