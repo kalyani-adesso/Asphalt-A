@@ -46,6 +46,15 @@ struct ConnectedRideMapView: View {
         return rideModel.userId == MBUserDefaults.userIdStatic ? rideModel.organizer : "Rider"
     }
 
+    /// keep both spped identical one in map and other in current user.
+    private var displayedSpeedKph: Int {
+        if !speedSamples.isEmpty {
+            let avg = speedSamples.reduce(0, +) / Double(speedSamples.count)
+            return Int(avg.rounded())
+        }
+        return Int(locationManager.speedInKph ?? 0.0)
+    }
+
     var body: some View {
         
         ZStack{
@@ -161,7 +170,7 @@ struct ConnectedRideMapView: View {
                             VStack(spacing: 18) {
                                 ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
                                 
-                                ActiveRiderView(title: currentUserDisplayName, speed: "\(Int(locationManager.speedInKph ?? 0.0)) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
+                                ActiveRiderView(title: currentUserDisplayName, speed: "\(displayedSpeedKph) kph", rideModel: rideModel, startTrack:$startTrack , locationManager: locationManager, viewModel: viewModel)
                                 
                                 Button(action: {
                                     if rideModel.userId != MBUserDefaults.userIdStatic {
@@ -507,16 +516,8 @@ struct ConnectedRideMapView: View {
     }
     
     @ViewBuilder func distanceAndETA() -> some View {
-        // Show smoothed average speed when available, else fall back to raw.
-        let displayedSpeed: Int = {
-            if !speedSamples.isEmpty {
-                let avg = speedSamples.reduce(0, +) / Double(speedSamples.count)
-                return Int(avg.rounded())
-            }
-            return Int(locationManager.speedInKph ?? 0.0)
-        }()
         VStack(alignment: .center) {
-            Text("\(displayedSpeed)")
+            Text("\(displayedSpeedKph)")
                 .font(KlavikaFont.bold.font(size: 20))
                 .foregroundStyle(AppColor.black)
             Text("kph")
