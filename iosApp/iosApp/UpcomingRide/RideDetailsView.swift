@@ -14,9 +14,8 @@ struct RideDetailsView: View {
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
     var body: some View {
-        AppToolBar(showBack: true){
+        AppToolBar{
         ZStack {
-            NavigationStack {
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(alignment: .leading, spacing: 22) {
@@ -155,7 +154,6 @@ struct RideDetailsView: View {
                         }
                     }
                 }
-            }
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
