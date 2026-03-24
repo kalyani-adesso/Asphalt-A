@@ -269,7 +269,7 @@ fun MapWithCurrentLocation(
 ) {
     val context = LocalContext.current
     val refreshScope = rememberCoroutineScope()
-
+    var userRecentlyInteracted by remember { mutableStateOf(false) }
     val riders by rideViewModel.joinedUsers.collectAsState()
     val polyline by rideViewModel.polyLine.collectAsState()
 
@@ -278,6 +278,7 @@ fun MapWithCurrentLocation(
     var mapLoaded by remember { mutableStateOf(false) }
     val currentUserConnectedRideData by rideViewModel.currentUserConnectedRideData.collectAsStateWithLifecycle()
     var isFollowingUser by remember { mutableStateOf(false) }
+    val currentSpeed = currentUserConnectedRideData?.speedInKph ?: 0.0
 
     val cameraPositionState = rememberCameraPositionState()
     LaunchedEffect(Unit) {
@@ -305,6 +306,13 @@ fun MapWithCurrentLocation(
             )
         }
     }
+
+    LaunchedEffect(currentSpeed, userRecentlyInteracted) {
+        if (!userRecentlyInteracted && currentSpeed > 2.0) {
+            isFollowingUser = true
+        }
+    }
+
     LaunchedEffect(
         currentUserConnectedRideData?.currentLat,
         currentUserConnectedRideData?.currentLong
@@ -321,7 +329,13 @@ fun MapWithCurrentLocation(
     LaunchedEffect(cameraPositionState.isMoving) {
         if (cameraPositionState.isMoving) {
             if (cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+                userRecentlyInteracted = true
                 isFollowingUser = false
+            }
+        } else {
+            if (userRecentlyInteracted) {
+                kotlinx.coroutines.delay(5000L)
+                userRecentlyInteracted = false
             }
         }
     }
