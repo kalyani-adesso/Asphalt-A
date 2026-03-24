@@ -10,7 +10,10 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var currentDate = Date()
-    
+    var isAtFirstMonth: Bool {
+        guard let firstMonth = home.firstAvailableMonth else { return false }
+        return Calendar.current.isDate(currentDate, equalTo: firstMonth, toGranularity: .month)
+    }
     
     var body: some View {
             VStack(spacing: 15) {
@@ -29,13 +32,22 @@ struct DashboardView: View {
 
                                HStack(spacing: 20) {
                                    Button {
-                                       currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                                       let previousDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                                          
+                                          if let firstMonth = home.firstAvailableMonth {
+                                              if previousDate >= firstMonth {
+                                                  currentDate = previousDate
+                                              }
+                                          } else {
+                                              currentDate = previousDate
+                                          }
                                    } label: {
                                        Image(systemName: "chevron.left")
                                            .font(.system(size: 16, weight: .semibold))
                                            .foregroundColor(AppColor.celticBlue)
                                    }
                                    .buttonStyle(.plain)
+                                   .disabled(isAtFirstMonth)
                                    let isToday = Calendar.current.isDateInToday(currentDate)
                                    Button {
                                        let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
