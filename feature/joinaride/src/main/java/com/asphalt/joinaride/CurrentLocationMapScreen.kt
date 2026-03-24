@@ -330,7 +330,7 @@ fun MapWithCurrentLocation(
     }
 
     LaunchedEffect(currentSpeed, userRecentlyInteracted) {
-        if (!userRecentlyInteracted && currentSpeed > 2.0) {
+        if (!userRecentlyInteracted && currentSpeed > 10.0) {
             isFollowingUser = true
         }
     }
