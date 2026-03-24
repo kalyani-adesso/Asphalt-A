@@ -70,7 +70,7 @@ struct JourneyCardView: View {
         .onAppear {
             home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
         }
-        .onChange(of: selectedOption) { newValue in
+        .onChange(of: selectedOption) { _, newValue in
             withAnimation {
                 home.currentSlices = home.getJourneySlices(for: newValue)
                 home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: newValue)
@@ -123,17 +123,13 @@ struct DonutChartView: View {
     var body: some View {
         Chart {
             ForEach(slices) { s in
-                if #available(iOS 17.0, *) {
-                    SectorMark(
-                        angle: .value("Value", s.value),
-                        innerRadius: .ratio(0.60),
-                        angularInset: 2.0
-                    )
-                    .cornerRadius(5)
-                    .foregroundStyle(s.color)
-                } else {
-                    // Fallback on earlier versions
-                }
+                SectorMark(
+                    angle: .value("Value", s.value),
+                    innerRadius: .ratio(0.60),
+                    angularInset: 2.0
+                )
+                .cornerRadius(5)
+                .foregroundStyle(s.color)
             }
         }
         .overlay(

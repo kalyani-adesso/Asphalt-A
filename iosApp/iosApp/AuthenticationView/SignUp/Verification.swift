@@ -69,7 +69,7 @@ struct Verification: View {
                             text: $otp
                         )
                         .keyboardType(.numberPad)
-                        .onChange(of: otp) { newValue in
+                        .onChange(of: otp) { _, newValue in
                             otp = newValue.numbersOnly
                         }
                         .font(KlavikaFont.regular.font(size: 16))

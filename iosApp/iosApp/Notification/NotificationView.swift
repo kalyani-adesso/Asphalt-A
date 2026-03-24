@@ -18,9 +18,16 @@ struct NotificationView: View {
             VStack {
                 List(viewModel.notifications, id: \.id) { notification in
                     HStack(spacing: 17) {
-                        notification.image!
-                            .resizable()
-                            .frame(width: 30, height: 30)
+                        if let image = notification.image {
+                            image
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                        } else {
+                            Image(systemName: "bell")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(AppColor.celticBlue)
+                                .frame(width: 30, height: 30)
+                        }
                         VStack(alignment: .leading, spacing: 5) {
                             HStack {
                                 Text(notification.title)

@@ -380,8 +380,7 @@ extension CreateRideViewModel {
     
     // MARK: - Details View validation
     var isDetailsValid: Bool {
-        guard let type = ride.type,
-              !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
+        guard !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
               !ride.description.trimmingCharacters(in: .whitespaces).isEmpty,
               selectedStartDate != nil,
               selectedStartTime != nil,

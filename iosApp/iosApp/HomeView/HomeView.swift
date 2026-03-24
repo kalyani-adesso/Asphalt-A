@@ -123,7 +123,7 @@ struct HomeView: View {
             await viewModel.fetchAllRides()
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
-           await home.updateStatsFor(month: month, year: year)
+            home.updateStatsFor(month: month, year: year)
         }
         .task {
             await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")

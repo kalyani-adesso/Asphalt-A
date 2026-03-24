@@ -38,6 +38,14 @@ class LocationManager: NSObject, ObservableObject, @preconcurrency CLLocationMan
             break
         }
     }
+
+    func startUpdatingLocation() {
+        manager.startUpdatingLocation()
+    }
+
+    func stopUpdatingLocation() {
+        manager.stopUpdatingLocation()
+    }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
@@ -71,13 +79,17 @@ class LocationManager: NSObject, ObservableObject, @preconcurrency CLLocationMan
     private func reverseGeocode(_ location: CLLocation) {
         geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
             guard let placemark = placemarks?.first, error == nil else {
-                self?.currentAddress = "Unknown location"
+                Task { @MainActor in
+                    self?.currentAddress = "Unknown location"
+                }
                 return
             }
             
             let city = placemark.locality ?? ""
             let area = placemark.subLocality ?? ""
-            self?.currentAddress = area.isEmpty ? city : "\(area), \(city)"
+            Task { @MainActor in
+                self?.currentAddress = area.isEmpty ? city : "\(area), \(city)"
+            }
         }
     }
 }

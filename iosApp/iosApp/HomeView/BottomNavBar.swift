@@ -153,7 +153,7 @@ struct BottomNavBar: View {
                 rideJoined = createRideVM.activeRide?.rideJoined ?? false
             }
         }
-        .onChange(of: selectedTab) { newTab in
+        .onChange(of: selectedTab) { _, newTab in
             if newTab == 0 {
                 Task {
                     await createRideVM.getActiveJoinedRide()

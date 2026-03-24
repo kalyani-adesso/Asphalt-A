@@ -128,7 +128,7 @@ struct UpcomingRideView: View {
                     rideIdToOpen = nil
                 }
             }
-            .onChange(of: viewModel.rideFromDeepLink) { newValue in
+            .onChange(of: viewModel.rideFromDeepLink) { _, newValue in
                 if let r = newValue {
                     deepLinkRide = r
                     showDeepLinkRideDetail = true

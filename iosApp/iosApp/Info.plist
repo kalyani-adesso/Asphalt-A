@@ -21,6 +21,10 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Klavika-Light.otf</string>

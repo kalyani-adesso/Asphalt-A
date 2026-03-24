@@ -142,21 +142,11 @@ class QueryViewModel: ObservableObject {
                 let likes: [String: Bool]
                 let dislikes: [String: Bool]
                 
-                if let likeKeys = ans.likes as? [String] {
-                    likes = Dictionary(uniqueKeysWithValues: likeKeys.map { ($0, true) })
-                } else if let likeMap = ans.likes as? [String: Bool] {
-                    likes = likeMap
-                } else {
-                    likes = [:]
-                }
+                let likeKeys = ans.likes
+                likes = Dictionary(uniqueKeysWithValues: likeKeys.map { ($0, true) })
                 
-                if let dislikeKeys = ans.dislikes as? [String] {
-                    dislikes = Dictionary(uniqueKeysWithValues: dislikeKeys.map { ($0, true) })
-                } else if let dislikeMap = ans.dislikes as? [String: Bool] {
-                    dislikes = dislikeMap
-                } else {
-                    dislikes = [:]
-                }
+                let dislikeKeys = ans.dislikes
+                dislikes = Dictionary(uniqueKeysWithValues: dislikeKeys.map { ($0, true) })
                 
                 
                 return Answer(
@@ -192,13 +182,7 @@ class QueryViewModel: ObservableObject {
             
             let combinedTags = [categoryTag, answerTag]
             
-            let queryLikesDict: [String: Bool]
-            if let likeKeys = domain.likes as? [String] {
-                queryLikesDict = Dictionary(uniqueKeysWithValues: likeKeys.map { ($0, true) })
-            }
-            else{
-                queryLikesDict = [:]
-            }
+            let queryLikesDict = Dictionary(uniqueKeysWithValues: domain.likes.map { ($0, true) })
             
             
             return Query(

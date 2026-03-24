@@ -126,28 +126,23 @@ class MessagesViewModel: ObservableObject {
         messageText = ""
 
         Task {
-            do {
-                try await chatRepository.createOrGet1v1Chat(
-                    userAId: currentUserId,
-                    userBId: recipientId
-                )
+            chatRepository.createOrGet1v1Chat(
+                userAId: currentUserId,
+                userBId: recipientId
+            )
 
-                chatRepository.sendMessage(
-                    chatRoomId: chatRoomId,
-                    senderId: currentUserId,
-                    recipientId: recipientId,
-                    text: textToSend
-                )
+            chatRepository.sendMessage(
+                chatRoomId: chatRoomId,
+                senderId: currentUserId,
+                recipientId: recipientId,
+                text: textToSend
+            )
 
-                print("Message sent successfully")
+            print("Message sent successfully")
 
-                // Refresh recent chats
-                await MainActor.run {
-                    self.fetchRecentChats()
-                }
-
-            } catch {
-                print("Chat creation failed:", error)
+            // Refresh recent chats
+            await MainActor.run {
+                self.fetchRecentChats()
             }
         }
     }
@@ -178,31 +173,26 @@ class MessagesViewModel: ObservableObject {
         messageText = ""
 
         Task {
-            do {
-                // Create or get group chat
-                try await chatRepository.createOrGetGroupChat(
-                    memberList: memberList,
-                    rideID: rideId,
-                    rideTitle: rideTitle
-                )
+            // Create or get group chat
+            chatRepository.createOrGetGroupChat(
+                memberList: memberList,
+                rideID: rideId,
+                rideTitle: rideTitle
+            )
 
-                // Send group message
-                chatRepository.sendGroupMessage(
-                    rideId: rideId,
-                    senderId: currentUserId,
-                    text: textToSend,
-                    allMemberIds: memberList
-                )
+            // Send group message
+            chatRepository.sendGroupMessage(
+                rideId: rideId,
+                senderId: currentUserId,
+                text: textToSend,
+                allMemberIds: memberList
+            )
 
-                print("Group message sent successfully")
+            print("Group message sent successfully")
 
-                // REFRESH recent chats so MessagesListView can see it
-                await MainActor.run {
-                    self.fetchRecentChats()
-                }
-
-            } catch {
-                print("Group chat creation failed:", error)
+            // REFRESH recent chats so MessagesListView can see it
+            await MainActor.run {
+                self.fetchRecentChats()
             }
         }
     }

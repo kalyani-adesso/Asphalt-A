@@ -8,49 +8,15 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-
-// MARK: - Route trimming (polyline shortens as rider moves, like Apple/Google Maps)
-func trimRouteFromUserPosition(_ route: [CLLocationCoordinate2D], user: CLLocationCoordinate2D) -> [CLLocationCoordinate2D] {
-    guard route.count >= 2 else { return route }
-    var bestDistSq = Double.infinity
-    var bestPoint = route[0]
-    var bestEndIndex = 0
-    for i in 0..<(route.count - 1) {
-        let a = route[i]
-        let b = route[i + 1]
-        let closest = closestPointOnSegment(point: user, segmentStart: a, segmentEnd: b)
-        let dLat = closest.latitude - user.latitude
-        let dLon = closest.longitude - user.longitude
-        let distSq = dLat * dLat + dLon * dLon
-        if distSq < bestDistSq {
-            bestDistSq = distSq
-            bestPoint = closest
-            bestEndIndex = i + 1
-        }
-    }
-    if bestEndIndex >= route.count { return [route.last!] }
-    var result = [bestPoint]
-    result.append(contentsOf: route[bestEndIndex...])
-    return result
-}
-
-func closestPointOnSegment(point: CLLocationCoordinate2D, segmentStart: CLLocationCoordinate2D, segmentEnd: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
-    let dx = segmentEnd.longitude - segmentStart.longitude
-    let dy = segmentEnd.latitude - segmentStart.latitude
-    let lenSq = dx * dx + dy * dy
-    if lenSq == 0 { return segmentStart }
-    var t = ((point.longitude - segmentStart.longitude) * dx + (point.latitude - segmentStart.latitude) * dy) / lenSq
-    t = max(0, min(1, t))
-    return CLLocationCoordinate2D(
-        latitude: segmentStart.latitude + t * dy,
-        longitude: segmentStart.longitude + t * dx
-    )
-}
+import Combine
 
 @available(iOS 17.0, *)
 struct BikeRouteMapView: View {
     @Binding var position: MapCameraPosition
     @State private var fullRouteCoordinates: [CLLocationCoordinate2D] = []
+    @State private var fullRouteSegments: [ColoredRouteSegment] = []
+    @State private var isReroutingRoute: Bool = false
+    @State private var lastBikeRerouteAt: Date?
     var currentMapStyle: MapStyle
     var rideModel: JoinRideModel
     var groupRiders: [Rider]
@@ -70,6 +36,25 @@ struct BikeRouteMapView: View {
         return fullRouteCoordinates
     }
 
+    /// Segments currently shown on map with traffic colors.
+    private var displayedTrafficSegments: [ColoredRouteSegment] {
+        guard !fullRouteSegments.isEmpty else { return [] }
+        if startTracking, let user = userLocation, !fullRouteCoordinates.isEmpty {
+            let trimmed = trimRouteFromUserPosition(fullRouteCoordinates, user: user)
+            if trimmed.count >= 2 {
+                let perStep = trimColoredSegmentsFromUser(
+                    fullRoute: fullRouteCoordinates,
+                    segments: fullRouteSegments,
+                    user: user
+                )
+                if !perStep.isEmpty { return perStep }
+                let density = predominantDensity(fullRouteSegments)
+                return [ColoredRouteSegment(coordinates: trimmed, density: density)]
+            }
+        }
+        return fullRouteSegments
+    }
+
     /// Arrow (start) icon position: moves to rider's current location when tracking; otherwise fixed at route start.
     private var startAnnotationCoordinate: CLLocationCoordinate2D {
         if startTracking, let user = userLocation {
@@ -79,17 +64,27 @@ struct BikeRouteMapView: View {
     }
 
     var body: some View {
-        if #available(iOS 17.0, *) {
-            Map(position: $position) {
+        Map(position: $position) {
                 
-                if !displayedRouteCoordinates.isEmpty {
-                    MapPolyline(coordinates: displayedRouteCoordinates)
-                        .stroke(AppColor.celticBlue, lineWidth: 6)
+                ForEach(displayedTrafficSegments) { segment in
+                    if segment.coordinates.count >= 2 {
+                        MapPolyline(coordinates: segment.coordinates)
+                            .stroke(segment.density.color, lineWidth: 6)
+                    }
                 }
                 
                 // Start / rider position annotation (arrow moves with rider when tracking)
                 Annotation("", coordinate: startAnnotationCoordinate) {
-                    if let image = AppIcon.ConnectedRide.startLocation {
+                    if startTracking {
+                        Image(systemName: "location.north.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 30, height: 30)
+                            .background(AppColor.celticBlue)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    } else if let image = AppIcon.ConnectedRide.startLocation {
                         Image(uiImage: image)
                             .resizable()
                             .frame(width: 32, height: 32)
@@ -145,27 +140,62 @@ struct BikeRouteMapView: View {
                     startLocation = CLLocationCoordinate2D(latitude: rideModel.startLat, longitude: rideModel.startLong)
                 }
                 endLocation = CLLocationCoordinate2D(latitude: rideModel.endLat, longitude: rideModel.endLong)
-                fetchBikeRoute()
+                fetchBikeRoute(source: nil, fitCamera: true)
             }
-        }
+            .onReceive(Timer.publish(every: ConnectedRideReroutePolicy.bikeMapCheckSeconds, on: .main, in: .common).autoconnect()) { _ in
+                evaluateBikeMapReroute()
+            }
     }
-    
-    func fetchBikeRoute() {
+
+    private func predominantDensity(_ segments: [ColoredRouteSegment]) -> TrafficDensity {
+        let counts = Dictionary(grouping: segments, by: \.density).mapValues(\.count)
+        return counts.max(by: { $0.value < $1.value })?.key ?? .unknown
+    }
+
+    private func evaluateBikeMapReroute() {
+        guard startTracking,
+              let user = userLocation,
+              !fullRouteCoordinates.isEmpty,
+              !isReroutingRoute else { return }
+        let deviation = crossTrackDistanceMeters(from: user, along: fullRouteCoordinates)
+        guard deviation > ConnectedRideReroutePolicy.offRouteMeters else { return }
+        let now = Date()
+        if let last = lastBikeRerouteAt,
+           now.timeIntervalSince(last) < ConnectedRideReroutePolicy.minSecondsBetweenReroutes { return }
+        lastBikeRerouteAt = now
+        fetchBikeRoute(source: user, fitCamera: false)
+    }
+
+    func fetchBikeRoute(source: CLLocationCoordinate2D?, fitCamera: Bool) {
+        let sourceCoord = source ?? startLocation
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: startLocation))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: sourceCoord))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endLocation))
         request.transportType = .automobile
-        
+        let isReroute = source != nil
+        if isReroute { isReroutingRoute = true }
         let directions = MKDirections(request: request)
         directions.calculate { response, error in
+            defer {
+                if isReroute {
+                    DispatchQueue.main.async { isReroutingRoute = false }
+                }
+            }
             guard let route = response?.routes.first else {
                 print(" No route found: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            let polyline = route.polyline
-            fullRouteCoordinates = polyline.coordinates
+            let polylineCoords = route.polyline.coordinates
+            let stepSegments: [ColoredRouteSegment] = route.steps.compactMap { step -> ColoredRouteSegment? in
+                let coords = step.polyline.coordinates
+                guard coords.count >= 2 else { return nil }
+                return ColoredRouteSegment(
+                    coordinates: coords,
+                    density: densityFor(stepDistanceMeters: step.distance, expectedTravelTime: estimatedTravelTimeForStep(step, route: route))
+                )
+            }
             
-            let region = MKCoordinateRegion(polyline.boundingMapRect)
+            let region = MKCoordinateRegion(route.polyline.boundingMapRect)
             let adjustedRegion = MKCoordinateRegion(
                 center: region.center,
                 span: MKCoordinateSpan(
@@ -174,21 +204,17 @@ struct BikeRouteMapView: View {
                 )
             )
             DispatchQueue.main.async {
-                withAnimation {
-                    position = .region(adjustedRegion)
+                fullRouteCoordinates = polylineCoords
+                fullRouteSegments = stepSegments.isEmpty
+                    ? [ColoredRouteSegment(coordinates: polylineCoords, density: .unknown)]
+                    : stepSegments
+                if fitCamera {
+                    withAnimation {
+                        position = .region(adjustedRegion)
+                    }
+                    onRouteFitted?(adjustedRegion)
                 }
-                onRouteFitted?(adjustedRegion)
             }
         }
     }
 }
-
-extension MKPolyline {
-    var coordinates: [CLLocationCoordinate2D] {
-        var coords = [CLLocationCoordinate2D](repeating: kCLLocationCoordinate2DInvalid, count: pointCount)
-        getCoordinates(&coords, range: NSRange(location: 0, length: pointCount))
-        return coords
-    }
-}
-
-
