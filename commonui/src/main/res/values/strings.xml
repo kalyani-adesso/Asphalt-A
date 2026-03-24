@@ -279,6 +279,7 @@
     <string name="rejoinRide">Rejoin Ride</string>
     <string name="send_reply">SEND REPLY</string>
     <string name="coming_soon">Coming Soon...</string>
+    <string name="redirect_google_map">Launching Google Maps so you can find your way!</string>
 
 
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTimePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#006EC7</item>
+    </style>
+</resources>

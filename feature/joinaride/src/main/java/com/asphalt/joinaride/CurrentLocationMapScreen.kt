@@ -29,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +64,7 @@ import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.StatusBanner
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayLite25
 import com.asphalt.commonui.theme.NeutralBlack
@@ -70,6 +73,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.utils.CustomLogoutDialog
 import com.asphalt.commonui.utils.ImageUtils
 import com.asphalt.commonui.utils.ImageUtils.bitmapDescriptorFromVector
 import com.asphalt.commonui.utils.Utils.generateUserColor
@@ -98,6 +102,7 @@ import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import com.asphalt.commonui.R.string
 
 
 @Composable
@@ -113,18 +118,25 @@ fun CurrentLocationMapScreen(
     var isInitialLoadComplete = false
     val scope = rememberCoroutineScope()
     Log.d("TAG", "ConnectedRideMapScreen: $rideId")
-    LaunchedEffect(Unit) {
+    // Replace your existing LaunchedEffect(Unit) with this:
+    DisposableEffect(rideId) {
         val chatRef = FirebaseDatabase.getInstance().getReference("messages/$rideId")
-        chatRef.addListenerForSingleValueEvent(object : ValueEventListener {
+
+        var isInitialLoadComplete = false
+
+        val initialLoadListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 isInitialLoadComplete = true
             }
-
             override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseChat", "Failed to load initial data", error.toException())
             }
-        })
-        chatRef.limitToLast(1).addChildEventListener(object : ChildEventListener {
+        }
+        chatRef.addListenerForSingleValueEvent(initialLoadListener)
+
+        val childEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // Ignore the historical message that triggers immediately upon connection
                 if (!isInitialLoadComplete) return
 
                 val msg = snapshot.getValue(MessageRoot::class.java)
@@ -132,34 +144,71 @@ fun CurrentLocationMapScreen(
                     scope.launch {
                         UIStateHandler.sendEvent(UIState.INFO("New Message from ${msg?.senderName}"))
                     }
-
-//                    showChatNotification(msg?.receiverName, msg?.text)
                 }
             }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        }
 
-            override fun onChildChanged(
-                snapshot: DataSnapshot,
-                previousChildName: String?
-            ) {
+        // 4. Attach the listener for new messages
+        val query = chatRef.limitToLast(1)
+        query.addChildEventListener(childEventListener)
 
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-            }
-
-            override fun onChildMoved(
-                snapshot: DataSnapshot,
-                previousChildName: String?
-            ) {
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("msg_db", "cancelled_$error")
-
-            }
-        })
-
+        // 5. Clean up EVERYTHING when the user leaves the screen
+        onDispose {
+            chatRef.removeEventListener(initialLoadListener)
+            query.removeEventListener(childEventListener)
+        }
     }
+//    LaunchedEffect(Unit) {
+//        val chatRef = FirebaseDatabase.getInstance().getReference("messages/$rideId")
+//        chatRef.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                isInitialLoadComplete = true
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//        })
+//        chatRef.limitToLast(1).addChildEventListener(object : ChildEventListener {
+//            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+//                if (!isInitialLoadComplete) return
+//
+//                val msg = snapshot.getValue(MessageRoot::class.java)
+//                if (msg?.receiverID == rideViewModel.currentUid && msg?.onGoingRideID == rideId) {
+//                    scope.launch {
+//                        UIStateHandler.sendEvent(UIState.INFO("New Message from ${msg?.senderName}"))
+//                    }
+//
+////                    showChatNotification(msg?.receiverName, msg?.text)
+//                }
+//            }
+//
+//            override fun onChildChanged(
+//                snapshot: DataSnapshot,
+//                previousChildName: String?
+//            ) {
+//
+//            }
+//
+//            override fun onChildRemoved(snapshot: DataSnapshot) {
+//            }
+//
+//            override fun onChildMoved(
+//                snapshot: DataSnapshot,
+//                previousChildName: String?
+//            ) {
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.d("msg_db", "cancelled_$error")
+//
+//            }
+//        })
+//
+//    }
     LaunchedEffect("Test") {
         rideViewModel.getPolyLines(
             ridesData.startLatitude,
@@ -224,7 +273,7 @@ fun MapWithCurrentLocation(
 ) {
     val context = LocalContext.current
     val refreshScope = rememberCoroutineScope()
-
+    var userRecentlyInteracted by remember { mutableStateOf(false) }
     val riders by rideViewModel.joinedUsers.collectAsState()
     val polyline by rideViewModel.polyLine.collectAsState()
 
@@ -233,8 +282,27 @@ fun MapWithCurrentLocation(
     var mapLoaded by remember { mutableStateOf(false) }
     val currentUserConnectedRideData by rideViewModel.currentUserConnectedRideData.collectAsStateWithLifecycle()
     var isFollowingUser by remember { mutableStateOf(false) }
+    val currentSpeed = currentUserConnectedRideData?.speedInKph ?: 0.0
 
     val cameraPositionState = rememberCameraPositionState()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        CustomLogoutDialog(
+            showDialog = showLogoutDialog,
+            onDismiss = { showLogoutDialog = false }, message = stringResource(string.redirect_google_map), positiveButton =
+                stringResource(string.ok), negButton = stringResource(string.cancel), title = "",
+            onConfirm = {
+                showLogoutDialog = false
+                ShareLocation.openGoogleMapsNavigation(
+                    context,
+                    ridesData.endLatitude,
+                    ridesData.endLongitude
+                )
+            }
+        )
+    }
+
     LaunchedEffect(Unit) {
         cameraPositionState.animate(
             CameraUpdateFactory.newLatLngZoom(
@@ -260,6 +328,13 @@ fun MapWithCurrentLocation(
             )
         }
     }
+
+    LaunchedEffect(currentSpeed, userRecentlyInteracted) {
+        if (!userRecentlyInteracted && currentSpeed > 10.0) {
+            isFollowingUser = true
+        }
+    }
+
     LaunchedEffect(
         currentUserConnectedRideData?.currentLat,
         currentUserConnectedRideData?.currentLong
@@ -276,7 +351,13 @@ fun MapWithCurrentLocation(
     LaunchedEffect(cameraPositionState.isMoving) {
         if (cameraPositionState.isMoving) {
             if (cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+                userRecentlyInteracted = true
                 isFollowingUser = false
+            }
+        } else {
+            if (userRecentlyInteracted) {
+                kotlinx.coroutines.delay(5000L)
+                userRecentlyInteracted = false
             }
         }
     }
@@ -550,12 +631,7 @@ fun MapWithCurrentLocation(
             Spacer(modifier = Modifier.width(Dimensions.size10))
             GradientButton(
                 onClick = {
-
-                    ShareLocation.openGoogleMapsNavigation(
-                        context,
-                        ridesData.endLatitude,
-                        ridesData.endLongitude
-                    )
+                    showLogoutDialog=true
 
                 },
                 buttonRadius = Dimensions.size10,
