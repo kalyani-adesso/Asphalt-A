@@ -46,6 +46,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +63,7 @@ import com.asphalt.commonui.PermissionHandler
 import com.asphalt.commonui.StatusBanner
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
+import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayLite25
 import com.asphalt.commonui.theme.NeutralBlack
@@ -70,6 +72,7 @@ import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.ui.GradientButton
+import com.asphalt.commonui.utils.CustomLogoutDialog
 import com.asphalt.commonui.utils.ImageUtils
 import com.asphalt.commonui.utils.ImageUtils.bitmapDescriptorFromVector
 import com.asphalt.commonui.utils.Utils.generateUserColor
@@ -98,6 +101,7 @@ import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import com.asphalt.commonui.R.string
 
 
 @Composable
@@ -235,6 +239,24 @@ fun MapWithCurrentLocation(
     var isFollowingUser by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        CustomLogoutDialog(
+            showDialog = showLogoutDialog,
+            onDismiss = { showLogoutDialog = false }, message = stringResource(string.redirect_google_map), positiveButton =
+                stringResource(string.ok), negButton = stringResource(string.cancel), title = "",
+            onConfirm = {
+                showLogoutDialog = false
+                ShareLocation.openGoogleMapsNavigation(
+                    context,
+                    ridesData.endLatitude,
+                    ridesData.endLongitude
+                )
+            }
+        )
+    }
+
     LaunchedEffect(Unit) {
         cameraPositionState.animate(
             CameraUpdateFactory.newLatLngZoom(
@@ -550,12 +572,7 @@ fun MapWithCurrentLocation(
             Spacer(modifier = Modifier.width(Dimensions.size10))
             GradientButton(
                 onClick = {
-
-                    ShareLocation.openGoogleMapsNavigation(
-                        context,
-                        ridesData.endLatitude,
-                        ridesData.endLongitude
-                    )
+                    showLogoutDialog=true
 
                 },
                 buttonRadius = Dimensions.size10,
