@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -61,7 +62,7 @@ fun CustomLogoutDialog(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = Dimensions.padding24, bottom = Dimensions.padding24),
+                        .padding(top = Dimensions.padding24, bottom = Dimensions.padding24, end =Dimensions.padding24, start = Dimensions.padding24 ),
 
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -71,7 +72,8 @@ fun CustomLogoutDialog(
                     Spacer(modifier = Modifier.height(Dimensions.padding16))
                     Text(
                         text = message,
-                        style = Typography.bodySmall
+                        style = Typography.bodySmall,
+                        textAlign = TextAlign.Center, fontSize = Dimensions.textSize16
                     )
                     Spacer(modifier = Modifier.height(Dimensions.padding24))
                     Row(

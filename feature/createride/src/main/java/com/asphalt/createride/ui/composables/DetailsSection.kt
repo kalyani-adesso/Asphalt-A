@@ -52,6 +52,7 @@ import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.theme.VividRed
 import com.asphalt.commonui.util.CustomTimePickerDialog
 import com.asphalt.commonui.util.DatePickerSample
+import com.asphalt.commonui.util.ShowDefaultTimePicker
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
@@ -67,8 +68,9 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
 
     val tagRideType = if (viewModel._showRideTypeError.value) "Ride_Type_Error" else "Ride_Type"
     //Start Date
-    if (viewModel.show_timePicker.value) {
-        CustomTimePickerDialog(onDismiss = {
+    if (viewModel.show_timePicker.value) {//CustomTimePickerDialog
+
+        ShowDefaultTimePicker(onDismiss = {
             viewModel.showTimePicker(false)
         }, onTimeSelected = { hr, min, isAm ->
             var time_text = "$hr:${String.format("%02d", min)} ${
@@ -98,7 +100,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     }
 //End Date
     if (viewModel.show_EndTimePicker.value) {
-        CustomTimePickerDialog(
+        ShowDefaultTimePicker(
             onDismiss = {
                 viewModel.showEndTimePicker(false)
             },
@@ -115,7 +117,7 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
                 viewModel._showRideEndTimeError.value = false
             },
             hour = viewModel.rideDetailsState.value.endHour ,
-            mins = viewModel.rideDetailsState.value.endMins ,
+            minute = viewModel.rideDetailsState.value.endMins ,
             isAm = viewModel.rideDetailsState.value.isEndAm
         )
     }

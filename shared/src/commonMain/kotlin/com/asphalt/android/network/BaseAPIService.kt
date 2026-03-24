@@ -75,6 +75,11 @@ abstract class BaseAPIService(
         return client.getClient(APIConstants.BASE_URL_PlACES, true).get(url)
     }
 
+    protected suspend fun getAutoCompletePlaces(url: String): HttpResponse {
+        return client.getClient(APIConstants.BASE_URL_PlACES_AUTOCOMPLETE).get(url)
+
+    }
+
     protected suspend fun getPolyLines(url: String): HttpResponse {
         return client.getClient(APIConstants.POLY_LINE_API, true).get(url)
     }

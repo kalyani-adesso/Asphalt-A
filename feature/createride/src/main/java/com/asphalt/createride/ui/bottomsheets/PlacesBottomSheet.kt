@@ -104,7 +104,13 @@ fun BottomSheetLayout(
         ) {
             TextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = {
+                    text = it
+                    placesVM?.getAutoCompletePlaces(
+                        text
+                    )
+
+                },
                 placeholder = {
                     Text(
                         text = stringResource(com.asphalt.commonui.R.string.search_location),
@@ -123,7 +129,10 @@ fun BottomSheetLayout(
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        placesVM?.getPlaces(text) // Trigger your search operation
+                        placesVM?.getAutoCompletePlaces(
+                            text,
+                            needDelay = false
+                        ) // Trigger your search operation
                     }
                 ),
                 colors = TextFieldDefaults.colors(
@@ -143,7 +152,7 @@ fun BottomSheetLayout(
                         contentDescription = "Email icon",
                         tint = Color.Unspecified,
                         modifier = Modifier.clickable {
-                            placesVM?.getPlaces(text)
+                            placesVM?.getAutoCompletePlaces(text, needDelay = false)
                         }
 
                     )
@@ -161,10 +170,14 @@ fun BottomSheetLayout(
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f) // limit height if needed
         ) {
-            items(placesVM?.placeData?.value ?: emptyList()) { item ->
+            items(placesVM?.autoCompletePlaces?.value ?: emptyList()) { item ->
                 Box(
                     modifier = Modifier.clickable {
-                        latLon.invoke(item.lat ?: 0.0, item.lon ?: 0.0, item.name ?: "")
+                        latLon.invoke(
+                            item.geometry.coordinates[1] ?: 0.0,
+                            item.geometry.coordinates[0] ?: 0.0,
+                            item.properties.getDisplayName() ?: ""
+                        )
                         placesVM?.clearList()
                     },
                 ) {
@@ -188,14 +201,14 @@ fun BottomSheetLayout(
                             Spacer(modifier = Modifier.width(Dimensions.size8))
                             Column {
                                 Text(
-                                    text = item.name ?: "",
+                                    text = item.properties.name ?: "",
                                     style = TypographyMedium.titleMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Spacer(Modifier.height(Dimensions.size3))
                                 Text(
-                                    text = item.displayName ?: "",
+                                    text = item.properties.getFormattedAddress() ?: "",
                                     style = Typography.bodySmall,
                                     color = NeutralDarkGrey
                                 )
