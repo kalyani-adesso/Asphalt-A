@@ -20,3 +20,37 @@ data class PlaceData(
     @SerialName("display_name") val displayName: String? = null,
     @SerialName("boundingbox") val boundingBox: List<String>? = null
 )
+
+@Serializable
+data class PhotonResponse(
+    val features: List<PhotonFeature>
+)
+
+@Serializable
+data class PhotonFeature(
+    val geometry: PhotonGeometry,
+    val properties: PhotonProperties
+)
+
+@Serializable
+data class PhotonGeometry(
+    val coordinates: List<Double> // Note: GeoJSON is always [longitude, latitude]
+)
+
+@Serializable
+data class PhotonProperties(
+    val name: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+    val street: String? = null
+) {
+    fun getFormattedAddress(): String {
+        val parts = listOfNotNull(name, street, city, state)
+        return parts.joinToString(", ")
+    }
+    fun getDisplayName(): String{
+        val parts = listOfNotNull(name, city, state)
+        return parts.joinToString(", ")
+    }
+}
