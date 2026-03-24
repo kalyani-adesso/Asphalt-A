@@ -86,7 +86,7 @@ struct ProfileScreen: View {
                     _ = await loadStats
                     _ = await loadProfile
                 }
-                if viewModel.isLoading {
+                if viewModel.isLoading && !showEditProfile {
                     // Light overlay only while profile (header) is loading; content is already visible
                     Color.black.opacity(0.15)
                         .ignoresSafeArea()

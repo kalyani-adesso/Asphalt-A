@@ -1,20 +1,27 @@
 package com.asphalt.dashboard.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.asphalt.android.FirebaseServerValue
+import com.asphalt.android.PlatformDatabase
+import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.helpers.APIHelperUI
+import com.asphalt.android.model.rides.ImageData
 import com.asphalt.android.repository.UserRepoImpl
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.constants.RideStatConstants
 import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
 import com.asphalt.dashboard.utils.RidesFilter
 import kotlinx.coroutines.launch
+import okhttp3.Callback
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
@@ -42,7 +49,6 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     val showNodata = mutableStateOf(false)
 
 
-
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
     }
@@ -54,7 +60,9 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     fun getRides() {
 
         viewModelScope.launch {
-            val currentTime = Calendar.getInstance().timeInMillis
+            //val currentTime = Calendar.getInstance().timeInMillis
+            val currentTime = Utils.currentDateWithoutTime()
+
             var user = userRepoImpl.getUserDetails()
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
@@ -73,15 +81,22 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                 upcomiList.addAll(upcoming)
                 inviteList.addAll(invite)
                 historyList.addAll(history)
-                if (inviteList.isNotEmpty()) {
-                    updateInviteStatus(true)
-                } else {
-                    updateInviteStatus(false)
-                }
+
                 if (upcomiList.isNotEmpty()) {
                     upcomiList.removeAll { ride ->
                         ride.startDate?.let { it < currentTime } ?: false
                     }
+                }
+
+                if (inviteList.isNotEmpty()) {
+                    inviteList.removeAll { ride ->
+                        ride.startDate?.let { it < currentTime } ?: false
+                    }
+                }
+                if (inviteList.isNotEmpty()) {
+                    updateInviteStatus(true)
+                } else {
+                    updateInviteStatus(false)
                 }
                 var ridesList =
                     YourRideRoot(
@@ -140,6 +155,8 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                     ridesRepo.uploadImage(rideID, image)
                 }, viewModelScope
             ) {
+                ridesRepo.updateImageCount(image.size, rideID)
+
                 getRides()
             }
         }
@@ -152,8 +169,26 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
                     ridesRepo.deleteImage(ridesID, imageID)
                 }, viewModelScope
             ) {
+                ridesRepo.updateImageCount(-1, ridesID)
+
+
                 //getRides()
             }
+        }
+    }
+
+    fun fetchImages(ridesId: String?, imageFetchCallback: (ArrayList<ImageData>) -> Unit) {
+        viewModelScope.launch {
+
+            ridesId?.let {
+                APIHelperUI.handleApiResult(
+                    APIHelperUI.runWithLoader { ridesRepo.fetchImages(it) }, viewModelScope
+                ) { imageList ->
+                    val imageArrayList = ArrayList(imageList)
+                    imageFetchCallback.invoke(imageArrayList)
+                }
+            }
+
         }
     }
 

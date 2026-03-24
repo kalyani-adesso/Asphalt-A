@@ -32,13 +32,21 @@ actual class UserRepoImpl actual constructor() : UserRepo {
             withBlock = { snapshot ->
                 val data = snapshot?.value() as? Map<*, *>
                 val name = (data?.get("user_name")) as? String ?: "Guest"
+                val rawCreatedDate = data?.get("created_date")
 
+                val accountCreatedDate: Long = when (rawCreatedDate) {
+                    is Long -> rawCreatedDate
+                    is Int -> rawCreatedDate.toLong()
+                    is Double -> rawCreatedDate.toLong()
+                    else -> 0L
+                }
                 cont.resume(
                     CurrentUser(
                         uid = uid,
                         name = name,
                         email = email,
                         isSuccess = true,
+                        accountCreatedDate = accountCreatedDate ,
                         errorMessage = null
                     )
                 )

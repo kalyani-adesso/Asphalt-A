@@ -33,7 +33,7 @@ class RidesData(
     var assemblyLat: Double = 0.0,
     var assemblyLon: Double = 0.0,
     var ratings: List<RatingsData> = emptyList(),
-    var images: List<ImageData> = emptyList(),
+    var imageCount: Int = 0
 )
 
 fun RidesData.showRejoinButton(userId: String): Boolean {

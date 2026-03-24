@@ -67,7 +67,6 @@ struct MessagesListView: View {
     
     var body: some View {
         AppToolBar(showBack: true){
-            NavigationStack {
                 
                 VStack(spacing: 0) {
                     ReusableHeader {
@@ -178,7 +177,6 @@ struct MessagesListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
-            }
             .onAppear {
                 Task {
                     try? await viewModel.fetchAllUsers()

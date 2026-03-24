@@ -92,7 +92,8 @@ object RidesFilter {
                     riders = ride.participants.size + 1,// need to count the organizer
                     createdBy = ride.createdBy,
                     createdUSerName = userDomain?.name ?: "",
-                    profileImageUrl = userDomain?.profilePic
+                    profileImageUrl = userDomain?.profilePic,
+                    startDate = ride.startDate
                 )
             } else {
                 null // Skip if participant not found
@@ -121,7 +122,7 @@ object RidesFilter {
                 startDate = ride.startDate,
                 ratings = ride.ratings,
                 starsCount = ride.ratings.find { it.userId == userId }?.stars ?: 0,
-                images_server = ArrayList(ride.images)
+                imageCount = ride.imageCount
             )
         }
     }

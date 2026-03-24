@@ -66,7 +66,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                         },
                         label = { Text("Connected Ride", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = {
+                            itemClick.invoke(Constants.CONNECTED_RIDE_CLICK)
+                        }
                     )
 //
 //                    NavigationDrawerItem(
@@ -107,7 +109,7 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                         label = { Text("Marketplace", style = TypographyMedium.bodyMedium) },
                         selected = false,
                         onClick = {
-//                            itemClick.invoke(Constants.MARKET_PLACE_CLICK)
+                            itemClick.invoke(Constants.MARKET_PLACE_CLICK)
                         }
                     )
                     NavigationDrawerItem(
@@ -146,7 +148,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                         },
                         label = { Text("Settings", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = {
+                            itemClick.invoke(Constants.SETTINGS_CLICK)
+                        }
                     )
                     NavigationDrawerItem(
                         icon = {
@@ -165,7 +169,9 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                         },
                         label = { Text("Refer a Friend", style = TypographyMedium.bodyMedium) },
                         selected = false,
-                        onClick = {}
+                        onClick = {
+                            itemClick.invoke(Constants.REFER_FRIEND)
+                        }
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(16.dp),

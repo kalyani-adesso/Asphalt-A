@@ -2,6 +2,7 @@ package com.asphalt.android.network
 
 import com.asphalt.android.constants.APIConstants
 import com.asphalt.android.model.APIResult
+import com.asphalt.android.repository.AuthenticatorImpl
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ServerResponseException
@@ -13,9 +14,14 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.JsonConvertException
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-abstract class BaseAPIService(private val client: KtorClient) {
-
+abstract class BaseAPIService(
+    private val client: KtorClient,
+) :
+    KoinComponent {
+    protected val authenticator: AuthenticatorImpl by inject()
     protected suspend fun <T> safeApiCall(apiCall: suspend () -> T): APIResult<T> {
         return try {
             val result = apiCall()
@@ -69,11 +75,23 @@ abstract class BaseAPIService(private val client: KtorClient) {
         return client.getClient(APIConstants.BASE_URL_PlACES, true).get(url)
     }
 
+    protected suspend fun getAutoCompletePlaces(url: String): HttpResponse {
+        return client.getClient(APIConstants.BASE_URL_PlACES_AUTOCOMPLETE).get(url)
+
+    }
+
     protected suspend fun getPolyLines(url: String): HttpResponse {
         return client.getClient(APIConstants.POLY_LINE_API, true).get(url)
     }
 
-    protected fun buildUrl(url: String): String {
-        return "$url.json"
+    protected suspend fun buildUrl(url: String): String {
+        val tokenResult = authenticator.getToken()
+
+        return if (tokenResult.isSuccess && tokenResult.getOrNull() != null) {
+            val token = tokenResult.getOrNull()
+            "$url.json?auth=$token"
+        } else {
+            "$url.json"
+        }
     }
 }

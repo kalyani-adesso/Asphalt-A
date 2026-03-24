@@ -174,7 +174,7 @@ struct DetailsView: View {
                 .cornerRadius(10)
                 
             }
-       
+            
             ButtonView( title: AppStrings.CreateRideButton.nextStep.rawValue,
                         showShadow: false , onTap: {
                 viewModel.nextStep()
@@ -210,13 +210,14 @@ struct DetailsView: View {
                                end >= start {
                                 return end
                             } else {
-                                return viewModel.selectedStartDate ?? Date()
+                                // Allow today if no valid end date
+                                return Date()
                             }
                         },
                         set: { newEnd in
                             // Ensure end date is always >= start date
-                            if let start = viewModel.selectedStartDate, newEnd >= start {
-                                viewModel.selectedEndDate = newEnd
+                            if let start = viewModel.selectedStartDate{
+                                viewModel.selectedEndDate = newEnd >= start ? newEnd : start
                             } else {
                                 viewModel.selectedEndDate = viewModel.selectedStartDate
                             }
@@ -229,9 +230,9 @@ struct DetailsView: View {
                         }
                         activePicker = nil
                     },
-                    minimumDate: viewModel.selectedStartDate ?? Date()
+                    minimumDate: viewModel.selectedStartDate ?? Calendar.current.startOfDay(for: Date())
                 )
-
+                
                 
             case .startTime:
                 CustomTimePicker(

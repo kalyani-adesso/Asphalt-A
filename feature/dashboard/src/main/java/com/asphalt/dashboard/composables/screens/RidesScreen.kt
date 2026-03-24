@@ -183,7 +183,7 @@ fun UpcomingRides(
     upComingViewDetails: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val coming_soon_txt =stringResource(R.string.coming_soon)
+    val coming_soon_txt = stringResource(R.string.coming_soon)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -397,7 +397,7 @@ fun UpcomingRides(
 
             BorderedButton(
                 onClick = {
-                    Toast.makeText(context,coming_soon_txt, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, coming_soon_txt, Toast.LENGTH_SHORT).show()
                     // upComingViewDetails.invoke(upconing.ridesId.toString())
                 },
                 modifier = Modifier
@@ -444,7 +444,7 @@ fun UpcomingRides(
 fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDataModel) {
     var addPhotos by remember { mutableStateOf(false) }
     var showGalleryDialog by remember { mutableStateOf(false) }
-    var showViewPhotos by remember { mutableStateOf(history.images_server.size > 0) }
+    var showViewPhotos by remember { mutableStateOf(history.imageCount > 0) }
     val context = LocalContext.current
     if (addPhotos) {
         GalleryDialog(isShowUpload = true, onDismiss = { isRefresh, imgcount ->
@@ -471,6 +471,8 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
                 it.url, it.imageID
             )
         })
+
+
         GalleryDialog(images = images, isShowUpload = false, onDismiss = { isRefresh, imgCount ->
             showGalleryDialog = false
             showViewPhotos = imgCount > 0
@@ -583,7 +585,13 @@ fun HistoryRides(ridesScreenViewModel: RidesScreenViewModel, history: YourRideDa
             if (showViewPhotos) {
                 BorderedButton(
                     onClick = {
-                        showGalleryDialog = true
+
+                        ridesScreenViewModel.fetchImages(
+                            history.ridesId,
+                            { imageData ->
+                                history.images_server = imageData
+                                showGalleryDialog = true
+                            })
                     },
                     modifier = Modifier
                         .height(Dimensions.size50)

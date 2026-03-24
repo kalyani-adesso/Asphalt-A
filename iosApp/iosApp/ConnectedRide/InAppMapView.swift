@@ -18,12 +18,16 @@ struct InAppMapView: View {
     var startCoordinate: CLLocationCoordinate2D?
     var endCoordinate: CLLocationCoordinate2D?
     var userCoordinate: CLLocationCoordinate2D?
+    /// Other riders participating in the connected ride (for pins on the navigation map).
+    var participants: [Rider]
     var followUser: Bool
     var cameraAltitude: Double
     var mapType: MKMapType
     var recenterCounter: Int
     var focusCoordinate: CLLocationCoordinate2D?
     var focusCounter: Int
+    /// Increment to force re-fitting camera to route (reliable on first load across devices).
+    var fitRouteCounter: Int
 
     @State private var position: MapCameraPosition = .automatic
     @State private var hasFittedRoute = false
@@ -33,20 +37,6 @@ struct InAppMapView: View {
             if !routeCoordinates.isEmpty {
                 MapPolyline(coordinates: routeCoordinates)
                     .stroke(AppColor.celticBlue, lineWidth: 6)
-            }
-            // User location marker (when available)
-            if let user = userCoordinate {
-                Annotation("", coordinate: user) {
-                    ZStack {
-                        Circle()
-                            .fill(AppColor.celticBlue.opacity(0.2))
-                            .frame(width: 44, height: 44)
-                        Circle()
-                            .fill(AppColor.celticBlue)
-                            .frame(width: 16, height: 16)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                    }
-                }
             }
             // Start pin
             if let start = startCoordinate {
@@ -70,6 +60,46 @@ struct InAppMapView: View {
                     }
                 }
             }
+            // Participant pins
+            ForEach(participants) { rider in
+                Annotation("", coordinate: CLLocationCoordinate2D(latitude: rider.currentLat, longitude: rider.currentLong)) {
+                    VStack(spacing: 1) {
+                        ProfileImageView(profileImageName: rider.profileImageName, size: CGSize(width: 24, height: 24))
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
+                        HStack {
+                            Spacer()
+                            (rider.status == .connected ? AppIcon.JoinRide.greenPin
+                                : rider.status == .delayed ? AppIcon.JoinRide.yellowPin
+                                : AppIcon.JoinRide.orangePin)
+                            .resizable()
+                            .frame(width: 18, height: 18)
+                        }
+                        .frame(width: 28)
+                    }
+                    .frame(width: 28)
+                    .background(.clear)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .shadow(radius: 2)
+                }
+            }
+            // User / navigate location marker (drawn last so it appears on top of polyline)
+            if let user = userCoordinate {
+                Annotation("", coordinate: user) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.celticBlue.opacity(0.2))
+                            .frame(width: 44, height: 44)
+                        Circle()
+                            .fill(AppColor.celticBlue)
+                            .frame(width: 16, height: 16)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                    }
+                    .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
+                }
+            }
         }
         .mapStyle(style(for: mapType))
         .mapControls {
@@ -81,6 +111,11 @@ struct InAppMapView: View {
                 fitMapToRoute()
                 hasFittedRoute = true
             }
+        }
+        .onChange(of: fitRouteCounter) { _ in
+            guard !routeCoordinates.isEmpty else { return }
+            fitMapToRoute()
+            hasFittedRoute = true
         }
         .onChange(of: recenterCounter) { _ in
             recenter()
@@ -146,24 +181,3 @@ struct InAppMapView: View {
     }
 }
 
-#if DEBUG
-@available(iOS 17.0, *)
-struct InAppMapView_Previews: PreviewProvider {
-    static var previews: some View {
-        let start = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
-        let end = CLLocationCoordinate2D(latitude: 37.7849, longitude: -122.4094)
-        return InAppMapView(
-            routeCoordinates: [start, end],
-            startCoordinate: start,
-            endCoordinate: end,
-            userCoordinate: nil,
-            followUser: true,
-            cameraAltitude: 200,
-            mapType: .standard,
-            recenterCounter: 0,
-            focusCoordinate: nil,
-            focusCounter: 0
-        )
-    }
-}
-#endif

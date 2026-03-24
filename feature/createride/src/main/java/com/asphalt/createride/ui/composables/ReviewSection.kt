@@ -84,13 +84,18 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                             text = viewModel.rideDetailsState.value.rideTitle ?: "",
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("ride_title")
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.testTag("ride_title")
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation ?: ""}",
+                            //text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation ?: ""}",
+                            text = viewModel.rideDetailsState.value.description ?: "----",
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey, modifier = Modifier.testTag("ride_destination")
+                            color = NeutralDarkGrey,
+                            modifier = Modifier.testTag("ride_destination"),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -151,8 +156,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = (viewModel.rideDetailsState.value.dateString ?: "") +" - "+
-                            viewModel.rideDetailsState.value.displayTime,
+                            text = (viewModel.rideDetailsState.value.dateString ?: "") + " - " +
+                                    viewModel.rideDetailsState.value.displayTime,
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey,
                             modifier = Modifier.testTag("date_time")
@@ -161,9 +166,9 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
 
                 }
 
-              /*  +" - "+
-                        (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
-                        viewModel.rideDetailsState.value.endDisplayTime,*/
+                /*  +" - "+
+                          (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
+                          viewModel.rideDetailsState.value.endDisplayTime,*/
             }
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
@@ -244,7 +249,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                                 )
                             }",
                             style = Typography.bodySmall,
-                            color = NeutralDarkGrey, modifier = Modifier.testTag("participant_count")
+                            color = NeutralDarkGrey,
+                            modifier = Modifier.testTag("participant_count")
                         )
                     }
 

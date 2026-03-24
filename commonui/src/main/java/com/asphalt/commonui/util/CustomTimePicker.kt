@@ -39,9 +39,20 @@ import java.util.Calendar
 
 @Composable
 fun CustomTimePickerDialog(
-    onDismiss: () -> Unit, onTimeSelected: (hour: Int, minute: Int, isAm: Boolean) -> Unit
+    onDismiss: () -> Unit,
+    onTimeSelected: (hour: Int, minute: Int, isAm: Boolean) -> Unit,
+    hour: Int?,
+    mins: Int?,
+    isAm: Boolean
 ) {
-    val calendar = remember { Calendar.getInstance() }
+    val calendar = remember {
+        if (hour != null && mins != null) Calendar.getInstance().apply {
+            val safeHour = if (hour == 12) 0 else hour
+            set(Calendar.HOUR, safeHour)
+            set(Calendar.MINUTE, mins)
+            set(Calendar.AM_PM, if (isAm) Calendar.AM else Calendar.PM)
+        } else Calendar.getInstance()
+    }
     val initialHour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
     val initialMinute = calendar.get(Calendar.MINUTE)
     val initialIsAm = calendar.get(Calendar.AM_PM) == Calendar.AM

@@ -3,6 +3,7 @@ package com.asphalt.android.constants
 object APIConstants {
     const val BASE_URL = "riders-club-5910a-default-rtdb.firebaseio.com"
     const val BASE_URL_PlACES = "nominatim.openstreetmap.org"
+    const val BASE_URL_PlACES_AUTOCOMPLETE = "photon.komoot.io/api/"
     const val USERS_URL = "/users"
     const val BIKES_URL = "/bikes"
     const val QUERIES_URL = "/queries"

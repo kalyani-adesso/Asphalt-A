@@ -195,13 +195,15 @@ fun ConnectedRideGoogleMapScreen(
             ) {
                 CurrentLocationMapScreen(
                     locationProvider = locationProvider,
-                    ridesData = ridesData
+                    ridesData = ridesData,
+                    rideViewModel = rideViewModel
                 )
             }
 
             // Other UI
             RideProgress(
                 androidUserVM = androidUserVM,
+                viewmodel = rideViewModel,
                 onClickEndRide = onClick,
                 ridesData = ridesData
             )

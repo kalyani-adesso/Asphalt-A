@@ -23,6 +23,7 @@ data class YourRideDataModel(
     var ratings: List<RatingsData> = emptyList(),
     var starsCount: Int = 0,
     var images : ArrayList<GalleryModel> = arrayListOf(),
+    var imageCount:Int = 0,
     var images_server : ArrayList<ImageData> = arrayListOf()
 
 ) {

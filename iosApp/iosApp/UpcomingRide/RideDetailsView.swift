@@ -14,9 +14,8 @@ struct RideDetailsView: View {
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
     var body: some View {
-        AppToolBar(showBack: true){
+        AppToolBar{
         ZStack {
-            NavigationStack {
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(alignment: .leading, spacing: 22) {
@@ -34,14 +33,16 @@ struct RideDetailsView: View {
                                         .foregroundColor(AppColor.stoneGray)
                                 }
                                 Spacer()
-                                Button(action: {
-                                    openChat()
-                                }) {
-                                    AppIcon.UpcomingRide.message
-                                        .resizable()
-                                        .frame(width:30, height:30)
+                                if ride.riderCount > 1 {
+                                    Button(action: {
+                                        openChat()
+                                    }) {
+                                        AppIcon.UpcomingRide.message
+                                            .resizable()
+                                            .frame(width:30, height:30)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
                             
                            
@@ -153,7 +154,6 @@ struct RideDetailsView: View {
                         }
                     }
                 }
-            }
             if viewModel.isRideLoading {
                 ProgressViewReusable(title: "Loading ...")
             }
@@ -164,6 +164,8 @@ struct RideDetailsView: View {
                 ) {
                     activeChat = nil
                 }
+                .ignoresSafeArea()
+                       .zIndex(1)
             }
         }
         

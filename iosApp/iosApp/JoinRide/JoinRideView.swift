@@ -101,145 +101,156 @@ struct JoinRideView: View {
     }
 }
 
+
 struct JoinRideRow: View {
     var ride:JoinRideModel?
+    @State private var showFutureAlert = false
     let index:Int
     @ObservedObject var viewModel:JoinRideViewModel
     @Binding var selectedRide: JoinRideModel?
     var body: some View {
-            VStack(alignment: .leading, spacing: 22) {
-                HStack(spacing: 11) {
-                    AppIcon.Profile.profile
+        VStack(alignment: .leading, spacing: 22) {
+            HStack(spacing: 11) {
+                AppIcon.Profile.profile
+                    .resizable()
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(AppColor.celticBlue.opacity(0.8), lineWidth: 2)
+                    )
+                    .frame(width: 30, height: 30)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(ride?.title ?? "")
+                        .font(KlavikaFont.bold.font(size: 16))
+                        .foregroundColor(AppColor.black)
+                    Text("By \(ride?.organizer ?? "")")
+                        .font(KlavikaFont.regular.font(size: 12))
+                        .foregroundColor(AppColor.richBlack)
+                }
+                Spacer()
+            }
+            
+            Text(ride?.description ?? "")
+                .font(KlavikaFont.regular.font(size: 14))
+                .foregroundColor(AppColor.stoneGray)
+            
+            HStack {
+                HStack(spacing: 5) {
+                    AppIcon.JoinRide.calenderToday
                         .resizable()
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(AppColor.celticBlue.opacity(0.8), lineWidth: 2)
-                        )
-                        .frame(width: 30, height: 30)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(ride?.title ?? "")
-                            .font(KlavikaFont.bold.font(size: 16))
-                            .foregroundColor(AppColor.black)
-                        Text("By \(ride?.organizer ?? "")")
-                            .font(KlavikaFont.regular.font(size: 12))
-                            .foregroundColor(AppColor.richBlack)
-                    }
-                    Spacer()
+                        .frame(width: 16, height: 16)
+                    Text(ride?.date ?? "")
+                        .font(KlavikaFont.regular.font(size: 16))
+                        .foregroundStyle(AppColor.richBlack)
                 }
-                
-                Text(ride?.description ?? "")
-                    .font(KlavikaFont.regular.font(size: 14))
-                    .foregroundColor(AppColor.stoneGray)
-                
-                HStack {
-                    HStack(spacing: 5) {
-                        AppIcon.JoinRide.calenderToday
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text(ride?.date ?? "")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
-                    }
-                    Spacer()
-                    HStack(spacing: 5) {
-                        AppIcon.JoinRide.joinGroup
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text("\(ride?.ridersCount ?? "")/\(ride?.maxRiders ?? "") rides")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
-                    }
-                }
-                
-                HStack {
-                    HStack(spacing: 5) {
-                        AppIcon.JoinRide.location
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text(ride?.route ?? "")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
-                    }
-                    Spacer()
-                    HStack(spacing: 5) {
-                        AppIcon.JoinRide.route
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text(ride?.distance ?? "")
-                            .font(KlavikaFont.regular.font(size: 16))
-                            .foregroundStyle(AppColor.richBlack)
-                    }
-                }
-                
-                HStack(spacing: 15) {
-                    Button(action: {
-                        viewModel.callToRider(contactNumber: ride?.contactNumber ?? "")
-                    }) {
-                        HStack {
-                            AppIcon.NavigationSlider.call
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                            Text(AppStrings.JoinRide.callRider.uppercased())
-                                .font(KlavikaFont.bold.font(size: 14))
-                                .foregroundStyle(AppColor.black)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(AppColor.white)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(AppColor.darkGray, lineWidth: 2)
-                        )
-                    }
-                    .padding(.bottom,20)
-                    .buttonStyle(.plain)
-                    
-                    if #available(iOS 17.0, *) {
-                        ButtonView(
-                            title: AppStrings.JoinRide.joinRide.uppercased(),
-                            icon: AppIcon.JoinRide.movedLocation,
-                            background: AppColor.celticBlue
-                        ) {
-                            guard let ride = ride else { return }
-
-                            viewModel.tappedIndex = index
-
-                            Task {
-                                if ride.rideJoined {
-                                    selectedRide = ride
-                                    return
-                                }
-                                if let selected = await viewModel.handleJoin(for: ride) {
-                                    selectedRide = selected
-                                }
-                            }
-                        }
-
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom,20)
-                    }
+                Spacer()
+                HStack(spacing: 5) {
+                    AppIcon.JoinRide.joinGroup
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                    Text("\(ride?.ridersCount ?? "")/\(ride?.maxRiders ?? "") rides")
+                        .font(KlavikaFont.regular.font(size: 16))
+                        .foregroundStyle(AppColor.richBlack)
                 }
             }
-            .padding([.leading,.trailing,.top],16)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(AppColor.listGray)
-            )
-            .contentShape(Rectangle())
-//                .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
-//                Button(AppStrings.JoinRide.no, role: .cancel) { }
-//                Button(AppStrings.JoinRide.yes) {
-//                    Task {
-//                        await viewModel.endActiveRide()
-//                        await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
-//                        selectedRide = viewModel.filteredRides[viewModel.tappedIndex ?? 0]
-//                    }
-//                }
-//            } message: {
-//                Text(AppStrings.JoinRide.confirmEndCurrentRide)
-//            }
+            
+            HStack {
+                HStack(spacing: 5) {
+                    AppIcon.JoinRide.location
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                    Text(ride?.route ?? "")
+                        .font(KlavikaFont.regular.font(size: 16))
+                        .foregroundStyle(AppColor.richBlack)
+                }
+                Spacer()
+                HStack(spacing: 5) {
+                    AppIcon.JoinRide.route
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                    Text(ride?.distance ?? "")
+                        .font(KlavikaFont.regular.font(size: 16))
+                        .foregroundStyle(AppColor.richBlack)
+                }
+            }
+            
+            HStack(spacing: 15) {
+                Button(action: {
+                    viewModel.callToRider(contactNumber: ride?.contactNumber ?? "")
+                }) {
+                    HStack {
+                        AppIcon.NavigationSlider.call
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                        Text(AppStrings.JoinRide.callRider.uppercased())
+                            .font(KlavikaFont.bold.font(size: 14))
+                            .foregroundStyle(AppColor.black)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppColor.white)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(AppColor.darkGray, lineWidth: 2)
+                    )
+                }
+                .padding(.bottom,20)
+                .buttonStyle(.plain)
+                
+                if #available(iOS 17.0, *) {
+                    ButtonView(
+                        title: AppStrings.JoinRide.joinRide.uppercased(),
+                        icon: AppIcon.JoinRide.movedLocation,
+                        background: ride?.isFutureRide == true ? Color.gray.opacity(0.5) : AppColor.celticBlue
+                    ) {
+                        guard let ride = ride else { return }
+                        if ride.isFutureRide {
+                            showFutureAlert = true
+                            return
+                        }
+                        viewModel.tappedIndex = index
+                        
+                        Task {
+                            if ride.rideJoined {
+                                selectedRide = ride
+                                return
+                            }
+                            if let selected = await viewModel.handleJoin(for: ride) {
+                                selectedRide = selected
+                            }
+                        }
+                    }
+                    .foregroundColor(ride?.isFutureRide == true ? Color.white.opacity(0.7) : AppColor.black)
+                    .alert("Ride Not Started", isPresented: $showFutureAlert) {
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text("Your ride is in the future.")
+                    }
+                    
+                    .frame(maxWidth: .infinity)
+                    .padding(.bottom,20)
+                }
+            }
+        }
+        .padding([.leading,.trailing,.top],16)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(AppColor.listGray)
+        )
+        .contentShape(Rectangle())
+        //                .alert(AppStrings.JoinRide.rideActive, isPresented: $viewModel.showRideAlreadyActivePopup) {
+        //                Button(AppStrings.JoinRide.no, role: .cancel) { }
+        //                Button(AppStrings.JoinRide.yes) {
+        //                    Task {
+        //                        await viewModel.endActiveRide()
+        //                        await viewModel.joinRide(viewModel.filteredRides[viewModel.tappedIndex ?? 0])
+        //                        selectedRide = viewModel.filteredRides[viewModel.tappedIndex ?? 0]
+        //                    }
+        //                }
+        //            } message: {
+        //                Text(AppStrings.JoinRide.confirmEndCurrentRide)
+        //            }
     }
 }
 

@@ -25,7 +25,6 @@ struct UpcomingRidesView: View {
                 }
                 .font(KlavikaFont.bold.font(size: 13))
             }
-           
             if viewModel.upcomingInvitesRide.isEmpty {
                 emptyStateView
             }
@@ -45,10 +44,6 @@ struct UpcomingRidesView: View {
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })
-        .task{
-            await viewModel.fetchAllRides()
-            await viewModel.fetchAllUsers()
-        }
     }
 }
 struct UpcomingRideCard: View {
@@ -83,15 +78,17 @@ struct UpcomingRideCard: View {
                             .foregroundColor(AppColor.stoneGray)
                     }
                     Spacer()
-                    Button {
-                        withAnimation(.easeInOut) {
-                               onMessageTap(ride.id)
-                           }
-                    } label: {
-                        AppIcon.Home.message
+                    if ride.riderCount > 1 {
+                        Button {
+                            withAnimation(.easeInOut) {
+                                onMessageTap(ride.id)
+                            }
+                        } label: {
+                            AppIcon.Home.message
+                        }
+                        .buttonStyle(.plain)
+                        
                     }
-                    .buttonStyle(.plain)
-                    
                 }
                 HStack(spacing: 8) {
                     AppIcon.Home.calender
@@ -184,7 +181,7 @@ struct UpcomingRideCard: View {
             )
         }
     }
-
+    
     private func initials(from name: String) -> String {
         name.split(separator: " ").compactMap { $0.first }.map { String($0) }.joined()
     }

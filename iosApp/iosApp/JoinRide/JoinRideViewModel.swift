@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import shared
+import CoreLocation
 
 struct JoinRideModel: Identifiable,Hashable {
     let id = UUID()
@@ -29,7 +30,23 @@ struct JoinRideModel: Identifiable,Hashable {
     let endLat:Double
     let endLong:Double
     let rideJoined:Bool
-    let participants: [ParticipantData]? 
+    let participants: [ParticipantData]?
+    /// When true, navigation (in-app, Apple Maps, Google Maps) should use assembly → end route.
+    let hasAssemblyPoint: Bool
+    let assemblyLat: Double?
+    let assemblyLon: Double?
+    var isFutureRide: Bool {
+        guard let rideDate = Self.parseDate(from: date) else { return false }
+        let calendar = Calendar.current
+        return !calendar.isDateInToday(rideDate) && rideDate > Date()
+    }
+
+     static func parseDate(from string: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM dd yyyy - hh:mm a"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: string)
+    }
 }
 
 @MainActor
@@ -74,13 +91,13 @@ extension JoinRideViewModel {
         do {
             self.isRideLoading = true
             let rideArray = try await getAllRidesAsync()
-            
+            let todayStart = Calendar.current.startOfDay(for: Date())
             let filteredRideArray = rideArray.filter { ride in
                 guard let startEpoch = ride.startDate else { return false }
                 
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 // 1. Ignore past rides
-                guard startDate >= Date() else { return false }
+                guard startDate >= todayStart else { return false }
                 // 2. Determine current user role
                 let isCreator = ride.createdBy == currentUserId
                 let participantRecord = ride.participants.first { $0.userId == currentUserId }
@@ -121,6 +138,19 @@ extension JoinRideViewModel {
 
 
 
+                    let distanceKm: Int = {
+                        if ride.rideDistance > 0 {
+                            return Int(ride.rideDistance)
+                        }
+                        // Fallback: estimate distance from coordinates if backend distance is missing/0.
+                        let start = CLLocation(latitude: ride.startLatitude, longitude: ride.startLongitude)
+                        let end = CLLocation(latitude: ride.endLatitude, longitude: ride.endLongitude)
+                        let km = start.distance(from: end) / 1000
+                        return max(Int(km.rounded()), 0)
+                    }()
+
+                    let distanceText: String = distanceKm > 0 ? "\(distanceKm) km" : "--"
+
                     let model = JoinRideModel(
                         userId:ride.createdBy ?? "",
                         rideId: ride.ridesID ?? "",
@@ -128,7 +158,7 @@ extension JoinRideViewModel {
                         organizer: (ride.createdBy == currentUserId) ? "Me" : (userName?.0 ?? ""),
                         description: ride.description_ ?? "",
                         route: "\(ride.startLocation ?? "") - \(ride.endLocation ?? "")",
-                        distance: "\(Int(ride.rideDistance)) km",
+                        distance: distanceText,
                         date: dateString,
                         ridersCount: "\(joinedCount)",
                         maxRiders: "\(ride.participants.count)",
@@ -139,7 +169,10 @@ extension JoinRideViewModel {
                         endLat: ride.endLatitude,
                         endLong: ride.endLongitude,
                         rideJoined: rideJoinedStatus,
-                        participants: participants
+                        participants: participants,
+                        hasAssemblyPoint: ride.hasAssemblyPoint,
+                        assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil,
+                        assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil
                     )
                     joinRideModels.append(model)
                 
@@ -156,7 +189,6 @@ extension JoinRideViewModel {
             print("Failed to fetch rides: \(error.localizedDescription)")
         }
     }
-    
     private func getAllRidesAsync() async throws -> [RidesData] {
         try await withCheckedThrowingContinuation { continuation in
             rideRepository.getAllRide { result, error in

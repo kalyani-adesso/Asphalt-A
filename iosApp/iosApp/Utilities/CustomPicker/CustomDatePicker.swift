@@ -124,7 +124,7 @@ struct CalendarGrid: View {
                 ForEach(days, id: \.self) { day in
                     let isToday = calendar.isDateInToday(day)
                     let isSelected = calendar.isDate(day, inSameDayAs: selectedDate)
-                    let isDisabled = day < minimumDate 
+                    let isDisabled = calendar.startOfDay(for: day) < calendar.startOfDay(for: minimumDate)
 
                     Text(dayString(day))
                         .font(KlavikaFont.regular.font(size: 14))

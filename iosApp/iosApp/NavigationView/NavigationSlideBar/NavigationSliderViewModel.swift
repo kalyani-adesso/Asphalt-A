@@ -29,41 +29,14 @@ struct MenuItemModel: Identifiable, Hashable {
 @MainActor
 final class NavigationSliderViewModel: ObservableObject {
    @Published var sections: [MenuItemModel] = []
-   private var createRideVM = CreateRideViewModel()
-    init()  {
-        // Load data immediately to avoid empty list delay
+   var createRideVM = CreateRideViewModel()
+    init() {
         loadData()
-        
-        // Then fetch active ride asynchronously to update destinations
-        Task {
-            await createRideVM.getActiveJoinedRide()
-            await MainActor.run {
-                // Update connected ride destination with fresh data
-                self.sections[0] = MenuItemModel(
-                    icon: AppIcon.NavigationSlider.connectedRide,
-                    iconColor: AppColor.black,
-                    title: AppStrings.NavigationSlider.connectedRide,
-                    destination: self.connectedRideDestination
-                )
-            }
-        }
     }
-    
+
+    /// Resolves active joined ride on push (see ConnectedRideSidebarDestinationView) so loader → map matches Home Join Ride.
     private var connectedRideDestination: AnyView {
-        if createRideVM.activeRide?.rideJoined == true,
-           let ride = createRideVM.activeRide {
-            return AnyView(
-                ConnectedRideView(
-                    notificationTitle: AppStrings.JoinRide.rideActive,
-                    title: AppStrings.ConnectedRide.startRideTitle,
-                    subTitle: AppStrings.ConnectedRide.startRideSubtitle,
-                    model: ride,
-                    rideCompleteModel: []
-                )
-            )
-        } else {
-            return AnyView(JoinRideView())
-        }
+        AnyView(ConnectedRideSidebarDestinationView())
     }
     
     private func loadData() {

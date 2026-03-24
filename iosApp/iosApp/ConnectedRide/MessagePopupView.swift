@@ -16,6 +16,7 @@ struct MessagePopupView: View {
     @FocusState private var isCustomFocused: Bool
     @Binding var showMessageNotification: Bool
     @Binding var riderName: String
+    @State private var keyboardHeight: CGFloat = 0
 
     private let quickMessages = [
         "All good!",
@@ -45,10 +46,36 @@ struct MessagePopupView: View {
                 ButtonsView
             }
             .padding()
-            .frame(width: 342)
-            .fixedSize(horizontal: false, vertical: true)
+            .frame(
+                width: 342,
+                height: UIScreen.main.bounds.height * 0.7 - keyboardHeight * 0.4
+            )
             .background(Color.white)
             .cornerRadius(22)
+            .offset(y: keyboardHeight > 0 ? -20 : 0)
+            .animation(.easeOut(duration: 0.25), value: keyboardHeight)
+            .onAppear {
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillShowNotification,
+                    object: nil,
+                    queue: .main
+                ) { notification in
+                    if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                        keyboardHeight = frame.height
+                    }
+                }
+
+                NotificationCenter.default.addObserver(
+                    forName: UIResponder.keyboardWillHideNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    keyboardHeight = 0
+                }
+            }
+            .onDisappear {
+                NotificationCenter.default.removeObserver(self)
+            }
         }
         .task {
             await viewModel.receiveMessage(rideId: viewModel.rider?.rideId ?? "")
@@ -86,39 +113,53 @@ struct MessagePopupView: View {
         ScrollView {
             VStack(spacing: 12) {
                 ForEach(viewModel.chatMessages) { msg in
-                    VStack(alignment: .leading, spacing: 8) {
+                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        
                         HStack(spacing: 12) {
                             AppImage.Profile.profile
                                 .resizable()
                                 .frame(width: 36, height: 36)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(msg.isCurrentUser ? AppColor.celticBlue : AppColor.green, lineWidth: 2))
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            msg.isCurrentUser ? AppColor.celticBlue : AppColor.green,
+                                            lineWidth: 2
+                                        )
+                                )
                             
-                            HStack(spacing: 2) {
+                           
                                 Text(msg.senderName)
                                     .font(KlavikaFont.bold.font(size: 16))
                                     .foregroundColor(AppColor.black)
-                                Spacer()
+                            Spacer()
                                 HStack(spacing: 4) {
                                     Image(systemName: "clock")
                                         .font(.system(size: 12))
                                         .foregroundColor(.gray)
+                                    
                                     Text(msg.timestamp)
                                         .font(KlavikaFont.regular.font(size: 12))
                                         .foregroundColor(.gray)
                                 }
-                            }
+                            
+                            
                             Spacer()
                         }
-                        
+
                         Text(msg.message)
                             .font(KlavikaFont.regular.font(size: 15))
                             .foregroundColor(AppColor.black)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(msg.isCurrentUser ? AppColor.lightBlue : AppColor.lightGreen)
-                            .cornerRadius(10)
                     }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        msg.isCurrentUser
+                        ? AppColor.lightBlue
+                        : AppColor.lightGreen
+                    )
+                    .cornerRadius(14)
                     .padding(.horizontal)
                 }
             }

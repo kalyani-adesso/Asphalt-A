@@ -61,7 +61,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun RideProgress(
     androidUserVM: AndroidUserVM = koinViewModel(),
-    viewmodel: JoinRideViewModel = koinViewModel(),
+    viewmodel: JoinRideViewModel,
     onClickEndRide: (RideSummaryData) -> Unit,
     ridesData: RidesData
 ) {
