@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import Combine
+import CoreLocation
 
 @available(iOS 17.0, *)
 struct ConnectedRideMapView: View {
@@ -25,6 +26,9 @@ struct ConnectedRideMapView: View {
     /// Saved when route is first fitted; used by refresh to restore original map view.
     @State private var initialMapRegion: MKCoordinateRegion?
     @State private var elapsedSeconds = 0
+    /// Odometer: sum of GPS segment distances while on the connected ride screen (travelled distance).
+    @State private var travelledDistanceMeters: Double = 0
+    @State private var lastOdometerLocation: CLLocation?
     @State private var selectedRiderName: String = ""
     @State private var selectedRiderDelayText: String = ""
     @State private var index: Int = 0
@@ -215,6 +219,9 @@ struct ConnectedRideMapView: View {
                                 updateSpeedAndTimer()
                             }
                         }
+                        .onChange(of: locationManager.lastLocation) { _, newLoc in
+                            accumulateTravelledDistance(newLoc)
+                        }
                         .onChange(of: showMessageNotification) { _, isShowing in
                             if isShowing {
                                 NotificationStore.shared.add(
@@ -311,6 +318,30 @@ struct ConnectedRideMapView: View {
         let minutes = (totalSeconds % 3600) / 60
         let seconds = totalSeconds % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    /// Distance shown on the ride-complete screen (GPS odometer, km).
+    private func formatTravelledDistanceKm() -> String {
+        String(format: "%.1f", travelledDistanceMeters / 1000.0)
+    }
+
+    /// Adds segment length between consecutive fixes; ignores jitter and single-point GPS spikes.
+    private func accumulateTravelledDistance(_ newLoc: CLLocation?) {
+        guard let newLoc else { return }
+        guard newLoc.horizontalAccuracy > 0, newLoc.horizontalAccuracy <= 80 else { return }
+        guard let prev = lastOdometerLocation else {
+            lastOdometerLocation = newLoc
+            return
+        }
+        guard prev.horizontalAccuracy > 0, prev.horizontalAccuracy <= 80 else {
+            lastOdometerLocation = newLoc
+            return
+        }
+        let delta = newLoc.distance(from: prev)
+        if delta >= 2, delta < 500 {
+            travelledDistanceMeters += delta
+        }
+        lastOdometerLocation = newLoc
     }
     
     func stopTimer() {
@@ -491,14 +522,22 @@ struct ConnectedRideMapView: View {
                 }
                 return
             }
-            sessionVM.endRideSummary(ride: rideModel, userID: MBUserDefaults.userIdStatic ?? "") { summarySaved in
+            sessionVM.endRideSummary(
+                ride: rideModel,
+                userID: MBUserDefaults.userIdStatic ?? "",
+                travelledDistanceKm: travelledDistanceMeters / 1000.0
+            ) { summarySaved in
                 DispatchQueue.main.async {
                     guard summarySaved else {
                         endRideErrorMessage = AppStrings.ConnectedRide.endRideSummaryFailed
                         isEndingRide = false
                         return
                     }
-                    viewModel.getRideCompleteDetails(duration: formatTime(elapsedSeconds), distance: rideModel.distance, riders: "\(viewModel.groupRiders.count + 1)")
+                    viewModel.getRideCompleteDetails(
+                        duration: formatTime(elapsedSeconds),
+                        distance: formatTravelledDistanceKm(),
+                        riders: "\(viewModel.groupRiders.count + 1)"
+                    )
                     MBUserDefaults.isRideJoinedID = nil
                     stopTimer()
                     NotificationStore.shared.add(

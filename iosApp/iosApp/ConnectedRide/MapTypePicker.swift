@@ -90,6 +90,12 @@ struct BikeRouteMapView: View {
                             .frame(width: 32, height: 32)
                             .clipShape(Circle())
                             .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    } else {
+                        Image(systemName: "flag.checkered.circle.fill")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, AppColor.celticBlue)
+                            .font(.system(size: 32))
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }
                 
@@ -99,6 +105,12 @@ struct BikeRouteMapView: View {
                         Image(uiImage: image)
                             .resizable()
                             .frame(width: 32, height: 32)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    } else {
+                        Image(systemName: "mappin.circle.fill")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, AppColor.red)
+                            .font(.system(size: 32))
                             .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
                     }
                 }

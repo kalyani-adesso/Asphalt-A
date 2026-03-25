@@ -32,7 +32,8 @@ struct ColoredRouteSegment: Identifiable {
 }
 
 enum ConnectedRideReroutePolicy {
-    static let offRouteMeters: Double = 85
+    /// Cross-track distance above this triggers reroute. Lower = more sensitive (10 m is aggressive; GPS jitter is often ~5–20 m).
+    static let offRouteMeters: Double = 10
     static let minSecondsBetweenReroutes: TimeInterval = 18
     static let bikeMapCheckSeconds: TimeInterval = 5
     static let navMinSecondsBetweenChecks: TimeInterval = 4

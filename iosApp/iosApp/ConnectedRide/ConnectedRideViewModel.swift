@@ -714,11 +714,11 @@ extension ConnectedRideViewModel {
         groupStatusTimer = nil
     }
     
-    func endRideSummary(ride: JoinRideModel, userID: String, completion: @escaping (Bool) -> Void) {
+    func endRideSummary(ride: JoinRideModel, userID: String, travelledDistanceKm: Double, completion: @escaping (Bool) -> Void) {
         let isParticipant = ride.participants?.contains { $0.userId == userID } ?? false
         let dto = DashboardDTO(
               rideID: ride.rideId,
-              rideDistance: KotlinDouble(value: Double(ride.distance.replacingOccurrences(of: " km", with: "")) ?? 0),
+              rideDistance: KotlinDouble(value: travelledDistanceKm),
               isGroupRide: KotlinBoolean(bool: (Int(ride.maxRiders) ?? 0) > 0),
               startLocation: ride.route.split(separator: "-").first?.trimmingCharacters(in: .whitespaces) ?? "",
               endLocation: ride.route.split(separator: "-").last?.trimmingCharacters(in: .whitespaces) ?? "",

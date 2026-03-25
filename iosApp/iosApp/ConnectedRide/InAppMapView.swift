@@ -49,22 +49,39 @@ struct InAppMapView: View {
             // Start pin
             if let start = startCoordinate {
                 Annotation("", coordinate: start) {
-                    if let ui = AppIcon.ConnectedRide.startLocation {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    Group {
+                        if let ui = AppIcon.ConnectedRide.startLocation {
+                            Image(uiImage: ui)
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        } else {
+                            // Asset `icon-startLocation` missing from catalog → UIImage is nil; show fallback until PDF is added to imageset.
+                            Image(systemName: "flag.checkered.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, AppColor.celticBlue)
+                                .font(.system(size: 32))
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        }
                     }
                 }
             }
             if let end = endCoordinate {
                 Annotation("", coordinate: end) {
-                    if let ui = AppIcon.ConnectedRide.endLocation {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    Group {
+                        if let ui = AppIcon.ConnectedRide.endLocation {
+                            Image(uiImage: ui)
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        } else {
+                            Image(systemName: "mappin.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, AppColor.red)
+                                .font(.system(size: 32))
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        }
                     }
                 }
             }

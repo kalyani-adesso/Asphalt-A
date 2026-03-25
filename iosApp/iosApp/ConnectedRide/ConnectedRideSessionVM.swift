@@ -27,8 +27,8 @@ final class ConnectedRideSessionVM {
         core.endRide(rideId: rideId, completion: completion)
     }
 
-    func endRideSummary(ride: JoinRideModel, userID: String, completion: @escaping (Bool) -> Void) {
-        core.endRideSummary(ride: ride, userID: userID, completion: completion)
+    func endRideSummary(ride: JoinRideModel, userID: String, travelledDistanceKm: Double, completion: @escaping (Bool) -> Void) {
+        core.endRideSummary(ride: ride, userID: userID, travelledDistanceKm: travelledDistanceKm, completion: completion)
     }
 
     func onLocationUpdate(lat: Double?, long: Double?, speed: Double?) {
