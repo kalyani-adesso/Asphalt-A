@@ -203,6 +203,8 @@ extension CreateRideViewModel {
     func getActiveJoinedRide() async {
         do {
             self.isRideLoading = true
+            // Reset stale state before recomputing active ride.
+            self.activeRide = nil
 
             let allRides = try await getAllRidesAsync()
             let currentUserId = MBUserDefaults.userIdStatic
@@ -228,7 +230,7 @@ extension CreateRideViewModel {
 
                 // Joined logic (creator OR participant)
                 let isJoined =
-                    participant?.inviteStatus == 3 ||
+                    (participant?.inviteStatus == 3 && ride.rideStatus == 3) ||
                     (isCreator && ride.rideStatus == 3)
 
                 guard isJoined else { continue }

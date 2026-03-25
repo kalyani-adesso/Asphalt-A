@@ -18,6 +18,18 @@ struct BottomNavBar: View {
     @State private var rideJoined : Bool = false
     @State var showHome : Bool = false
     @State private var pendingDeepLinkRideId: String? = nil
+
+    /// Refreshes `rideJoined` so tab switching (including tapping the current tab)
+    /// can't keep stale state after ending a ride.
+    private func refreshActiveRideState() {
+        Task {
+            await createRideVM.getActiveJoinedRide()
+            await MainActor.run {
+                self.rideJoined = createRideVM.activeRide?.rideJoined ?? false
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -155,12 +167,7 @@ struct BottomNavBar: View {
         }
         .onChange(of: selectedTab) { _, newTab in
             if newTab == 0 {
-                Task {
-                    await createRideVM.getActiveJoinedRide()
-                    await MainActor.run {
-                        rideJoined = createRideVM.activeRide?.rideJoined ?? false
-                    }
-                }
+                refreshActiveRideState()
             }
         }
     }
@@ -198,6 +205,11 @@ struct BottomNavBar: View {
         .onTapGesture {
             
             selectedTab = index
+            if index == 0 {
+                // If the user taps Home while already on Home, `onChange` won't fire.
+                // Force refresh here to avoid resurrecting ended rides.
+                refreshActiveRideState()
+            }
             
         }
     }
