@@ -3,6 +3,7 @@ package com.asphalt.dashboard.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.model.dashboard.DashboardDomain
+import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.dashboard.data.DashboardSummaryUI
 import com.asphalt.dashboard.data.RideStatDataUIModel
@@ -14,13 +15,21 @@ import com.asphalt.dashboard.mappers.toDashboardSummaryUI
 import com.asphalt.dashboard.mappers.toRideStatUiModel
 import java.util.Calendar
 
-class PerMonthRideStatsViewModel() : ViewModel() {
+class PerMonthRideStatsViewModel(val androidUserVM: AndroidUserVM) : ViewModel() {
     private val _perMonthStats =
         MutableStateFlow(getDefaultStats())
     val perMonthStats: StateFlow<List<RideStatDataUIModel>> = _perMonthStats
     private val _calendar = MutableStateFlow<Calendar>(Calendar.getInstance())
     val calendar: StateFlow<Calendar> = _calendar
     private var dashboardSummaryUI = emptyList<DashboardSummaryUI>()
+    private val currentUid: String
+        get() = androidUserVM.getCurrentUserUID()
+    private val accountCreationDateMillis: Long?
+        get() = androidUserVM.getUser(currentUid)?.accountCreationDate
+    val creationCalendar: Calendar
+        get() = Calendar.getInstance().apply {
+            timeInMillis = accountCreationDateMillis ?: 0
+        }
 
 
     fun getRideStatsByDate() {
