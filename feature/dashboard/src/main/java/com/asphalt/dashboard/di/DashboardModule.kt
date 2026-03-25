@@ -12,7 +12,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val dashboardModule = module {
-    viewModel { PerMonthRideStatsViewModel() }
+    viewModel { PerMonthRideStatsViewModel(get()) }
     viewModel { DashboardRideInviteViewModel(get(), get()) }
     viewModel { AdventureJourneyViewModel() }
     viewModel { PlacesVisitedGraphViewModel(get()) }

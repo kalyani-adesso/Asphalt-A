@@ -65,6 +65,16 @@ object Utils {
         return (givenYear < currentYear) ||
                 (givenYear == currentYear && givenMonth < currentMonth)
     }
+    fun Calendar.isBeforeMonthAndYear(otherCalendar: Calendar): Boolean {
+        val thisYear = this.get(Calendar.YEAR)
+        val thisMonth = this.get(Calendar.MONTH)
+
+        val otherYear = otherCalendar.get(Calendar.YEAR)
+        val otherMonth = otherCalendar.get(Calendar.MONTH)
+
+        return (thisYear < otherYear) ||
+                (thisYear == otherYear && thisMonth < otherMonth)
+    }
 
     fun formatDateWithFormatter(format: String, date: Date?): String? {
         val formatter =
