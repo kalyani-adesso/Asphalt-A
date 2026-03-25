@@ -380,6 +380,31 @@ extension ConnectedRideViewModel {
             }
         })
     }
+
+    /// Mirrors `JoinRideViewModel.endActiveRide()` logic for the connected-ride end flow.
+    /// - Organizer: set `rideStatus = 4` on the ride.
+    /// - Participant: set their `inviteStatus = 4` on the ride participants node.
+    func endActiveRide(rideId: String, rideCreatedBy: String, completion: ((Bool) -> Void)? = nil) {
+        let uid = MBUserDefaults.userIdStatic ?? ""
+        guard !uid.isEmpty else {
+            completion?(false)
+            return
+        }
+
+        if rideCreatedBy == uid {
+            rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { _, error in
+                completion?(error == nil)
+            })
+        } else {
+            rideRepository.changeRideInviteStatus(
+                rideID: rideId,
+                currentUid: uid,
+                inviteStatus: 4
+            ) { _, error in
+                completion?(error == nil)
+            }
+        }
+    }
     
     @MainActor
     func getOnGoingRides(rideId: String) async {

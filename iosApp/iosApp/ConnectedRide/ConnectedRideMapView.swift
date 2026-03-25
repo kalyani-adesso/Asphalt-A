@@ -539,12 +539,10 @@ struct ConnectedRideMapView: View {
                         riders: "\(viewModel.groupRiders.count + 1)"
                     )
 
-                    // IMPORTANT: `createRideVM.getActiveJoinedRide()` checks `RIDES_URL.rideStatus`.
-                    // Our `endRide` call only deletes from `ONGOING_RIDE_URL`, so we must also update
-                    // the ride status to "ended" in the main rides table (rideStatus = 4).
-                    if rideModel.userId == MBUserDefaults.userIdStatic {
-                        viewModel.updateOrganizerStatus(rideId: rideModel.rideId)
-                    }
+                    // IMPORTANT: `getActiveJoinedRide()` checks the main ride node (`RIDES_URL`).
+                    // `endRide()` only deletes ongoing tracking (`ONGOING_RIDE_URL`), so also mark
+                    // the ride ended for organizer / participant here (same as `endActiveRide()` logic).
+                    viewModel.endActiveRide(rideId: rideModel.rideId, rideCreatedBy: rideModel.userId)
 
                     MBUserDefaults.isRideJoinedID = nil
                     stopTimer()
