@@ -12,9 +12,15 @@ import shared
 class LoginViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showToast: Bool = false
+    @Published var isLoggingIn: Bool = false
     func didTapLogin(email: String, password: String, completion: @escaping ()->(), errorCompletion: @escaping ()->()) {
+        guard !isLoggingIn else { return }
         if isValidEmailAndPassword(email:email, password:password) {
+            isLoggingIn = true
             AuthenticatorImpl().signIn(email: email, password: password, completionHandler: { result,error in
+                DispatchQueue.main.async {
+                    self.isLoggingIn = false
+                }
                 if let result = result {
                     if let uid = result.uid {
                         // Save user ID on successful login

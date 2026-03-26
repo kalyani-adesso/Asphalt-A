@@ -92,28 +92,22 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
             
             DispatchQueue.main.async {
                 let placeName = item.name ?? completion.title
+                let coord = item.placemark.coordinate
                 
                 if isStart {
                     self.ride.startLocation = placeName
-                    self.ride.startLat = item.placemark.coordinate.latitude
-                    self.ride.startLng = item.placemark.coordinate.longitude
-                }
-                else if isAssembly {
+                    self.ride.startLat = coord.latitude
+                    self.ride.startLng = coord.longitude
+                } else if isAssembly {
                     self.ride.assemblyPoint = placeName
-                    self.ride.assemblyLat = item.placemark.coordinate.latitude
-                    self.ride.assemblyLon = item.placemark.coordinate.longitude
-                }
-                else if isDestination {
+                    self.ride.assemblyLat = coord.latitude
+                    self.ride.assemblyLon = coord.longitude
+                    self.ride.hasAssemblyPoint = true
+                } else if isDestination {
                     self.ride.endLocation = placeName
-                    self.ride.endLat = item.placemark.coordinate.latitude
-                    self.ride.endLng = item.placemark.coordinate.longitude
+                    self.ride.endLat = coord.latitude
+                    self.ride.endLng = coord.longitude
                 }
-                
-                if let coordinate = item.placemark.coordinate as CLLocationCoordinate2D? {
-                    print("Selected place coordinate: \(coordinate.latitude), \(coordinate.longitude)")
-                }
-                
-                print("Selected place: \(placeName)")
             }
         }
     }
@@ -129,10 +123,21 @@ extension CreateRideViewModel: MKLocalSearchCompleterDelegate {
     }
     
     func getDistance() {
-        if let startLat = self.ride.startLat,
-           let startLng = self.ride.startLng,
-           let endLat = self.ride.endLat,
-           let endLng = self.ride.endLng {
+        let endLat = self.ride.endLat
+        let endLng = self.ride.endLng
+        let routeStartLat: Double?
+        let routeStartLng: Double?
+        if ride.hasAssemblyPoint == true, let aLat = ride.assemblyLat, let aLon = ride.assemblyLon {
+            routeStartLat = aLat
+            routeStartLng = aLon
+        } else {
+            routeStartLat = ride.startLat
+            routeStartLng = ride.startLng
+        }
+        if let startLat = routeStartLat,
+           let startLng = routeStartLng,
+           let endLat,
+           let endLng {
             
             let startPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: startLat, longitude: startLng))
             let endPlacemark = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: endLat, longitude: endLng))
@@ -198,6 +203,8 @@ extension CreateRideViewModel {
     func getActiveJoinedRide() async {
         do {
             self.isRideLoading = true
+            // Reset stale state before recomputing active ride.
+            self.activeRide = nil
 
             let allRides = try await getAllRidesAsync()
             let currentUserId = MBUserDefaults.userIdStatic
@@ -223,7 +230,7 @@ extension CreateRideViewModel {
 
                 // Joined logic (creator OR participant)
                 let isJoined =
-                    participant?.inviteStatus == 3 ||
+                    (participant?.inviteStatus == 3 && ride.rideStatus == 3) ||
                     (isCreator && ride.rideStatus == 3)
 
                 guard isJoined else { continue }
@@ -380,8 +387,7 @@ extension CreateRideViewModel {
     
     // MARK: - Details View validation
     var isDetailsValid: Bool {
-        guard let type = ride.type,
-              !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
+        guard !ride.title.trimmingCharacters(in: .whitespaces).isEmpty,
               !ride.description.trimmingCharacters(in: .whitespaces).isEmpty,
               selectedStartDate != nil,
               selectedStartTime != nil,

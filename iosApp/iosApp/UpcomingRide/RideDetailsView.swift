@@ -14,7 +14,7 @@ struct RideDetailsView: View {
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
     var body: some View {
-        AppToolBar{
+        AppToolBar(showBack: false){
         ZStack {
                 ScrollView {
                     VStack(spacing: 20) {

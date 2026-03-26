@@ -141,7 +141,7 @@ class UpcomingRideViewModel: ObservableObject {
                 if !isPastRide && !isUpcomingOrInvite { return nil }
                 
                 // Participants
-                let participants = ride.participants ?? []
+                let participants = ride.participants
                 let participantCount = participants.filter { $0.userId != ride.createdBy }.count
                 let participantAcceptedCount = participants.filter { [1,3].contains($0.inviteStatus) }.count
                 let myInviteStatus = participants.first(where: { $0.userId == currentUserID })?.inviteStatus
@@ -151,7 +151,7 @@ class UpcomingRideViewModel: ObservableObject {
                 var rideStatus: RideStatus
                 var rideViewAction: RideViewAction
                 
-                let imageCount = Int(truncating: (ride.imageCount ?? 0) as NSNumber)
+                let imageCount = Int(ride.imageCount ?? 0)
                 let hasPhotos = imageCount > 0
                 
                 if ride.createdBy == currentUserID {
@@ -201,7 +201,7 @@ class UpcomingRideViewModel: ObservableObject {
                 let endTime = Self.timeFormatter.string(from: endDate)
                 
                 // Ratings for current user
-                let myRating: Int? = (ride.ratings as? [RatingsData])?.first(where: { $0.userId == currentUserID }).map { Int($0.stars) }
+                let myRating: Int? = ride.ratings.first(where: { $0.userId == currentUserID }).map { Int($0.stars) }
                 
                 return RideModel(
                     id: ride.ridesID ?? UUID().uuidString,
@@ -365,17 +365,22 @@ class UpcomingRideViewModel: ObservableObject {
     @MainActor
     func getSingleRide(rideId: String) async {
         self.isRideLoading = true
-
-        rideRepository.getSingeRide(rideID: rideId) { result, error in
-
-            guard
-                let success = result as? APIResultSuccess<AnyObject>,
-                let ride = success.data as? RidesData,
-                let startEpoch = ride.startDate
-            else {
-                self.isRideLoading = false
-                return
+        let ride: RidesData? = await withCheckedContinuation { continuation in
+            rideRepository.getSingeRide(rideID: rideId) { result, _ in
+                guard
+                    let success = result as? APIResultSuccess<AnyObject>,
+                    let ride = success.data as? RidesData
+                else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                continuation.resume(returning: ride)
             }
+        }
+        guard let ride, let startEpoch = ride.startDate else {
+            self.isRideLoading = false
+            return
+        }
 
             let currentUserId = MBUserDefaults.userIdStatic ?? ""
             let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
@@ -481,7 +486,6 @@ class UpcomingRideViewModel: ObservableObject {
                     self.isRideLoading = false
                 }
             }
-        }
     }
     
     /// Call after getSingleRide to set rideFromDeepLink for navigation (e.g. from deep link).
@@ -600,7 +604,7 @@ extension UpcomingRideViewModel {
                     continuation.resume(throwing: error)
                 } else {
                     Task { @MainActor in
-                        try? await  self.rideRepository.updateImageCount(count: -1,rideId: rideId)
+                        self.rideRepository.updateImageCount(count: -1, rideId: rideId)
                         print("Photo deleted successfully")
                         continuation.resume()
                     }

@@ -52,6 +52,8 @@ struct SignInView: View {
                         MBUserDefaults.rememberMeDataStatic = false
                     })
                 })
+                .disabled(viewModel.isLoggingIn)
+                .opacity(viewModel.isLoggingIn ? 0.7 : 1.0)
                 .padding(.bottom,20)
                 socialSignInOptions
                 signUpLink()
@@ -72,6 +74,16 @@ struct SignInView: View {
                 // Clear form fields on view appear
                 emailOrPhone = ""
                 password = ""
+            }
+            .overlay {
+                if viewModel.isLoggingIn {
+                    ZStack {
+                        Color.black.opacity(0.2).ignoresSafeArea()
+                        ProgressView()
+                            .scaleEffect(1.2)
+                            .tint(AppColor.celticBlue)
+                    }
+                }
             }
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
         }

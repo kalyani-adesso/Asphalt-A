@@ -33,7 +33,7 @@ struct PasswordFormField: View {
                     (isPasswordEntering ? AppIcon.Login.passwordEncrypt : AppIcon.Login.password)
                         .frame(width: 20, height: 20)
                     SecureField(AppStrings.SignInPlaceholder.password.rawValue, text: $password)
-                        .onChange(of: password) { value in
+                        .onChange(of: password) { _, value in
                             isPasswordEntering = !value.isEmpty
                         }
                         .font(KlavikaFont.regular.font(size: 16))

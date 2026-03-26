@@ -192,8 +192,7 @@ extension ProfileViewModel {
                             self.drivingLicenseNumber = domain.drivingLicense
                             let emergency = (domain.emergencyContact).trimmingCharacters(in: .whitespaces)
                             MBUserDefaults.emergencyContactStatic = emergency.isEmpty ? nil : emergency
-                            if let domainImage = domain.profilePicUrl as? String,
-                             let base64Image = self.decodeBase64ToImage(base64: domainImage) {
+                            if let base64Image = self.decodeBase64ToImage(base64: domain.profilePicUrl) {
                               self.profileImage = Image(uiImage: base64Image)
                           }
                             self.isLoading = false
@@ -336,12 +335,7 @@ extension ProfileViewModel {
                 let isCreator = (ride.createdBy ?? "") == currentUserID
                 let isParticipant = ride.participants.contains { ($0.userId ?? "") == currentUserID }
                 
-                let statusValue: Int = {
-                    if let n = ride.rideStatus as? NSNumber { return n.intValue }
-                    if let i = ride.rideStatus as? Int { return i }
-                    if let i32 = ride.rideStatus as? Int32 { return Int(i32) }
-                    return 0
-                }()
+                let statusValue = Int(ride.rideStatus)
                 
                 guard statusValue == 4, isCreator || isParticipant else { continue }
                 

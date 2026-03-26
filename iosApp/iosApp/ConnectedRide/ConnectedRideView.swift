@@ -58,9 +58,7 @@ struct ConnectedRideView: View {
                 ConnectedRideCompleteView(viewModel: model, homeViewModel: homeViewModel, upcomingRideViewModel: upcomingViewModel, rideCompleteModel: rideCompleteModel)
                 
             } else {
-                if #available(iOS 17.0, *) {
-                    ConnectedRideMapView(rideModel: model)
-                }
+                ConnectedRideMapView(rideModel: model)
             }
         })
         .onAppear {

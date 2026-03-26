@@ -11,13 +11,11 @@ import UIKit
 
 struct ConnectedRideCompleteView: View {
     var viewModel: JoinRideModel
-    @EnvironmentObject var connectedRideViewModel: ConnectedRideViewModel
     @ObservedObject var homeViewModel: HomeViewModel
     @ObservedObject var upcomingRideViewModel: UpcomingRideViewModel
     @State var rating: Int = 0
     @State var showHome: Bool = false
     @State var showPopup: Bool = false
-    @State var showMapView:Bool = false
     let rideCompleteModel:[RideCompleteModel]
     var body: some View {
         ZStack{
@@ -55,11 +53,6 @@ struct ConnectedRideCompleteView: View {
                 })
             })
         }
-        .navigationDestination(isPresented: $showMapView, destination: {
-            if #available(iOS 17.0, *) {
-                ConnectedRideMapView(rideModel: viewModel)
-            }
-        })
         .onAppear {
             // Show rating sheet after 2 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -133,16 +126,16 @@ struct ConnectedRideCompleteView: View {
     private func shareRideDetails() {
         // replicate what the user sees on screen
         var details = "\(viewModel.title)\n" // large title
-        details += "Ride successfully completed!\n\n" // subtitle seen in UI
+        details += "\(AppStrings.ConnectedRide.rideCompleted)\n\n" // subtitle seen in UI
 
-        details += "Ride Summary:\n"
+        details += "\(AppStrings.ConnectedRide.rideSummaryTitle):\n"
         for item in rideCompleteModel {
             details += "- \(item.label): \(item.value)\n"
         }
         details += "\n"
 
         if !viewModel.contactNumber.isEmpty {
-            details += "Organizer: \(viewModel.organizer) (\(viewModel.contactNumber))\n"
+            details += "\(AppStrings.ConnectedRide.organizerPrefix): \(viewModel.organizer) (\(viewModel.contactNumber))\n"
         }
 
         let encoded = details.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""

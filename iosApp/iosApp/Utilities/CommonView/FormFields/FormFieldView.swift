@@ -30,8 +30,8 @@ struct FormFieldView: View {
                         .frame(width: 20, height: 20)
                 }
                 TextField(placeholder, text: $value)
-                    .onChange(of: value) { value in
-                        isValidEmail = value.isValidEmail
+                    .onChange(of: value) { _, newValue in
+                        isValidEmail = newValue.isValidEmail
                     }
                     .font(KlavikaFont.regular.font(size: 16))
                     .autocapitalization(.none)

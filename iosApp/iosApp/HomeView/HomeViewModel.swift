@@ -111,12 +111,9 @@ class HomeViewModel: ObservableObject {
         let rides = selectedDash.perMonthData
         
         let totalRides = rides.count
-        let rawDistance = rides.reduce(0) { $0 + Int($1.rideDistance ?? 0) }
+        let rawDistance = rides.reduce(0) { $0 + Int(truncating: $1.rideDistance ?? 0) }
         let totalDistance = formatDistance(rawDistance)
         let locations = Set(rides.map { $0.endLocation ?? "" }).count
-        let organiser = rides.filter { $0.isOrganiserGroupRide == true }.count
-        let participant = rides.filter { $0.isParticipantGroupRide == true }.count
-        
         // MARK: - Dashboard Stat Cards
         self.stats = [
             RideStat(title: "Total Rides", value: "\(totalRides)", icon: AppIcon.Home.createRide),
@@ -231,11 +228,6 @@ class HomeViewModel: ObservableObject {
                 )
             )
         }
-        let sorted = result.sorted {
-            if $0.year == $1.year { return $0.monthIndex < $1.monthIndex }
-            return $0.year < $1.year
-        }
-        
         // Sort chronologically
         self.placesByMonth = result.sorted {
             if $0.year == $1.year {
