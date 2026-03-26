@@ -132,9 +132,7 @@ struct EditProfileFieldView: View {
                 .foregroundStyle(AppColor.black)
             HStack {
                 TextField(placeholder, text: $inputText)
-                    .onChange(of: inputText) { value in
-                        
-                    }
+                    .onChange(of: inputText) { _, _ in }
                     .font(KlavikaFont.regular.font(size: 16))
                     .autocapitalization(.none)
                     .foregroundStyle(AppColor.richBlack)

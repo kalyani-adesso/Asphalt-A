@@ -15,6 +15,7 @@ import MapKit
 @available(iOS 17.0, *)
 struct InAppMapView: View {
     var routeCoordinates: [CLLocationCoordinate2D]
+    var trafficSegments: [ColoredRouteSegment] = []
     var startCoordinate: CLLocationCoordinate2D?
     var endCoordinate: CLLocationCoordinate2D?
     var userCoordinate: CLLocationCoordinate2D?
@@ -34,29 +35,53 @@ struct InAppMapView: View {
 
     var body: some View {
         Map(position: $position) {
-            if !routeCoordinates.isEmpty {
+            if !trafficSegments.isEmpty {
+                ForEach(trafficSegments) { segment in
+                    if segment.coordinates.count >= 2 {
+                        MapPolyline(coordinates: segment.coordinates)
+                            .stroke(segment.density.color, lineWidth: 6)
+                    }
+                }
+            } else if !routeCoordinates.isEmpty {
                 MapPolyline(coordinates: routeCoordinates)
                     .stroke(AppColor.celticBlue, lineWidth: 6)
             }
             // Start pin
             if let start = startCoordinate {
                 Annotation("", coordinate: start) {
-                    if let ui = AppIcon.ConnectedRide.startLocation {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    Group {
+                        if let ui = AppIcon.ConnectedRide.startLocation {
+                            Image(uiImage: ui)
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        } else {
+                            // Asset `icon-startLocation` missing from catalog → UIImage is nil; show fallback until PDF is added to imageset.
+                            Image(systemName: "flag.checkered.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, AppColor.celticBlue)
+                                .font(.system(size: 32))
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        }
                     }
                 }
             }
             if let end = endCoordinate {
                 Annotation("", coordinate: end) {
-                    if let ui = AppIcon.ConnectedRide.endLocation {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                    Group {
+                        if let ui = AppIcon.ConnectedRide.endLocation {
+                            Image(uiImage: ui)
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        } else {
+                            Image(systemName: "mappin.circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white, AppColor.red)
+                                .font(.system(size: 32))
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        }
                     }
                 }
             }
@@ -90,12 +115,12 @@ struct InAppMapView: View {
                 Annotation("", coordinate: user) {
                     ZStack {
                         Circle()
-                            .fill(AppColor.celticBlue.opacity(0.2))
-                            .frame(width: 44, height: 44)
-                        Circle()
                             .fill(AppColor.celticBlue)
-                            .frame(width: 16, height: 16)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                            .frame(width: 34, height: 34)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                        Image(systemName: "location.north.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.white)
                     }
                     .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
                 }
@@ -106,21 +131,21 @@ struct InAppMapView: View {
             MapCompass()
             MapScaleView()
         }
-        .onChange(of: routeCoordinates.count) { _ in
+        .onChange(of: routeCoordinates.count) { _, _ in
             if !routeCoordinates.isEmpty && !hasFittedRoute {
                 fitMapToRoute()
                 hasFittedRoute = true
             }
         }
-        .onChange(of: fitRouteCounter) { _ in
+        .onChange(of: fitRouteCounter) { _, _ in
             guard !routeCoordinates.isEmpty else { return }
             fitMapToRoute()
             hasFittedRoute = true
         }
-        .onChange(of: recenterCounter) { _ in
+        .onChange(of: recenterCounter) { _, _ in
             recenter()
         }
-        .onChange(of: focusCounter) { _ in
+        .onChange(of: focusCounter) { _, _ in
             if let coord = focusCoordinate {
                 position = .camera(MapCamera(
                     centerCoordinate: coord,

@@ -239,7 +239,7 @@ final class ConnectedRideViewModel: ObservableObject {
 
     /// Notifies RSA (e.g. backend / roadside assistance) of emergency SOS. Override or implement when API is available.
     func callRSAForEmergencySOS() {
-        guard let ride = activeRide else { return }
+        guard activeRide != nil else { return }
         // TODO: Call RSA API when available, e.g. rideRepository.reportEmergencySOS(rideId: ride.rideId, userId: MBUserDefaults.userIdStatic ?? "", contactNumber: ride.contactNumber) { _, _ in }
     }
     
@@ -380,19 +380,43 @@ extension ConnectedRideViewModel {
             }
         })
     }
+
+    /// Mirrors `JoinRideViewModel.endActiveRide()` logic for the connected-ride end flow.
+    /// - Organizer: set `rideStatus = 4` on the ride.
+    /// - Participant: set their `inviteStatus = 4` on the ride participants node.
+    func endActiveRide(rideId: String, rideCreatedBy: String, completion: ((Bool) -> Void)? = nil) {
+        let uid = MBUserDefaults.userIdStatic ?? ""
+        guard !uid.isEmpty else {
+            completion?(false)
+            return
+        }
+
+        if rideCreatedBy == uid {
+            rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: 4, completionHandler: { _, error in
+                completion?(error == nil)
+            })
+        } else {
+            rideRepository.changeRideInviteStatus(
+                rideID: rideId,
+                currentUid: uid,
+                inviteStatus: 4
+            ) { _, error in
+                completion?(error == nil)
+            }
+        }
+    }
     
     @MainActor
     func getOnGoingRides(rideId: String) async {
         do {
             let flow = try await ConnectedRideImpl().getOngoingRides(rideId: rideId)
 
-            try await flow.collect(
+            flow.collect(
                 collector: ConnectedRideCollector(
                     onValue: { ongoingRides in
                         Task {
                             var ridersDict: [String: Rider] = [:]
                             let now = Date().timeIntervalSince1970
-                            var newLastMessageReceivedTime = now
                             var newLastMovementTime = self.lastMovementTime
                             var newLastLocations = self.lastLocations
                             var newActiveRider = self.activeRider
@@ -468,7 +492,6 @@ extension ConnectedRideViewModel {
 
                             let updatedRiders = Array(ridersDict.values)
                             DispatchQueue.main.async {
-                                self.lastMessageReceivedTime = newLastMessageReceivedTime
                                 self.lastMovementTime = newLastMovementTime
                                 self.lastLocations = newLastLocations
                                 self.activeRider = newActiveRider
@@ -531,6 +554,13 @@ extension ConnectedRideViewModel {
 
     func showPopup(title: String) {
         self.popupTitle = title
+        Task { @MainActor in
+            NotificationStore.shared.add(
+                title: AppStrings.NavigationSlider.connectedRide,
+                message: title,
+                type: .rideUpdate
+            )
+        }
         self.showPopup = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showPopup = false
@@ -556,7 +586,7 @@ extension ConnectedRideViewModel {
     }
     
     func rateYourRide(ratings:Int,comments:String) {
-        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { [self] result, error in
+        rideRepository.rateYourRide(rideId: ongoingRideId, userId: MBUserDefaults.userIdStatic ?? "", stars: Int32(ratings), comments: comments) { result, error in
             if let error = error {
                 print("Error while rating your ride \(error)")
             } else {
@@ -645,14 +675,7 @@ extension ConnectedRideViewModel {
 
     /// Connected/Delayed/Stopped for another rider from their last update time (same thresholds as getRideStatus).
     func riderStatusFromOngoing(_ ongoing: ConnectedRideDTO) -> RiderStatus {
-        let epochMillis: Int64
-        if let num = ongoing.dateTime as? NSNumber {
-            epochMillis = num.int64Value
-        } else if let val = ongoing.dateTime as? Int64 {
-            epochMillis = val
-        } else {
-            epochMillis = 0
-        }
+        let epochMillis: Int64 = ongoing.dateTime
         if epochMillis <= 0 {
             return RiderStatus.fromBackend(ongoing.status)
         }
@@ -662,10 +685,7 @@ extension ConnectedRideViewModel {
     /// Extracts epoch millis from ConnectedRideDTO.dateTime for formatTime / status.
     /// If value is in 1e9..<1e10 range, treats as seconds; else treats as milliseconds.
     private func epochMillisFromOngoing(_ ongoing: ConnectedRideDTO) -> Int64 {
-        let raw: Int64
-        if let num = ongoing.dateTime as? NSNumber { raw = num.int64Value }
-        else if let val = ongoing.dateTime as? Int64 { raw = val }
-        else { return 0 }
+        let raw: Int64 = ongoing.dateTime
         if raw <= 0 { return 0 }
         if raw >= 1_000_000_000 && raw < 10_000_000_000 { return raw * 1000 }
         return raw
@@ -719,11 +739,11 @@ extension ConnectedRideViewModel {
         groupStatusTimer = nil
     }
     
-    func endRideSummary(ride: JoinRideModel, userID: String, completion: @escaping () -> Void) {
+    func endRideSummary(ride: JoinRideModel, userID: String, travelledDistanceKm: Double, completion: @escaping (Bool) -> Void) {
         let isParticipant = ride.participants?.contains { $0.userId == userID } ?? false
         let dto = DashboardDTO(
               rideID: ride.rideId,
-              rideDistance: KotlinDouble(value: Double(ride.distance.replacingOccurrences(of: " km", with: "")) ?? 0),
+              rideDistance: KotlinDouble(value: travelledDistanceKm),
               isGroupRide: KotlinBoolean(bool: (Int(ride.maxRiders) ?? 0) > 0),
               startLocation: ride.route.split(separator: "-").first?.trimmingCharacters(in: .whitespaces) ?? "",
               endLocation: ride.route.split(separator: "-").last?.trimmingCharacters(in: .whitespaces) ?? "",
@@ -734,8 +754,10 @@ extension ConnectedRideViewModel {
         rideRepository.endRideSummary(userID: userID, endRide: dto) { result, error in
             if let error = error {
                 print("Error endRideSummary:", error.localizedDescription)
+                completion(false)
+                return
             }
-            completion()
+            completion(true)
         }
     }
     
@@ -775,6 +797,13 @@ extension ConnectedRideViewModel {
                             if let latest = mapped.last, latest.id != self.lastMessageId {
                                 self.lastMessageId = latest.id
                                 self.latestIncomingSenderName = latest.senderName
+                                Task { @MainActor in
+                                    NotificationStore.shared.add(
+                                        title: AppStrings.NavigationSlider.message,
+                                        message: "\(latest.senderName): \(latest.message)",
+                                        type: .message
+                                    )
+                                }
                                 
                                 if !self.chatMessages.isEmpty {
                                     self.showRecieveMessagePopup = true
@@ -811,7 +840,17 @@ class ConnectedRideCollector: Kotlinx_coroutines_coreFlowCollector {
             onValue(rides)
             completionHandler(nil)
         } else if let apiError = value as? APIResultError {
-            onError(apiError.exception as! any Error)
+            if let swiftError = apiError.exception as? Error {
+                onError(swiftError)
+            } else {
+                onError(
+                    NSError(
+                        domain: "APIResultError",
+                        code: 0,
+                        userInfo: [NSLocalizedDescriptionKey: "\(apiError.exception)"]
+                    )
+                )
+            }
             completionHandler(nil)
         } else {
             onError(NSError(domain: "UnknownResult", code: 0, userInfo: nil))
@@ -835,7 +874,17 @@ class ReceiveMessageCollector: Kotlinx_coroutines_coreFlowCollector {
             onValue(messages)
             completionHandler(nil)
         } else if let apiError = value as? APIResultError {
-            onError(apiError.exception as! any Error)
+            if let swiftError = apiError.exception as? Error {
+                onError(swiftError)
+            } else {
+                onError(
+                    NSError(
+                        domain: "APIResultError",
+                        code: 0,
+                        userInfo: [NSLocalizedDescriptionKey: "\(apiError.exception)"]
+                    )
+                )
+            }
             completionHandler(nil)
         } else {
             onError(NSError(domain: "UnknownResult", code: 0, userInfo: nil))

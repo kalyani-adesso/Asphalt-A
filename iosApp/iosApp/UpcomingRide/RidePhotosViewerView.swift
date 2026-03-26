@@ -195,7 +195,7 @@ struct RidePhotosViewerView: View {
                     
                     self.ridePhotos = validPhotos
                 }
-                else if let failure = result as? APIResultError {
+                else if result is APIResultError {
                     print("Error fetching images:")
                 }
                 

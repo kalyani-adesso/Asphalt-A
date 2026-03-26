@@ -59,6 +59,7 @@ final class JoinRideViewModel: ObservableObject {
     private var userRepository: UserRepository
     private var currentUserId = MBUserDefaults.userIdStatic ?? ""
     @Published var isRideLoading = false
+    @Published var joinRideError: String?
     @Published var totalRides:Int = 0
     @Published var tappedIndex: Int?
     @Published var searchQuery: String = "" {
@@ -91,6 +92,7 @@ extension JoinRideViewModel {
         do {
             self.isRideLoading = true
             let rideArray = try await getAllRidesAsync()
+            let usersById = await getAllUsersMap()
             let todayStart = Calendar.current.startOfDay(for: Date())
             let filteredRideArray = rideArray.filter { ride in
                 guard let startEpoch = ride.startDate else { return false }
@@ -118,8 +120,8 @@ extension JoinRideViewModel {
                 let dateString = self.formatDate(startDate)
                 let participants = ride.participants
                 
-                // Fetch user name asynchronously
-                let userName = await self.getAllUsers(createdBy: ride.createdBy ?? "")
+                // Use a pre-fetched user lookup map to avoid N+1 user requests.
+                let userName = usersById[ride.createdBy ?? ""]
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 self.totalRides = filteredRideArray.count
                 
@@ -127,10 +129,7 @@ extension JoinRideViewModel {
                 let userInviteStatus = ride.participants.first { $0.userId == currentUserId }?.inviteStatus
                 let isCreator = ride.createdBy == currentUserId
                 let rideJoinedStatus = (userInviteStatus == 3) || (ride.rideStatus == 3 && isCreator)
-                guard
-                    let startEpoch = ride.startDate,
-                    let endEpoch = ride.endDate
-                else { continue }
+                guard let endEpoch = ride.endDate else { continue }
 
                 let endDate = Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000)
                 
@@ -187,6 +186,24 @@ extension JoinRideViewModel {
         } catch {
             self.isRideLoading = false
             print("Failed to fetch rides: \(error.localizedDescription)")
+        }
+    }
+
+    private func getAllUsersMap() async -> [String: (String, String)] {
+        await withCheckedContinuation { continuation in
+            userRepository.getAllUsers { result, _ in
+                guard
+                    let success = result as? APIResultSuccess<AnyObject>,
+                    let domainList = success.data as? [UserDomain]
+                else {
+                    continuation.resume(returning: [:])
+                    return
+                }
+                let mapped = Dictionary(uniqueKeysWithValues: domainList.map {
+                    ($0.uid, ($0.name, $0.contactNumber))
+                })
+                continuation.resume(returning: mapped)
+            }
         }
     }
     private func getAllRidesAsync() async throws -> [RidesData] {
@@ -256,39 +273,37 @@ extension JoinRideViewModel {
         }
     }
     // MARK: - Join Flow
-    /// Handles the join ride flow with non-blocking navigation
+    /// Handles the join ride flow with confirmation-based navigation.
     /// - Parameter ride: The ride model to join
     /// - Returns: The ride model to trigger navigation
     /// - Note: Join API call happens in background without blocking UI navigation
     /// This was optimized to prevent slowness when tapping join ride button
     func handleJoin(for ride: JoinRideModel) async -> JoinRideModel? {
         if ride.rideJoined { return ride }
-        
-        // Check for active ride in background without blocking navigation
-        // Fixed: Previously this was an await call that blocked navigation
-        Task.detached { [weak self] in
-            if let _ = await self?.getUserActiveRide() {
-              
-            }
+
+        isRideLoading = true
+        defer { isRideLoading = false }
+
+        let success = await joinRide(ride)
+        if success {
+            NotificationStore.shared.add(
+                title: AppStrings.Notification.newRiderJoined.localized,
+                message: "\(MBUserDefaults.userNameStatic ?? AppStrings.ConnectedRide.riderFallbackName) joined \"\(ride.title)\"",
+                type: .newRiderJoined
+            )
+            return ride
         }
-        
-        // Send join request in background without waiting
-        // This ensures the API call doesn't block the navigation to ConnectedRideView
-        Task.detached { [weak self] in
-            await self?.joinRide(ride)
-        }
-        
-        // Return immediately for fast navigation
-        return ride
+        joinRideError = AppStrings.JoinRide.joinRideFailed
+        return nil
     }
     
-    func joinRide(_ ride: JoinRideModel) async {
+    func joinRide(_ ride: JoinRideModel) async -> Bool {
         let uid = currentUserId
         
         if ride.userId == uid {
-            updateOrganizerStatus(rideId: ride.rideId, rideStatus: 3)
+            return await updateOrganizerStatusAsync(rideId: ride.rideId, rideStatus: 3)
         } else {
-            changeRideInviteStatus(rideId: ride.rideId, userId: uid, inviteStatus: 3)
+            return await changeRideInviteStatusAsync(rideId: ride.rideId, userId: uid, inviteStatus: 3)
         }
     }
     
@@ -358,5 +373,25 @@ extension JoinRideViewModel {
                 print("Successfully updated ride status")
             }
         })
+    }
+
+    private func changeRideInviteStatusAsync(rideId: String, userId: String, inviteStatus: Int32) async -> Bool {
+        await withCheckedContinuation { continuation in
+            rideRepository.changeRideInviteStatus(
+                rideID: rideId,
+                currentUid: userId,
+                inviteStatus: inviteStatus
+            ) { _, error in
+                continuation.resume(returning: error == nil)
+            }
+        }
+    }
+
+    private func updateOrganizerStatusAsync(rideId: String, rideStatus: Int) async -> Bool {
+        await withCheckedContinuation { continuation in
+            rideRepository.updateOrganizerStatus(rideId: rideId, rideStatus: Int32(rideStatus)) { _, error in
+                continuation.resume(returning: error == nil)
+            }
+        }
     }
 }

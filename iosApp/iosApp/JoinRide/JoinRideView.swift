@@ -19,52 +19,56 @@ struct JoinRideView: View {
     var body: some View {
         AppToolBar{
             ZStack {
-                NavigationStack {
-                    if #available(iOS 17.0, *) {
-                        VStack {
-                            searchBarView
-                                .font(KlavikaFont.regular.font(size: 14))
-                                .padding(.top)
-                            if viewModel.filteredRides.isEmpty {
-                                VStack(spacing: 12) {
-                                    Text(AppStrings.JoinRide.noActiveRidesFound)
-                                        .font(KlavikaFont.bold.font(size: 18))
-                                        .foregroundColor(.gray)
-                                }
-                                .frame(maxWidth: .infinity, minHeight: 400)
-                            } else {
-                                List(viewModel.filteredRides.indices, id: \.self) { index in
-                                    let ride = viewModel.filteredRides[index]
-                                    
-                                    JoinRideRow(
-                                        ride: ride,
-                                        index: index,
-                                        viewModel: viewModel, selectedRide: $selectedRide
-                                    )
-                                    .listRowSeparator(.hidden)
-                                }
-                                .listStyle(.plain)
-                            }
-                            Spacer()
+                VStack {
+                    searchBarView
+                        .font(KlavikaFont.regular.font(size: 14))
+                        .padding(.top)
+                    if viewModel.filteredRides.isEmpty {
+                        VStack(spacing: 12) {
+                            Text(AppStrings.JoinRide.noActiveRidesFound)
+                                .font(KlavikaFont.bold.font(size: 18))
+                                .foregroundColor(.gray)
                         }
-                        .navigationBarBackButtonHidden(true)
-                        .navigationDestination(isPresented: $showHomeView, destination: {
-                            BottomNavBar()
-                        })
-                        .navigationDestination(item: $selectedRide, destination: { ride in
-                            ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
-                        })
-                        .task {
-                            await viewModel.getRides()
-                        }
-                        .refreshable {
-                            Task {
-                                await viewModel.getRides()
-                            }
-                        }
+                        .frame(maxWidth: .infinity, minHeight: 400)
                     } else {
-                        // Fallback on earlier versions
+                        List(viewModel.filteredRides.indices, id: \.self) { index in
+                            let ride = viewModel.filteredRides[index]
+                            
+                            JoinRideRow(
+                                ride: ride,
+                                index: index,
+                                viewModel: viewModel, selectedRide: $selectedRide
+                            )
+                            .listRowSeparator(.hidden)
+                        }
+                        .listStyle(.plain)
                     }
+                    Spacer()
+                }
+                .navigationBarBackButtonHidden(true)
+                .navigationDestination(isPresented: $showHomeView, destination: {
+                    BottomNavBar()
+                })
+                .navigationDestination(item: $selectedRide, destination: { ride in
+                    ConnectedRideView(notificationTitle: AppStrings.JoinRide.rideActive, title: AppStrings.ConnectedRide.startRideTitle, subTitle: AppStrings.ConnectedRide.startRideSubtitle, model: ride, rideCompleteModel: [])
+                })
+                .task {
+                    await viewModel.getRides()
+                }
+                .refreshable {
+                    Task {
+                        await viewModel.getRides()
+                    }
+                }
+                .alert(AppStrings.JoinRide.joinRideFailed, isPresented: Binding(
+                    get: { viewModel.joinRideError != nil },
+                    set: { if !$0 { viewModel.joinRideError = nil } }
+                )) {
+                    Button(AppStrings.JoinRide.ok, role: .cancel) {
+                        viewModel.joinRideError = nil
+                    }
+                } message: {
+                    Text(viewModel.joinRideError ?? AppStrings.JoinRide.joinRideFailed)
                 }
                 if viewModel.isRideLoading {
                     Color.black.opacity(0.5)
@@ -122,7 +126,7 @@ struct JoinRideRow: View {
                     Text(ride?.title ?? "")
                         .font(KlavikaFont.bold.font(size: 16))
                         .foregroundColor(AppColor.black)
-                    Text("By \(ride?.organizer ?? "")")
+                    Text("\(AppStrings.JoinRide.byOrganizerPrefix) \(ride?.organizer ?? "")")
                         .font(KlavikaFont.regular.font(size: 12))
                         .foregroundColor(AppColor.richBlack)
                 }
@@ -198,39 +202,37 @@ struct JoinRideRow: View {
                 .padding(.bottom,20)
                 .buttonStyle(.plain)
                 
-                if #available(iOS 17.0, *) {
-                    ButtonView(
-                        title: AppStrings.JoinRide.joinRide.uppercased(),
-                        icon: AppIcon.JoinRide.movedLocation,
-                        background: ride?.isFutureRide == true ? Color.gray.opacity(0.5) : AppColor.celticBlue
-                    ) {
-                        guard let ride = ride else { return }
-                        if ride.isFutureRide {
-                            showFutureAlert = true
+                ButtonView(
+                    title: AppStrings.JoinRide.joinRide.uppercased(),
+                    icon: AppIcon.JoinRide.movedLocation,
+                    background: ride?.isFutureRide == true ? Color.gray.opacity(0.5) : AppColor.celticBlue
+                ) {
+                    guard let ride = ride else { return }
+                    if ride.isFutureRide {
+                        showFutureAlert = true
+                        return
+                    }
+                    viewModel.tappedIndex = index
+                    
+                    Task {
+                        if ride.rideJoined {
+                            selectedRide = ride
                             return
                         }
-                        viewModel.tappedIndex = index
-                        
-                        Task {
-                            if ride.rideJoined {
-                                selectedRide = ride
-                                return
-                            }
-                            if let selected = await viewModel.handleJoin(for: ride) {
-                                selectedRide = selected
-                            }
+                        if let selected = await viewModel.handleJoin(for: ride) {
+                            selectedRide = selected
                         }
                     }
-                    .foregroundColor(ride?.isFutureRide == true ? Color.white.opacity(0.7) : AppColor.black)
-                    .alert("Ride Not Started", isPresented: $showFutureAlert) {
-                        Button("OK", role: .cancel) {}
-                    } message: {
-                        Text("Your ride is in the future.")
-                    }
-                    
-                    .frame(maxWidth: .infinity)
-                    .padding(.bottom,20)
                 }
+                .foregroundColor(ride?.isFutureRide == true ? Color.white.opacity(0.7) : AppColor.black)
+                .alert(AppStrings.JoinRide.rideNotStartedTitle, isPresented: $showFutureAlert) {
+                    Button(AppStrings.JoinRide.ok, role: .cancel) {}
+                } message: {
+                    Text(AppStrings.JoinRide.rideFutureMessage)
+                }
+                
+                .frame(maxWidth: .infinity)
+                .padding(.bottom,20)
             }
         }
         .padding([.leading,.trailing,.top],16)

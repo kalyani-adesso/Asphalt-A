@@ -64,7 +64,7 @@ struct CreateAccount: View {
                             .rawValue,
                         password: $confirmPassword
                     )
-                    .onChange(of: confirmPassword) { _ in validatePasswords() }
+                    .onChange(of: confirmPassword) { _, _ in validatePasswords() }
                     
                     if !passwordsMatch {
                         Text("Passwords do not match")
