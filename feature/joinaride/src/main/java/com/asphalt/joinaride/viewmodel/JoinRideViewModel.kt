@@ -110,7 +110,7 @@ class JoinRideViewModel(
             val apiResult = APIHelperUI.runWithLoader {
                 ridesRepo.getAllRide()
             }
-            APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
+
                 APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
                     val now = Utils.currentDateWithoutTime()
 
@@ -134,9 +134,8 @@ class JoinRideViewModel(
                         //  Final condition
                         isUpcoming || isAllowed
                     }
+                    //_rides.value = ride
                 }
-                //_rides.value = ride
-            }
         }
     }
 
