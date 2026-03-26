@@ -17,6 +17,7 @@ import com.asphalt.android.model.rides.RidesData
 import com.asphalt.android.repository.places.PlacesRepository
 import com.asphalt.android.repository.rides.RidesRepository
 import com.asphalt.android.viewmodels.AndroidUserVM
+import com.asphalt.commonui.utils.Utils
 import com.asphalt.joinaride.repository.IdRepository
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
@@ -110,7 +111,31 @@ class JoinRideViewModel(
                 ridesRepo.getAllRide()
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
-                _rides.value = ride
+                APIHelperUI.handleApiResult(apiResult, viewModelScope) { ride ->
+                    val now = Utils.currentDateWithoutTime()
+
+                    _rides.value = ride.orEmpty().filter { rideItem ->
+
+                        //  1. Check upcoming ride
+                        val isUpcoming = rideItem.startDate?.let { it >= now } == true
+
+                        //  2. Check user condition
+                        val isAllowed = if (rideItem.createdBy == currentUid) {
+                            // Creator case
+                            rideItem.rideStatus == APIConstants.RIDE_JOINED
+                        } else {
+                            // Participant case
+                            rideItem.participants.any { participant ->
+                                participant.userId == currentUid &&
+                                        participant.inviteStatus == APIConstants.RIDE_JOINED
+                            }
+                        }
+
+                        //  Final condition
+                        isUpcoming || isAllowed
+                    }
+                }
+                //_rides.value = ride
             }
         }
     }
