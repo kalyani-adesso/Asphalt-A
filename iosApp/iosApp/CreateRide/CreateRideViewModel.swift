@@ -230,7 +230,7 @@ extension CreateRideViewModel {
 
                 // Joined logic (creator OR participant)
                 let isJoined =
-                    (participant?.inviteStatus == 3 && ride.rideStatus == 3) ||
+                    (participant?.inviteStatus == 3) ||
                     (isCreator && ride.rideStatus == 3)
 
                 guard isJoined else { continue }
