@@ -98,18 +98,26 @@ extension JoinRideViewModel {
                 guard let startEpoch = ride.startDate else { return false }
                 
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
-                // 1. Ignore past rides
-                guard startDate >= todayStart else { return false }
-                // 2. Determine current user role
+                let todayStart = Calendar.current.startOfDay(for: Date())
+                
+                let isFutureOrToday = startDate >= todayStart
+                
                 let isCreator = ride.createdBy == currentUserId
                 let participantRecord = ride.participants.first { $0.userId == currentUserId }
-                let isParticipant = participantRecord != nil
-                // 3. Hide ended rides
-                if isCreator, ride.rideStatus == 4 { return false }
-                if isParticipant, participantRecord?.inviteStatus == 4 { return false }
-                // 4. Show only creator or participant rides
-                return isCreator || isParticipant
+                let inviteStatus = participantRecord?.inviteStatus
+                
+                if ride.rideStatus == 4 || inviteStatus == 4 {
+                       return false
+                   }
+                
+                // FUTURE / TODAY
+                if isFutureOrToday {
+                        return isCreator || inviteStatus == 3 || inviteStatus == 1
+                    }
+                    return false
             }
+                       
+
             
             
             var joinRideModels: [JoinRideModel] = []

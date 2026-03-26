@@ -827,6 +827,8 @@ struct GroupRiderView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
                         Text(title.isEmpty ? AppStrings.ConnectedRide.riderFallbackName : title)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                             .font(KlavikaFont.bold.font(size: 16))
                             .foregroundColor(AppColor.black)
                         Text(status)
