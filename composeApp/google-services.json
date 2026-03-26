@@ -1,10 +1,50 @@
 {
   "project_info": {
     "project_number": "81829881241",
+    "firebase_url": "https://asphalt-a-d59cb-default-rtdb.firebaseio.com",
     "project_id": "asphalt-a-d59cb",
     "storage_bucket": "asphalt-a-d59cb.firebasestorage.app"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81829881241:android:fe5170e7fcd851c14e5f08",
+        "android_client_info": {
+          "package_name": "com.adesso.riderclub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "81829881241-vomlqinbc2635a1rr577blmuo0mqiua9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb5s9ZHP3KqXZUgYD1yv1rvDo8RWjQR8w"
+        },
+        {
+          "current_key": "AIzaSyAEtdzmzz_uCRRpzefvE5U5UCPye0M7nBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "81829881241-vomlqinbc2635a1rr577blmuo0mqiua9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "81829881241-6u7g7tr3t421ge947amkrrpa18jhfvh7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.asphalta.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:81829881241:android:5215e6e7bb1bc98e4e5f08",
@@ -12,15 +52,35 @@
           "package_name": "com.asphalt.android"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "81829881241-vomlqinbc2635a1rr577blmuo0mqiua9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
+        {
+          "current_key": "AIzaSyAb5s9ZHP3KqXZUgYD1yv1rvDo8RWjQR8w"
+        },
         {
           "current_key": "AIzaSyAEtdzmzz_uCRRpzefvE5U5UCPye0M7nBE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "81829881241-vomlqinbc2635a1rr577blmuo0mqiua9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "81829881241-6u7g7tr3t421ge947amkrrpa18jhfvh7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.asphalta.ios"
+              }
+            }
+          ]
         }
       }
     }
