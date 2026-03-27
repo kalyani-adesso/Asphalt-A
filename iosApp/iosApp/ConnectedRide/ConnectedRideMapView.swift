@@ -259,14 +259,6 @@ struct ConnectedRideMapView: View {
             }
         }
         .animation(.easeInOut, value: showMessageNotification)
-        .alert(AppStrings.ConnectedRide.endRideFailed, isPresented: Binding(
-            get: { endRideErrorMessage != nil },
-            set: { if !$0 { endRideErrorMessage = nil } }
-        )) {
-            Button(AppStrings.JoinRide.ok, role: .cancel) { endRideErrorMessage = nil }
-        } message: {
-            Text(endRideErrorMessage ?? AppStrings.ConnectedRide.endRideFailed)
-        }
     }
     
     func tryJoinWhenLocationReady() {

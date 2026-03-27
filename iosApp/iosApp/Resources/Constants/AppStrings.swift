@@ -448,6 +448,10 @@ public struct AppStrings{
         static let skip = "skip"
         static let submitRating = "Submit Rating"
         static let endRideFailed = "Unable to end ride. Please try again."
+        /// Short alert titles (message body uses `endRideFailed` / `endRideSummaryFailed` / `locationUnavailableJoinFailed`).
+        static let sessionAlertTitleEndRide = "End ride failed"
+        static let sessionAlertTitleSummarySave = "Summary not saved"
+        static let sessionAlertTitleLocation = "Location unavailable"
         static let endRideSummaryFailed = "Ride ended, but summary save failed. Please retry."
         static let locationUnavailableJoinFailed = "Unable to get your location. Please try again."
         static let endRideInProgress = "Ending ride..."
