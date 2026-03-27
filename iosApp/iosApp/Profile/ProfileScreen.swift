@@ -393,18 +393,19 @@ struct ProfileHeaderView: View {
                         .background(AppColor.white)
                         .cornerRadius(5)
                     }
-                    
-                    HStack {
-                        AppIcon.NavigationSlider.call
-                            .frame(width: 16, height: 16)
-                        Text(phoneNumber)
-                            .font(KlavikaFont.regular.font(size: 12))
+                    if phoneNumber.contains(where: { $0.isNumber }) {
+                        HStack {
+                            AppIcon.NavigationSlider.call
+                                .frame(width: 16, height: 16)
+                            Text(phoneNumber)
+                                .font(KlavikaFont.regular.font(size: 12))
+                        }
+                        .frame(height: 24)
+                        .padding([.leading,.trailing],8)
+                        .padding([.top, .bottom], 5)
+                        .background(AppColor.white)
+                        .cornerRadius(5)
                     }
-                    .frame(height: 24)
-                    .padding([.leading,.trailing],8)
-                    .padding([.top, .bottom], 5)
-                    .background(AppColor.white)
-                    .cornerRadius(5)
                 }
             }
             Spacer()
