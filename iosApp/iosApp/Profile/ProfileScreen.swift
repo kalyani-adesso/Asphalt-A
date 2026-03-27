@@ -246,6 +246,7 @@ struct ProfileGridView: View {
 struct AchivementsRow: View {
     let item: ProfileItemModel
     @State var itemIsSelected: Bool = false
+    @State private var showComingSoonAlert: Bool = false
     var body: some View {
         VStack(alignment: .center,spacing: 15) {
             item.icon
@@ -263,7 +264,7 @@ struct AchivementsRow: View {
                 .multilineTextAlignment(.center)
                 .padding([.leading, .trailing])
             Button(action: {
-                
+                showComingSoonAlert = true
             }) {
                 Text(AppStrings.Profile.startEarnBadge)
                     .frame(maxWidth: .infinity)
@@ -292,6 +293,11 @@ struct AchivementsRow: View {
         .navigationDestination(isPresented: $itemIsSelected, destination: {
             item.destination
         })
+        .alert("Coming soon", isPresented: $showComingSoonAlert) {
+            Button(AppStrings.JoinRide.ok, role: .cancel) { }
+        } message: {
+            Text("This feature will be available soon.")
+        }
         .padding([.leading, .trailing],16)
         .padding(.bottom,21)
     }
