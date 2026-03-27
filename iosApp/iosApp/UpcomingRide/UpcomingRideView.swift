@@ -612,6 +612,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                         
                         Button(action: {
                             Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false) }
@@ -624,6 +625,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.bottom, 20)
