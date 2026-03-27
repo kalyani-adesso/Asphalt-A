@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import shared
+import FirebaseAuth
 
 class SignUpViewModal: ObservableObject {
     @Published var showToast: Bool = false
@@ -32,6 +33,9 @@ class SignUpViewModal: ObservableObject {
             if let _ = failure {
                 self.showToast = true
             } else {
+                if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty {
+                    MBUserDefaults.userIdStatic = uid
+                }
                 onSuccess()
             }
         })
