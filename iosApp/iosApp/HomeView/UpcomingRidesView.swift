@@ -73,9 +73,13 @@ struct UpcomingRideCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(isMyRide ? ride.title : "Invite from  \(hostName)")
                             .font(KlavikaFont.bold.font(size: 16))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                         Text("\(ride.routeStart)")
                             .font(KlavikaFont.regular.font(size: 12))
                             .foregroundColor(AppColor.stoneGray)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                     Spacer()
                     if ride.riderCount > 1 {

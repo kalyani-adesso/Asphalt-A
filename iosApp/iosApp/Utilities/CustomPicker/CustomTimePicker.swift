@@ -18,6 +18,20 @@ struct CustomTimePicker: View {
     private let hourRange = Array(1...12)
     private let minuteRange = Array(0...59)
     
+    var isPastTime: Bool {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        
+        var hour = hours % 12
+        if !isAM { hour += 12 }
+        
+        components.hour = hour
+        components.minute = minutes
+        
+        guard let selectedDateTime = Calendar.current.date(from: components) else { return false }
+        
+        return selectedDateTime < Date()
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
             Text("Custom Time")
@@ -72,6 +86,14 @@ struct CustomTimePicker: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(AppColor.backgroundLight, lineWidth: 2)
             )
+            if isPastTime {
+                Text("Cannot select past time")
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+            }
+
             
             // Buttons
             HStack(spacing: 30) {

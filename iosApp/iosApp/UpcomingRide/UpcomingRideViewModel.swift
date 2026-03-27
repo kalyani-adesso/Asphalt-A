@@ -140,11 +140,27 @@ class UpcomingRideViewModel: ObservableObject {
                 // Skip irrelevant rides
                 if !isPastRide && !isUpcomingOrInvite { return nil }
                 
+                let isCreator = ride.createdBy == currentUserID
+                let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+
+                if isUpcomingOrInvite {
+                    
+                    //  Creator logic
+                    if isCreator {
+                        guard [0, 3].contains(ride.rideStatus) else { return nil }
+                    }
+                    
+                    //  Participant logic
+                    else {
+                        // Show if accepted or ongoing
+                        guard myInviteStatus == 1 || myInviteStatus == 3 || myInviteStatus == 0 else { return nil }
+                    }
+                }
+                
                 // Participants
                 let participants = ride.participants
                 let participantCount = participants.filter { $0.userId != ride.createdBy }.count
                 let participantAcceptedCount = participants.filter { [1,3].contains($0.inviteStatus) }.count
-                let myInviteStatus = participants.first(where: { $0.userId == currentUserID })?.inviteStatus
                 
                 // Determine rideAction, rideStatus, rideViewAction
                 var rideAction: RideAction
