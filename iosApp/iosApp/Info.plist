@@ -5,9 +5,9 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDisplayName</key>
-	<string>adesso Rider&apos;s Club</string>
+	<string>adRevv</string>
 	<key>CFBundleName</key>
-	<string>adesso Rider&apos;s Club</string>
+	<string>adRevv</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
