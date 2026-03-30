@@ -240,6 +240,7 @@ struct DetailsView: View {
                         get: { viewModel.selectedStartTime ?? Date() },
                         set: { viewModel.selectedStartTime = $0 }
                     ),
+                    selectedDate: viewModel.selectedStartDate ?? Date(),
                     onDismiss: {
                         activePicker = nil
                     }
@@ -251,6 +252,8 @@ struct DetailsView: View {
                         get: { viewModel.selectedEndTime ?? Date() },
                         set: { viewModel.selectedEndTime = $0 }
                     ),
+                    selectedDate: viewModel.selectedStartDate ?? Date(),
+                    referenceTime: viewModel.selectedStartTime,
                     onDismiss: {
                         activePicker = nil
                     }

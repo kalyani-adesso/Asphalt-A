@@ -215,10 +215,10 @@ struct JoinRideRow: View {
                     viewModel.tappedIndex = index
                     
                     Task {
-                        if ride.rideJoined {
-                            selectedRide = ride
-                            return
-                        }
+//                        if ride.rideJoined {
+//                            selectedRide = ride
+//                            return
+//                        }
                         if let selected = await viewModel.handleJoin(for: ride) {
                             selectedRide = selected
                         }
