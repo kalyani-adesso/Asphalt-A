@@ -124,6 +124,8 @@ struct CustomTimePicker: View {
                 }
                 .font(KlavikaFont.regular.font(size: 12))
                 .foregroundColor(AppColor.celticBlue)
+                .foregroundColor(isInvalidTime ? AppColor.grey : AppColor.celticBlue)
+                .opacity(isInvalidTime ? 0.5 : 1.0) 
                 .disabled(isInvalidTime) //Disable OK if invalid
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
