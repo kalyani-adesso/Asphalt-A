@@ -128,13 +128,7 @@ private struct ConnectedRideRouteView: View {
                 .ignoresSafeArea()
 
             Group {
-                if createRideVM.isRideLoading {
-                    VStack {
-                        Spacer()
-                        ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
-                        Spacer()
-                    }
-                } else if let ride = createRideVM.activeRide, ride.rideJoined {
+               if let ride = createRideVM.activeRide, ride.rideJoined {
                     ConnectedRideView(
                         notificationTitle: AppStrings.JoinRide.rideActive,
                         title: AppStrings.ConnectedRide.startRideTitle,

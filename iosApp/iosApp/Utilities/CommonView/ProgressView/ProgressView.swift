@@ -111,6 +111,13 @@ struct ProgressViewReusable: View {
 
     var body: some View {
         ZStack {
+            // Always block interaction with underlying UI while loader is visible.
+            // (Even when we don't dim the background.)
+            Color.clear
+                .ignoresSafeArea()
+                .contentShape(Rectangle())
+                .onTapGesture { }
+
             let shouldDim = dimsBackground ?? (style == .connectedRide)
             if shouldDim {
                 Color.black.opacity(style == .connectedRide ? 0.18 : 0.15)
@@ -150,6 +157,7 @@ struct ProgressViewReusable: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
     }
 }
 

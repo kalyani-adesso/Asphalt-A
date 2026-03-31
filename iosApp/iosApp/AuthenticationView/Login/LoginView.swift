@@ -76,14 +76,16 @@ struct SignInView: View {
                     emailOrPhone = ""
                     password = ""
                 }
-                .overlay {
-                    if viewModel.isLoggingIn {
-                        ZStack {
-                            Color.black.opacity(0.2).ignoresSafeArea()
-                            ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
-                        }
-                    }
+            }
+            // Put the loading overlay at the root (not inside ScrollView),
+            // so it covers the status bar / notch area too.
+            if viewModel.isLoggingIn {
+                ZStack {
+                    Color.black.opacity(0.2)
+                        .ignoresSafeArea()
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                 }
+                .ignoresSafeArea()
             }
             ToastView(message: viewModel.errorMessage ?? "", isShowing: $viewModel.showToast)
         }

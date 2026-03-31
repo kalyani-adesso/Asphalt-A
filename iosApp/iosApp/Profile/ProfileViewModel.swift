@@ -62,6 +62,8 @@ class ProfileViewModel: ObservableObject {
     @Published var drivingLicenseNumber: String = "--"
     @Published var isMechanic: Bool = false
     @Published var profileImage = AppIcon.Profile.profile
+    /// Latest profile picture base64 string from backend (empty means none).
+    private var profilePicBase64: String = ""
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
     let vehicleArray: [AppStrings.VehicleType] = AppStrings.VehicleType.allCases
@@ -192,6 +194,7 @@ extension ProfileViewModel {
                             self.drivingLicenseNumber = domain.drivingLicense
                             let emergency = (domain.emergencyContact).trimmingCharacters(in: .whitespaces)
                             MBUserDefaults.emergencyContactStatic = emergency.isEmpty ? nil : emergency
+                            self.profilePicBase64 = domain.profilePicUrl
                             if let base64Image = self.decodeBase64ToImage(base64: domain.profilePicUrl) {
                               self.profileImage = Image(uiImage: base64Image)
                           }
@@ -277,11 +280,17 @@ extension ProfileViewModel {
         emergencyContact: String,
         drivingLicense: String,
         isMachanic: Bool,
-        profileUIImage: UIImage,
+        profileUIImage: UIImage?,
         onSuccess: (() -> Void)? = nil
     ) {
         
-        let base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
+        let base64Image: String
+        if let profileUIImage {
+            base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
+        } else {
+            // No new image selected — keep whatever we last fetched from backend.
+            base64Image = profilePicBase64
+        }
         
         profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, profileImage:base64Image , completionHandler: { [weak self] result,error  in
             
