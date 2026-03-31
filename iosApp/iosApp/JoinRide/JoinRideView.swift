@@ -71,7 +71,7 @@ struct JoinRideView: View {
                     Text(viewModel.joinRideError ?? AppStrings.JoinRide.joinRideFailed)
                 }
                 if viewModel.isRideLoading {
-                    ProgressViewReusable(title: AppStrings.JoinRide.loading)
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                 }
             }
         }

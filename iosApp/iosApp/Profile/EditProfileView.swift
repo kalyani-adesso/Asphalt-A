@@ -114,7 +114,7 @@ struct EditProfileView: View {
                 await profileViewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
             }
             if profileViewModel.isLoading {
-                ProgressViewReusable(title: "Loading ...")
+                ProgressViewReusable(title: "", style: .standard)
             }
         }
     }

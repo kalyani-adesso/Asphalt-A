@@ -122,21 +122,30 @@ private struct ConnectedRideRouteView: View {
     @EnvironmentObject private var createRideVM: CreateRideViewModel
     
     var body: some View {
-        Group {
-            if createRideVM.isRideLoading {
-                // Use the standard white bubble loader while we resolve whether a ride is active.
-                ProgressViewReusable(title: "Loading...", style: .standard, dimsBackground: false)
-            } else if let ride = createRideVM.activeRide, ride.rideJoined {
-                ConnectedRideView(
-                    notificationTitle: AppStrings.JoinRide.rideActive,
-                    title: AppStrings.ConnectedRide.startRideTitle,
-                    subTitle: AppStrings.ConnectedRide.startRideSubtitle,
-                    model: ride,
-                    rideCompleteModel: []
-                )
-                .id(ride.rideId)
-            } else {
-                JoinRideView()
+        ZStack {
+            // Prevent a blank white flash while we resolve the active ride.
+            AppColor.backgroundLight
+                .ignoresSafeArea()
+
+            Group {
+                if createRideVM.isRideLoading {
+                    VStack {
+                        Spacer()
+                        ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
+                        Spacer()
+                    }
+                } else if let ride = createRideVM.activeRide, ride.rideJoined {
+                    ConnectedRideView(
+                        notificationTitle: AppStrings.JoinRide.rideActive,
+                        title: AppStrings.ConnectedRide.startRideTitle,
+                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                        model: ride,
+                        rideCompleteModel: []
+                    )
+                    .id(ride.rideId)
+                } else {
+                    JoinRideView()
+                }
             }
         }
         .task {

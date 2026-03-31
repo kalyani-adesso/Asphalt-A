@@ -79,7 +79,7 @@ struct SignInView: View {
                 if viewModel.isLoggingIn {
                     ZStack {
                         Color.black.opacity(0.2).ignoresSafeArea()
-                        ProgressViewReusable(title: "Loading...", style: .standard, dimsBackground: false)
+                        ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                     }
                 }
             }

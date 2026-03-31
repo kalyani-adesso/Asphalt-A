@@ -155,7 +155,7 @@ struct RideDetailsView: View {
                     }
                 }
             if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading ...")
+                ProgressViewReusable(title: "", style: .standard)
             }
             if let chat = activeChat, let vm = chatVM {
                 ChatOverlayView(

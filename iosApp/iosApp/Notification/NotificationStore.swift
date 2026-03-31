@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum AppNotificationType: String, Codable {
     case rideReminder
@@ -35,6 +36,7 @@ final class NotificationStore {
     static let shared = NotificationStore()
 
     private let key = "com.adesso.rider.club.notifications.v1"
+    private let unreadFlagKey = AppStrings.userdefaultKeys.hasUnreadNotifications.rawValue
     private let maxCount = 100
 
     private init() {}
@@ -58,9 +60,19 @@ final class NotificationStore {
         if let data = try? JSONEncoder().encode(current) {
             UserDefaults.standard.set(data, forKey: key)
         }
+        // Mark as unread whenever we receive/store a new notification.
+        UserDefaults.standard.set(true, forKey: unreadFlagKey)
     }
 
     func unreadCount() -> Int {
         all().count
+    }
+
+    func hasUnread() -> Bool {
+        UserDefaults.standard.bool(forKey: unreadFlagKey)
+    }
+
+    func markAllRead() {
+        UserDefaults.standard.set(false, forKey: unreadFlagKey)
     }
 }

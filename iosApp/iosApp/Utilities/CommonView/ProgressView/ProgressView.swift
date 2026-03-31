@@ -12,15 +12,107 @@ enum ProgressLoaderStyle {
     case connectedRide
 }
 
+private struct ShimmerModifier: ViewModifier {
+    @State private var phase: CGFloat = -0.8
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { proxy in
+                    let w = proxy.size.width
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.clear,
+                                    Color.white.opacity(0.70),
+                                    Color.clear
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: w * 0.55)
+                        .rotationEffect(.degrees(18))
+                        .offset(x: phase * w)
+                        .blendMode(.screen)
+                }
+                .clipped()
+            }
+            .onAppear {
+                withAnimation(.linear(duration: 1.05).repeatForever(autoreverses: false)) {
+                    phase = 1.8
+                }
+            }
+    }
+}
+
+private extension View {
+    func shimmer() -> some View { modifier(ShimmerModifier()) }
+}
+
+/// A full-screen shimmer *overlay* meant to sit on top of an existing UI.
+/// This avoids a generic "loading screen" by keeping the underlying UI visible and
+/// drawing a dense skeleton layer above it, with an animated highlight pass.
+private struct FullPageShimmerOverlay: View {
+    @State private var highlightPhase: CGFloat = -1.2
+    @State private var drift: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { proxy in
+            let size = proxy.size
+
+            ZStack {
+                // Clean highlight sweep across the existing UI.
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .clear, location: 0.0),
+                                .init(color: Color.white.opacity(0.78), location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: size.width * 0.75)
+                    .rotationEffect(.degrees(18))
+                    .offset(x: (highlightPhase * size.width) + (drift * 10))
+                    .blendMode(.screen)
+                    .opacity(0.72)
+                    .blur(radius: 0.6)
+                    .ignoresSafeArea()
+            }
+            .ignoresSafeArea()
+            .onAppear {
+                withAnimation(.linear(duration: 1.15).repeatForever(autoreverses: false)) {
+                    highlightPhase = 2.2
+                }
+                withAnimation(.easeInOut(duration: 2.6).repeatForever(autoreverses: true)) {
+                    drift = 1
+                }
+            }
+        }
+        .allowsHitTesting(true)
+    }
+
+}
+
 struct ProgressViewReusable: View {
-    var title: String = "Loading..."
+    // Default empty; only Connected Ride should show visible loading text.
+    var title: String = ""
     var color: Color = AppColor.celticBlue
     var style: ProgressLoaderStyle = .standard
-    var dimsBackground: Bool = true
+    /// When `nil`, we choose a sensible default:
+    /// - `.standard`: no black dim (keeps page visible)
+    /// - `.connectedRide`: dim to match existing flow
+    var dimsBackground: Bool? = nil
 
     var body: some View {
         ZStack {
-            if dimsBackground {
+            let shouldDim = dimsBackground ?? (style == .connectedRide)
+            if shouldDim {
                 Color.black.opacity(style == .connectedRide ? 0.18 : 0.15)
                     .ignoresSafeArea()
             }
@@ -28,21 +120,8 @@ struct ProgressViewReusable: View {
             Group {
                 switch style {
                 case .standard:
-                    HStack(spacing: 10) {
-                        HorizontalBouncingDotsLoader(color: color, dotSize: 7, spacing: 6)
-                        if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            Text(title)
-                                .font(KlavikaFont.medium.font(size: 13))
-                                .foregroundStyle(color)
-                                .lineLimit(1)
-                        }
-                    }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 14)
-                    .background(Color.white)
-                    .clipShape(Capsule())
-                    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 4)
-                    .padding(.horizontal, 24)
+                    // Shimmer overlay on top of the existing UI (no generic skeleton page).
+                    FullPageShimmerOverlay()
 
                 case .connectedRide:
                     VStack(spacing: 8) {
@@ -75,5 +154,5 @@ struct ProgressViewReusable: View {
 }
 
 #Preview {
-    ProgressViewReusable(title: "Loading...")
+    ProgressViewReusable(title: "", style: .connectedRide)
 }
