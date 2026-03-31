@@ -71,12 +71,7 @@ struct JoinRideView: View {
                     Text(viewModel.joinRideError ?? AppStrings.JoinRide.joinRideFailed)
                 }
                 if viewModel.isRideLoading {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                    ProgressView(AppStrings.JoinRide.loading)
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .padding(.top, 100)
-                        .foregroundColor(.white)
+                    ProgressViewReusable(title: AppStrings.JoinRide.loading)
                 }
             }
         }
