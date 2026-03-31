@@ -153,7 +153,7 @@ struct BottomNavBar: View {
                 })
                 .navigationBarBackButtonHidden(true)
                 if createRideVM.isRideLoading || upcomingRideViewModel.isRideLoading  {
-                    ProgressViewReusable(title: "Loading...")
+                    ProgressViewReusable(title: "Loading...", dimsBackground: false)
                 }
             }
         }

@@ -120,7 +120,7 @@ struct QueriesView: View {
                         .zIndex(2)
                 }
                 if viewModel.isLoading {
-                    ProgressViewReusable(title: "Loading Queries...", color: AppColor.stoneGray)
+                    ProgressViewReusable(title: "Loading Queries...")
                 }
                 if viewModel.isLiking {
                     ProgressViewReusable(title: "Loading Queries...")

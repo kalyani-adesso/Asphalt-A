@@ -110,8 +110,12 @@ struct ProfileSectionView: View {
                 if viewModel.isLoadingBikes {
                     HStack {
                         Spacer()
-                        ProgressView()
-                            .padding()
+                        HorizontalBouncingDotsLoader(color: AppColor.celticBlue, dotSize: 7, spacing: 6)
+                            .padding(.vertical, 14)
+                            .padding(.horizontal, 20)
+                            .background(Color.white)
+                            .clipShape(Capsule())
+                            .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
                         Spacer()
                     }
                     .frame(height: 80)

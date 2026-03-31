@@ -118,8 +118,7 @@ struct MessagesListView: View {
                         
                         Spacer()
                         
-                        ProgressView("Loading chats...")
-                            .scaleEffect(1.2)
+                        ProgressViewReusable(title: "Loading chats...", style: .standard, dimsBackground: false)
                         
                         Spacer()
                         
