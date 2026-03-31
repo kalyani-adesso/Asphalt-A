@@ -35,13 +35,24 @@ final class NavigationSliderViewModel: ObservableObject {
     }
 
     /// Resolves active joined ride on push (see ConnectedRideSidebarDestinationView) so loader → map matches Home Join Ride.
-    private var connectedRideDestination: AnyView {
-        AnyView(ConnectedRideSidebarDestinationView())
-    }
     
     private func loadData() {
         sections = [
-            MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.black, title: AppStrings.NavigationSlider.connectedRide, destination: connectedRideDestination),
+            MenuItemModel(icon: AppIcon.NavigationSlider.connectedRide, iconColor: AppColor.black, title: AppStrings.NavigationSlider.connectedRide, destination: {
+                if let ride = createRideVM.activeRide, ride.rideJoined == true {
+                    return AnyView(
+                        ConnectedRideView(
+                            notificationTitle: AppStrings.JoinRide.rideActive,
+                            title: AppStrings.ConnectedRide.startRideTitle,
+                            subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                            model: ride,
+                            rideCompleteModel: []
+                        )
+                    )
+                } else {
+                    return AnyView(JoinRideView())
+                }
+            }()),
             MenuItemModel(icon: AppIcon.NavigationSlider.marketPlace, iconColor: AppColor.black, title: AppStrings.NavigationSlider.marketplace, destination: AnyView(HomeView())),
             MenuItemModel(icon: AppIcon.NavigationSlider.message, iconColor: AppColor.black, title: AppStrings.NavigationSlider.message, destination: AnyView(
                            MessagesListView(viewModel: MessagesViewModel(
