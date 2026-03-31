@@ -23,19 +23,25 @@ struct CustomTimePicker: View {
     /// Checks if the selected date + time is in the past or invalid compared to referenceTime
     var isInvalidTime: Bool {
         var components = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
+        
         var hour = hours % 12
         if !isAM { hour += 12 }
+        
         components.hour = hour
         components.minute = minutes
         
         guard let selectedDateTime = Calendar.current.date(from: components) else { return false }
         
-        //  Cannot be in the past
+        // past check
         if selectedDateTime < Date() { return true }
         
-        // Cannot be before referenceTime if provided
-        if let reference = referenceTime, selectedDateTime < reference {
-            return true
+        // compare FULL datetime properly
+        if let reference = referenceTime {
+            if Calendar.current.isDate(selectedDate, inSameDayAs: reference) {
+                if selectedDateTime < reference {
+                    return true
+                }
+            }
         }
         
         return false

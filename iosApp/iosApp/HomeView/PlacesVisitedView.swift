@@ -42,7 +42,7 @@ struct PlacesVisitedView: View {
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(AppColor.stoneGray)
+                            .foregroundColor ((isAtFirstMonth ? AppColor.stoneGray  : AppColor.celticBlue))
                             .frame(width: 32, height: 32)
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -59,7 +59,7 @@ struct PlacesVisitedView: View {
                     }) {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(AppColor.stoneGray)
+                            .foregroundColor( (monthOffset >= 0 ? AppColor.stoneGray : AppColor.celticBlue))
                             .frame(width: 32, height: 32)
                             .background(Color.gray.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
