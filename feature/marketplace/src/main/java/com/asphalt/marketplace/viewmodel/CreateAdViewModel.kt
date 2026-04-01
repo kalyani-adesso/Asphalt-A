@@ -12,22 +12,42 @@ class CreateAdViewModel : ViewModel() {
     fun validations(): Boolean {
         if (_createAd_model.value.tile.isEmpty()) {
             _createAd_model.value = _createAd_model.value.copy(isShowTitleError = true)
-
             return false
         } else {
             _createAd_model.value = _createAd_model.value.copy(isShowTitleError = false)
         }
         if (_createAd_model.value.color.isEmpty()) {
-            _createAd_model.value.isShowColorError = true
+            _createAd_model.value = _createAd_model.value.copy(isShowColorError = true)
             return false
         } else {
-            _createAd_model.value.isShowColorError = false
+            _createAd_model.value = _createAd_model.value.copy(isShowColorError = false)
+        }
+        if (_createAd_model.value.fuel.isEmpty()) {
+            _createAd_model.value = _createAd_model.value.copy(isShowFuelError = true)
+            return false
+        } else {
+            _createAd_model.value = _createAd_model.value.copy(isShowFuelError = false)
         }
         return true
     }
 
     fun setTitle(value: String) {
         _createAd_model.value = _createAd_model.value.copy(tile = value)
+    }
+
+    fun setColor(value: String) {
+        _createAd_model.value = _createAd_model.value.copy(color = value)
+    }
+
+    fun setFuelType(value: String) {
+        _createAd_model.value = _createAd_model.value.copy(fuel = value)
+    }
+
+    fun setPrice(input: String) {
+        if (input.isNotEmpty()) {
+            _createAd_model.value = _createAd_model.value.copy(price = input.toDouble())
+        }
+
     }
 
 }

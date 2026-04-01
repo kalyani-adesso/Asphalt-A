@@ -8,9 +8,11 @@ data class CreateAdUIModel(
     var isShowFuelError: Boolean = false,
     var isShowPriceError: Boolean = false,
     var isShowDescError: Boolean = false,
+    var isLocationError: Boolean = false,
     var tile: String = "",
     var color: String = "",
     var fuel: String = "",
-    var price: Int = 0,
-    var desc: String = ""
+    var price: Double? = null,
+    var desc: String = "",
+    var location: String = ""
 )
