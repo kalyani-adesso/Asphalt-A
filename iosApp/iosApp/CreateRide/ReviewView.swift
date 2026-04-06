@@ -73,7 +73,7 @@ struct ReviewView: View {
             }
             
             if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading ...")
+                ProgressViewReusable(title: "", style: .standard)
             }
         }
 

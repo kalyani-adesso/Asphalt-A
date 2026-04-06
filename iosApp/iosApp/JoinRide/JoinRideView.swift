@@ -71,12 +71,7 @@ struct JoinRideView: View {
                     Text(viewModel.joinRideError ?? AppStrings.JoinRide.joinRideFailed)
                 }
                 if viewModel.isRideLoading {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                    ProgressView(AppStrings.JoinRide.loading)
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .padding(.top, 100)
-                        .foregroundColor(.white)
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                 }
             }
         }
@@ -215,10 +210,10 @@ struct JoinRideRow: View {
                     viewModel.tappedIndex = index
                     
                     Task {
-                        if ride.rideJoined {
-                            selectedRide = ride
-                            return
-                        }
+//                        if ride.rideJoined {
+//                            selectedRide = ride
+//                            return
+//                        }
                         if let selected = await viewModel.handleJoin(for: ride) {
                             selectedRide = selected
                         }

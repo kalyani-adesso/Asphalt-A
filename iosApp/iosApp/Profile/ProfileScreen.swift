@@ -90,7 +90,7 @@ struct ProfileScreen: View {
                     // Light overlay only while profile (header) is loading; content is already visible
                     Color.black.opacity(0.15)
                         .ignoresSafeArea()
-                    ProgressViewReusable(title: "Loading...")
+                    ProgressViewReusable(title: "")
                 }
             }
     }
@@ -110,8 +110,7 @@ struct ProfileSectionView: View {
                 if viewModel.isLoadingBikes {
                     HStack {
                         Spacer()
-                        ProgressView()
-                            .padding()
+                        ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                         Spacer()
                     }
                     .frame(height: 80)

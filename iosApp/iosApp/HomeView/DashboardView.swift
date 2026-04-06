@@ -44,11 +44,11 @@ struct DashboardView: View {
                                    } label: {
                                        Image(systemName: "chevron.left")
                                            .font(.system(size: 16, weight: .semibold))
-                                           .foregroundColor(AppColor.celticBlue)
+                                           .foregroundColor(isAtFirstMonth ? AppColor.grey : AppColor.celticBlue)
                                    }
                                    .buttonStyle(.plain)
                                    .disabled(isAtFirstMonth)
-                                   let isToday = Calendar.current.isDateInToday(currentDate)
+                                   let isCurrentMonth = Calendar.current.isDate(currentDate, equalTo: Date(), toGranularity: .month)
                                    Button {
                                        let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
                                        if nextDate <= Date()
@@ -58,10 +58,11 @@ struct DashboardView: View {
                                    } label: {
                                        Image(systemName: "chevron.right")
                                            .font(.system(size: 16, weight: .semibold))
-                                           .foregroundColor(isToday ? AppColor.grey : AppColor.celticBlue)
+                                           .foregroundColor(isCurrentMonth ? AppColor.grey : AppColor.celticBlue)
                                    }
                                    .buttonStyle(.plain)
-                                   .disabled(isToday)
+                                   .disabled(isCurrentMonth)
+                                   .opacity(isCurrentMonth ? 0.5 : 1)
                                }
                            }
                 .padding(.horizontal, 10)

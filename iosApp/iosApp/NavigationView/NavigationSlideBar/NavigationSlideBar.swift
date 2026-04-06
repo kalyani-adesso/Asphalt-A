@@ -34,7 +34,7 @@ struct NavigationSlideBar: View {
 }
 
 struct MenuItemRow: View {
-    let viewModel: NavigationSliderViewModel
+    @ObservedObject var viewModel: NavigationSliderViewModel
     let item: MenuItemModel
     let home: HomeViewModel
     let upcomingRide: UpcomingRideViewModel
@@ -49,6 +49,10 @@ struct MenuItemRow: View {
         item.title == AppStrings.NavigationSlider.marketplace ||
         item.title == AppStrings.NavigationSlider.settings ||
         item.title == AppStrings.NavigationSlider.referFriend
+    }
+    
+    private var isConnectedRideItem: Bool {
+        item.title == AppStrings.NavigationSlider.connectedRide
     }
 
     var body: some View {
@@ -76,6 +80,9 @@ struct MenuItemRow: View {
                 }
             } else if isComingSoonItem {
                 showComingSoonAlert = true
+            } else if isConnectedRideItem {
+                // Navigate immediately; destination view will fetch + route.
+                itemIsSelected = true
             } else {
                 itemIsSelected = true
             }
@@ -95,11 +102,52 @@ struct MenuItemRow: View {
             Text("Are you sure you want to log out?")
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {
-            item.destination
-                .environmentObject(home)
-                .environmentObject(upcomingRide)
-                .environmentObject(viewModel.createRideVM)
+            Group {
+                if isConnectedRideItem {
+                    ConnectedRideRouteView()
+                } else {
+                    item.destination
+                }
+            }
+            .environmentObject(home)
+            .environmentObject(upcomingRide)
+            .environmentObject(viewModel.createRideVM)
         })
+    }
+}
+
+/// Inline router for the slide bar's "Connected Ride" item.
+/// Fetches active ride and then routes to Connected Ride map flow or Join Ride.
+private struct ConnectedRideRouteView: View {
+    @EnvironmentObject private var createRideVM: CreateRideViewModel
+    
+    var body: some View {
+        ZStack {
+            // Prevent a blank white flash while we resolve the active ride.
+            AppColor.backgroundLight
+                .ignoresSafeArea()
+
+            Group {
+               if let ride = createRideVM.activeRide, ride.rideJoined {
+                    ConnectedRideView(
+                        notificationTitle: AppStrings.JoinRide.rideActive,
+                        title: AppStrings.ConnectedRide.startRideTitle,
+                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                        model: ride,
+                        rideCompleteModel: []
+                    )
+                    .id(ride.rideId)
+                } else {
+                    JoinRideView()
+                }
+            }
+        }
+        .task {
+            // Fetch once when opened.
+            if createRideVM.activeRide == nil && !createRideVM.isRideLoading {
+                await createRideVM.getActiveJoinedRide()
+            }
+        }
     }
 }
 

@@ -119,11 +119,8 @@ struct QueriesView: View {
                         .transition(.scale)
                         .zIndex(2)
                 }
-                if viewModel.isLoading {
-                    ProgressViewReusable(title: "Loading Queries...", color: AppColor.stoneGray)
-                }
-                if viewModel.isLiking {
-                    ProgressViewReusable(title: "Loading Queries...")
+                if viewModel.isLoading || viewModel.isLiking {
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                 }
             }
         }

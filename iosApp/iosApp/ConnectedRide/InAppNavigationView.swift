@@ -101,9 +101,7 @@ struct InAppNavigationView: View {
                         Spacer()
                         HStack {
                             Spacer()
-                            ProgressView()
-                                .scaleEffect(1.2)
-                                .tint(AppColor.celticBlue)
+                            HorizontalBouncingDotsLoader(color: AppColor.celticBlue, dotSize: 7, spacing: 6)
                             Text(AppStrings.ConnectedRide.navCalculatingRoute)
                                 .font(KlavikaFont.medium.font(size: 14))
                                 .foregroundColor(AppColor.stoneGray)
@@ -120,9 +118,7 @@ struct InAppNavigationView: View {
                     VStack {
                         Spacer()
                         HStack(spacing: 8) {
-                            ProgressView()
-                                .scaleEffect(0.9)
-                                .tint(AppColor.celticBlue)
+                            HorizontalBouncingDotsLoader(color: AppColor.celticBlue, dotSize: 6, spacing: 5)
                             Text(AppStrings.ConnectedRide.navUpdatingRoute)
                                 .font(KlavikaFont.medium.font(size: 13))
                                 .foregroundColor(AppColor.stoneGray)

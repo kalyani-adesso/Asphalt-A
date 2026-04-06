@@ -79,7 +79,7 @@ struct EditProfileView: View {
                                 })
                                 .padding(.bottom, 21)
                                 ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage ?? UIImage(named: "icon-profile")!, onSuccess: {
+                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage, onSuccess: {
                                         isPresented = false
                                     })
                                 }).disabled(profileViewModel.validateProfile(fullName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emargencyContact: profileViewModel.emergencyNumber, DL: profileViewModel.drivingLicenseNumber))
@@ -114,7 +114,7 @@ struct EditProfileView: View {
                 await profileViewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
             }
             if profileViewModel.isLoading {
-                ProgressViewReusable(title: "Loading ...")
+                ProgressViewReusable(title: "", style: .standard)
             }
         }
     }

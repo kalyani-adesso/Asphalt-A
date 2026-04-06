@@ -113,7 +113,7 @@ struct RidePhotosViewerView: View {
                 Color.black.opacity(0.25)
                     .ignoresSafeArea()
                     .zIndex(1)
-                ProgressViewReusable(title: "Loading photos...")
+                ProgressViewReusable(title: "", style: .standard)
                     .zIndex(2)
             }
         }

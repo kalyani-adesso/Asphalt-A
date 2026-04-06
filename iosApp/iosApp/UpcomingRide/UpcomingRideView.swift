@@ -27,6 +27,8 @@ struct UpcomingRideView: View {
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
     @State private var showNotification = false
+    @AppStorage(AppStrings.userdefaultKeys.hasUnreadNotifications.rawValue)
+    private var hasUnreadNotifications: Bool = false
     @State private var showSlideBar = false
     @State private var showPhotosViewer = false
     @State private var selectedRideForPhotos: RideModel?
@@ -202,7 +204,7 @@ struct UpcomingRideView: View {
         }
         .overlay(alignment: .center) {
             if viewModel.isUploading {
-                ProgressViewReusable(title: "Uploading Photos...")
+                ProgressViewReusable(title: "", style: .standard)
                     .zIndex(11)
             }
         }
@@ -247,16 +249,19 @@ struct UpcomingRideView: View {
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
+                        hasUnreadNotifications = false
                         showNotification = true
                     } label: {
                         ZStack(alignment: .topTrailing) {
                             Image(systemName: "bell")
                                 .font(.system(size: 15))
                                 .foregroundColor(AppColor.celticBlue)
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                                .offset(x: -2, y: 1)
+                            if hasUnreadNotifications {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
                         }
                     }
                     
@@ -612,6 +617,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                         
                         Button(action: {
                             Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false) }
@@ -624,6 +630,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.bottom, 20)

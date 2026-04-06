@@ -203,8 +203,10 @@ extension CreateRideViewModel {
     func getActiveJoinedRide() async {
         do {
             self.isRideLoading = true
-            // Reset stale state before recomputing active ride.
-            self.activeRide = nil
+            // Don't clear `activeRide` up-front.
+            // Home/slider routing uses this cached value; clearing it creates a brief window where
+            // UI thinks there's no active ride while the network refresh is in-flight.
+            var resolvedActiveRide: JoinRideModel? = nil
 
             let allRides = try await getAllRidesAsync()
             let currentUserId = MBUserDefaults.userIdStatic
@@ -240,7 +242,7 @@ extension CreateRideViewModel {
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 let dateString = formatDate(startDate)
 
-                activeRide = JoinRideModel(
+                resolvedActiveRide = JoinRideModel(
                     userId: ride.createdBy ?? "",
                     rideId: ride.ridesID ?? "",
                     title: ride.rideTitle ?? "",
@@ -263,14 +265,12 @@ extension CreateRideViewModel {
                     assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil,
                     assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil
                 )
-                self.isRideLoading = false
                 break
             }
-            
-            // If no active ride was found, set loading to false
-            if self.activeRide == nil {
-                self.isRideLoading = false
-            }
+
+            // Only store a ride when `isJoined == true` (the guard above enforces that).
+            self.activeRide = resolvedActiveRide
+            self.isRideLoading = false
 
         } catch {
             await MainActor.run {

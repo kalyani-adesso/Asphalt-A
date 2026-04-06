@@ -16,32 +16,47 @@ struct SelectYourRideView: View {
     private let totalPages = 7
     @ObservedObject var viewModel:ProfileViewModel
     var body: some View {
-        VStack {
-            ScrollView {
-                VStack {
-                    Group {
-                        ProfileTitleView(title:AppStrings.SelectRide.selectingRide, subtitle: AppStrings.SelectRide.chooseType, icon: AppIcon.Profile.ride)
-                            .padding(.horizontal,15)
-                            .padding(.top,20)
-                        SelectBikeTabView(image:viewModel.vehicleImageArray ,vehicleArray: viewModel.vehicleArray,  currentPage:$currentPage , totalPages: totalPages)
-                        AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
-                        AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
-                        ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
-                            Task {
-                                await viewModel.addNewBike(userId: MBUserDefaults.userIdStatic ?? "", model: model, make: make, type:viewModel.vehicleArray[currentPage].constantValue)
-                            }
-                           
-                            isPresented = false
-                        })
-                        .disabled(viewModel.validateMake(make: make, moodel: model))
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                ScrollView {
+                    VStack {
+                        Group {
+                            ProfileTitleView(title:AppStrings.SelectRide.selectingRide, subtitle: AppStrings.SelectRide.chooseType, icon: AppIcon.Profile.ride)
+                                .padding(.horizontal,15)
+                                .padding(.top,20)
+                            SelectBikeTabView(image:viewModel.vehicleImageArray ,vehicleArray: viewModel.vehicleArray,  currentPage:$currentPage , totalPages: totalPages)
+                            AddBikeFieldView(label: AppStrings.SelectRide.make, placeholder: AppStrings.SelectRide.selectMake, inputText: $make)
+                            AddBikeFieldView(label: AppStrings.SelectRide.model, placeholder: AppStrings.SelectRide.model, inputText: $model)
+                            ButtonView(title: AppStrings.SelectRide.addVehicle, onTap: {
+                                Task {
+                                    await viewModel.addNewBike(userId: MBUserDefaults.userIdStatic ?? "", model: model, make: make, type:viewModel.vehicleArray[currentPage].constantValue)
+                                }
+                                
+                                isPresented = false
+                            })
+                            .disabled(viewModel.validateMake(make: make, moodel: model))
+                        }
+                        .padding()
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity,maxHeight: .infinity)
+                    .background(AppColor.listGray)
+                    .cornerRadius(10)
+                    .padding(EdgeInsets(top: 15, leading: 15, bottom: 50, trailing: 15))
                 }
-                .frame(maxWidth: .infinity,maxHeight: .infinity)
-                .background(AppColor.listGray)
-                .cornerRadius(10)
-                .padding(EdgeInsets(top: 15, leading: 15, bottom: 50, trailing: 15))
             }
+            Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(AppColor.black)
+                            .padding(10)
+                            .background(Color.white)
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
+                    }
+                    .padding(.top, 20)
+                    .padding(.trailing, 20)
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .background(AppColor.darkgray)

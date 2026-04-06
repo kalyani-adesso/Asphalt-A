@@ -15,6 +15,8 @@ struct ChatDetailView: View {
     let chatId: String
     
     @State private var showNotification = false
+    @AppStorage(AppStrings.userdefaultKeys.hasUnreadNotifications.rawValue)
+    private var hasUnreadNotifications: Bool = false
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
@@ -94,16 +96,19 @@ struct ChatDetailView: View {
                     }
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
+                            hasUnreadNotifications = false
                             showNotification = true
                         } label: {
                             ZStack(alignment: .topTrailing) {
                                 Image(systemName: "bell")
                                     .font(.system(size: 15))
                                     .foregroundColor(AppColor.celticBlue)
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 8, height: 8)
-                                    .offset(x: -2, y: 1)
+                                if hasUnreadNotifications {
+                                    Circle()
+                                        .fill(Color.red)
+                                        .frame(width: 8, height: 8)
+                                        .offset(x: -2, y: 1)
+                                }
                             }
                         }
                         

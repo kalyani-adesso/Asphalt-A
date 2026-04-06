@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CustomTimePicker: View {
     @Binding var selectedTime: Date
+    var selectedDate: Date
+    var referenceTime: Date?
     var onDismiss: (() -> Void)?
     
     @State private var hours = 12
@@ -18,8 +20,9 @@ struct CustomTimePicker: View {
     private let hourRange = Array(1...12)
     private let minuteRange = Array(0...59)
     
-    var isPastTime: Bool {
-        var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+    /// Checks if the selected date + time is in the past or invalid compared to referenceTime
+    var isInvalidTime: Bool {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
         
         var hour = hours % 12
         if !isAM { hour += 12 }
@@ -29,7 +32,19 @@ struct CustomTimePicker: View {
         
         guard let selectedDateTime = Calendar.current.date(from: components) else { return false }
         
-        return selectedDateTime < Date()
+        // past check
+        if selectedDateTime < Date() { return true }
+        
+        // compare FULL datetime properly
+        if let reference = referenceTime {
+            if Calendar.current.isDate(selectedDate, inSameDayAs: reference) {
+                if selectedDateTime < reference {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
     
     var body: some View {
@@ -86,14 +101,14 @@ struct CustomTimePicker: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(AppColor.backgroundLight, lineWidth: 2)
             )
-            if isPastTime {
-                Text("Cannot select past time")
+            
+            if isInvalidTime {
+                Text("Selected time is invalid")
                     .font(.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
             }
-
             
             // Buttons
             HStack(spacing: 30) {
@@ -102,7 +117,7 @@ struct CustomTimePicker: View {
                     .foregroundColor(AppColor.celticBlue)
                 
                 Button("OK") {
-                    var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+                    var components = Calendar.current.dateComponents([.year, .month, .day], from: selectedDate)
                     var hour = hours % 12
                     if !isAM { hour += 12 }
                     components.hour = hour
@@ -115,6 +130,9 @@ struct CustomTimePicker: View {
                 }
                 .font(KlavikaFont.regular.font(size: 12))
                 .foregroundColor(AppColor.celticBlue)
+                .foregroundColor(isInvalidTime ? AppColor.grey : AppColor.celticBlue)
+                .opacity(isInvalidTime ? 0.5 : 1.0) 
+                .disabled(isInvalidTime) //Disable OK if invalid
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.horizontal)
@@ -128,24 +146,19 @@ struct CustomTimePicker: View {
             let comps = Calendar.current.dateComponents([.hour, .minute], from: selectedTime)
             let hour24 = comps.hour ?? 0
             
-            if hour24 == 0 {
-                hours = 12; isAM = true
-            } else if hour24 < 12 {
-                hours = hour24; isAM = true
-            } else if hour24 == 12 {
-                hours = 12; isAM = false
-            } else {
-                hours = hour24 - 12; isAM = false
-            }
+            if hour24 == 0 { hours = 12; isAM = true }
+            else if hour24 < 12 { hours = hour24; isAM = true }
+            else if hour24 == 12 { hours = 12; isAM = false }
+            else { hours = hour24 - 12; isAM = false }
+            
             minutes = comps.minute ?? 0
         }
     }
 }
-
 #Preview {
-    CustomTimePicker(selectedTime: .constant(Date()))
+    CustomTimePicker(selectedTime: .constant(Date()),  selectedDate: Date())
 }
 
 #Preview {
-    CustomTimePicker(selectedTime: .constant(Date()))
+    CustomTimePicker(selectedTime: .constant(Date()), selectedDate: Date())
 }

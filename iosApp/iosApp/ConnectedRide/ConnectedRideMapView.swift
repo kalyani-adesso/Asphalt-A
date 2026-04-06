@@ -264,9 +264,9 @@ struct ConnectedRideMapView: View {
     func tryJoinWhenLocationReady() {
         sessionController.tryJoinWhenLocationReady(
             locationProvider: {
-                let lat = locationManager.lastLocation?.coordinate.latitude ?? 0
-                let long = locationManager.lastLocation?.coordinate.longitude ?? 0
-                let isValid = (lat != 0 || long != 0) && locationManager.lastLocation != nil
+                let lat = locationManager.lastLocation?.coordinate.latitude ?? (rideModel.hasAssemblyPoint ? rideModel.assemblyLat : rideModel.startLat) ?? 0
+                let long = locationManager.lastLocation?.coordinate.longitude ?? (rideModel.hasAssemblyPoint ? rideModel.assemblyLon : rideModel.startLong) ?? 0
+                let isValid = (lat != 0 || long != 0)
                 return (lat, long, isValid)
             },
             joinAction: { lat, long in
