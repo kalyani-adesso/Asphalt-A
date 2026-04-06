@@ -31,9 +31,18 @@ import com.asphalt.commonui.theme.NeutralLightPaper
 import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyMedium
+import com.asphalt.commonui.theme.VividRed
 
 @Composable
-fun InputAndDropDown(title1:String,title2:String){
+fun InputAndDropDown(
+    title1: String,
+    title2: String,
+    showTitleError1: Boolean = false,
+    showTitleError2: Boolean = false,
+    input1: (String) -> Unit,
+    input2: (String) -> Unit,
+    inputString1: String = ""
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,18 +64,28 @@ fun InputAndDropDown(title1:String,title2:String){
                     .background(
                         NeutralLightPaper, shape = RoundedCornerShape(Dimensions.padding10)
                     )
-                    .border(
-                        width = Dimensions.padding1,
-                        color = NeutralWhite,
-                        shape = RoundedCornerShape(Dimensions.padding10)
+                    .then(
+                        if (showTitleError1) {
+                            Modifier.border(
+                                width = Dimensions.padding1,
+                                color = VividRed,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        } else {
+                            Modifier.border(
+                                width = Dimensions.padding1,
+                                color = NeutralWhite,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }
                     ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextField(
-                    value = "",
+                    value = inputString1,
                     onValueChange = {
-
+                        input1.invoke(it)
                     },
                     placeholder = {
                         Text(
@@ -120,6 +139,21 @@ fun InputAndDropDown(title1:String,title2:String){
                         color = NeutralWhite,
                         shape = RoundedCornerShape(Dimensions.padding10)
                     )
+                    .then(
+                        if (showTitleError2) {
+                            Modifier.border(
+                                width = Dimensions.padding1,
+                                color = VividRed,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        } else {
+                            Modifier.border(
+                                width = Dimensions.padding1,
+                                color = NeutralWhite,
+                                shape = RoundedCornerShape(Dimensions.padding10)
+                            )
+                        }
+                    )
                     .clickable { },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -144,6 +178,6 @@ fun InputAndDropDown(title1:String,title2:String){
 
 @Preview
 @Composable
-fun InputAndDropDownPreview(){
-    InputAndDropDown("title1","title2")
+fun InputAndDropDownPreview() {
+    InputAndDropDown("title1", "title2", false, false, {}, {})
 }
