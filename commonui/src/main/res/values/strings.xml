@@ -285,6 +285,7 @@
     <string name="product_details">Product Details</string>
     <string name="message">MESSAGE</string>
     <string name="make_offer">MAKE OFFER</string>
+    <string name="price">Price</string>
 
 
 </resources>
