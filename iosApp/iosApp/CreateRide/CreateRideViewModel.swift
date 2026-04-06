@@ -202,11 +202,10 @@ extension CreateRideViewModel {
     @MainActor
     func getActiveJoinedRide() async {
         do {
-            self.isRideLoading = true
-            // Don't clear `activeRide` up-front.
-            // Home/slider routing uses this cached value; clearing it creates a brief window where
-            // UI thinks there's no active ride while the network refresh is in-flight.
-            var resolvedActiveRide: JoinRideModel? = nil
+            // Do not toggle `isRideLoading` here — it drives the tab-bar blocking overlay
+            // (`ListShimmerPlaceholder`). Background active-ride refresh should not cover Home.
+            // Reset stale state before recomputing active ride.
+            self.activeRide = nil
 
             let allRides = try await getAllRidesAsync()
             let currentUserId = MBUserDefaults.userIdStatic
@@ -242,7 +241,7 @@ extension CreateRideViewModel {
                 let joinedCount = ride.participants.filter { $0.inviteStatus == 3 }.count
                 let dateString = formatDate(startDate)
 
-                resolvedActiveRide = JoinRideModel(
+                activeRide = JoinRideModel(
                     userId: ride.createdBy ?? "",
                     rideId: ride.ridesID ?? "",
                     title: ride.rideTitle ?? "",
@@ -268,14 +267,7 @@ extension CreateRideViewModel {
                 break
             }
 
-            // Only store a ride when `isJoined == true` (the guard above enforces that).
-            self.activeRide = resolvedActiveRide
-            self.isRideLoading = false
-
         } catch {
-            await MainActor.run {
-                self.isRideLoading = false
-            }
             print("Failed to fetch active ride: \(error.localizedDescription)")
         }
     }

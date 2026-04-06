@@ -29,28 +29,32 @@ struct ForgotPassword: View {
                         title: AppStrings.SignInLabel.createNewPassword.localized,
                         subtitle: AppStrings.SignInLabel.enterYourNewPassword.localized
                     )
-                    VStack(spacing: 21) {
-                        FormFieldView(
-                            label: AppStrings.SignInLabel.emailOrPhone.localized,
-                            icon: AppIcon.Login.email,
-                            placeholder: AppStrings.SignInPlaceholder.email.localized,
-                            value: $emailOrPhone,
-                            isValidEmail: $isValidEmail
-                        )
+                    if viewModel.isSendingReset {
+                        ForgotPasswordSkeleton()
+                    } else {
+                        VStack(spacing: 21) {
+                            FormFieldView(
+                                label: AppStrings.SignInLabel.emailOrPhone.localized,
+                                icon: AppIcon.Login.email,
+                                placeholder: AppStrings.SignInPlaceholder.email.localized,
+                                value: $emailOrPhone,
+                                isValidEmail: $isValidEmail
+                            )
+                        }
+                        .padding(.bottom, 18)
+                        //TODO: Show forgot password mail send toast.
+                        ButtonView(title: AppStrings.SignInLabel.updatePassword.localized.uppercased(), onTap: {
+                            viewModel.getEmailorPhoneNumber(emailorPhoneNumber: emailOrPhone, password: password, confirmPassword: confirmPassword, onSucess: {
+                                // Show snackbar and start timer for navigation
+                                showSnackbar = true
+                                navigationTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                                    hasPasswordReset = true
+                                    showSnackbar = false
+                                }
+                            })
+                        }).disabled(!isValidEmail)
+                            .padding(.bottom, 20)
                     }
-                    .padding(.bottom, 18)
-                    //TODO: Show forgot password mail send toast.
-                    ButtonView(title: AppStrings.SignInLabel.updatePassword.localized.uppercased(), onTap: {
-                        viewModel.getEmailorPhoneNumber(emailorPhoneNumber: emailOrPhone, password: password, confirmPassword: confirmPassword, onSucess: {
-                            // Show snackbar and start timer for navigation
-                            showSnackbar = true
-                            navigationTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
-                                hasPasswordReset = true
-                                showSnackbar = false
-                            }
-                        })
-                    }).disabled(!isValidEmail)
-                        .padding(.bottom,20)
                     NavigationLink(destination: {
                         SignInView()
                     }, label: {

@@ -8,159 +8,142 @@
 import SwiftUI
 
 enum ProgressLoaderStyle {
+    /// List / forms / details — light frosted layer + soft white → brand blue sweep.
     case standard
+    /// Connected ride flows — slightly stronger scrim + tighter, brighter blue shimmer.
     case connectedRide
 }
 
-private struct ShimmerModifier: ViewModifier {
-    @State private var phase: CGFloat = -0.8
+/// Full-screen shimmer that reads clearly on device (no dot animation).
+private struct DesignAlignedShimmerOverlay: View {
+    let style: ProgressLoaderStyle
+    let accent: Color
 
-    func body(content: Content) -> some View {
-        content
-            .overlay {
-                GeometryReader { proxy in
-                    let w = proxy.size.width
+    private var baseFillOpacity: CGFloat {
+        switch style {
+        case .standard: return 0.42
+        case .connectedRide: return 0.32
+        }
+    }
+
+    private var bandWidthFraction: CGFloat {
+        switch style {
+        case .standard: return 0.62
+        case .connectedRide: return 0.48
+        }
+    }
+
+    /// Seconds for one full sweep (standard = calmer; connected = snappier).
+    private var cycleDuration: Double {
+        switch style {
+        case .standard: return 1.55
+        case .connectedRide: return 1.12
+        }
+    }
+
+    private var centerOpacity: CGFloat {
+        switch style {
+        case .standard: return 0.55
+        case .connectedRide: return 0.72
+        }
+    }
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: false)) { timeline in
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+                let t = timeline.date.timeIntervalSinceReferenceDate
+                let progress = CGFloat((t.truncatingRemainder(dividingBy: cycleDuration)) / cycleDuration)
+                // Sweep band fully across screen once per cycle.
+                let phase = -1.2 + progress * 2.8
+
+                ZStack {
+                    AppColor.backgroundLight
+                        .opacity(baseFillOpacity)
+                        .ignoresSafeArea()
+
                     Rectangle()
                         .fill(
                             LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color.clear,
-                                    Color.white.opacity(0.70),
-                                    Color.clear
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
+                                stops: [
+                                    .init(color: .white.opacity(0.05), location: 0.0),
+                                    .init(color: .white.opacity(0.55), location: 0.42),
+                                    .init(color: accent.opacity(centerOpacity), location: 0.50),
+                                    .init(color: .white.opacity(0.45), location: 0.58),
+                                    .init(color: .white.opacity(0.06), location: 1.0)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: w * 0.55)
-                        .rotationEffect(.degrees(18))
-                        .offset(x: phase * w)
-                        .blendMode(.screen)
+                        .frame(width: max(w, h) * bandWidthFraction, height: max(w, h) * 1.35)
+                        .rotationEffect(.degrees(22))
+                        .offset(x: phase * w * 1.25, y: phase * h * 0.08)
+                        .blendMode(.plusLighter)
                 }
-                .clipped()
-            }
-            .onAppear {
-                withAnimation(.linear(duration: 1.05).repeatForever(autoreverses: false)) {
-                    phase = 1.8
-                }
-            }
-    }
-}
-
-private extension View {
-    func shimmer() -> some View { modifier(ShimmerModifier()) }
-}
-
-/// A full-screen shimmer *overlay* meant to sit on top of an existing UI.
-/// This avoids a generic "loading screen" by keeping the underlying UI visible and
-/// drawing a dense skeleton layer above it, with an animated highlight pass.
-private struct FullPageShimmerOverlay: View {
-    @State private var highlightPhase: CGFloat = -1.2
-    @State private var drift: CGFloat = 0
-
-    var body: some View {
-        GeometryReader { proxy in
-            let size = proxy.size
-
-            ZStack {
-                // Clean highlight sweep across the existing UI.
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(stops: [
-                                .init(color: .clear, location: 0.0),
-                                .init(color: Color.white.opacity(0.78), location: 0.5),
-                                .init(color: .clear, location: 1.0)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: size.width * 0.75)
-                    .rotationEffect(.degrees(18))
-                    .offset(x: (highlightPhase * size.width) + (drift * 10))
-                    .blendMode(.screen)
-                    .opacity(0.72)
-                    .blur(radius: 0.6)
-                    .ignoresSafeArea()
-            }
-            .ignoresSafeArea()
-            .onAppear {
-                withAnimation(.linear(duration: 1.15).repeatForever(autoreverses: false)) {
-                    highlightPhase = 2.2
-                }
-                withAnimation(.easeInOut(duration: 2.6).repeatForever(autoreverses: true)) {
-                    drift = 1
-                }
+                .frame(width: w, height: h)
             }
         }
         .allowsHitTesting(true)
     }
-
 }
 
 struct ProgressViewReusable: View {
-    // Default empty; only Connected Ride should show visible loading text.
     var title: String = ""
     var color: Color = AppColor.celticBlue
     var style: ProgressLoaderStyle = .standard
-    /// When `nil`, we choose a sensible default:
-    /// - `.standard`: no black dim (keeps page visible)
-    /// - `.connectedRide`: dim to match existing flow
+    /// When `nil`, a sensible default scrim is used per style.
+    /// Pass `false` for a lighter overlay (e.g. over tab bar) while shimmer stays visible.
     var dimsBackground: Bool? = nil
+
+    private var scrimOpacity: CGFloat {
+        switch style {
+        case .connectedRide:
+            if let dims = dimsBackground { return dims ? 0.22 : 0.12 }
+            return 0.22
+        case .standard:
+            if let dims = dimsBackground { return dims ? 0.26 : 0.12 }
+            return 0.20
+        }
+    }
 
     var body: some View {
         ZStack {
-            // Always block interaction with underlying UI while loader is visible.
-            // (Even when we don't dim the background.)
-            Color.clear
+            Color.black.opacity(scrimOpacity)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
-                .onTapGesture { }
 
-            let shouldDim = dimsBackground ?? (style == .connectedRide)
-            if shouldDim {
-                Color.black.opacity(style == .connectedRide ? 0.18 : 0.15)
-                    .ignoresSafeArea()
-            }
+            DesignAlignedShimmerOverlay(style: style, accent: color)
 
-            Group {
-                switch style {
-                case .standard:
-                    // Shimmer overlay on top of the existing UI (no generic skeleton page).
-                    FullPageShimmerOverlay()
-
-                case .connectedRide:
-                    VStack(spacing: 8) {
-                        HorizontalBouncingDotsLoader(
-                            color: AppColor.celticBlue,
-                            dotSize: 7,
-                            spacing: 6,
-                            travel: 5,
-                            duration: 0.62,
-                            stagger: 0.12
+            if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                VStack {
+                    Spacer()
+                    Text(title)
+                        .font(KlavikaFont.medium.font(size: 13))
+                        .foregroundStyle(Color.primary.opacity(0.85))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(AppColor.backgroundLight.opacity(0.94))
+                                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
                         )
-                        if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            Text(title)
-                                .font(KlavikaFont.medium.font(size: 12))
-                                .foregroundStyle(Color.white.opacity(0.88))
-                                .lineLimit(1)
-                        }
-                    }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(Color.black.opacity(0.72))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .shadow(color: Color.black.opacity(0.20), radius: 10, x: 0, y: 5)
-                    .padding(.horizontal, 24)
+                        .padding(.bottom, 36)
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(title.isEmpty ? "Loading" : title)
     }
 }
 
 #Preview {
+    ProgressViewReusable(title: "Loading…", style: .standard)
+}
+
+#Preview("Connected") {
     ProgressViewReusable(title: "", style: .connectedRide)
 }

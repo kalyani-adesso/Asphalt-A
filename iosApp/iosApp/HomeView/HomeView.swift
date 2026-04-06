@@ -121,6 +121,7 @@ struct HomeView: View {
         .task {
             await viewModel.fetchAllUsers()
             await viewModel.fetchAllRides()
+            home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             home.updateStatsFor(month: month, year: year)

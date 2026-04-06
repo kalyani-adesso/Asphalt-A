@@ -157,8 +157,17 @@ struct BottomNavBar: View {
                     NotificationView()
                 })
                 .navigationBarBackButtonHidden(true)
-                if createRideVM.isRideLoading || upcomingRideViewModel.isRideLoading  {
-                    ProgressViewReusable(title: "", dimsBackground: false)
+                // Block interaction during create-ride network work — no list shimmer (avoids Timeline sweep on Home).
+                if createRideVM.isRideLoading {
+                    ZStack {
+                        Color.black.opacity(0.12)
+                            .ignoresSafeArea()
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(AppColor.celticBlue)
+                            .scaleEffect(1.15)
+                    }
+                    .allowsHitTesting(true)
                 }
             }
         }

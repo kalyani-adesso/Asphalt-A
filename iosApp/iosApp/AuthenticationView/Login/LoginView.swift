@@ -55,7 +55,7 @@ struct SignInView: View {
                     })
                     .disabled(viewModel.isLoggingIn)
                     .opacity(viewModel.isLoggingIn ? 0.7 : 1.0)
-                    .padding(.bottom,20)
+                    .padding(.bottom, 20)
                     socialSignInOptions
                     signUpLink()
                 }

@@ -22,8 +22,9 @@ class HomeViewModel: ObservableObject {
     @Published var stats: [RideStat] = []
     @Published var userName: String = ""
     @Published var userCreatedDate: Date? = nil
-    
-    
+    /// True while ride summary / dashboard API is in flight (journey donut, stats, places chart).
+    @Published var isRideSummaryLoading = true
+
     // MARK: - Bar chart
     @Published var selectedMonth: PlacesMonth? = nil
     @Published var placesByMonth: [PlacesMonth] = []
@@ -69,10 +70,14 @@ class HomeViewModel: ObservableObject {
         }
     }
     func getRideSummary(userID: String, range: String) {
+        Task { @MainActor in
+            isRideSummaryLoading = true
+        }
         rideRepository.getRideSummary(userID: userID) { result, error in
-            if let success = result as? APIResultSuccess<AnyObject>,
-               let rideArray = success.data as? [DashboardDomain] {
-                Task { @MainActor in
+            Task { @MainActor in
+                defer { self.isRideSummaryLoading = false }
+                if let success = result as? APIResultSuccess<AnyObject>,
+                   let rideArray = success.data as? [DashboardDomain] {
                     self.dashboardData = rideArray
                     let month = Calendar.current.component(.month, from: Date())
                     let year = Calendar.current.component(.year, from: Date())
@@ -81,14 +86,12 @@ class HomeViewModel: ObservableObject {
                     self.currentSlices = self.getJourneySlices(for: range)
                     self.generatePlacesByMonth()
                     NotificationCenter.default.post(name: .placesDataUpdated, object: nil)
-                    
+                    print("----Rides---\(rideArray)")
+                } else {
+                    print("error")
                 }
-                print("----Rides---\(rideArray)")
-            }  else {
-                print("error")
             }
         }
-        
     }
     
     

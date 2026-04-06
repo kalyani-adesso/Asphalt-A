@@ -13,19 +13,31 @@ struct NavigationSlideBar: View {
     @StateObject private var home = HomeViewModel()
     @StateObject private var upcomingRide = UpcomingRideViewModel()
     @State var showHome: Bool = false
+    @State private var menuRowsVisible = false
     var body: some View {
         AppToolBar(showBack: false){
             VStack {
-                List(viewModel.sections, id: \.self) { item in
-                    MenuItemRow(viewModel: viewModel, item: item, home: home, upcomingRide: upcomingRide)
+                List {
+                    ForEach(Array(viewModel.sections.enumerated()), id: \.element.id) { index, item in
+                        MenuItemRow(
+                            viewModel: viewModel,
+                            item: item,
+                            home: home,
+                            upcomingRide: upcomingRide,
+                            rowIndex: index,
+                            rowsVisible: menuRowsVisible
+                        )
                         .padding(.vertical, 5)
                         .listRowSeparator(.hidden)
                         .listRowBackground(AppColor.listGray)
+                    }
                 }
+                .animation(AppListRowAnimations.spring, value: viewModel.sections.map(\.id))
                 .scrollContentBackground(.hidden)
                 .listStyle(.plain)
                 .cornerRadius(10)
                 .padding(16)
+                .onAppear { menuRowsVisible = true }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
@@ -38,6 +50,8 @@ struct MenuItemRow: View {
     let item: MenuItemModel
     let home: HomeViewModel
     let upcomingRide: UpcomingRideViewModel
+    var rowIndex: Int = 0
+    var rowsVisible: Bool = true
     @State var itemIsSelected: Bool = false
     @State private var showComingSoonAlert: Bool = false
     @State private var logoutAlert: Bool = false
@@ -71,6 +85,8 @@ struct MenuItemRow: View {
                 .padding(.trailing, 8)
         }
         .modifier(logoutSection(title: item.title))
+        .staggeredListRow(index: rowIndex, visible: rowsVisible)
+        .dashboardListRowTransition()
         .contentShape(Rectangle())
         .onTapGesture {
             if item.title == AppStrings.NavigationSlider.logout {

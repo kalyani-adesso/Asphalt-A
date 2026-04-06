@@ -106,13 +106,25 @@ struct CreateAccount: View {
                         }
                     }
                 }
-                .padding()
+                // Match `SignInView`: horizontal inset on scroll content only so full-screen overlays
+                // (loading shimmer, toasts) span edge-to-edge within the safe area.
+                .padding(.horizontal, 24)
+                // Avoid double top inset (NavigationBar already consumes safe-area).
+                .padding(.top, 16)
+                .padding(.bottom, 24)
             }
            
             // TODO: do validation for other case as well - check sign in flow.
+            if signUpViewModel.isSigningUp {
+                ZStack {
+                    Color.black.opacity(0.2)
+                        .ignoresSafeArea()
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
+                }
+                .ignoresSafeArea()
+            }
             ToastView(message:AppStrings.ValidationMessage.validateEmail.rawValue , isShowing: $signUpViewModel.showToast)
         }
-        .padding(.horizontal, 24)
     }
     private func validatePasswords() {
         

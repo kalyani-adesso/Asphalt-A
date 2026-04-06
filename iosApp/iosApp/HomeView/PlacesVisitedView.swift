@@ -13,6 +13,10 @@ struct PlacesVisitedView: View {
     @State private var monthOffset = 0
     @State private var visiblePlaces: [HomeViewModel.PlacesMonth] = []
     var body: some View {
+        Group {
+            if home.isRideSummaryLoading {
+                PlacesVisitedChartSkeleton()
+            } else {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -145,6 +149,8 @@ struct PlacesVisitedView: View {
         .onAppear {
             home.loadUserName()
             updateVisiblePlaces()
+        }
+            }
         }
         .padding()
     }

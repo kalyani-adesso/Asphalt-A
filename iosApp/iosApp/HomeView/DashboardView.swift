@@ -10,12 +10,17 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var currentDate = Date()
+    @State private var statsVisible = false
     var isAtFirstMonth: Bool {
         guard let firstMonth = home.firstAvailableMonth else { return false }
         return Calendar.current.isDate(currentDate, equalTo: firstMonth, toGranularity: .month)
     }
     
     var body: some View {
+        Group {
+            if home.isRideSummaryLoading {
+                DashboardStatsSkeleton()
+            } else {
             VStack(spacing: 15) {
                 HStack {
                                VStack(alignment: .leading, spacing: 2) {
@@ -68,8 +73,9 @@ struct DashboardView: View {
                 .padding(.horizontal, 10)
                 .cornerRadius(12)
                 HStack(spacing: 15) {
-                    ForEach(home.stats) { stat in
+                    ForEach(Array(home.stats.enumerated()), id: \.element.id) { index, stat in
                         StatCardView(stat: stat)
+                            .staggeredListRow(index: index, visible: statsVisible)
                     }
                 }
             }
@@ -84,14 +90,19 @@ struct DashboardView: View {
                         let month = Calendar.current.component(.month, from: newValue)
                         let year = Calendar.current.component(.year, from: newValue)
                         home.updateStatsFor(month: month, year: year)
+                        statsVisible = false
+                        DispatchQueue.main.async {
+                            statsVisible = true
+                        }
                     }
                     .onAppear {
-                       
                             let month = Calendar.current.component(.month, from: currentDate)
                             let year = Calendar.current.component(.year, from: currentDate)
                             home.updateStatsFor(month: month, year: year)
-                        
+                            statsVisible = true
                     }
+            }
+        }
     }
     
 }

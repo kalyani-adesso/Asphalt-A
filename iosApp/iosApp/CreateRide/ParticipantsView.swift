@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ParticipantsView: View {
     @State private var searchText = ""
+    @State private var participantRowsVisible = false
     @EnvironmentObject var viewModel: CreateRideViewModel
     
     var body: some View {
@@ -16,6 +17,10 @@ struct ParticipantsView: View {
             VStack {
                 VStack(spacing: 20) {
                     stepIndicator
+                    if viewModel.isRideLoading {
+                        ParticipantsSkeleton()
+                            .frame(width: 343, height: 448)
+                    } else {
                     VStack(alignment: .leading, spacing: 20) {
                         
                         HStack {
@@ -37,7 +42,7 @@ struct ParticipantsView: View {
 
                         ScrollView {
                             VStack(spacing: 10) {
-                                ForEach(filteredParticipants) { participant in
+                                ForEach(Array(filteredParticipants.enumerated()), id: \.element.id) { index, participant in
                                     ParticipantsRow(
                                         participant: participant,
                                         isSelected: Binding(
@@ -46,14 +51,30 @@ struct ParticipantsView: View {
                                             }
                                         )
                                     )
+                                    .staggeredListRow(index: index, visible: participantRowsVisible)
+                                    .dashboardListRowTransition()
                                 }
                             }
+                            .animation(AppListRowAnimations.spring, value: filteredParticipants.map(\.id))
+                        }
+                        .onAppear {
+                            participantRowsVisible = viewModel.isRideLoading ? false : true
+                        }
+                        .onChange(of: viewModel.isRideLoading) { _, loading in
+                            if !loading {
+                                participantRowsVisible = true
+                            }
+                        }
+                        .onChange(of: filteredParticipants.map(\.id)) { _, _ in
+                            participantRowsVisible = false
+                            DispatchQueue.main.async { participantRowsVisible = true }
                         }
                     }
                     .frame(width: 343, height: 448)
                     .padding()
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
+                    }
                 }
                 Spacer()
                 HStack(spacing: 15) {
@@ -76,9 +97,6 @@ struct ParticipantsView: View {
                 .onAppear {
                     viewModel.getAllUsers()
                 }
-            }
-            if viewModel.isRideLoading {
-                ProgressViewReusable(title: "", style: .standard)
             }
         }
     }
