@@ -67,6 +67,7 @@ import com.asphalt.joinaride.locationutils.CurrentLocationUpdates
 import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.marketplace.ui.CreateAd
+import com.asphalt.marketplace.ui.ProductDetailsScreen
 import com.asphalt.profile.screens.ProfileScreen
 import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -627,7 +628,8 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.CreateAd> { key ->
-                        CreateAd(setTopAppBarState = setTopAppBarState)
+                        //CreateAd(setTopAppBarState = setTopAppBarState)
+                        ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
@@ -664,11 +666,11 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
-                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
-                    /*  scope.launch {
+                    //Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                     scope.launch {
                           backStack.add(AppNavKey.CreateAd)
                           drawerState.close()
-                      }*/
+                      }
                 }
 
                 Constants.SETTINGS_CLICK -> {
