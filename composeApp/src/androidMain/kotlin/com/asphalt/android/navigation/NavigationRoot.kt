@@ -628,8 +628,8 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.CreateAd> { key ->
-                        //CreateAd(setTopAppBarState = setTopAppBarState)
-                        ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
+                        CreateAd(setTopAppBarState = setTopAppBarState)
+                        //ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
