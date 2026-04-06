@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,6 +67,7 @@ fun ProductDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .background(NeutralLightPaper)
@@ -165,6 +168,18 @@ fun ProductDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
 
                 }
             }
+            Spacer(modifier = Modifier.height(Dimensions.size16))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(NeutralWhite)
+                    .padding(vertical = Dimensions.padding16, horizontal = Dimensions.padding16)
+
+            ) {
+
+            }
+
         }
 
 
