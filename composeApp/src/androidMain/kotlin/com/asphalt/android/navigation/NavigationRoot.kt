@@ -666,11 +666,11 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
-                    //Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
-                     scope.launch {
+                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                     /*scope.launch {
                           backStack.add(AppNavKey.CreateAd)
                           drawerState.close()
-                      }
+                      }*/
                 }
 
                 Constants.SETTINGS_CLICK -> {
