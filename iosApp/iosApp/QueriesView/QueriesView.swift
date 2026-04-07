@@ -112,7 +112,9 @@ struct QueriesView: View {
                                                 .dashboardListRowTransition()
                                         }
                                     }
-                                    .animation(AppListRowAnimations.spring, value: viewModel.filteredQueries.map(\.id))
+                                    // Avoid animating the entire list on every filter tap (causes scroll "bounce").
+                                    // We only want the initial staggered entrance.
+                                    .animation(AppListRowAnimations.spring, value: queryRowsVisible)
                                     .padding(.horizontal, 20)
                                 }
                             }
@@ -124,10 +126,6 @@ struct QueriesView: View {
                             if !loading {
                                 queryRowsVisible = true
                             }
-                        }
-                        .onChange(of: viewModel.filteredQueries.map(\.id)) { _, _ in
-                            queryRowsVisible = false
-                            DispatchQueue.main.async { queryRowsVisible = true }
                         }
                     }
                 }
