@@ -24,12 +24,27 @@ struct HomeView: View {
     @State private var currentDate = Date()
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
+    @State private var didLoadActiveRideOnce = false
+
+    private var isActionButtonsLoading: Bool {
+        // Buttons should become interactive ASAP; don't wait for the heavier dashboard/profile loads.
+        // We only gate on:
+        // - Upcoming rides fetch (used for upcoming section and home interactions)
+        // - Active ride lookup (used to route Join Ride -> Connected Ride instantly)
+        viewModel.isRideLoading || !didLoadActiveRideOnce
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
                 VStack(spacing: 15){
                     TopNavBar(viewModel: profileVM)
-                    ActionButtonView(viewModel: createRideVM, upcomingRideViewModel: viewModel, homeViewModel: home)
+                    ActionButtonView(
+                        viewModel: createRideVM,
+                        upcomingRideViewModel: viewModel,
+                        homeViewModel: home,
+                        showSkeleton: isActionButtonsLoading
+                    )
                     DashboardView()
                     UpcomingRidesView(home: home , viewModel: viewModel){ rideId in
                         guard let ride = viewModel.upcomingInvitesRide.first(where: { $0.id == rideId }) else {
@@ -119,19 +134,32 @@ struct HomeView: View {
             }
         }
         .task {
-            await viewModel.fetchAllUsers()
-            await viewModel.fetchAllRides()
+            // Run the startup calls in parallel to reduce post-login jank.
+            async let usersTask: Void = viewModel.fetchAllUsers()
+            async let ridesTask: Void = viewModel.fetchAllRides()
+            async let profileTask: Void = profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+            async let activeRideTask: Void = createRideVM.getActiveJoinedRide()
+
             home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
+
+            // Flip the action-buttons skeleton off as soon as active-ride lookup completes.
+            await activeRideTask
+            didLoadActiveRideOnce = true
+
+            _ = await (usersTask, ridesTask, profileTask)
             let month = Calendar.current.component(.month, from: currentDate)
             let year = Calendar.current.component(.year, from: currentDate)
             home.updateStatsFor(month: month, year: year)
         }
-        .task {
-            await profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
-        }
         .refreshable {
-            await viewModel.fetchAllUsers()
-            await viewModel.fetchAllRides()
+            didLoadActiveRideOnce = false
+            async let usersTask: Void = viewModel.fetchAllUsers()
+            async let ridesTask: Void = viewModel.fetchAllRides()
+            async let profileTask: Void = profileVM.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+            async let activeRideTask: Void = createRideVM.getActiveJoinedRide()
+            await activeRideTask
+            didLoadActiveRideOnce = true
+            _ = await (usersTask, ridesTask, profileTask)
          
         }
     }

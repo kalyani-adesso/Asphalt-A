@@ -90,10 +90,8 @@ struct MenuItemRow: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if item.title == AppStrings.NavigationSlider.logout {
-                viewModel.logout {
-                    isLoggedIn = false
-                    logoutAlert = true
-                }
+                // Ask for confirmation first; do NOT clear session until user confirms.
+                logoutAlert = true
             } else if isComingSoonItem {
                 showComingSoonAlert = true
             } else if isConnectedRideItem {
@@ -110,7 +108,10 @@ struct MenuItemRow: View {
         }
         .alert("Logout", isPresented: $logoutAlert) {
             Button("Yes", role: .destructive) {
-                itemIsSelected = true
+                viewModel.logout {
+                    isLoggedIn = false
+                    itemIsSelected = true
+                }
             }
             Button("No", role: .cancel) {
                }

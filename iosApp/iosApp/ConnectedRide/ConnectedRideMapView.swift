@@ -36,6 +36,8 @@ struct ConnectedRideMapView: View {
     @State private var showInAppNavigation: Bool = false
     @State private var endRideErrorMessage: String?
     @State private var isEndingRide: Bool = false
+    /// While `true`, Firebase message + ongoing-rider streams run; set `false` when ride ends.
+    @State private var rideSessionActive: Bool = true
     // Smoothed speed & movement state for timer / UI
     @State private var speedSamples: [Double] = []
     @State private var isMoving: Bool = false
@@ -203,6 +205,7 @@ struct ConnectedRideMapView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 showToast = false
                             }
+                            guard rideSessionActive else { return }
                             locationManager.requestLocation()
                             locationManager.startUpdatingLocation()
 
@@ -245,10 +248,16 @@ struct ConnectedRideMapView: View {
                                 }
                             }
                         }
-                        .task { await messagingVM.receiveMessage(rideId: rideModel.rideId) }
-                        .task { await participantsVM.getOnGoingRides(rideId: rideModel.rideId) }
+                        .task(id: rideSessionActive) {
+                            guard rideSessionActive else { return }
+                            await messagingVM.receiveMessage(rideId: rideModel.rideId)
+                        }
+                        .task(id: rideSessionActive) {
+                            guard rideSessionActive else { return }
+                            await participantsVM.getOnGoingRides(rideId: rideModel.rideId)
+                        }
                         .onChange(of: viewModel.ongoingRideId) { _, ride in
-                            if !ride.isEmpty {
+                            if !ride.isEmpty, rideSessionActive, !rideComplted, !isEndingRide {
                                 startOngoingRideTimer()
                             }
                         }
@@ -285,6 +294,7 @@ struct ConnectedRideMapView: View {
     }
 
     func startOngoingRideTimer() {
+        guard rideSessionActive, !rideComplted, !isEndingRide else { return }
         sessionController.startHeartbeat(interval: 10) {
             if MBUserDefaults.userIdStatic == nil || MBUserDefaults.userIdStatic?.isEmpty == true {
                 stopTimer()
@@ -338,6 +348,18 @@ struct ConnectedRideMapView: View {
     
     func stopTimer() {
         sessionController.stopAllTimers()
+    }
+
+    /// Stops heartbeat + location updates immediately after a successful end ride.
+    private func stopSessionAfterRideEnded() {
+        stopTimer()
+        viewModel.stopOngoingRideTimer()
+        viewModel.endRide()
+        rideSessionActive = false
+        viewModel.ongoingRideId = ""
+        MBUserDefaults.isRideJoinedID = nil
+        MBUserDefaults.rideIdStatic = nil
+        locationManager.stopUpdatingLocation()
     }
 
     /// Updates smoothed speed and controls when the ride timer should advance.
@@ -514,6 +536,14 @@ struct ConnectedRideMapView: View {
                 }
                 return
             }
+            // Stop any background heartbeats immediately so no more PATCH updates go out after ride ends.
+            DispatchQueue.main.async {
+                stopSessionAfterRideEnded()
+                // Mark ride ended in the main ride node immediately (source of truth for "active ride").
+                // Do NOT depend on end-ride summary success for this, otherwise the app can treat the ride as still active
+                // on next refresh and re-join in background.
+                viewModel.endActiveRide(rideId: rideModel.rideId, rideCreatedBy: rideModel.userId)
+            }
             sessionVM.endRideSummary(
                 ride: rideModel,
                 userID: MBUserDefaults.userIdStatic ?? "",
@@ -531,13 +561,6 @@ struct ConnectedRideMapView: View {
                         riders: "\(viewModel.groupRiders.count + 1)"
                     )
 
-                    // IMPORTANT: `getActiveJoinedRide()` checks the main ride node (`RIDES_URL`).
-                    // `endRide()` only deletes ongoing tracking (`ONGOING_RIDE_URL`), so also mark
-                    // the ride ended for organizer / participant here (same as `endActiveRide()` logic).
-                    viewModel.endActiveRide(rideId: rideModel.rideId, rideCreatedBy: rideModel.userId)
-
-                    MBUserDefaults.isRideJoinedID = nil
-                    stopTimer()
                     NotificationStore.shared.add(
                         title: AppStrings.NavigationSlider.connectedRide,
                         message: AppStrings.ConnectedRide.rideCompleted,
