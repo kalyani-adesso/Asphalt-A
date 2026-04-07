@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		25FF5C842F90FE03AEDE041D /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C87AEDD8BC8FECABDEEE41E /* Pods_iosApp.framework */; };
+		5C1F7A8C2C8C4C2E9E3B9A10 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5C1F7A8B2C8C4C2E9E3B9A10 /* GoogleService-Info.plist */; };
 		CE9EBE652E86A8CC00CEC3E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		8F4DBD235FBCAF9DA4FD9431 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		97796D799F4E36E690C10DB2 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
+		5C1F7A8B2C8C4C2E9E3B9A10 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iosApp/Resources/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9C87AEDD8BC8FECABDEEE41E /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B0AEC11295E356AF3912F7 /* aRide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aRide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE353D692EFA60140010F5A8 /* AsphaltATests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AsphaltATests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +106,7 @@
 				1F0872E5BAF8F5F17FD4CE84 /* iosApp */,
 				CE353D6A2EFA60140010F5A8 /* AsphaltATests */,
 				0657DC9FC4DDAC98975E3C11 /* Products */,
+				5C1F7A8B2C8C4C2E9E3B9A10 /* GoogleService-Info.plist */,
 				CE9EBE642E86A8CC00CEC3E4 /* LaunchScreen.storyboard */,
 				93D2BA06F534C0A190240FD9 /* Pods */,
 				CEE428692E9E00D5000D8712 /* Recovered References */,
@@ -140,6 +143,7 @@
 				0B0131AE0BD35980853B7429 /* Frameworks */,
 				C5954ADC1F5879BB5EB571CF /* Resources */,
 				9E93516D8B5006F67203EB8D /* [CP] Embed Pods Frameworks */,
+				8B8E7B1D2F7A4C4A00C0A1C1 /* [CP] FirebaseCrashlytics */,
 			);
 			buildRules = (
 			);
@@ -218,6 +222,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C1F7A8C2C8C4C2E9E3B9A10 /* GoogleService-Info.plist in Resources */,
 				CE9EBE652E86A8CC00CEC3E4 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,6 +255,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n";
+		};
+		8B8E7B1D2F7A4C4A00C0A1C1 /* [CP] FirebaseCrashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+			);
+			name = "[CP] FirebaseCrashlytics";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n";
+			showEnvVarsInLog = 0;
 		};
 		9E93516D8B5006F67203EB8D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -46,6 +46,9 @@ kotlin {
         pod("FirebaseAuth") {
             extraOpts += fmodules
         }
+        pod("FirebaseCrashlytics") {
+            extraOpts += fmodules
+        }
     }
 
     sourceSets {
