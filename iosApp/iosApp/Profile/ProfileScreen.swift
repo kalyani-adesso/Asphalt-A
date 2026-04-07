@@ -12,6 +12,7 @@ struct ProfileScreen: View {
     @StateObject var viewModel = ProfileViewModel()
     @State var showEditProfile: Bool = false
     @State var showEditRide: Bool = false
+    @State private var profileSectionsVisible = false
     @Environment(\.dismiss) var dismiss
     var body: some View {
             ZStack {
@@ -30,44 +31,55 @@ struct ProfileScreen: View {
                             }
                         }
                     }
-                    ZStack{
-                        
-                        List {
-                            Section {
-                                ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
-                                    .frame(height: 135)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(AppColor.listGray)
-                                    )
-                                    .listRowInsets(EdgeInsets())
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
-                                    .padding([.leading, .trailing])
+                    Group {
+                        if viewModel.isLoading && !showEditProfile {
+                            ScrollView {
+                                ProfileScreenSkeleton()
+                                    .padding(.top, 20)
                             }
-                            ForEach(viewModel.sections) { section in
-                                ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
-                                    .listRowSeparator(.hidden)
-                                    .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
-                                    .listRowBackground(Color.clear)
-                            }
-                        }
-                        .listStyle(.plain)
-                        .padding(.top, 20)
-                        .background(AppColor.white)
-                        .sheet(isPresented: $showEditRide, onDismiss: {
-                            showEditRide = false
-                        }) {
-                            SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
-                        }
-                        if showEditProfile {
-                            EditProfileView(profileViewModel: viewModel, isPresented: $showEditProfile)
-                                .onDisappear {
-                                    // Refresh when sheet closes (e.g. after Cancel) so data stays in sync
-                                    Task {
-                                        await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                            .background(AppColor.white)
+                        } else {
+                            ZStack {
+                                List {
+                                    Section {
+                                        ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
+                                            .frame(height: 135)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .fill(AppColor.listGray)
+                                            )
+                                            .listRowInsets(EdgeInsets())
+                                            .listRowSeparator(.hidden)
+                                            .listRowBackground(Color.clear)
+                                            .padding([.leading, .trailing])
+                                    }
+                                    ForEach(Array(viewModel.sections.enumerated()), id: \.element.id) { index, section in
+                                        ProfileSectionView(section: section, itemSelected: $showEditRide, selectedBikeType: viewModel.selectedBikeType, viewModel: viewModel)
+                                            .listRowSeparator(.hidden)
+                                            .listRowInsets(EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0))
+                                            .listRowBackground(Color.clear)
+                                            .staggeredListRow(index: index, visible: profileSectionsVisible)
+                                            .dashboardListRowTransition()
                                     }
                                 }
+                                .animation(AppListRowAnimations.spring, value: viewModel.sections.map(\.id))
+                                .listStyle(.plain)
+                                .padding(.top, 20)
+                                .background(AppColor.white)
+                                .sheet(isPresented: $showEditRide, onDismiss: {
+                                    showEditRide = false
+                                }) {
+                                    SelectYourRideView(isPresented: $showEditRide, viewModel: viewModel)
+                                }
+                                if showEditProfile {
+                                    EditProfileView(profileViewModel: viewModel, isPresented: $showEditProfile)
+                                        .onDisappear {
+                                            Task {
+                                                await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                                            }
+                                        }
+                                }
+                            }
                         }
                     }
                 }
@@ -85,14 +97,30 @@ struct ProfileScreen: View {
                     async let loadProfile: () = viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
                     _ = await loadStats
                     _ = await loadProfile
+                    profileSectionsVisible = true
                 }
-                if viewModel.isLoading && !showEditProfile {
-                    // Light overlay only while profile (header) is loading; content is already visible
-                    Color.black.opacity(0.15)
-                        .ignoresSafeArea()
-                    ProgressViewReusable(title: "")
+                .onChange(of: viewModel.sections.map(\.id)) { _, _ in
+                    profileSectionsVisible = false
+                    DispatchQueue.main.async { profileSectionsVisible = true }
                 }
             }
+    }
+}
+
+/// Garage loading uses shared list shimmer (white card + sweep).
+private struct ProfileGarageLoadingPlaceholder: View {
+    var body: some View {
+        ListShimmerPlaceholder(
+            rowCount: 2,
+            rowHeight: 54,
+            rowSpacing: 12,
+            horizontalPadding: 16,
+            bottomPadding: 8,
+            embeddedInCard: true,
+            cardCornerRadius: 8,
+            cardInteriorPadding: 16,
+            showsSweep: true
+        )
     }
 }
 
@@ -108,12 +136,7 @@ struct ProfileSectionView: View {
                 .padding(.horizontal,16)
             if section.section == 0 {
                 if viewModel.isLoadingBikes {
-                    HStack {
-                        Spacer()
-                        ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
-                        Spacer()
-                    }
-                    .frame(height: 80)
+                    ProfileGarageLoadingPlaceholder()
                 } else {
                     YourVehicleRow(item: section.items[0], itemIsSelected: $itemSelected, viewModel: viewModel)
                 }
@@ -140,6 +163,8 @@ struct YourVehicleRow: View {
     let item: ProfileItemModel
     @Binding var itemIsSelected: Bool
     @ObservedObject var viewModel: ProfileViewModel
+    @State private var garageRowsVisible = false
+
     var body: some View {
         if viewModel.selectedBikeType.count > 0 {
             HStack {
@@ -151,13 +176,15 @@ struct YourVehicleRow: View {
             .padding()
             VStack {
                 VStack(alignment: .leading, spacing: 15) {
-                    ForEach(viewModel.selectedBikeType, id: \.id) { bikeType in
+                    ForEach(Array(viewModel.selectedBikeType.enumerated()), id: \.element.id) { index, bikeType in
                         AddBikeView(
                             bikeId: bikeType.id,
                             viewModel: viewModel,
                             title: AppStrings.VehicleType(constantValue: bikeType.type)?.rawValue ?? "",
                             subtitle: "\(bikeType.make)-\(bikeType.model)"
                         )
+                        .staggeredListRow(index: index, visible: garageRowsVisible)
+                        .dashboardListRowTransition()
                     }
                     .padding()
                     .background(
@@ -168,6 +195,12 @@ struct YourVehicleRow: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(AppColor.listGray, lineWidth: 1)
                     )
+                    .animation(AppListRowAnimations.spring, value: viewModel.selectedBikeType.map(\.id))
+                }
+                .onAppear { garageRowsVisible = true }
+                .onChange(of: viewModel.selectedBikeType.map(\.id)) { _, _ in
+                    garageRowsVisible = false
+                    DispatchQueue.main.async { garageRowsVisible = true }
                 }
                 ButtonView(title: AppStrings.Profile.addBike, onTap: {
                     itemIsSelected = true
@@ -215,6 +248,7 @@ struct YourVehicleRow: View {
 
 struct ProfileGridView: View {
     let items: [ProfileItemModel]
+    @State private var gridVisible = false
     let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
@@ -223,7 +257,7 @@ struct ProfileGridView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns,spacing: 20) {
-                ForEach(items) { item in
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     TotalStatisticsRow(item: item)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
@@ -234,10 +268,18 @@ struct ProfileGridView: View {
                                 .stroke(AppColor.listGray, lineWidth: 1)
                         )
                         .contentShape(Rectangle())
+                        .staggeredListRow(index: index, visible: gridVisible)
+                        .dashboardListRowTransition()
                 }
             }
+            .animation(AppListRowAnimations.spring, value: items.map(\.id))
             .background(.clear)
             .padding([.leading, .trailing,.bottom])
+            .onAppear { gridVisible = true }
+            .onChange(of: items.map(\.id)) { _, _ in
+                gridVisible = false
+                DispatchQueue.main.async { gridVisible = true }
+            }
         }
     }
 }

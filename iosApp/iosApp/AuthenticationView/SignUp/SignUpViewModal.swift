@@ -14,29 +14,41 @@ class SignUpViewModal: ObservableObject {
     @Published var showToast: Bool = false
     var emailorPhoneNumber: String?
     @Published var errorMessage: String?
+    @Published var isSendingReset: Bool = false
+    @Published var isSigningUp: Bool = false
     func getEmailorPhoneNumber(emailorPhoneNumber: String,password: String, confirmPassword: String, onSucess: @escaping () -> Void)  {
+        guard !isSendingReset else { return }
+        isSendingReset = true
         AuthenticatorImpl().resetPassword(email:emailorPhoneNumber, completionHandler: { success, error in
-            if let error = error {
-                print("Error sending password reset: \(error.localizedDescription)")
-                self.showToast = true
-                self.errorMessage = error.localizedDescription
-            } else {
-                print("Password reset email sent.")
-                onSucess()
+            DispatchQueue.main.async {
+                self.isSendingReset = false
+                if let error = error {
+                    print("Error sending password reset: \(error.localizedDescription)")
+                    self.showToast = true
+                    self.errorMessage = error.localizedDescription
+                } else {
+                    print("Password reset email sent.")
+                    onSucess()
+                }
             }
         })
     }
     
     func didTapSignUp(email: String, username: String, password: String,confirmPassword:String, onSuccess: @escaping () -> Void) {
+        guard !isSigningUp else { return }
+        isSigningUp = true
         let user = User(email: email, password: password, name: username, confirmPassword: confirmPassword)
         AuthenticatorImpl().signUp(user: user, completionHandler: { success, failure in
-            if let _ = failure {
-                self.showToast = true
-            } else {
-                if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty {
-                    MBUserDefaults.userIdStatic = uid
+            DispatchQueue.main.async {
+                self.isSigningUp = false
+                if let _ = failure {
+                    self.showToast = true
+                } else {
+                    if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty {
+                        MBUserDefaults.userIdStatic = uid
+                    }
+                    onSuccess()
                 }
-                onSuccess()
             }
         })
     }

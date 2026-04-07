@@ -27,69 +27,85 @@ struct EditProfileView: View {
         ZStack {
             VStack {
                 ScrollView {
-                    VStack {
-                        HStack {
-                            ProfileTitleView(title:AppStrings.EditProfile.editProfile, subtitle: AppStrings.EditProfile.updateProfileInfo, icon: AppIcon.Profile.ride)
-                                .padding(.horizontal,15)
-                                .padding(.top,20)
-                            Button(action: {
-                                isPresented = false
-                            }) {
-                                Image(systemName: "xmark")
-                                    .resizable()
-                                    .frame(width: 14,height: 14)
-                                    .foregroundStyle(AppColor.richBlack)
-                                    .padding(.trailing,15)
-                            }
-                        }
-                        ZStack(alignment: .bottomTrailing) {
-                            ((selectedImage != nil) ? Image(uiImage: selectedImage!) : profileViewModel.profileImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 92, height: 73)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
-                                .padding([.top, .bottom], 20)
-                            Button(action: {
-                                showActionSheet = true
-                            }) {
-                                AppIcon.Profile.camera
-                                    .resizable()
-                                    .frame(width: 38,height: 38)
-                                    .foregroundStyle(AppColor.richBlack)
-                                    .padding([.leading, .bottom],10)
-                            }
-                        }
-                        
-                        Group {
-                            EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $profileViewModel.profileName, keyboardType: .default)
-                            EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $profileViewModel.email, keyboardType: .emailAddress)
-                            EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.phoneNumber, keyboardType: .numberPad)
-                            EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.emergencyNumber, keyboardType: .numberPad)
-                            EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.drivingLicenseNumber, keyboardType: .default)
-                            MechanicView(isOn: $profileViewModel.isMechanic)
-                            HStack(spacing: 19) {
-                                ButtonView( title: "CANCEL",
-                                            background:AppColor.white,
-                                            foregroundColor: AppColor.darkRed,
-                                            showShadow: false ,
-                                            borderColor: AppColor.darkRed,
-                                            onTap: {
-                                    isPresented = false
-                                })
-                                .padding(.bottom, 21)
-                                ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
-                                    profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage, onSuccess: {
+                    Group {
+                        if profileViewModel.isLoading {
+                            EditProfileSkeleton()
+                                .overlay(alignment: .topTrailing) {
+                                    Button(action: { isPresented = false }) {
+                                        Image(systemName: "xmark")
+                                            .resizable()
+                                            .frame(width: 14, height: 14)
+                                            .foregroundStyle(AppColor.richBlack)
+                                    }
+                                    .padding(.trailing, 15)
+                                    .padding(.top, 20)
+                                }
+                        } else {
+                            VStack {
+                                HStack {
+                                    ProfileTitleView(title:AppStrings.EditProfile.editProfile, subtitle: AppStrings.EditProfile.updateProfileInfo, icon: AppIcon.Profile.ride)
+                                        .padding(.horizontal,15)
+                                        .padding(.top,20)
+                                    Button(action: {
                                         isPresented = false
-                                    })
-                                }).disabled(profileViewModel.validateProfile(fullName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emargencyContact: profileViewModel.emergencyNumber, DL: profileViewModel.drivingLicenseNumber))
-                                    .padding(.bottom, 21)
+                                    }) {
+                                        Image(systemName: "xmark")
+                                            .resizable()
+                                            .frame(width: 14,height: 14)
+                                            .foregroundStyle(AppColor.richBlack)
+                                            .padding(.trailing,15)
+                                    }
+                                }
+                                ZStack(alignment: .bottomTrailing) {
+                                    ((selectedImage != nil) ? Image(uiImage: selectedImage!) : profileViewModel.profileImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 92, height: 73)
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(Color.blue.opacity(0.2), lineWidth: 5))
+                                        .padding([.top, .bottom], 20)
+                                    Button(action: {
+                                        showActionSheet = true
+                                    }) {
+                                        AppIcon.Profile.camera
+                                            .resizable()
+                                            .frame(width: 38,height: 38)
+                                            .foregroundStyle(AppColor.richBlack)
+                                            .padding([.leading, .bottom],10)
+                                    }
+                                }
+
+                                Group {
+                                    EditProfileFieldView(label: AppStrings.CreateAccountLabel.userName.localized, placeholder: AppStrings.SignUpPlaceholder.userName.localized, inputText: $profileViewModel.profileName, keyboardType: .default)
+                                    EditProfileFieldView(label: AppStrings.CreateAccountLabel.email.localized, placeholder: AppStrings.CreateAccountLabel.email.localized, inputText: $profileViewModel.email, keyboardType: .emailAddress)
+                                    EditProfileFieldView(label: AppStrings.EditProfile.enterPhoneNumber, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.phoneNumber, keyboardType: .numberPad)
+                                    EditProfileFieldView(label: AppStrings.EditProfile.emergencyContact, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.emergencyNumber, keyboardType: .numberPad)
+                                    EditProfileFieldView(label: AppStrings.EditProfile.drivingLicense, placeholder: AppStrings.EditProfile.enterNumber, inputText: $profileViewModel.drivingLicenseNumber, keyboardType: .default)
+                                    MechanicView(isOn: $profileViewModel.isMechanic)
+                                    HStack(spacing: 19) {
+                                        ButtonView( title: "CANCEL",
+                                                    background:AppColor.white,
+                                                    foregroundColor: AppColor.darkRed,
+                                                    showShadow: false ,
+                                                    borderColor: AppColor.darkRed,
+                                                    onTap: {
+                                            isPresented = false
+                                        })
+                                        .padding(.bottom, 21)
+                                        ButtonView(title: AppStrings.EditProfile.saveChanges.uppercased(), onTap: {
+                                            profileViewModel.editProfile(userId: MBUserDefaults.userIdStatic ?? "", userName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emergencyContact: profileViewModel.emergencyNumber, drivingLicense: profileViewModel.drivingLicenseNumber, isMachanic: profileViewModel.isMechanic, profileUIImage: selectedImage, onSuccess: {
+                                                isPresented = false
+                                            })
+                                        }).disabled(profileViewModel.validateProfile(fullName: profileViewModel.profileName, email: profileViewModel.email, phoneNumber: profileViewModel.phoneNumber, emargencyContact: profileViewModel.emergencyNumber, DL: profileViewModel.drivingLicenseNumber))
+                                            .padding(.bottom, 21)
+                                    }
+                                }
+                                .padding()
                             }
+                            .background(AppColor.listGray)
+                            .cornerRadius(10)
                         }
-                        .padding()
                     }
-                    .background(AppColor.listGray)
-                    .cornerRadius(10)
                     .padding(EdgeInsets(top: 15, leading: 15, bottom: 150, trailing: 15))
                 }
             }
@@ -112,9 +128,6 @@ struct EditProfileView: View {
             }
             .task {
                 await profileViewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
-            }
-            if profileViewModel.isLoading {
-                ProgressViewReusable(title: "", style: .standard)
             }
         }
     }

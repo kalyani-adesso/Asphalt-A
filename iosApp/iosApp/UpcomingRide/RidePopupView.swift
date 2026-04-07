@@ -17,23 +17,32 @@ struct RidePopupView: View {
     @Binding var openGallery: Bool
     @Binding var selectedImages: [UIImage]
     @State private var showDelete = false
-    
-    var onUpload: (() -> Void)? = nil
-    
+    @State private var isUploadingPhotos = false
+
+    /// Upload handler; popup shows `RidePhotosPopupSkeleton` until this completes successfully.
+    var onUpload: (() async throws -> Void)? = nil
+
     var body: some View {
         ZStack {
             if activePopup != nil {
                 // Dim background
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
-                    .onTapGesture { withAnimation { activePopup = nil } }
+                    .onTapGesture {
+                        guard !isUploadingPhotos else { return }
+                        withAnimation { activePopup = nil }
+                    }
                 uploadContent
             }
         }
     }
-    
+
     // MARK: Upload Content
     private var uploadContent: some View {
+        Group {
+            if isUploadingPhotos {
+                RidePhotosPopupSkeleton()
+            } else {
         VStack(spacing: 20) {
             Text(selectedImages.isEmpty ? "Add Ride Photos" : "Ride Photos")
                 .font(KlavikaFont.bold.font(size: 20))
@@ -92,7 +101,10 @@ struct RidePopupView: View {
         .background(Color.white)
         .cornerRadius(16)
         .shadow(radius: 10)
+            }
+        }
     }
+
     struct RideImageView: View {
         @Binding var selectedImages: [UIImage]
         var img: UIImage
@@ -181,9 +193,11 @@ struct RidePopupView: View {
                 showShadow: false,
                 borderColor: AppColor.stoneGray.opacity(0.3),
                 onTap: {
+                    guard !isUploadingPhotos else { return }
                     withAnimation { activePopup = nil }
                 }
             )
+            .disabled(isUploadingPhotos)
             
             if activePopup == .previewSelected {
                 let canAddMore = selectedImages.count < 6
@@ -195,12 +209,13 @@ struct RidePopupView: View {
                     showShadow: false,
                     borderColor: AppColor.stoneGray.opacity(0.3),
                     onTap: {
+                        guard !isUploadingPhotos else { return }
                         if canAddMore {
                             openGallery = true
                         }
                     }
                 )
-                .disabled(!canAddMore)
+                .disabled(!canAddMore || isUploadingPhotos)
                 .opacity(canAddMore ? 1.0 : 0.6)
             }
             ButtonView(
@@ -212,16 +227,32 @@ struct RidePopupView: View {
                 borderColor: AppColor.stoneGray.opacity(0.3),
                 onTap: {
                     if activePopup == .uploadOptions {
+                        guard !isUploadingPhotos else { return }
                         openGallery = true
                     } else {
-                        onUpload?()
-                        withAnimation {
-                            activePopup = nil
-                            selectedImages = []
+                        Task {
+                            await MainActor.run { isUploadingPhotos = true }
+                            do {
+                                guard let upload = onUpload else {
+                                    await MainActor.run { isUploadingPhotos = false }
+                                    return
+                                }
+                                try await upload()
+                                await MainActor.run {
+                                    isUploadingPhotos = false
+                                    withAnimation {
+                                        activePopup = nil
+                                        selectedImages = []
+                                    }
+                                }
+                            } catch {
+                                await MainActor.run { isUploadingPhotos = false }
+                            }
                         }
                     }
                 }
             )
+            .disabled(isUploadingPhotos)
         }
     }
 }

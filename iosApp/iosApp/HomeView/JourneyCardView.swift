@@ -13,6 +13,10 @@ struct JourneyCardView: View {
     @State private var selectedOption = "This month"
    
     var body: some View {
+        Group {
+            if home.isRideSummaryLoading {
+                JourneyCardSkeleton()
+            } else {
         HStack(alignment: .top,spacing: 12) {
             VStack(alignment: .leading, spacing: 20){
                 Text(AppStrings.JourneyChart.title.rawValue)
@@ -67,8 +71,7 @@ struct JourneyCardView: View {
                 .stroke(AppColor.darkGray, lineWidth: 2)
         )
         .padding(.horizontal, 5)
-        .onAppear {
-            home.getRideSummary(userID: MBUserDefaults.userIdStatic ?? "", range: "This month")
+            }
         }
         .onChange(of: selectedOption) { _, newValue in
             withAnimation {

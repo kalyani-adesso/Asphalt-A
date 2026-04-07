@@ -56,8 +56,32 @@ struct RidePhotosViewerView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 16)
 
-                // Content: grid or empty state
-                if ridePhotos.isEmpty && !isLoading {
+                // Content: grid shimmer, empty state, or loaded grid
+                if isLoading {
+                    GeometryReader { geo in
+                        let availableWidth = max(geo.size.width - 32, 0)
+                        let cellSide = max((availableWidth - (gridSpacing * 2)) / 3, 80)
+                        let columns = [
+                            GridItem(.fixed(cellSide), spacing: gridSpacing),
+                            GridItem(.fixed(cellSide), spacing: gridSpacing),
+                            GridItem(.fixed(cellSide), spacing: gridSpacing)
+                        ]
+                        ScrollView {
+                            GridShimmerPlaceholder(
+                                columns: columns,
+                                cellSide: cellSide,
+                                cellCount: 9,
+                                spacing: gridSpacing,
+                                horizontalPadding: 16,
+                                showsSweep: true
+                            )
+                            .padding(.top, 8)
+                            .padding(.bottom, 24)
+                        }
+                        .scrollIndicators(.hidden)
+                    }
+                    .frame(maxHeight: .infinity)
+                } else if ridePhotos.isEmpty {
                     emptyState
                 } else {
                     GeometryReader { geo in
@@ -106,15 +130,6 @@ struct RidePhotosViewerView: View {
                 }
             } message: { _ in
                 Text("Are you sure you want to delete this photo?")
-            }
-           
-
-            if isLoading {
-                Color.black.opacity(0.25)
-                    .ignoresSafeArea()
-                    .zIndex(1)
-                ProgressViewReusable(title: "", style: .standard)
-                    .zIndex(2)
             }
         }
         .onAppear {

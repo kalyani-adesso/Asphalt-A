@@ -12,11 +12,13 @@ struct NotificationView: View {
     @State var showHome: Bool = false
     @State var showNotification: Bool = false
     @State var showSlideBar: Bool = false
+    @State private var notificationRowsVisible = false
     
     var body: some View {
         AppToolBar(showBack: false){
             VStack {
-                List(viewModel.notifications, id: \.id) { notification in
+                List {
+                    ForEach(Array(viewModel.notifications.enumerated()), id: \.element.id) { index, notification in
                     HStack(spacing: 17) {
                         if let image = notification.image {
                             image
@@ -50,11 +52,20 @@ struct NotificationView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(notification.title == AppStrings.Notification.rideReminder.localized ? AppColor.iceBlue : AppColor.backgroundLight)
                         )
-                    
-                }.listStyle(.plain)
+                        .staggeredListRow(index: index, visible: notificationRowsVisible)
+                        .dashboardListRowTransition()
+                    }
+                }
+                .animation(AppListRowAnimations.spring, value: viewModel.notifications.map(\.id))
+                .listStyle(.plain)
             }
             .onAppear {
                 viewModel.fetchNotifications()
+                notificationRowsVisible = true
+            }
+            .onChange(of: viewModel.notifications.map(\.id)) { _, _ in
+                notificationRowsVisible = false
+                DispatchQueue.main.async { notificationRowsVisible = true }
             }
             .navigationBarBackButtonHidden(true)
             

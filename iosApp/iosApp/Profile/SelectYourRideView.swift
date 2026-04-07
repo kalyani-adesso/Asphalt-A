@@ -110,11 +110,7 @@ private struct SelectBikeTabView: View {
         VStack(spacing: 16) {
             HStack {
                 Button(action: {
-                    if currentPage > 0 {
-                        withAnimation(.easeInOut) {
-                            currentPage -= 1
-                        }
-                    }
+                    if currentPage > 0 { currentPage -= 1 }
                 }) {
                     AppIcon.Profile.leftIcon
                         .opacity(currentPage == 0 ? 0.3 : 1.0)
@@ -135,11 +131,7 @@ private struct SelectBikeTabView: View {
                 }
                 Spacer()
                 Button(action: {
-                    if currentPage < totalPages - 1 {
-                        withAnimation(.easeInOut) {
-                            currentPage += 1
-                        }
-                    }
+                    if currentPage < totalPages - 1 { currentPage += 1 }
                 }) {
                     AppIcon.Profile.rightIcon
                         .opacity(currentPage == totalPages - 1 ? 0.3 : 1.0)
@@ -149,13 +141,14 @@ private struct SelectBikeTabView: View {
                 .resizable()
                 .frame(width: 311, height: 164)
                 .cornerRadius(10)
-                .animation(.easeInOut, value: currentPage)
+                .contentTransition(.opacity)
             
             Text(title)
                 .font(KlavikaFont.bold.font(size: 16))
                 .foregroundColor(AppColor.black)
                 .multilineTextAlignment(.center)
         }
+        .animation(.easeInOut(duration: 0.28), value: currentPage)
     }
 }
 

@@ -554,8 +554,9 @@ extension UpcomingRideViewModel {
            f.dateFormat = "hh:mm a"
            return f
        }()
+    /// - Parameter showGlobalProgress: When `false`, skips toggling `isUploading` (e.g. caller shows inline skeleton on the ride-photos popup).
     @MainActor
-    func uploadImages(images:[UIImage], rideId:String) async throws -> String {
+    func uploadImages(images:[UIImage], rideId:String, showGlobalProgress: Bool = true) async throws -> String {
         print("Images Count:\(images.count)")
         var encoadedImages:[String] = []
         for eachImage in images {
@@ -563,19 +564,25 @@ extension UpcomingRideViewModel {
                 encoadedImages.append(encodedImage)
             }
         }
-        isUploading = true
+        if showGlobalProgress {
+            isUploading = true
+        }
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             rideRepository.uploadImage(rideId: rideId, images: encoadedImages, completionHandler: { result, error in
                 if let error = error {
                     Task { @MainActor in
                         print("Error uploading image: \(error)")
-                        self.isUploading = false
+                        if showGlobalProgress {
+                            self.isUploading = false
+                        }
                         continuation.resume(throwing: error)
                     }
                 } else {
                     Task { @MainActor in
                         print("Image uploaded successfully:\(images.count)")
-                        self.isUploading = false
+                        if showGlobalProgress {
+                            self.isUploading = false
+                        }
                         self.rideRepository.updateImageCount(count : Int32(images.count) , rideId: rideId)
                         continuation.resume(returning: "success")
                     }

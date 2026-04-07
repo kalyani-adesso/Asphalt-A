@@ -11,8 +11,41 @@ struct AnswerSheetView: View {
     @Environment(\.dismiss) var dismiss
     var query: Query
     @ObservedObject var viewModel: QueryViewModel
-    
+
+    /// Same layout-matched shimmer as main Queries loading; brief beat so the sweep reads clearly.
+    @State private var showAnswerSkeleton = true
+    /// Shown while `Post Answer` request is in flight (same `AnswerSheetSkeleton` animation).
+    @State private var isPostingAnswer = false
+
+    private static let skeletonRevealNanoseconds: UInt64 = 320_000_000
+
+    private var showsAnswerSkeleton: Bool {
+        showAnswerSkeleton || isPostingAnswer
+    }
+
     var body: some View {
+        Group {
+            if showsAnswerSkeleton {
+                AnswerSheetSkeleton()
+                    .transition(.opacity)
+            } else {
+                answerSheetContent
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeOut(duration: 0.28), value: showsAnswerSkeleton)
+        .onAppear {
+            viewModel.selectedQuery = query
+            Task {
+                try? await Task.sleep(nanoseconds: Self.skeletonRevealNanoseconds)
+                await MainActor.run {
+                    showAnswerSkeleton = false
+                }
+            }
+        }
+    }
+
+    private var answerSheetContent: some View {
         VStack(spacing: 20) {
             // MARK: Header
             HStack {
@@ -29,17 +62,17 @@ struct AnswerSheetView: View {
                 }
             }
             .padding()
-            
-            
+
+
             // MARK: Question + Answers
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    
+
                     // Question Card
                     VStack(alignment: .leading, spacing: 12) {
                         Text(query.title)
                             .font(KlavikaFont.bold.font(size: 16))
-                        
+
                         HStack {
                             ForEach(query.tags, id: \.self) { tag in
                                 Text(tag)
@@ -51,12 +84,12 @@ struct AnswerSheetView: View {
                                     .cornerRadius(6)
                             }
                         }
-                        
+
                         Text(query.content)
                             .font(KlavikaFont.regular.font(size: 14))
                             .foregroundColor(AppColor.stoneGray)
                             .lineSpacing(2)
-                        
+
                         HStack {
                             AppImage.Profile.profile
                                 .resizable()
@@ -73,7 +106,7 @@ struct AnswerSheetView: View {
                                 .font(KlavikaFont.regular.font(size: 12))
                                 .foregroundColor(AppColor.stoneGray)
                         }
-                        
+
                         HStack(spacing: 16) {
                             HStack(spacing: 4) {
                                 AppIcon.Queries.like
@@ -105,7 +138,7 @@ struct AnswerSheetView: View {
                 }
                 .padding(.horizontal, 35)
             }
-            
+
             // MARK: Bottom Input Bar
             VStack(alignment: .leading, spacing: 12) {
                 // TextField Row
@@ -118,7 +151,7 @@ struct AnswerSheetView: View {
                             RoundedRectangle(cornerRadius: 44)
                                 .stroke(AppColor.lightBlue.opacity(0.4), lineWidth: 4)
                         )
-                    
+
                     VStack(alignment: .leading, spacing: 10) {
                         TextField(AppStrings.Query.feedbackLabel, text: $viewModel.answerText, axis: .vertical)
                             .font(KlavikaFont.regular.font(size: 16))
@@ -132,7 +165,7 @@ struct AnswerSheetView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(AppColor.darkGray, lineWidth: 1)
                             )
-                        
+
                         // Buttons under textfield
                         HStack(spacing: 12) {
                             Button(AppStrings.Query.cancel) {
@@ -143,12 +176,19 @@ struct AnswerSheetView: View {
                             .frame(width: 87, height: 36)
                             .background(AppColor.white)
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppColor.darkGray, lineWidth: 1))
+                            .disabled(isPostingAnswer)
                             Spacer()
                             Button {
                                 Task {
-                                    dismiss()
-                                    await viewModel.addAnswer()
-                                    viewModel.answerText = ""
+                                    await MainActor.run { isPostingAnswer = true }
+                                    let ok = await viewModel.addAnswer()
+                                    await MainActor.run {
+                                        isPostingAnswer = false
+                                        if ok {
+                                            viewModel.answerText = ""
+                                            dismiss()
+                                        }
+                                    }
                                 }
                             } label: {
                                 HStack {
@@ -158,18 +198,18 @@ struct AnswerSheetView: View {
                                 .font(KlavikaFont.medium.font(size: 14))
                                 .foregroundColor(.white)
                             }
-                            .disabled(viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            .disabled(viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isPostingAnswer)
                             .frame(width: 132, height: 36)
                             .background(
                                 viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                                 ? AppColor.celticBlue.opacity(0.4)
-                                : AppColor.celticBlue               
+                                : AppColor.celticBlue
                             )
                             .cornerRadius(8)
                         }
                         .padding(.top, 10)
                     }
-                    
+
                 }
                 .padding(.top, 60)
                 .padding(.horizontal, 30)
@@ -177,7 +217,7 @@ struct AnswerSheetView: View {
             }
             .frame(width: 400, height: 189)
             .background(Color.white)
-            
+
         }
         .background(
             LinearGradient(
@@ -189,11 +229,6 @@ struct AnswerSheetView: View {
                 endPoint: .bottom
             )
         )
-        .onAppear {
-            viewModel.selectedQuery = query
-        }
-        
     }
-    
-}
 
+}
