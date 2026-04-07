@@ -282,4 +282,10 @@
     <string name="redirect_google_map">Launching Google Maps so you can find your way!</string>
 
 
+    <string name="product_details">Product Details</string>
+    <string name="message">MESSAGE</string>
+    <string name="make_offer">MAKE OFFER</string>
+    <string name="price">Price</string>
+
+
 </resources>
