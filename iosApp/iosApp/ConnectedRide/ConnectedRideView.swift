@@ -19,6 +19,7 @@ struct ConnectedRideView: View {
     @StateObject var homeViewModel = HomeViewModel()
     @Environment(\.dismiss) var dismiss
     @State var showView = false
+    @State private var showHomeRoot = false
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
@@ -53,6 +54,9 @@ struct ConnectedRideView: View {
         .navigationTitle(AppStrings.ConnectedRide.connectedRide)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showHomeRoot, destination: {
+            BottomNavBar(showHome: showHomeRoot)
+        })
         .navigationDestination(isPresented: $showView, destination: {
             if title == AppStrings.ConnectedRide.rideMessage {
                 ConnectedRideCompleteView(viewModel: model, homeViewModel: homeViewModel, upcomingRideViewModel: upcomingViewModel, rideCompleteModel: rideCompleteModel)
@@ -72,7 +76,9 @@ struct ConnectedRideView: View {
                     if let onBackToHome {
                         onBackToHome()
                     } else {
-                        dismiss()
+                        // Avoid popping back into login stack (e.g. when ConnectedRide is shown right after login).
+                        // Route to Home root instead.
+                        showHomeRoot = true
                     }
                 }, label:{
                     AppIcon.CreateRide.backButton

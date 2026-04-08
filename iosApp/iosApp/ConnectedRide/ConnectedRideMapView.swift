@@ -38,6 +38,7 @@ struct ConnectedRideMapView: View {
     @State private var isEndingRide: Bool = false
     /// While `true`, Firebase message + ongoing-rider streams run; set `false` when ride ends.
     @State private var rideSessionActive: Bool = true
+    @State private var activeRiderProfileImageName: String? = nil
     // Smoothed speed & movement state for timer / UI
     @State private var speedSamples: [Double] = []
     @State private var isMoving: Bool = false
@@ -208,6 +209,17 @@ struct ConnectedRideMapView: View {
                             guard rideSessionActive else { return }
                             locationManager.requestLocation()
                             locationManager.startUpdatingLocation()
+
+                            // Fetch current user's profile image once for Active Rider UI.
+                            Task {
+                                let uid = MBUserDefaults.userIdStatic ?? ""
+                                guard !uid.isEmpty else { return }
+                                if let details = await viewModel.getAllUsers(createdBy: uid) {
+                                    await MainActor.run {
+                                        activeRiderProfileImageName = details.2
+                                    }
+                                }
+                            }
 
                             if !rideModel.rideJoined {
                                 tryJoinWhenLocationReady()
@@ -442,7 +454,12 @@ struct ConnectedRideMapView: View {
     @ViewBuilder private func rideProgressSection() -> some View {
         VStack(spacing: 18) {
             ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-            ActiveRiderView(title: currentUserDisplayName, speed: "\(displayedSpeedKph) \(AppStrings.ConnectedRide.speedUnitKph)", startTrack:$startTrack)
+            ActiveRiderView(
+                profileImageName: activeRiderProfileImageName,
+                title: currentUserDisplayName,
+                speed: "\(displayedSpeedKph) \(AppStrings.ConnectedRide.speedUnitKph)",
+                startTrack: $startTrack
+            )
             Button(action: endRideTapped) {
                 Text(isEndingRide ? AppStrings.ConnectedRide.endRideInProgress : AppStrings.ConnectedRide.endRideButton)
                     .frame(maxWidth: .infinity,minHeight: 60)
@@ -770,16 +787,14 @@ struct ConnectedRideOfflineView: View {
 }
 
 struct ActiveRiderView: View {
+    let profileImageName: String?
     let title: String
     let speed: String
     @Binding var startTrack:Bool
     var body: some View {
         HStack {
             HStack(spacing: 16) {
-                AppIcon.Profile.profile
-                    .resizable()
-                    .clipShape(Circle())
-                    .frame(width: 37, height: 37)
+                ProfileImageView(profileImageName: profileImageName, size: CGSize(width: 37, height: 37))
                     .overlay(Circle().stroke(AppColor.green, lineWidth: 1.5))
                     .padding(.leading, 18)
                 
