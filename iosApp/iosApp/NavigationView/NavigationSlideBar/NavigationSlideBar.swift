@@ -13,19 +13,31 @@ struct NavigationSlideBar: View {
     @StateObject private var home = HomeViewModel()
     @StateObject private var upcomingRide = UpcomingRideViewModel()
     @State var showHome: Bool = false
+    @State private var menuRowsVisible = false
     var body: some View {
         AppToolBar(showBack: false){
             VStack {
-                List(viewModel.sections, id: \.self) { item in
-                    MenuItemRow(viewModel: viewModel, item: item, home: home, upcomingRide: upcomingRide)
+                List {
+                    ForEach(Array(viewModel.sections.enumerated()), id: \.element.id) { index, item in
+                        MenuItemRow(
+                            viewModel: viewModel,
+                            item: item,
+                            home: home,
+                            upcomingRide: upcomingRide,
+                            rowIndex: index,
+                            rowsVisible: menuRowsVisible
+                        )
                         .padding(.vertical, 5)
                         .listRowSeparator(.hidden)
                         .listRowBackground(AppColor.listGray)
+                    }
                 }
+                .animation(AppListRowAnimations.spring, value: viewModel.sections.map(\.id))
                 .scrollContentBackground(.hidden)
                 .listStyle(.plain)
                 .cornerRadius(10)
                 .padding(16)
+                .onAppear { menuRowsVisible = true }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
@@ -34,10 +46,12 @@ struct NavigationSlideBar: View {
 }
 
 struct MenuItemRow: View {
-    let viewModel: NavigationSliderViewModel
+    @ObservedObject var viewModel: NavigationSliderViewModel
     let item: MenuItemModel
     let home: HomeViewModel
     let upcomingRide: UpcomingRideViewModel
+    var rowIndex: Int = 0
+    var rowsVisible: Bool = true
     @State var itemIsSelected: Bool = false
     @State private var showComingSoonAlert: Bool = false
     @State private var logoutAlert: Bool = false
@@ -49,6 +63,10 @@ struct MenuItemRow: View {
         item.title == AppStrings.NavigationSlider.marketplace ||
         item.title == AppStrings.NavigationSlider.settings ||
         item.title == AppStrings.NavigationSlider.referFriend
+    }
+    
+    private var isConnectedRideItem: Bool {
+        item.title == AppStrings.NavigationSlider.connectedRide
     }
 
     var body: some View {
@@ -67,15 +85,18 @@ struct MenuItemRow: View {
                 .padding(.trailing, 8)
         }
         .modifier(logoutSection(title: item.title))
+        .staggeredListRow(index: rowIndex, visible: rowsVisible)
+        .dashboardListRowTransition()
         .contentShape(Rectangle())
         .onTapGesture {
             if item.title == AppStrings.NavigationSlider.logout {
-                viewModel.logout {
-                    isLoggedIn = false
-                    logoutAlert = true
-                }
+                // Ask for confirmation first; do NOT clear session until user confirms.
+                logoutAlert = true
             } else if isComingSoonItem {
                 showComingSoonAlert = true
+            } else if isConnectedRideItem {
+                // Navigate immediately; destination view will fetch + route.
+                itemIsSelected = true
             } else {
                 itemIsSelected = true
             }
@@ -87,7 +108,10 @@ struct MenuItemRow: View {
         }
         .alert("Logout", isPresented: $logoutAlert) {
             Button("Yes", role: .destructive) {
-                itemIsSelected = true
+                viewModel.logout {
+                    isLoggedIn = false
+                    itemIsSelected = true
+                }
             }
             Button("No", role: .cancel) {
                }
@@ -95,11 +119,52 @@ struct MenuItemRow: View {
             Text("Are you sure you want to log out?")
         }
         .navigationDestination(isPresented: $itemIsSelected, destination: {
-            item.destination
-                .environmentObject(home)
-                .environmentObject(upcomingRide)
-                .environmentObject(viewModel.createRideVM)
+            Group {
+                if isConnectedRideItem {
+                    ConnectedRideRouteView()
+                } else {
+                    item.destination
+                }
+            }
+            .environmentObject(home)
+            .environmentObject(upcomingRide)
+            .environmentObject(viewModel.createRideVM)
         })
+    }
+}
+
+/// Inline router for the slide bar's "Connected Ride" item.
+/// Fetches active ride and then routes to Connected Ride map flow or Join Ride.
+private struct ConnectedRideRouteView: View {
+    @EnvironmentObject private var createRideVM: CreateRideViewModel
+    
+    var body: some View {
+        ZStack {
+            // Prevent a blank white flash while we resolve the active ride.
+            AppColor.backgroundLight
+                .ignoresSafeArea()
+
+            Group {
+               if let ride = createRideVM.activeRide, ride.rideJoined {
+                    ConnectedRideView(
+                        notificationTitle: AppStrings.JoinRide.rideActive,
+                        title: AppStrings.ConnectedRide.startRideTitle,
+                        subTitle: AppStrings.ConnectedRide.startRideSubtitle,
+                        model: ride,
+                        rideCompleteModel: []
+                    )
+                    .id(ride.rideId)
+                } else {
+                    JoinRideView()
+                }
+            }
+        }
+        .task {
+            // Fetch once when opened.
+            if createRideVM.activeRide == nil && !createRideVM.isRideLoading {
+                await createRideVM.getActiveJoinedRide()
+            }
+        }
     }
 }
 

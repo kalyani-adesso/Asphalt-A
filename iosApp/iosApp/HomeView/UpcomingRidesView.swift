@@ -12,6 +12,7 @@ struct UpcomingRidesView: View {
     @ObservedObject var home: HomeViewModel
     @ObservedObject var viewModel : UpcomingRideViewModel
     @State private var showAllRides: Bool = false
+    @State private var rideCardsVisible = false
     let onMessageTap: (String) -> Void
     
     var body: some View {
@@ -25,25 +26,57 @@ struct UpcomingRidesView: View {
                 }
                 .font(KlavikaFont.bold.font(size: 13))
             }
-            if viewModel.upcomingInvitesRide.isEmpty {
+            if viewModel.isRideLoading {
+                UpcomingRidesSectionSkeleton()
+            } else if viewModel.upcomingInvitesRide.isEmpty {
                 emptyStateView
-            }
-            else{
+            } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 25) {
-                        ForEach($viewModel.upcomingInvitesRide, id: \.id) { $ride in
-                            UpcomingRideCard(viewModel: viewModel, ride: $ride,  onMessageTap: onMessageTap)
+                        ForEach(Array(viewModel.upcomingInvitesRide.indices), id: \.self) { idx in
+                            UpcomingRideCard(
+                                viewModel: viewModel,
+                                ride: $viewModel.upcomingInvitesRide[idx],
+                                onMessageTap: onMessageTap
+                            )
+                            .staggeredListRow(index: idx, visible: rideCardsVisible)
+                            .dashboardListRowTransition()
                         }
                     }
                 }
             }
         }
         .padding(.top,20)
+        .onAppear { rideCardsVisible = true }
+        .onChange(of: viewModel.upcomingInvitesRide.count) { _, _ in
+            rideCardsVisible = false
+            DispatchQueue.main.async { rideCardsVisible = true }
+        }
         .navigationDestination(isPresented:$showAllRides , destination: {
             UpcomingRideView(viewModel: viewModel, startingTab: .upcoming, showpopup: false, navigationDone: true, rideIdToOpen: .constant(nil))
                 .environmentObject(viewModel)
                 .environmentObject(home)
         })
+    }
+
+    @ViewBuilder
+    private var emptyStateView: some View {
+        VStack(spacing: 12) {
+            HStack {
+                AppIcon.UpcomingRide.message
+                    .resizable()
+                    .frame(width: 25, height: 25)
+
+                Text("No Upcoming Rides !!!")
+                    .font(KlavikaFont.bold.font(size: 16))
+                    .foregroundColor(AppColor.richBlack)
+            }
+            Text("You’ll see your ride invites here once someone adds you.")
+                .font(KlavikaFont.regular.font(size: 12))
+                .foregroundColor(AppColor.stoneGray)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 30)
     }
 }
 struct UpcomingRideCard: View {
@@ -189,24 +222,4 @@ struct UpcomingRideCard: View {
     private func initials(from name: String) -> String {
         name.split(separator: " ").compactMap { $0.first }.map { String($0) }.joined()
     }
-}
-@ViewBuilder
-var emptyStateView: some View {
-    VStack(spacing: 12) {
-        HStack{
-            AppIcon.UpcomingRide.message
-                .resizable()
-                .frame(width: 25, height: 25)
-            
-            Text("No Upcoming Rides !!!")
-                .font(KlavikaFont.bold.font(size: 16))
-                .foregroundColor(AppColor.richBlack)
-            
-        }
-        Text("You’ll see your ride invites here once someone adds you.")
-            .font(KlavikaFont.regular.font(size: 12))
-            .foregroundColor(AppColor.stoneGray)
-    }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 30)
 }

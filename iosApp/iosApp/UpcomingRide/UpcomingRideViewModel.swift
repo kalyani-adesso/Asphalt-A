@@ -134,28 +134,32 @@ class UpcomingRideViewModel: ObservableObject {
                 let startDate = Date(timeIntervalSince1970: Double(truncating: startEpoch) / 1000)
                 let endDate = Date(timeIntervalSince1970: Double(truncating: endEpoch) / 1000)
                 
-                let isPastRide = endDate < todayStart
-                let isUpcomingOrInvite = startDate >= todayStart
-                
-                // Skip irrelevant rides
-                if !isPastRide && !isUpcomingOrInvite { return nil }
-                
-                let isCreator = ride.createdBy == currentUserID
-                let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+                let now = Date()
+                let isPastRide = endDate < now
+               let isFutureRide = Calendar.current.isDate(startDate, inSameDayAs: now) || startDate > now
 
-                if isUpcomingOrInvite {
-                    
-                    //  Creator logic
+                let isCompletedRide = ride.rideStatus == 4
+                let myInviteStatus = ride.participants.first(where: { $0.userId == currentUserID })?.inviteStatus
+                let isCreator = ride.createdBy == currentUserID
+
+                // Decide if this ride should even be shown
+                var shouldInclude = false
+
+                // HISTORY
+                if isPastRide || isCompletedRide || myInviteStatus == 4 {
+                    shouldInclude = true
+                }
+
+                // FUTURE / TODAY
+                else if isFutureRide {
                     if isCreator {
-                        guard [0, 3].contains(ride.rideStatus) else { return nil }
-                    }
-                    
-                    //  Participant logic
-                    else {
-                        // Show if accepted or ongoing
-                        guard myInviteStatus == 1 || myInviteStatus == 3 || myInviteStatus == 0 else { return nil }
+                        shouldInclude = [0,1,3].contains(ride.rideStatus)
+                    } else {
+                        shouldInclude = [0,1,3].contains(myInviteStatus ?? -1)
                     }
                 }
+
+                if !shouldInclude { return nil }
                 
                 // Participants
                 let participants = ride.participants
@@ -170,44 +174,39 @@ class UpcomingRideViewModel: ObservableObject {
                 let imageCount = Int(ride.imageCount ?? 0)
                 let hasPhotos = imageCount > 0
                 
-                if ride.createdBy == currentUserID {
-                    // Ride created by me
-                        
-                    if  ride.rideStatus == 4  || isPastRide {
+                if isCreator {
+                    if ride.rideStatus == 4 || isPastRide {
                         rideAction = .history
                         rideStatus = .complete
-                        rideViewAction = .addPhotos
-                        
                         rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
                     } else {
                         rideAction = .upcoming
-                        rideStatus = participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
+                        rideStatus = .upcoming
                         rideViewAction = .viewDetails
                     }
                 } else if let status = myInviteStatus {
-                    switch status {
-                    case 0 where isUpcomingOrInvite:
-                        rideAction = .invities
-                        rideStatus = .invite
-                        rideViewAction = .decline
-                    case 1, 3:
-                        if isUpcomingOrInvite {
-                            rideAction = .upcoming
-                            rideStatus = participants.allSatisfy { [1,3].contains($0.inviteStatus) } ? .upcoming : .queue
-                            rideViewAction = .viewDetails
-                        } else {
-                            rideAction = .history
-                            rideStatus = .complete
-                            rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
-                        }
-                    case 2: return nil
-                    case 4:
+                    
+                    if status == 4 || isPastRide {
                         rideAction = .history
                         rideStatus = .complete
                         rideViewAction = hasPhotos ? .viewPhotos : .addPhotos
-                    default: return nil
                     }
-                } else { return nil }
+                    else if status == 0 {
+                        rideAction = .invities
+                        rideStatus = .invite
+                        rideViewAction = .decline
+                    }
+                    else if status == 1 || status == 3 {
+                        rideAction = .upcoming
+                        rideStatus = .upcoming
+                        rideViewAction = .viewDetails
+                    }
+                    else {
+                        return nil
+                    }
+                } else {
+                    return nil
+                }
                 
                 // Dates & times using static formatters
                 let startText = Self.dateFormatter.string(from: startDate)
@@ -555,8 +554,9 @@ extension UpcomingRideViewModel {
            f.dateFormat = "hh:mm a"
            return f
        }()
+    /// - Parameter showGlobalProgress: When `false`, skips toggling `isUploading` (e.g. caller shows inline skeleton on the ride-photos popup).
     @MainActor
-    func uploadImages(images:[UIImage], rideId:String) async throws -> String {
+    func uploadImages(images:[UIImage], rideId:String, showGlobalProgress: Bool = true) async throws -> String {
         print("Images Count:\(images.count)")
         var encoadedImages:[String] = []
         for eachImage in images {
@@ -564,19 +564,25 @@ extension UpcomingRideViewModel {
                 encoadedImages.append(encodedImage)
             }
         }
-        isUploading = true
+        if showGlobalProgress {
+            isUploading = true
+        }
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             rideRepository.uploadImage(rideId: rideId, images: encoadedImages, completionHandler: { result, error in
                 if let error = error {
                     Task { @MainActor in
                         print("Error uploading image: \(error)")
-                        self.isUploading = false
+                        if showGlobalProgress {
+                            self.isUploading = false
+                        }
                         continuation.resume(throwing: error)
                     }
                 } else {
                     Task { @MainActor in
                         print("Image uploaded successfully:\(images.count)")
-                        self.isUploading = false
+                        if showGlobalProgress {
+                            self.isUploading = false
+                        }
                         self.rideRepository.updateImageCount(count : Int32(images.count) , rideId: rideId)
                         continuation.resume(returning: "success")
                     }

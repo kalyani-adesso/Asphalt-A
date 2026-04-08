@@ -260,14 +260,13 @@ class QueryViewModel: ObservableObject {
     
     // MARK: - Post Answer
     @MainActor
-    func addAnswer() async {
-        guard !answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    func addAnswer() async -> Bool {
+        guard !answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
         guard let query = selectedQuery else {
             print("No query selected!")
-            return
+            return false
         }
         
-        isLiking = true
         do {
             let result = try await queryRepo.addAnswer(
                 queryId: query.apiId,
@@ -279,11 +278,12 @@ class QueryViewModel: ObservableObject {
             if result is APIResultSuccess<GenericResponse> {
                 print(" Answer added successfully!")
                 self.fetchAllQueries(showLoader: false)
+                return true
             }
         } catch {
             print(" Exception: \(error.localizedDescription)")
         }
-        
+        return false
     }
     
     

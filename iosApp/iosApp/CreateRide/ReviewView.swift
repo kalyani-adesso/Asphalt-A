@@ -15,6 +15,9 @@ struct ReviewView: View {
             VStack{
                 VStack(spacing: 20) {
                     stepIndicator
+                    if viewModel.isRideLoading {
+                        ReviewSkeleton()
+                    } else {
                     VStack(alignment: .leading, spacing: 20) {
                   
                             Text(AppStrings.CreateRide.reviewSubTitle)
@@ -46,10 +49,15 @@ struct ReviewView: View {
                     .padding()
                     .background(AppColor.backgroundLight)
                     .cornerRadius(10)
+                    }
                 }
 
                 Spacer()
 
+                if viewModel.isRideLoading {
+                    ReviewFooterSkeleton()
+                        .padding()
+                } else {
                 HStack(spacing: 15) {
                     ButtonView( title: AppStrings.CreateRideButton.previous.rawValue,
                                 background: AppColor.white,
@@ -70,10 +78,7 @@ struct ReviewView: View {
                     )
                 }
                 .padding()
-            }
-            
-            if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading ...")
+                }
             }
         }
 

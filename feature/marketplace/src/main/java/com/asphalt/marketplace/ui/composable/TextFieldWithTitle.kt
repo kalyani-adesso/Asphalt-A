@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.NeutralBlack
@@ -36,8 +38,10 @@ fun TextFieldWithTitle(
     maxLines: Int = 1,
     showError: Boolean = false,
     value: String,
-    onValueChange: (String) -> Unit
-) {
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    onValueChange: (String) -> Unit,
+
+    ) {
     Column() {
         Text(
             text = title, //stringResource(R.string.ride_title),
@@ -109,8 +113,9 @@ fun TextFieldWithTitle(
                     errorIndicatorColor = Color.Transparent,
 
                     ),
+                keyboardOptions = keyboardOptions
+            )
 
-                )
 
         }
     }
@@ -120,5 +125,5 @@ fun TextFieldWithTitle(
 @Composable
 fun TextFieldWithTitlePreview() {
 
-    TextFieldWithTitle("title",1 ,false,value = "",{})
+    TextFieldWithTitle("title", 1, false, value = "", onValueChange = {})
 }

@@ -10,12 +10,17 @@ import SwiftUI
 struct DashboardView: View {
     @EnvironmentObject var home: HomeViewModel
     @State private var currentDate = Date()
+    @State private var statsVisible = false
     var isAtFirstMonth: Bool {
         guard let firstMonth = home.firstAvailableMonth else { return false }
         return Calendar.current.isDate(currentDate, equalTo: firstMonth, toGranularity: .month)
     }
     
     var body: some View {
+        Group {
+            if home.isRideSummaryLoading {
+                DashboardStatsSkeleton()
+            } else {
             VStack(spacing: 15) {
                 HStack {
                                VStack(alignment: .leading, spacing: 2) {
@@ -44,11 +49,11 @@ struct DashboardView: View {
                                    } label: {
                                        Image(systemName: "chevron.left")
                                            .font(.system(size: 16, weight: .semibold))
-                                           .foregroundColor(AppColor.celticBlue)
+                                           .foregroundColor(isAtFirstMonth ? AppColor.grey : AppColor.celticBlue)
                                    }
                                    .buttonStyle(.plain)
                                    .disabled(isAtFirstMonth)
-                                   let isToday = Calendar.current.isDateInToday(currentDate)
+                                   let isCurrentMonth = Calendar.current.isDate(currentDate, equalTo: Date(), toGranularity: .month)
                                    Button {
                                        let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
                                        if nextDate <= Date()
@@ -58,17 +63,19 @@ struct DashboardView: View {
                                    } label: {
                                        Image(systemName: "chevron.right")
                                            .font(.system(size: 16, weight: .semibold))
-                                           .foregroundColor(isToday ? AppColor.grey : AppColor.celticBlue)
+                                           .foregroundColor(isCurrentMonth ? AppColor.grey : AppColor.celticBlue)
                                    }
                                    .buttonStyle(.plain)
-                                   .disabled(isToday)
+                                   .disabled(isCurrentMonth)
+                                   .opacity(isCurrentMonth ? 0.5 : 1)
                                }
                            }
                 .padding(.horizontal, 10)
                 .cornerRadius(12)
                 HStack(spacing: 15) {
-                    ForEach(home.stats) { stat in
+                    ForEach(Array(home.stats.enumerated()), id: \.element.id) { index, stat in
                         StatCardView(stat: stat)
+                            .staggeredListRow(index: index, visible: statsVisible)
                     }
                 }
             }
@@ -83,14 +90,19 @@ struct DashboardView: View {
                         let month = Calendar.current.component(.month, from: newValue)
                         let year = Calendar.current.component(.year, from: newValue)
                         home.updateStatsFor(month: month, year: year)
+                        statsVisible = false
+                        DispatchQueue.main.async {
+                            statsVisible = true
+                        }
                     }
                     .onAppear {
-                       
                             let month = Calendar.current.component(.month, from: currentDate)
                             let year = Calendar.current.component(.year, from: currentDate)
                             home.updateStatsFor(month: month, year: year)
-                        
+                            statsVisible = true
                     }
+            }
+        }
     }
     
 }

@@ -15,6 +15,7 @@ struct JoinRideView: View {
     @State private var showHomeView:Bool = false
     @StateObject private var homeViewModel = HomeViewModel()
     @State private var selectedRide: JoinRideModel? = nil
+    @State private var joinRideRowsVisible = false
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         AppToolBar{
@@ -23,7 +24,9 @@ struct JoinRideView: View {
                     searchBarView
                         .font(KlavikaFont.regular.font(size: 14))
                         .padding(.top)
-                    if viewModel.filteredRides.isEmpty {
+                    if viewModel.isRideLoading {
+                        JoinRideSkeleton()
+                    } else if viewModel.filteredRides.isEmpty {
                         VStack(spacing: 12) {
                             Text(AppStrings.JoinRide.noActiveRidesFound)
                                 .font(KlavikaFont.bold.font(size: 18))
@@ -31,20 +34,25 @@ struct JoinRideView: View {
                         }
                         .frame(maxWidth: .infinity, minHeight: 400)
                     } else {
-                        List(viewModel.filteredRides.indices, id: \.self) { index in
-                            let ride = viewModel.filteredRides[index]
-                            
-                            JoinRideRow(
-                                ride: ride,
-                                index: index,
-                                viewModel: viewModel, selectedRide: $selectedRide
-                            )
-                            .listRowSeparator(.hidden)
+                        List {
+                            ForEach(Array(viewModel.filteredRides.enumerated()), id: \.element.rideId) { index, ride in
+                                JoinRideRow(
+                                    ride: ride,
+                                    index: index,
+                                    viewModel: viewModel,
+                                    selectedRide: $selectedRide
+                                )
+                                .listRowSeparator(.hidden)
+                                .staggeredListRow(index: index, visible: joinRideRowsVisible)
+                                .dashboardListRowTransition()
+                            }
                         }
+                        .animation(AppListRowAnimations.spring, value: viewModel.filteredRides.map(\.rideId))
                         .listStyle(.plain)
                     }
                     Spacer()
                 }
+                .disabled(viewModel.isRideLoading)
                 .navigationBarBackButtonHidden(true)
                 .navigationDestination(isPresented: $showHomeView, destination: {
                     BottomNavBar()
@@ -54,6 +62,16 @@ struct JoinRideView: View {
                 })
                 .task {
                     await viewModel.getRides()
+                    joinRideRowsVisible = !viewModel.isRideLoading
+                }
+                .onChange(of: viewModel.isRideLoading) { _, loading in
+                    if !loading {
+                        joinRideRowsVisible = true
+                    }
+                }
+                .onChange(of: viewModel.filteredRides.map(\.rideId)) { _, _ in
+                    joinRideRowsVisible = false
+                    DispatchQueue.main.async { joinRideRowsVisible = true }
                 }
                 .refreshable {
                     Task {
@@ -69,14 +87,6 @@ struct JoinRideView: View {
                     }
                 } message: {
                     Text(viewModel.joinRideError ?? AppStrings.JoinRide.joinRideFailed)
-                }
-                if viewModel.isRideLoading {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                    ProgressView(AppStrings.JoinRide.loading)
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .padding(.top, 100)
-                        .foregroundColor(.white)
                 }
             }
         }
@@ -215,10 +225,10 @@ struct JoinRideRow: View {
                     viewModel.tappedIndex = index
                     
                     Task {
-                        if ride.rideJoined {
-                            selectedRide = ride
-                            return
-                        }
+//                        if ride.rideJoined {
+//                            selectedRide = ride
+//                            return
+//                        }
                         if let selected = await viewModel.handleJoin(for: ride) {
                             selectedRide = selected
                         }

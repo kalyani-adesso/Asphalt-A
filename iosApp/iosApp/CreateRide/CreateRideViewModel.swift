@@ -202,7 +202,8 @@ extension CreateRideViewModel {
     @MainActor
     func getActiveJoinedRide() async {
         do {
-            self.isRideLoading = true
+            // Do not toggle `isRideLoading` here — it drives the tab-bar blocking overlay
+            // (`ListShimmerPlaceholder`). Background active-ride refresh should not cover Home.
             // Reset stale state before recomputing active ride.
             self.activeRide = nil
 
@@ -263,19 +264,10 @@ extension CreateRideViewModel {
                     assemblyLat: ride.hasAssemblyPoint ? ride.assemblyLat : nil,
                     assemblyLon: ride.hasAssemblyPoint ? ride.assemblyLon : nil
                 )
-                self.isRideLoading = false
                 break
-            }
-            
-            // If no active ride was found, set loading to false
-            if self.activeRide == nil {
-                self.isRideLoading = false
             }
 
         } catch {
-            await MainActor.run {
-                self.isRideLoading = false
-            }
             print("Failed to fetch active ride: \(error.localizedDescription)")
         }
     }

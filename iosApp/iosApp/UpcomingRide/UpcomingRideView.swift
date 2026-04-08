@@ -27,6 +27,8 @@ struct UpcomingRideView: View {
     @State private var selectedImages: [UIImage] = []
     @State private var selectedRideId: String? = nil
     @State private var showNotification = false
+    @AppStorage(AppStrings.userdefaultKeys.hasUnreadNotifications.rawValue)
+    private var hasUnreadNotifications: Bool = false
     @State private var showSlideBar = false
     @State private var showPhotosViewer = false
     @State private var selectedRideForPhotos: RideModel?
@@ -34,6 +36,7 @@ struct UpcomingRideView: View {
     @State private var deepLinkRide: RideModel?
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
+    @State private var rideListRowsVisible = false
     
     var body: some View {
         ZStack{
@@ -74,36 +77,58 @@ struct UpcomingRideView: View {
                 .contentShape(Rectangle())
                 VStack {
                     List {
-
-                        let filteredIndices = viewModel.rides.indices.filter {
-                            viewModel.rides[$0].rideAction == viewModel.selectedTab
-                        }
-
-                        if filteredIndices.isEmpty {
-                            Text("No rides found")
-                                .font(KlavikaFont.bold.font(size: 16))
-                                .foregroundColor(AppColor.stoneGray)
+                        if viewModel.isRideLoading && viewModel.selectedTab == .upcoming {
+                            ForEach(0..<3, id: \.self) { rowIndex in
+                                UpcomingRideCardSkeleton()
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(
+                                        EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
+                                    )
+                                    .staggeredListRow(index: rowIndex, visible: rideListRowsVisible)
+                                    .dashboardListRowTransition()
+                            }
+                        } else if viewModel.isRideLoading && viewModel.selectedTab == .history {
+                            ForEach(0..<3, id: \.self) { rowIndex in
+                                HistoryRideCardSkeleton()
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(
+                                        EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
+                                    )
+                                    .staggeredListRow(index: rowIndex, visible: rideListRowsVisible)
+                                    .dashboardListRowTransition()
+                            }
                         } else {
+                            let filteredIndices = viewModel.rides.indices.filter {
+                                viewModel.rides[$0].rideAction == viewModel.selectedTab
+                            }
 
-                            ForEach(filteredIndices, id: \.self) { index in
-                                UpComingView(
-                                    viewModel: viewModel,
-                                    ride: $viewModel.rides[index],
-                                    onAddPhotos: { rideId in
-                                        selectedRideId = rideId
-                                        selectedImages = []
-                                        withAnimation(.easeInOut) { activePopup = .uploadOptions }
-                                    },
-                                    onMessageTap: { ride in
-                                        openChatForRide(ride)
-                                    },
-                                    showPhotosViewer: $showPhotosViewer,
-                                    selectedRideForPhotos: $selectedRideForPhotos
-                                )
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(
-                                    EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
-                                )
+                            if filteredIndices.isEmpty {
+                                Text("No rides found")
+                                    .font(KlavikaFont.bold.font(size: 16))
+                                    .foregroundColor(AppColor.stoneGray)
+                            } else {
+                                ForEach(Array(filteredIndices.enumerated()), id: \.offset) { rowIndex, index in
+                                    UpComingView(
+                                        viewModel: viewModel,
+                                        ride: $viewModel.rides[index],
+                                        onAddPhotos: { rideId in
+                                            selectedRideId = rideId
+                                            selectedImages = []
+                                            withAnimation(.easeInOut) { activePopup = .uploadOptions }
+                                        },
+                                        onMessageTap: { ride in
+                                            openChatForRide(ride)
+                                        },
+                                        showPhotosViewer: $showPhotosViewer,
+                                        selectedRideForPhotos: $selectedRideForPhotos
+                                    )
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(
+                                        EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
+                                    )
+                                    .staggeredListRow(index: rowIndex, visible: rideListRowsVisible)
+                                    .dashboardListRowTransition()
+                                }
                             }
                         }
                     }
@@ -111,7 +136,12 @@ struct UpcomingRideView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
+            .onChange(of: viewModel.selectedTab) { _, _ in
+                rideListRowsVisible = false
+                DispatchQueue.main.async { rideListRowsVisible = true }
+            }
             .onAppear {
+                rideListRowsVisible = true
                 viewModel.selectedTab = .upcoming
                 if showpopup {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -191,9 +221,7 @@ struct UpcomingRideView: View {
                     openGallery: $openGallery,
                     selectedImages: $selectedImages,
                     onUpload: {
-                      
-                           handleUpload(selectedImages: selectedImages)
-                        
+                        try await handleUploadAsync(selectedImages: selectedImages)
                     }
                 )
                 .transition(.opacity.combined(with: .scale))
@@ -202,7 +230,7 @@ struct UpcomingRideView: View {
         }
         .overlay(alignment: .center) {
             if viewModel.isUploading {
-                ProgressViewReusable(title: "Uploading Photos...")
+                ProgressViewReusable(title: "", style: .standard)
                     .zIndex(11)
             }
         }
@@ -247,16 +275,19 @@ struct UpcomingRideView: View {
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
+                        hasUnreadNotifications = false
                         showNotification = true
                     } label: {
                         ZStack(alignment: .topTrailing) {
                             Image(systemName: "bell")
                                 .font(.system(size: 15))
                                 .foregroundColor(AppColor.celticBlue)
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 8, height: 8)
-                                .offset(x: -2, y: 1)
+                            if hasUnreadNotifications {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: -2, y: 1)
+                            }
                         }
                     }
                     
@@ -277,22 +308,21 @@ struct UpcomingRideView: View {
         
     }
     
-    private func handleUpload(selectedImages:[UIImage]) {
+    private func handleUploadAsync(selectedImages: [UIImage]) async throws {
         guard let rideId = selectedRideId else { return }
-        
-        if let index = viewModel.rides.firstIndex(where: { $0.id == rideId }) {
-            var ride = viewModel.rides[index]
-            ride.hasPhotos = true
-            viewModel.rides[index] = ride
-            Task {
-                try await viewModel.uploadImages(images: selectedImages, rideId: rideId)
+        guard let index = viewModel.rides.firstIndex(where: { $0.id == rideId }) else { return }
+
+        var ride = viewModel.rides[index]
+        ride.hasPhotos = true
+        viewModel.rides[index] = ride
+
+        try await viewModel.uploadImages(images: selectedImages, rideId: rideId, showGlobalProgress: false)
+
+        await MainActor.run {
+            withAnimation {
+                selectedRideId = nil
             }
         }
-        
-        withAnimation {
-            selectedRideId = nil
-        }
-        
     }
     private func openChatForRide(_ ride: RideModel) {
 
@@ -612,6 +642,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                         
                         Button(action: {
                             Task { await viewModel.changeRideInviteStatus(rideId: ride.id, accepted: false) }
@@ -624,6 +655,7 @@ struct UpComingView: View {
                                 .font(KlavikaFont.bold.font(size: 14))
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.bottom, 20)

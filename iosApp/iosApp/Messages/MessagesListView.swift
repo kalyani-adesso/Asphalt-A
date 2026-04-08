@@ -38,6 +38,7 @@ struct MessagesListView: View {
     @State private var showSlideBar = false
     @State var showHome: Bool = false
     @State var showBack: Bool = false
+    @State private var chatRowsVisible = false
     
     var emptyStateTitle: String {
         switch viewModel.selectedCategory {
@@ -115,14 +116,17 @@ struct MessagesListView: View {
                     .zIndex(1)
                     .padding(.bottom, 20)
                     if viewModel.isLoading {
-                        
                         Spacer()
-                        
-                        ProgressView("Loading chats...")
-                            .scaleEffect(1.2)
-                        
+                        ListShimmerPlaceholder(
+                            rowCount: 6,
+                            rowHeight: 68,
+                            rowSpacing: 12,
+                            horizontalPadding: 20,
+                            bottomPadding: 0,
+                            embeddedInCard: false,
+                            showsSweep: true
+                        )
                         Spacer()
-                        
                     } else if viewModel.filteredChats.isEmpty {
                         
                         Spacer()
@@ -150,7 +154,7 @@ struct MessagesListView: View {
                         
                         ScrollView {
                             VStack(spacing: 12) {
-                                ForEach(viewModel.filteredChats) { chat in
+                                ForEach(Array(viewModel.filteredChats.enumerated()), id: \.element.id) { index, chat in
                                     NavigationLink {
                                         ChatDetailContainer(chat: chat)
                                     }label: {
@@ -161,8 +165,11 @@ struct MessagesListView: View {
                                         })
                                     }
                                     .buttonStyle(.plain)
+                                    .staggeredListRow(index: index, visible: chatRowsVisible)
+                                    .dashboardListRowTransition()
                                 }
                             }
+                            .animation(AppListRowAnimations.spring, value: viewModel.filteredChats.map(\.id))
                             .padding(.horizontal, 16)
                             .padding(.top, 20)
                         }
@@ -177,7 +184,15 @@ struct MessagesListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
+            .onChange(of: viewModel.filteredChats.map(\.id)) { _, _ in
+                chatRowsVisible = false
+                DispatchQueue.main.async { chatRowsVisible = true }
+            }
+            .onChange(of: viewModel.isLoading) { _, loading in
+                if !loading { chatRowsVisible = true }
+            }
             .onAppear {
+                chatRowsVisible = true
                 Task {
                     try? await viewModel.fetchAllUsers()
                     viewModel.fetchRecentChats()

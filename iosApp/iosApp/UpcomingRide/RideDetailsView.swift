@@ -13,6 +13,7 @@ struct RideDetailsView: View {
     @State private var deleteRide = false
     @State private var activeChat: ActiveChat? = nil
     @State private var chatVM: MessagesViewModel?
+    @State private var detailRowsVisible = false
     var body: some View {
         AppToolBar(showBack: false){
         ZStack {
@@ -104,19 +105,28 @@ struct RideDetailsView: View {
                         )
                         .contentShape(Rectangle())
                         
-                        HStack(spacing: 16) {
-                            StatusCard(count: viewModel.rideDetails.first?.confirmedCount ?? 0, title: "Confirmed", color: AppColor.spanishGreen)
-                            StatusCard(count: viewModel.rideDetails.first?.pendingCount ?? 0, title: "Pending", color: AppColor.lightOrange)
-                            StatusCard(count: viewModel.rideDetails.first?.declinedCount ?? 0, title: "Declined", color: AppColor.darkRed)
+                        if viewModel.isRideLoading {
+                            RideDetailsStatusSkeleton()
+                        } else {
+                            HStack(spacing: 16) {
+                                StatusCard(count: viewModel.rideDetails.first?.confirmedCount ?? 0, title: "Confirmed", color: AppColor.spanishGreen)
+                                StatusCard(count: viewModel.rideDetails.first?.pendingCount ?? 0, title: "Pending", color: AppColor.lightOrange)
+                                StatusCard(count: viewModel.rideDetails.first?.declinedCount ?? 0, title: "Declined", color: AppColor.darkRed)
+                            }
+                            .frame(height: 63)
+                            .padding([.top,.bottom],16)
                         }
-                        .frame(height: 63)
-                        .padding([.top,.bottom],16)
-                        if viewModel.rideDetails.count > 0 {
+                        if viewModel.isRideLoading {
+                            RideDetailsParticipantsSkeleton()
+                        } else if viewModel.rideDetails.count > 0 {
                             VStack {
-                                ForEach(viewModel.rideDetails) { rideDetails in
-                                    ParticipantsStatusRow(rideDetails:rideDetails )
+                                ForEach(Array(viewModel.rideDetails.enumerated()), id: \.element.id) { index, rideDetails in
+                                    ParticipantsStatusRow(rideDetails: rideDetails)
+                                        .staggeredListRow(index: index, visible: detailRowsVisible)
+                                        .dashboardListRowTransition()
                                 }
                             }
+                            .animation(AppListRowAnimations.spring, value: viewModel.rideDetails.map(\.id))
                             .padding([.leading,.trailing,.top,.bottom],16)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
@@ -149,14 +159,20 @@ struct RideDetailsView: View {
                         UpcomingRideView(viewModel: viewModel, showpopup: false, navigationDone: true, rideIdToOpen: .constant(nil))
                     })
                     .onAppear {
+                        detailRowsVisible = viewModel.isRideLoading ? false : true
                         Task {
                             await  viewModel.fetchAllUsers()
                         }
                     }
+                    .onChange(of: viewModel.isRideLoading) { _, loading in
+                        if !loading {
+                            detailRowsVisible = true
+                        }
+                    }
+                    .onChange(of: ride.id) { _, _ in
+                        detailRowsVisible = false
+                    }
                 }
-            if viewModel.isRideLoading {
-                ProgressViewReusable(title: "Loading ...")
-            }
             if let chat = activeChat, let vm = chatVM {
                 ChatOverlayView(
                     chat: chat,
@@ -167,10 +183,6 @@ struct RideDetailsView: View {
                 .ignoresSafeArea()
                        .zIndex(1)
             }
-        }
-        
-        var declinedCount:Int  {
-            ride.participantAcceptedCount > 0 ? (ride.riderCount  - ride.participantAcceptedCount) : 0
         }
     }
     }

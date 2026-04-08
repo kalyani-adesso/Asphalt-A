@@ -36,6 +36,9 @@ struct ConnectedRideMapView: View {
     @State private var showInAppNavigation: Bool = false
     @State private var endRideErrorMessage: String?
     @State private var isEndingRide: Bool = false
+    /// While `true`, Firebase message + ongoing-rider streams run; set `false` when ride ends.
+    @State private var rideSessionActive: Bool = true
+    @State private var activeRiderProfileImageName: String? = nil
     // Smoothed speed & movement state for timer / UI
     @State private var speedSamples: [Double] = []
     @State private var isMoving: Bool = false
@@ -203,8 +206,20 @@ struct ConnectedRideMapView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 showToast = false
                             }
+                            guard rideSessionActive else { return }
                             locationManager.requestLocation()
                             locationManager.startUpdatingLocation()
+
+                            // Fetch current user's profile image once for Active Rider UI.
+                            Task {
+                                let uid = MBUserDefaults.userIdStatic ?? ""
+                                guard !uid.isEmpty else { return }
+                                if let details = await viewModel.getAllUsers(createdBy: uid) {
+                                    await MainActor.run {
+                                        activeRiderProfileImageName = details.2
+                                    }
+                                }
+                            }
 
                             if !rideModel.rideJoined {
                                 tryJoinWhenLocationReady()
@@ -245,10 +260,16 @@ struct ConnectedRideMapView: View {
                                 }
                             }
                         }
-                        .task { await messagingVM.receiveMessage(rideId: rideModel.rideId) }
-                        .task { await participantsVM.getOnGoingRides(rideId: rideModel.rideId) }
+                        .task(id: rideSessionActive) {
+                            guard rideSessionActive else { return }
+                            await messagingVM.receiveMessage(rideId: rideModel.rideId)
+                        }
+                        .task(id: rideSessionActive) {
+                            guard rideSessionActive else { return }
+                            await participantsVM.getOnGoingRides(rideId: rideModel.rideId)
+                        }
                         .onChange(of: viewModel.ongoingRideId) { _, ride in
-                            if !ride.isEmpty {
+                            if !ride.isEmpty, rideSessionActive, !rideComplted, !isEndingRide {
                                 startOngoingRideTimer()
                             }
                         }
@@ -264,9 +285,9 @@ struct ConnectedRideMapView: View {
     func tryJoinWhenLocationReady() {
         sessionController.tryJoinWhenLocationReady(
             locationProvider: {
-                let lat = locationManager.lastLocation?.coordinate.latitude ?? 0
-                let long = locationManager.lastLocation?.coordinate.longitude ?? 0
-                let isValid = (lat != 0 || long != 0) && locationManager.lastLocation != nil
+                let lat = locationManager.lastLocation?.coordinate.latitude ?? (rideModel.hasAssemblyPoint ? rideModel.assemblyLat : rideModel.startLat) ?? 0
+                let long = locationManager.lastLocation?.coordinate.longitude ?? (rideModel.hasAssemblyPoint ? rideModel.assemblyLon : rideModel.startLong) ?? 0
+                let isValid = (lat != 0 || long != 0)
                 return (lat, long, isValid)
             },
             joinAction: { lat, long in
@@ -285,6 +306,7 @@ struct ConnectedRideMapView: View {
     }
 
     func startOngoingRideTimer() {
+        guard rideSessionActive, !rideComplted, !isEndingRide else { return }
         sessionController.startHeartbeat(interval: 10) {
             if MBUserDefaults.userIdStatic == nil || MBUserDefaults.userIdStatic?.isEmpty == true {
                 stopTimer()
@@ -338,6 +360,18 @@ struct ConnectedRideMapView: View {
     
     func stopTimer() {
         sessionController.stopAllTimers()
+    }
+
+    /// Stops heartbeat + location updates immediately after a successful end ride.
+    private func stopSessionAfterRideEnded() {
+        stopTimer()
+        viewModel.stopOngoingRideTimer()
+        viewModel.endRide()
+        rideSessionActive = false
+        viewModel.ongoingRideId = ""
+        MBUserDefaults.isRideJoinedID = nil
+        MBUserDefaults.rideIdStatic = nil
+        locationManager.stopUpdatingLocation()
     }
 
     /// Updates smoothed speed and controls when the ride timer should advance.
@@ -420,7 +454,12 @@ struct ConnectedRideMapView: View {
     @ViewBuilder private func rideProgressSection() -> some View {
         VStack(spacing: 18) {
             ConnectedRideHeaderView(title: AppStrings.ConnectedRide.rideInProgressTitle, subtitle:AppStrings.ConnectedRide.groupNavigationActiveSubtitle, image: AppIcon.Profile.profile)
-            ActiveRiderView(title: currentUserDisplayName, speed: "\(displayedSpeedKph) \(AppStrings.ConnectedRide.speedUnitKph)", startTrack:$startTrack)
+            ActiveRiderView(
+                profileImageName: activeRiderProfileImageName,
+                title: currentUserDisplayName,
+                speed: "\(displayedSpeedKph) \(AppStrings.ConnectedRide.speedUnitKph)",
+                startTrack: $startTrack
+            )
             Button(action: endRideTapped) {
                 Text(isEndingRide ? AppStrings.ConnectedRide.endRideInProgress : AppStrings.ConnectedRide.endRideButton)
                     .frame(maxWidth: .infinity,minHeight: 60)
@@ -514,6 +553,14 @@ struct ConnectedRideMapView: View {
                 }
                 return
             }
+            // Stop any background heartbeats immediately so no more PATCH updates go out after ride ends.
+            DispatchQueue.main.async {
+                stopSessionAfterRideEnded()
+                // Mark ride ended in the main ride node immediately (source of truth for "active ride").
+                // Do NOT depend on end-ride summary success for this, otherwise the app can treat the ride as still active
+                // on next refresh and re-join in background.
+                viewModel.endActiveRide(rideId: rideModel.rideId, rideCreatedBy: rideModel.userId)
+            }
             sessionVM.endRideSummary(
                 ride: rideModel,
                 userID: MBUserDefaults.userIdStatic ?? "",
@@ -531,13 +578,6 @@ struct ConnectedRideMapView: View {
                         riders: "\(viewModel.groupRiders.count + 1)"
                     )
 
-                    // IMPORTANT: `getActiveJoinedRide()` checks the main ride node (`RIDES_URL`).
-                    // `endRide()` only deletes ongoing tracking (`ONGOING_RIDE_URL`), so also mark
-                    // the ride ended for organizer / participant here (same as `endActiveRide()` logic).
-                    viewModel.endActiveRide(rideId: rideModel.rideId, rideCreatedBy: rideModel.userId)
-
-                    MBUserDefaults.isRideJoinedID = nil
-                    stopTimer()
                     NotificationStore.shared.add(
                         title: AppStrings.NavigationSlider.connectedRide,
                         message: AppStrings.ConnectedRide.rideCompleted,
@@ -747,16 +787,14 @@ struct ConnectedRideOfflineView: View {
 }
 
 struct ActiveRiderView: View {
+    let profileImageName: String?
     let title: String
     let speed: String
     @Binding var startTrack:Bool
     var body: some View {
         HStack {
             HStack(spacing: 16) {
-                AppIcon.Profile.profile
-                    .resizable()
-                    .clipShape(Circle())
-                    .frame(width: 37, height: 37)
+                ProfileImageView(profileImageName: profileImageName, size: CGSize(width: 37, height: 37))
                     .overlay(Circle().stroke(AppColor.green, lineWidth: 1.5))
                     .padding(.leading, 18)
                 

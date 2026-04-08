@@ -18,6 +18,8 @@ struct BottomNavBar: View {
     @State private var rideJoined : Bool = false
     @State var showHome : Bool = false
     @State private var pendingDeepLinkRideId: String? = nil
+    @AppStorage(AppStrings.userdefaultKeys.hasUnreadNotifications.rawValue)
+    private var hasUnreadNotifications: Bool = false
 
     /// Refreshes `rideJoined` so tab switching (including tapping the current tab)
     /// can't keep stale state after ending a ride.
@@ -123,16 +125,19 @@ struct BottomNavBar: View {
                     }
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
+                            hasUnreadNotifications = false
                             self.showNotification = true
                         } label: {
                             ZStack(alignment: .topTrailing) {
                                 Image(systemName: "bell")
                                     .font(.system(size: 15))
                                     .foregroundColor(AppColor.celticBlue)
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 8, height: 8)
-                                    .offset(x: -2, y: 1)
+                                if hasUnreadNotifications {
+                                    Circle()
+                                        .fill(Color.red)
+                                        .frame(width: 8, height: 8)
+                                        .offset(x: -2, y: 1)
+                                }
                             }
                         }
                         Button(action: {
@@ -152,8 +157,17 @@ struct BottomNavBar: View {
                     NotificationView()
                 })
                 .navigationBarBackButtonHidden(true)
-                if createRideVM.isRideLoading || upcomingRideViewModel.isRideLoading  {
-                    ProgressViewReusable(title: "Loading...")
+                // Block interaction during create-ride network work — no list shimmer (avoids Timeline sweep on Home).
+                if createRideVM.isRideLoading {
+                    ZStack {
+                        Color.black.opacity(0.12)
+                            .ignoresSafeArea()
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(AppColor.celticBlue)
+                            .scaleEffect(1.15)
+                    }
+                    .allowsHitTesting(true)
                 }
             }
         }

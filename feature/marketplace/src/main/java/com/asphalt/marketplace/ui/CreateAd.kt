@@ -16,15 +16,15 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -66,6 +66,7 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
                     .padding(bottom = Dimensions.padding100)
                     .imePadding()
             ) {
+                CreateAdForm(viewModel)
                 Box(
                     modifier = Modifier
                         .height(Dimensions.size175)
@@ -119,7 +120,6 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 
                 }
-                CreateAdForm(viewModel)
             }
             Row(
                 modifier = Modifier
@@ -146,8 +146,8 @@ fun CreateAdForm(viewModel: CreateAdViewModel) {
     var title: String = ""
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(
-        "Title*", 1, viewModel.createAd_model.value.isShowTitleError,
-        viewModel.createAd_model.value.tile
+        "Title*", 1, showError = viewModel.createAd_model.value.isShowTitleError,
+        value = viewModel.createAd_model.value.tile
     ) { tit ->
         viewModel.setTitle(tit)
     }
@@ -158,15 +158,50 @@ fun CreateAdForm(viewModel: CreateAdViewModel) {
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TwoDropDownWithTitle("Engine*", "Type*")
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    InputAndDropDown("Color*", "Owner*")
+    InputAndDropDown(
+        "Color*", "Owner*", viewModel.createAd_model.value.isShowColorError,
+        input1 = { input ->
+            viewModel.setColor(input)
+        }, input2 = {
+
+        }, inputString1 = viewModel.createAd_model.value.color
+    )
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    InputAndDropDown("Fuel Type*", "Insurance*")
+    InputAndDropDown(
+        "Fuel Type*",
+        "Insurance*",
+        viewModel.createAd_model.value.isShowFuelError,
+        input1 = { input ->
+            viewModel.setFuelType(input)
+        },
+        input2 = { input ->
+        }, inputString1 = viewModel.createAd_model.value.fuel
+    )
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    // TextFieldWithTitle("Price*", tile = viewModel.createAd_model.value.tile)
+    TextFieldWithTitle(
+        title = "Price*",
+        maxLines = 1,
+        viewModel.createAd_model.value.isShowPriceError,
+        if (viewModel.createAd_model.value.price == null) "" else viewModel.createAd_model.value.price.toString(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+    ) { input ->
+        viewModel.setPrice(input)
+    }
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    //TextFieldWithTitle("Location", tile = viewModel.createAd_model.value.tile)
+    TextFieldWithTitle(
+        "Location", maxLines = 1, viewModel.createAd_model.value.isLocationError,
+        viewModel.createAd_model.value.location
+    ) {
+
+    }
     Spacer(modifier = Modifier.height(Dimensions.size16))
-    //TextFieldWithTitle("Description*", 3, tile = viewModel.createAd_model.value.tile)
+    TextFieldWithTitle(
+        "Description", maxLines = 3, viewModel.createAd_model.value.isShowDescError,
+        viewModel.createAd_model.value.desc
+    ) {
+
+    }
+    Spacer(modifier = Modifier.height(Dimensions.size16))
 }
 
 

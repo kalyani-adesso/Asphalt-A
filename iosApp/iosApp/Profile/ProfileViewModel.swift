@@ -62,6 +62,8 @@ class ProfileViewModel: ObservableObject {
     @Published var drivingLicenseNumber: String = "--"
     @Published var isMechanic: Bool = false
     @Published var profileImage = AppIcon.Profile.profile
+    /// Latest profile picture base64 string from backend (empty means none).
+    private var profilePicBase64: String = ""
     @Published var sections: [ProfileSection] = []
     @Published var selectBikeType: [SelectBikeType] = []
     let vehicleArray: [AppStrings.VehicleType] = AppStrings.VehicleType.allCases
@@ -152,7 +154,7 @@ class ProfileViewModel: ObservableObject {
     func deleteSelectedBikeType(id: UUID) async {
         if let index = selectedBikeType.firstIndex(where: { $0.id == id }) {
             let bikeId = selectedBikeType[index].bikeId
-            await deleteBike(userId: MBUserDefaults.userIdStatic ?? "", bikeId:bikeId)
+            await deleteBike(userId: MBUserDefaults.userIdStatic ?? "", bikeId: bikeId)
             selectedBikeType.remove(at: index)
         }
     }
@@ -192,6 +194,7 @@ extension ProfileViewModel {
                             self.drivingLicenseNumber = domain.drivingLicense
                             let emergency = (domain.emergencyContact).trimmingCharacters(in: .whitespaces)
                             MBUserDefaults.emergencyContactStatic = emergency.isEmpty ? nil : emergency
+                            self.profilePicBase64 = domain.profilePicUrl
                             if let base64Image = self.decodeBase64ToImage(base64: domain.profilePicUrl) {
                               self.profileImage = Image(uiImage: base64Image)
                           }
@@ -220,43 +223,60 @@ extension ProfileViewModel {
     
     func fetchBikes(userId: String) async {
         isLoadingBikes = true
-        do {
-            try await withCheckedThrowingContinuation { continuation in
-                profileRepository.getBikes(userId: userId) { [self] result, error in
-                    if let success = result as? APIResultSuccess<AnyObject>,
-                       let domainArray = success.data as? [BikeDomain] {
-                        Task { @MainActor in
-                            self.selectedBikeType.removeAll()
-                            for eachBike in domainArray {
-                                self.getBikeType(
-                                    model: eachBike.model,
-                                    make: eachBike.make,
-                                    type: eachBike.type,
-                                    bikeId: eachBike.bikeId
-                                )
-                            }
-                            self.isLoadingBikes = false
-                             continuation.resume()
-                        }
-                     
-                    } else if let error = error {
-                        Task { @MainActor in
-                            self.isLoadingBikes = false
-                            continuation.resume(throwing: error)
-                            
+        guard !userId.isEmpty else {
+            selectedBikeType.removeAll()
+            isLoadingBikes = false
+            return
+        }
+
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let gate = SingleFlightResume(continuation)
+
+            // Never leave the garage stuck on “loading” if the bridge never calls back.
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 15_000_000_000)
+                self.isLoadingBikes = false
+                gate.resume()
+            }
+
+            profileRepository.getBikes(userId: userId) { [weak self] result, error in
+                Task { @MainActor in
+                    guard let self else {
+                        gate.resume()
+                        return
+                    }
+                    self.isLoadingBikes = false
+
+                    if let success = result as? APIResultSuccess<AnyObject> {
+                        let domainArray = Self.coerceBikeDomainList(success.data)
+                        self.selectedBikeType.removeAll()
+                        for eachBike in domainArray {
+                            self.getBikeType(
+                                model: eachBike.model,
+                                make: eachBike.make,
+                                type: eachBike.type,
+                                bikeId: eachBike.bikeId
+                            )
                         }
                     } else {
-                        Task { @MainActor in
-                            self.isLoadingBikes = false
-                            continuation.resume(throwing: NSError(domain: "UnknownError", code: -1))
+                        self.selectedBikeType.removeAll()
+                        if let error {
+                            print("Error fetching bikes: \(error)")
                         }
                     }
+                    gate.resume()
                 }
             }
-        } catch {
-            self.isLoadingBikes = false
-            print("Error fetching bikes: \(error)")
         }
+    }
+
+    /// Kotlin / NSArray bridging may not always cast as `[BikeDomain]`; normalize so we still clear loading.
+    private static func coerceBikeDomainList(_ data: Any?) -> [BikeDomain] {
+        if let typed = data as? [BikeDomain] { return typed }
+        if let ns = data as? NSArray {
+            return ns.compactMap { $0 as? BikeDomain }
+        }
+        return []
     }
 
     func addNewBike(userId: String, model: String, make: String, type:Int32) async {
@@ -277,11 +297,17 @@ extension ProfileViewModel {
         emergencyContact: String,
         drivingLicense: String,
         isMachanic: Bool,
-        profileUIImage: UIImage,
+        profileUIImage: UIImage?,
         onSuccess: (() -> Void)? = nil
     ) {
         
-        let base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
+        let base64Image: String
+        if let profileUIImage {
+            base64Image = encodeImageToBase64(image: profileUIImage) ?? ""
+        } else {
+            // No new image selected — keep whatever we last fetched from backend.
+            base64Image = profilePicBase64
+        }
         
         profileRepository.editProfile(userId: userId, userName: userName, email: email, contactNumber: phoneNumber, emergencyContact: emergencyContact, drivingLicense: drivingLicense, isMechanic: isMachanic, profileImage:base64Image , completionHandler: { [weak self] result,error  in
             
@@ -304,13 +330,12 @@ extension ProfileViewModel {
     }
     
     func deleteBike(userId: String, bikeId: String) async {
-        isLoadingBikes = true
+        // Do not toggle `isLoadingBikes` here — it replaced the whole garage with a loader on every delete.
         do {
             try await profileRepository.deleteBike(userId: userId, bikeId: bikeId)
         } catch {
             print("Error deleting bike: \(error)")
         }
-        isLoadingBikes = false
     }
     
     func fetchRideStats() async -> (completedRides: Int, citiesVisited: Int) {
@@ -358,3 +383,21 @@ extension ProfileViewModel {
     }
 }
 
+/// Ensures `CheckedContinuation` is resumed exactly once (callback vs timeout).
+private final class SingleFlightResume: @unchecked Sendable {
+    private let lock = NSLock()
+    private var consumed = false
+    private let continuation: CheckedContinuation<Void, Never>
+
+    init(_ continuation: CheckedContinuation<Void, Never>) {
+        self.continuation = continuation
+    }
+
+    func resume() {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !consumed else { return }
+        consumed = true
+        continuation.resume()
+    }
+}

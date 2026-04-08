@@ -11,6 +11,7 @@ struct QueriesView: View {
     @StateObject private var viewModel = QueryViewModel()
     @State private var selectedStatus: String? = nil
     @State private var showAskPopup = false
+    @State private var queryRowsVisible = false
     var body: some View {
         NavigationStack {
             ZStack {
@@ -82,31 +83,48 @@ struct QueriesView: View {
                     .zIndex(1)
                     .padding(.bottom, 20)
                     
-                    // Scrollable content
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            if viewModel.filteredQueries.isEmpty {
-                                VStack(spacing: 12) {
-                                    Image(systemName: "tray")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 60, height: 60)
-                                        .foregroundColor(.gray.opacity(0.5))
-                                    Text(AppStrings.Query.emptyQuery)
-                                        .font(KlavikaFont.bold.font(size: 18))
-                                        .foregroundColor(.gray)
-                                    Text(AppStrings.Query.emptySubQuery)
-                                        .font(KlavikaFont.regular.font(size: 14))
-                                        .foregroundColor(.gray.opacity(0.8))
-                                }
-                                .frame(maxWidth: .infinity, minHeight: 400)
-                            } else {
-                                LazyVStack(spacing: 20) {
-                                    ForEach(viewModel.filteredQueries) { query in
-                                        QueryCardView(query: query, viewModel: viewModel)
+                    // Scrollable content (animate skeleton only for cards area)
+                    if viewModel.isLoading {
+                        QueriesListSkeleton()
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                if viewModel.filteredQueries.isEmpty {
+                                    VStack(spacing: 12) {
+                                        Image(systemName: "tray")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 60, height: 60)
+                                            .foregroundColor(.gray.opacity(0.5))
+                                        Text(AppStrings.Query.emptyQuery)
+                                            .font(KlavikaFont.bold.font(size: 18))
+                                            .foregroundColor(.gray)
+                                        Text(AppStrings.Query.emptySubQuery)
+                                            .font(KlavikaFont.regular.font(size: 14))
+                                            .foregroundColor(.gray.opacity(0.8))
                                     }
+                                    .frame(maxWidth: .infinity, minHeight: 400)
+                                } else {
+                                    LazyVStack(spacing: 20) {
+                                        ForEach(Array(viewModel.filteredQueries.enumerated()), id: \.element.id) { index, query in
+                                            QueryCardView(query: query, viewModel: viewModel)
+                                                .staggeredListRow(index: index, visible: queryRowsVisible)
+                                                .dashboardListRowTransition()
+                                        }
+                                    }
+                                    // Avoid animating the entire list on every filter tap (causes scroll "bounce").
+                                    // We only want the initial staggered entrance.
+                                    .animation(AppListRowAnimations.spring, value: queryRowsVisible)
+                                    .padding(.horizontal, 20)
                                 }
-                                .padding(.horizontal, 20)
+                            }
+                        }
+                        .onAppear {
+                            queryRowsVisible = viewModel.isLoading ? false : true
+                        }
+                        .onChange(of: viewModel.isLoading) { _, loading in
+                            if !loading {
+                                queryRowsVisible = true
                             }
                         }
                     }
@@ -119,11 +137,8 @@ struct QueriesView: View {
                         .transition(.scale)
                         .zIndex(2)
                 }
-                if viewModel.isLoading {
-                    ProgressViewReusable(title: "Loading Queries...", color: AppColor.stoneGray)
-                }
                 if viewModel.isLiking {
-                    ProgressViewReusable(title: "Loading Queries...")
+                    ProgressViewReusable(title: "", style: .standard, dimsBackground: false)
                 }
             }
         }
