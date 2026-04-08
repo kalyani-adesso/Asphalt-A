@@ -14,6 +14,10 @@ struct ProfileScreen: View {
     @State var showEditRide: Bool = false
     @State private var profileSectionsVisible = false
     @Environment(\.dismiss) var dismiss
+
+    private var currentUserId: String { (MBUserDefaults.userIdStatic ?? "").trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var fallbackName: String { (MBUserDefaults.userNameStatic ?? homeVM.userName).trimmingCharacters(in: .whitespacesAndNewlines) }
+
     var body: some View {
             ZStack {
                 VStack {
@@ -42,7 +46,13 @@ struct ProfileScreen: View {
                             ZStack {
                                 List {
                                     Section {
-                                        ProfileHeaderView(name: viewModel.profileName, email: viewModel.email, role: viewModel.role, image: viewModel.profileImage, phoneNumber: viewModel.phoneNumber)
+                                        ProfileHeaderView(
+                                            name: viewModel.profileName == "--" && !fallbackName.isEmpty ? fallbackName : viewModel.profileName,
+                                            email: viewModel.email,
+                                            role: viewModel.role,
+                                            image: viewModel.profileImage,
+                                            phoneNumber: viewModel.phoneNumber
+                                        )
                                             .frame(height: 135)
                                             .background(
                                                 RoundedRectangle(cornerRadius: 10)
@@ -87,14 +97,14 @@ struct ProfileScreen: View {
                 .navigationBarBackButtonHidden(true)
                 .refreshable {
                     Task {
-                        await viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                        await viewModel.fetchProfile(userId: currentUserId)
                         await viewModel.loadData(homeVM: homeVM)
                     }
                 }
-                .task {
+                .task(id: currentUserId) {
                     // Load profile and stats in parallel so the screen feels faster
                     async let loadStats: () = viewModel.loadData(homeVM: homeVM)
-                    async let loadProfile: () = viewModel.fetchProfile(userId: MBUserDefaults.userIdStatic ?? "")
+                    async let loadProfile: () = viewModel.fetchProfile(userId: currentUserId)
                     _ = await loadStats
                     _ = await loadProfile
                     profileSectionsVisible = true

@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.asphalta.ios</string>
+	<string>com.adesso.riderclub</string>
 	<key>PROJECT_ID</key>
 	<string>riders-club-5910a</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,7 +25,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:787946739615:ios:762d2e707b129356e58faa</string>
+	<string>1:787946739615:ios:b87b96ffac94213ce58faa</string>
 	<key>DATABASE_URL</key>
 	<string>https://riders-club-5910a-default-rtdb.firebaseio.com</string>
 </dict>

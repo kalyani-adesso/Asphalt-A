@@ -178,10 +178,16 @@ extension ProfileViewModel {
 
 extension ProfileViewModel {
     func fetchProfile(userId: String) async {
+        let trimmed = userId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            // Avoid calling profile API with empty userId (can leave UI in a bad state for new users / fresh login).
+            isLoading = false
+            return
+        }
         isLoading = true
         do {
             try await withCheckedThrowingContinuation { continuation in
-                profileRepository.getProfile(userId: userId) { result, error in
+                profileRepository.getProfile(userId: trimmed) { result, error in
                     if let success = result as? APIResultSuccess<AnyObject>,
                        let domain = success.data as? ProfileDomain {
                         Task { @MainActor in
