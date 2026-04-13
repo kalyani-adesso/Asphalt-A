@@ -42,8 +42,7 @@ class HomeViewModel: ObservableObject {
         rideAPIService = RidesApiServiceImpl(client: KtorClient())
         rideRepository = RidesRepository(apiService: rideAPIService)
         loadUserName()
-        locationManager.requestLocation()
-        
+
         // Observe location updates
         Task {
             for await address in locationManager.$currentAddress.values {
@@ -51,6 +50,12 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
+
+    /// Starts location resolution for the main shell (Home or active ride). Do not call from `init()` — many screens create a `HomeViewModel()` and would re-trigger the permission flow on every launch.
+    func requestLocationForMainShell() {
+        locationManager.requestLocation()
+    }
+
     @MainActor
     func loadUserName() {
         Task {

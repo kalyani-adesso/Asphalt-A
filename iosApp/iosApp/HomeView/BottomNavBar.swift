@@ -105,6 +105,7 @@ struct BottomNavBar: View {
                 .ignoresSafeArea(edges: .bottom)
                 
                 .onAppear {
+                    homeViewModel.requestLocationForMainShell()
                     if let id = MBUserDefaults.deepLinkRideIdStatic {
                         pendingDeepLinkRideId = id
                         selectedTab = 1
