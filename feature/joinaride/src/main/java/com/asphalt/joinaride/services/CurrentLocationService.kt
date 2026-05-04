@@ -5,13 +5,14 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.location.Location
 import android.os.Build
+import android.os.HandlerThread
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.asphalt.android.PlatformDatabase
 import com.google.android.gms.location.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import kotlin.math.roundToInt
 
 class CurrentLocationService : Service() {
@@ -19,6 +20,8 @@ class CurrentLocationService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val database = PlatformDatabase()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val locationHandlerThread = HandlerThread("LocationCallbackThread")
+    private var locationCallback: LocationCallback? = null
     private var lastLocation: Location? = null
     private var totalDistanceMetres: Float = 0f
     private var rideId: String? = null
@@ -33,6 +36,7 @@ class CurrentLocationService : Service() {
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationHandlerThread.start()
         createNotificationChannel()
     }
 
@@ -58,16 +62,43 @@ class CurrentLocationService : Service() {
             startForeground(NOTIFICATION_ID, notification)
         }
 
-        startLocationUpdates()
+        val rId = rideId
+        val uId = ongoingRideId
+        serviceScope.launch {
+            if (rId != null && uId != null) {
+                restoreDistanceFromFirebase(rId, uId)
+            }
+            withContext(Dispatchers.Main) {
+                startLocationUpdates()
+            }
+        }
 
-        return START_STICKY
+        // Re-delivers the last intent on system restart so rideId/ongoingRideId are never null
+        return START_REDELIVER_INTENT
+    }
+
+    private suspend fun restoreDistanceFromFirebase(rideId: String, ongoingRideId: String) {
+        try {
+            val snapshot = database
+                .getReference("ongoing_ride/$rideId/$ongoingRideId")
+                .observeValue()
+                .first()
+            val data = snapshot.getValue() as? Map<*, *>
+            val savedDistanceKm = (data?.get("totalDistance") as? Number)?.toFloat() ?: 0f
+            totalDistanceMetres = savedDistanceKm * 1000f
+            Log.d("CurrentLocationService", "Restored distance: ${savedDistanceKm}km")
+        } catch (e: Exception) {
+            Log.e("CurrentLocationService", "Failed to restore distance, starting from 0: ${e.message}")
+        }
     }
 
     private fun startLocationUpdates() {
+        if (locationCallback != null) return
+
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
             .build()
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val currentLocation = result.lastLocation ?: return
 
@@ -109,8 +140,8 @@ class CurrentLocationService : Service() {
         try {
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
+                locationCallback!!,
+                locationHandlerThread.looper
             )
         } catch (unlikely: SecurityException) {
             Log.e("CurrentLocationService", "Location permission revoked")
@@ -162,7 +193,10 @@ class CurrentLocationService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
+        locationCallback = null
         serviceScope.cancel()
+        locationHandlerThread.quitSafely()
         super.onDestroy()
     }
 }

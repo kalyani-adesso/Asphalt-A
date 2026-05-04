@@ -318,8 +318,8 @@ class JoinRideViewModel(
                             status = data["status"] as? String ?: "Connected",
                             dateTime = (data["dateTime"] as? Number)?.toLong() ?: 0L,
                             isRejoined = data["isRejoined"] as? Boolean ?: false,
-                            distanceTravelled = data["totalDistance"] as? Double ?: 0.0,
-                            rideStartedTime = data["rideStartedTime"] as? Long ?: 0,
+                            distanceTravelled = (data["totalDistance"] as? Number)?.toDouble() ?: 0.0,
+                            rideStartedTime = (data["rideStartedTime"] as? Number)?.toLong() ?: 0,
                             canTrack = data["canTrack"] as? Boolean ?: true,
                             bearing = (data["bearing"] as? Number)?.toFloat() ?: 0.0f,
                         )

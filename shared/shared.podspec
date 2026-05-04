@@ -11,6 +11,7 @@ Pod::Spec.new do |spec|
     spec.ios.deployment_target    = '13'
     spec.dependency 'FirebaseAuth'
     spec.dependency 'FirebaseCore'
+    spec.dependency 'FirebaseCrashlytics'
     spec.dependency 'FirebaseDatabase'
     spec.dependency 'FirebaseFirestore'
     if !Dir.exist?('build/cocoapods/framework/shared.framework') || Dir.empty?('build/cocoapods/framework/shared.framework')
