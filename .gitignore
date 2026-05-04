@@ -1,26 +1,66 @@
+# ==========================================
+# Kotlin / Gradle
+# ==========================================
 *.iml
 .kotlin
 .gradle
 **/build/
-xcuserdata
 !src/**/build/
 local.properties
-.idea
-.DS_Store
 captures
 .externalNativeBuild
 .cxx
+
+# ==========================================
+# iOS / Xcode / CocoaPods
+# ==========================================
+
+# Xcode user data
+xcuserdata
+*.xcuserdata
+*.xccheckout
+*.moved-aside
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# Keep shared project files, ignore user-specific ones
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
-**/xcshareddata/WorkspaceSettings.xcsettings
-node_modules/
-/shared/shared.podspec
-.env
 
-# Beads / Dolt files (added by bd init)
+# CocoaPods — generated dependencies (run `pod install` after cloning)
+iosApp/Pods/
+iosApp/Podfile.lock
+
+# ==========================================
+# IDE
+# ==========================================
+.idea
+*.swp
+*.orig
+
+# ==========================================
+# macOS
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==========================================
+# Tooling & Local State
+# ==========================================
+.env
+.ralph/
+.streb/
+.container-use.yaml
+
+# Claude Code
+.claude/logs/
+
+# ==========================================
+# Beads / Dolt (issue tracking)
+# ==========================================
 .dolt/
 *.db
 .beads-credential-key
