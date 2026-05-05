@@ -628,8 +628,8 @@ fun NavigationRoot(
                     }
 
                     entry<AppNavKey.CreateAd> { key ->
-                        CreateAd(setTopAppBarState = setTopAppBarState)
-                        //ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
+                        //CreateAd(setTopAppBarState = setTopAppBarState)
+                        ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
 
@@ -666,7 +666,7 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
-                    Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                   Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
                      /*scope.launch {
                           backStack.add(AppNavKey.CreateAd)
                           drawerState.close()

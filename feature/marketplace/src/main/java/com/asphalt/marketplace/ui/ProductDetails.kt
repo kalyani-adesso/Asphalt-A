@@ -2,6 +2,7 @@ package com.asphalt.marketplace.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -31,12 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.model.chat.getOtherUserId
 import com.asphalt.commonui.AppBarState
 import com.asphalt.commonui.R
+import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.BlueLite35
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GrayDark
 import com.asphalt.commonui.theme.GrayLite34
+import com.asphalt.commonui.theme.GreenLIGHT
 import com.asphalt.commonui.theme.GreenLIGHT10
 import com.asphalt.commonui.theme.GreenLIGHT25
 import com.asphalt.commonui.theme.LightGray45
@@ -45,8 +51,10 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
+import com.asphalt.commonui.ui.CircularNetworkImage
 import com.asphalt.commonui.utils.Utils
 import com.asphalt.marketplace.ui.composable.Buttons
+import com.asphalt.marketplace.ui.composable.SpecificationRow
 
 @Composable
 fun ProductDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
@@ -177,6 +185,50 @@ fun ProductDetailsScreen(setTopAppBarState: (AppBarState) -> Unit) {
                     .padding(vertical = Dimensions.padding16, horizontal = Dimensions.padding16)
 
             ) {
+                Spacer(modifier = Modifier.height(Dimensions.size25))
+                Text(text = "Seller Information", style = TypographyBold.bodyMedium)
+                Spacer(modifier = Modifier.height(Dimensions.size30))
+                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier) {
+
+                        CircularNetworkImage(
+                            modifier = Modifier.border(
+                                width = Dimensions.size2pt5,
+                                color =
+                                    GreenLIGHT,
+                                shape = CircleShape
+                            ),
+                            size = Dimensions.padding40,
+                            imageUrl = ""
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.ic_online_icon),
+                            contentDescription = "Online Status",
+                            modifier = Modifier
+                                .size(Dimensions.size14)
+                                .align(Alignment.BottomEnd)
+                        )
+
+                    }
+                    Spacer(modifier = Modifier.width(Dimensions.size14))
+                    Text(text = "Vyshnav", style = TypographyBold.bodyMedium)
+
+                }
+                Spacer(modifier = Modifier.height(Dimensions.size25))
+                Text(text = "Description", style = TypographyBold.bodyMedium)
+                Spacer(modifier = Modifier.height(Dimensions.size14))
+                Text(text = "Excellent condition 2022 Royal Enfield Classic 350 with only 3,200 km. Always garaged and regularly maintained. Includes aftermarket exhaust, custom seat, and LED lighting. Clean RC in hand. First owner, all service records available.",
+                    style = Typography.bodySmall)
+                Spacer(modifier = Modifier.height(Dimensions.size14))
+                Text(text = "Specifications", style = TypographyBold.bodyMedium)
+                Spacer(modifier = Modifier.height(Dimensions.size8))
+                SpecificationRow(heading1 = "Year", value1 = "2024", heading2 = "Kilometers", value2 = "2000 km")
+                Spacer(modifier = Modifier.height(Dimensions.size8))
+                SpecificationRow(heading1 = "Color", value1 = "Black", heading2 = "Owner", value2 = "First Owner")
+                Spacer(modifier = Modifier.height(Dimensions.size8))
+                SpecificationRow(heading1 = "Fuel Type", value1 = "Petrol", heading2 = "Insurance", value2 = "Valid till 2025")
+
+
 
             }
 
