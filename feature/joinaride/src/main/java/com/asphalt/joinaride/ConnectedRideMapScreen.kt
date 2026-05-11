@@ -75,7 +75,7 @@ fun ConnectedRideGoogleMapScreen(
     LaunchedEffect(Unit) {
         rideViewModel.startRideTimer()
     }
-    LaunchedEffect(currentUser) {
+    LaunchedEffect(ridesData.ridesID) {
         val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
         rideViewModel.observeRideLocations(ridesData.ridesID.toString())
         Log.d("TAG", "RidersGroupStatus userData: $userData")

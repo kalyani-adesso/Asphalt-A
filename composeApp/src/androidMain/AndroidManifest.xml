@@ -49,7 +49,7 @@
         </provider>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCkYUic8oy8MP5hww6-J42jq4EQtP6aMpQ" />
+            android:value="${MAPS_API_KEY}" />
         <service
             android:name="com.asphalt.joinaride.services.CurrentLocationService"
             android:exported="false"

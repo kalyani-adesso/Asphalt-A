@@ -80,7 +80,7 @@ fun RidesDetailsScreen(
 ) {
     //val ridesData by viewModel.ridesData
     //viewModel.getUserList()
-    LaunchedEffect(Unit) {
+    LaunchedEffect(rideId) {
         if (rideId != null)
             viewModel.getSingleRide(rideId)
     }

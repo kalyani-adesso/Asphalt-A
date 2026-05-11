@@ -18,12 +18,13 @@ class LocationTracker(context: Context) {
     fun startLocationUpdates(onLocation: (Location) -> Unit) {
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
 
-        locationCallback = object : LocationCallback() {
+        val callback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.lastLocation?.let(onLocation)
             }
         }
-        fusedLocationClient.requestLocationUpdates(request, locationCallback!!, null)
+        locationCallback = callback
+        fusedLocationClient.requestLocationUpdates(request, callback, null)
     }
 
     fun stopLocationUpdates() {

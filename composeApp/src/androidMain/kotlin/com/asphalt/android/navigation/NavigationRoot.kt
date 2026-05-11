@@ -575,18 +575,18 @@ fun NavigationRoot(
                     entry<AppNavKey.RatingRideNavKey> { key ->
                         RatingThisRide(
                             ridesData = key.ridesData,
-                            onDismiss = {},
-                            onSubmit = {
-                                backStack.add(AppNavKey.RatingRideNavKey(ridesData = key.ridesData))
-                            }
+                            onDismiss = { backStack.removeLastOrNull() },
+                            onSubmit = { backStack.removeLastOrNull() }
                         )
                     }
 
                     entry<AppNavKey.MessageUiScreenKey> { key ->
-                        AppNavKey.MessageUiScreenKey(
-                            ridesData = key.ridesData,
-
-                            )
+                        ChatScreen(
+                            setTopAppBarState = setTopAppBarState,
+                            ids = listOf(key.ridesData.userID),
+                            initaliseChat = true,
+                            isGroupChat = false
+                        )
                     }
 
                     entry<AppNavKey.RideDetails> { key ->

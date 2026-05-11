@@ -99,7 +99,7 @@ fun GarageItem(vehicleData: VehicleData, onDeleteBike: () -> Unit) {
             ComposeUtils.RoundedIconWithHeaderComponent(
                 VividOrange,
                 R.drawable.ic_two_wheeler,
-                stringResource(BikeType.getBikeTypeById(vehicleData.type)!!),
+                BikeType.getBikeTypeById(vehicleData.type)?.let { stringResource(it) } ?: "Unknown",
                 stringResource(
                     R.string.garage_vehicle,
                     vehicleData.make,

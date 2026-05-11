@@ -44,10 +44,8 @@ class CreateAdViewModel : ViewModel() {
     }
 
     fun setPrice(input: String) {
-        if (input.isNotEmpty()) {
-            _createAd_model.value = _createAd_model.value.copy(price = input.toDouble())
-        }
-
+        val parsed = input.toDoubleOrNull() ?: return
+        _createAd_model.value = _createAd_model.value.copy(price = parsed)
     }
 
 }

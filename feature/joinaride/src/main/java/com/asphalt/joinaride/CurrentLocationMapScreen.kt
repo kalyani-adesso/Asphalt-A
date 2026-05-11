@@ -209,7 +209,7 @@ fun CurrentLocationMapScreen(
 //        })
 //
 //    }
-    LaunchedEffect("Test") {
+    LaunchedEffect(ridesData.ridesID) {
         rideViewModel.getPolyLines(
             ridesData.startLatitude,
             ridesData.startLongitude,

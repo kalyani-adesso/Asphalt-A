@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -11,6 +12,7 @@ plugins {
 }
 
 kotlin {
+    @Suppress("DEPRECATION")
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -68,8 +70,10 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        val mapsApiKey : String? = project.findProperty("MAPS_API_KEY") as String?
-        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey ?: ""
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
+        manifestPlaceholders["MAPS_API_KEY"] = localProps.getProperty("MAPS_API_KEY", "")
     }
     packaging {
         resources {

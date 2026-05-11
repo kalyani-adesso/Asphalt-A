@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,16 +90,16 @@ fun ChatScreen(
     var msgText by remember { mutableStateOf("") }
     val messages by viewModel.chatMessage.collectAsState()
 
-    if (initaliseChat) {
-        if (isGroupChat) {
-            ridesData?.let { viewModel.initializeGroupChat(it) }
-        } else {
-            if (ids != null && ids.size > 0) {
-                viewModel.initialise1V1Chat(ids.get(0))
+    LaunchedEffect(initaliseChat) {
+        if (initaliseChat) {
+            if (isGroupChat) {
+                ridesData?.let { viewModel.initializeGroupChat(it) }
+            } else {
+                if (!ids.isNullOrEmpty()) {
+                    viewModel.initialise1V1Chat(ids[0])
+                }
             }
         }
-
-
     }
     AsphaltTheme {
         Column(modifier = Modifier) {

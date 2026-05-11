@@ -37,7 +37,7 @@ class JoinRideMapViewModel(
         val currentUser = androidUserVM.getCurrentUserUID()
         val userDomain: UserDomain? = androidUserVM.getUser(userID = currentUser)
 
-        _userId.value = userDomain!!.name
+        _userId.value = userDomain?.name ?: ""
         Log.d("TAG", "setUserId: $currentUser")
         Log.d("TAG", "setUserId: ${_userId.value}")
     }

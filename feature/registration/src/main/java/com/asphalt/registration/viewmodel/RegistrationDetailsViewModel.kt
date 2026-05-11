@@ -202,7 +202,7 @@ class RegistrationDetailsViewModel(
                 //isLoginSuccess.value = true
             } else {
                 //isLoginSuccess.value = false
-                _eventFlow.emit(SignUpUiEvent.Success("Login Failed"))
+                _eventFlow.emit(SignUpUiEvent.Error("Login failed. Please try again."))
                 updateLoader(false)
                 //updateMessage(true)
             }

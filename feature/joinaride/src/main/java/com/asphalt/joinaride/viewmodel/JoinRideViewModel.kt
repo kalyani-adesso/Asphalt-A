@@ -290,10 +290,11 @@ class JoinRideViewModel(
     fun observeRideLocations(rideId: String) {
         // Remove old listener safely
         rideListener?.let { listener -> rideRef?.removeEventListener(listener) }
+        _currentUserConnectedRideData.value = null
+        _joinedUsers.value = emptyList()
 
-        val ref = database.getReference("ongoing_ride")
+        rideRef = database.getReference("ongoing_ride")
             .child(rideId)
-//            .child("ongoing_ride")
 
         rideListener = object : ValueEventListener {
 
@@ -361,7 +362,7 @@ class JoinRideViewModel(
                 }
             }
         }
-        ref.addValueEventListener(rideListener!!)
+        rideRef!!.addValueEventListener(rideListener!!)
     }
 
     private val _isRideStarted = MutableStateFlow(false)
