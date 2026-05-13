@@ -98,6 +98,8 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     object CreateAd : AppNavKey
+@Serializable
+object ProductDetails : AppNavKey
 }
 
 

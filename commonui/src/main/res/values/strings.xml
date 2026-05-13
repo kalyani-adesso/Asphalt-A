@@ -286,6 +286,9 @@
     <string name="message">MESSAGE</string>
     <string name="make_offer">MAKE OFFER</string>
     <string name="price">Price</string>
+    <string name="marketplace">Marketplace</string>
+    <string name="browse">Browse</string>
+    <string name="my_ads">My Ads</string>
 
 
 </resources>
