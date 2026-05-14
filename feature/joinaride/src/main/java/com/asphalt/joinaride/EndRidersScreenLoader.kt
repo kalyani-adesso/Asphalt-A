@@ -24,8 +24,8 @@ fun EndRidersScreenLoader(
     onNavigateToSummaryEndRide : () -> Unit) {
 
     var isLoading by remember { mutableStateOf(true) }
-    val loadingTitle = "Completing Ride"
-    val loadingDesc = "Saving your ride and generating summary"
+    val loadingTitle = stringResource(R.string.completing_ride)
+    val loadingDesc = stringResource(R.string.saving_your_ride_and_generating_summary)
     val logoRes = R.drawable.ic_app_icon
 
     setTopAppBarState(

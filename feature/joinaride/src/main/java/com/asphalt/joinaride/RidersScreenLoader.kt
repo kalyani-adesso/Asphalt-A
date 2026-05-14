@@ -38,8 +38,8 @@ fun RidersScreenLoader(
 ) {
 
     var isLoading by remember { mutableStateOf(true) }
-    val loadingTitle = "Starting Connected Ride"
-    val loadingDesc = "Initializing navigation and group cordination"
+    val loadingTitle = stringResource(R.string.starting_connected_ride)
+    val loadingDesc = stringResource(R.string.initializing_navigation_cordination)
     val logoRes = R.drawable.ic_app_icon
 
     val rideId = ridesData.ridesID

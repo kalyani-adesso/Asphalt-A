@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -104,6 +105,9 @@ fun RidesScreen(
         ridesScreenViewModel.getRides()
     }
 
+    val tabSelection by ridesScreenViewModel.tabSelectFlow.collectAsStateWithLifecycle()
+    val ridesList by ridesScreenViewModel.ridesListState.collectAsStateWithLifecycle()
+
     AsphaltTheme {
         Column(
             modifier = Modifier
@@ -131,9 +135,9 @@ fun RidesScreen(
 //            items(10) { index ->
 //
 //            }
-                    when (ridesScreenViewModel.tabSelectFlow.value) {
+                    when (tabSelection) {
                         RideStatConstants.UPCOMING_RIDE -> {
-                            items(ridesScreenViewModel.ridesListState.value.upcoming) { upconing ->
+                            items(ridesList.upcoming) { upconing ->
                                 UpcomingRides(upconing, upComingViewDetails)
                                 Spacer(Modifier.height(Dimensions.padding16))
                             }
@@ -141,14 +145,14 @@ fun RidesScreen(
                         }
 
                         RideStatConstants.HISTORY_RIDES -> {
-                            items(ridesScreenViewModel.ridesListState.value.history) { history ->
+                            items(ridesList.history) { history ->
                                 HistoryRides(ridesScreenViewModel, history)
                                 Spacer(Modifier.height(Dimensions.padding16))
                             }
                         }
 
                         RideStatConstants.INVITES_RIDES -> {
-                            items(ridesScreenViewModel.ridesListState.value.invite) { invites ->
+                            items(ridesList.invite) { invites ->
                                 Invites(ridesScreenViewModel, invites) { chatModel ->
                                     selectedInvite = chatModel
                                 }
@@ -160,14 +164,16 @@ fun RidesScreen(
 
 
                 }
-                ridesScreenViewModel.showNodata.value =
-                    when (ridesScreenViewModel.tabSelectFlow.value) {
-                        RideStatConstants.UPCOMING_RIDE -> ridesScreenViewModel.ridesListState.value.upcoming.isEmpty()
-                        RideStatConstants.HISTORY_RIDES -> ridesScreenViewModel.ridesListState.value.history.isEmpty()
-                        RideStatConstants.INVITES_RIDES -> ridesScreenViewModel.ridesListState.value.invite.isEmpty()
+                ridesScreenViewModel.updateShowNodata(
+                    when (tabSelection) {
+                        RideStatConstants.UPCOMING_RIDE -> ridesList.upcoming.isEmpty()
+                        RideStatConstants.HISTORY_RIDES -> ridesList.history.isEmpty()
+                        RideStatConstants.INVITES_RIDES -> ridesList.invite.isEmpty()
                         else -> false
                     }
-                if (ridesScreenViewModel.showNodata.value)
+                )
+                val showNodata by ridesScreenViewModel.showNodata.collectAsStateWithLifecycle()
+                if (showNodata)
                     Text(
                         text = stringResource(R.string.no_data), style = Typography.bodyMedium,
                         modifier = Modifier.align(alignment = Alignment.Center)
@@ -804,6 +810,7 @@ fun Invites(
 
 @Composable
 fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
+    val tabSelection by ridesScreenViewModel.tabSelectFlow.collectAsStateWithLifecycle()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -822,7 +829,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 .width(100.dp)
                 .weight(1f)
                 .then(
-                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                    if (tabSelection == RideStatConstants.UPCOMING_RIDE) {
                         Modifier.background(
                             brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                             shape = RoundedCornerShape(Dimensions.size10)
@@ -843,7 +850,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
             Text(
                 text = stringResource(R.string.upcoming),
                 style = TypographyMedium.titleMedium,
-                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.UPCOMING_RIDE) {
+                color = if (tabSelection == RideStatConstants.UPCOMING_RIDE) {
                     NeutralWhite
                 } else {
                     NeutralBlack
@@ -856,7 +863,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 .width(100.dp)
                 .weight(1f)
                 .then(
-                    if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.HISTORY_RIDES) {
+                    if (tabSelection == RideStatConstants.HISTORY_RIDES) {
                         Modifier.background(
                             brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                             shape = RoundedCornerShape(Dimensions.size10)
@@ -876,7 +883,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
             Text(
                 text = stringResource(R.string.history),
                 style = TypographyMedium.titleMedium,
-                color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.HISTORY_RIDES) {
+                color = if (tabSelection == RideStatConstants.HISTORY_RIDES) {
                     NeutralWhite
                 } else {
                     NeutralBlack
@@ -893,7 +900,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .then(
-                        if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                        if (tabSelection == RideStatConstants.INVITES_RIDES) {
                             Modifier.background(
                                 brush = GetGradient(PrimaryDarkerLightB75, PrimaryDarkerLightB75),
                                 shape = RoundedCornerShape(Dimensions.size10)
@@ -913,7 +920,7 @@ fun ButtonTabs(ridesScreenViewModel: RidesScreenViewModel) {
                 Text(
                     text = stringResource(R.string.invite),
                     style = TypographyMedium.titleMedium,
-                    color = if (ridesScreenViewModel.tabSelectFlow.value == RideStatConstants.INVITES_RIDES) {
+                    color = if (tabSelection == RideStatConstants.INVITES_RIDES) {
                         NeutralWhite
                     } else {
                         NeutralBlack

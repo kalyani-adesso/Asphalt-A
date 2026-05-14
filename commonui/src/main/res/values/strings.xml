@@ -280,6 +280,10 @@
     <string name="send_reply">SEND REPLY</string>
     <string name="coming_soon">Coming Soon...</string>
     <string name="redirect_google_map">Launching Google Maps so you can find your way!</string>
+    <string name="starting_connected_ride">Starting Connected Ride</string>
+    <string name="initializing_navigation_cordination">Initializing navigation and group coordination</string>
+    <string name="completing_ride">Completing Ride</string>
+    <string name="saving_your_ride_and_generating_summary">Saving your ride and generating summary</string>
 
 
     <string name="product_details">Product Details</string>

@@ -150,7 +150,6 @@ class RegistrationDetailsViewModel(
 
                 val response = authViewModel.SignUp(user)
                 if (response.isSuccess) {
-                    callLogin()
                    _uiState.update {
                         it.copy(
                             isLoading = false,

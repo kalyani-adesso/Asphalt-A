@@ -221,7 +221,7 @@ fun GroupRidersCard(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Spacer(Modifier.width(Dimensions.size5))
-                            when (riderData?.status?.lowercase()) {
+                            when (riderData.status.lowercase()) {
                                 "connected" -> {
                                     Row(
                                         modifier = Modifier
@@ -342,7 +342,7 @@ fun GroupRidersCard(
                         Box(
                             modifier = Modifier
                                 .clickable {
-                                    riderData?.userID?.let {
+                                    riderData.userID?.let {
                                         androidUserVM.getUser(it)?.contactNumber?.let { phoneNumber ->
                                             PhoneCallUtils.dialPhoneNumber(
                                                 context,

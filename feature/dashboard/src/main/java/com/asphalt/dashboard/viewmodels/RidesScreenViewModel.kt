@@ -1,9 +1,6 @@
 package com.asphalt.dashboard.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.FirebaseServerValue
@@ -20,6 +17,9 @@ import com.asphalt.dashboard.data.GalleryModel
 import com.asphalt.dashboard.data.YourRideDataModel
 import com.asphalt.dashboard.data.YourRideRoot
 import com.asphalt.dashboard.utils.RidesFilter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.Callback
 import org.koin.core.component.KoinComponent
@@ -32,25 +32,28 @@ open class RidesScreenViewModel(val androidUserVM: AndroidUserVM) : ViewModel(),
     val ridesRepo: RidesRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
 
-    private val _tabSelectionMutableFlow: MutableState<Int> = mutableStateOf(
-        RideStatConstants.UPCOMING_RIDE
-    )
-    val tabSelectFlow: State<Int> = _tabSelectionMutableFlow
+    private val _tabSelectionMutableFlow = MutableStateFlow(RideStatConstants.UPCOMING_RIDE)
+    val tabSelectFlow: StateFlow<Int> = _tabSelectionMutableFlow
 
-    private val _ridesListMutableState: MutableState<YourRideRoot> = mutableStateOf(
-        YourRideRoot()
-    )
-    val ridesListState: State<YourRideRoot> = _ridesListMutableState
+    private val _ridesListMutableState = MutableStateFlow(YourRideRoot())
+    val ridesListState: StateFlow<YourRideRoot> = _ridesListMutableState
 
-    private val _showInviteNotification = mutableStateOf(false)
-    val showInviteNotification: State<Boolean> = _showInviteNotification
+    private val _showInviteNotification = MutableStateFlow(false)
+    val showInviteNotification: StateFlow<Boolean> = _showInviteNotification
 
-    val showChatDialog = mutableStateOf(false)
-    val showNodata = mutableStateOf(false)
+    private val _showChatDialog = MutableStateFlow(false)
+    val showChatDialog: StateFlow<Boolean> = _showChatDialog
+
+    private val _showNodata = MutableStateFlow(false)
+    val showNodata: StateFlow<Boolean> = _showNodata
 
 
     fun updateTab(tab: Int) {
         _tabSelectionMutableFlow.value = tab
+    }
+
+    fun updateShowNodata(value: Boolean) {
+        _showNodata.value = value
     }
 
     fun updateInviteStatus(isShow: Boolean) {

@@ -13,6 +13,7 @@ import com.asphalt.android.viewmodels.AndroidUserVM
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase.getInstance
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -72,14 +73,19 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
 
+    private var messageListener: ValueEventListener? = null
+    private var messageRef2: DatabaseReference? = null
+
     // LISTEN FOR LIVE MESSAGES
     fun listenForMessages(rideId: String, recevierId: String) {
+        messageListener?.let { messageRef2?.removeEventListener(it) }
 
         val ref = messageRef.database.getReference("messages/$rideId")
+        messageRef2 = ref
 
         Log.d("TAG", "listenForMessages rideId: $rideId")
 
-        ref.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -105,6 +111,13 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
             override fun onCancelled(error: DatabaseError) {
                 Log.e("TAG", "listenForMessages cancelled", error.toException())
             }
-        })
+        }
+        messageListener = listener
+        ref.addValueEventListener(listener)
+    }
+
+    override fun onCleared() {
+        messageListener?.let { messageRef2?.removeEventListener(it) }
+        super.onCleared()
     }
 }
