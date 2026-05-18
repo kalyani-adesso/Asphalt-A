@@ -112,7 +112,7 @@ fun ProductListScreen(
 
             item {
                 Spacer(modifier = Modifier.height(Dimensions.size20))
-                SubTabs()
+                SubTabs(productListViewmodel)
             }
         }
 

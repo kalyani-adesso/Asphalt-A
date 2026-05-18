@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -152,7 +153,7 @@ fun MainTabs(productListViewmodel: ProductListViewModel) {//PrimaryDarkerLightB7
 }
 
 @Composable
-fun SubTabs() {
+fun SubTabs(productListViewmodel: ProductListViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,11 +171,11 @@ fun SubTabs() {
             horizontalArrangement = Arrangement.SpaceAround,
             contentPadding = PaddingValues(start = Dimensions.padding5)
         ) {
-            items(4) { item ->
+            items(productListViewmodel.subTabController.value) { item ->
                 Box(
                     modifier = Modifier
                         .then(
-                            if (item == 0) {
+                            if (item.isSelected) {
                                 Modifier.background(
                                     brush = GetGradient(
                                         PrimaryDarkerLightB75,
@@ -190,7 +191,7 @@ fun SubTabs() {
                             }
                         )
                         .clickable {
-                            //viewModel.updateTab(item.id)
+                            productListViewmodel.updateSubMenu(item.id)
                         }
                         .padding(all = Dimensions.padding15),
                     contentAlignment = Alignment.Center
@@ -199,17 +200,9 @@ fun SubTabs() {
 
                 ) {
                     Text(
-                        text = if (item == 0) {
-                            "All"
-                        } else if (item == 1) {
-                            "Motorcycle"
-                        } else if (item == 2) {
-                            "Gear"
-                        } else {
-                            "Parts"
-                        },//stringResource(R.string.upcoming),
+                        text = stringResource(item.title),//stringResource(R.string.upcoming),
                         style = TypographyMedium.titleMedium,
-                        color = if (item == 0) {//viewModel.tabSelection.value == item.id
+                        color = if (item.isSelected) {//viewModel.tabSelection.value == item.id
                             NeutralWhite
                         } else {
                             NeutralBlack
