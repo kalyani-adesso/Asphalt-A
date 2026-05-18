@@ -10,6 +10,7 @@ import com.asphalt.createride.di.createRideModule
 import com.asphalt.dashboard.di.dashboardModule
 import com.asphalt.joinaride.di.joinRideModule
 import com.asphalt.login.di.loginModule
+import com.asphalt.marketplace.di.marketPlaceModule
 import com.asphalt.profile.di.profileModule
 import com.asphalt.queries.di.queryModule
 import com.asphalt.registration.di.registrationModule
@@ -33,7 +34,8 @@ class AsphaltApplication : Application() {
             modules(
                 modules = appModule + loginModule + registrationModule + welcomeFeatureModule
                         + sharedModule + dashboardModule + profileModule + androidSharedModule
-                        + queryModule + resetModule + joinRideModule + createRideModule + chatModule,
+                        + queryModule + resetModule + joinRideModule + createRideModule + chatModule
+                        + marketPlaceModule,
 
                 )
             module {

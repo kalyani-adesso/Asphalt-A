@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +28,11 @@ import com.asphalt.commonui.theme.NeutralWhite
 import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.util.GetGradient
+import com.asphalt.marketplace.constant.MarketPlaceConstants
+import com.asphalt.marketplace.viewmodel.ProductListViewModel
 
 @Composable
-fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
+fun MainTabs(productListViewmodel: ProductListViewModel) {//PrimaryDarkerLightB75,NeutralBlack
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,8 +48,20 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    color = PrimaryDarkerLightB75, shape = RoundedCornerShape(Dimensions.size10)
+                .clickable {
+                    productListViewmodel.setMainTabController(MarketPlaceConstants.BROWSE)
+                }
+                .then(
+                    if (productListViewmodel.mainTabController.value == MarketPlaceConstants.BROWSE) {
+                        Modifier.background(
+                            color = PrimaryDarkerLightB75,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
                 ), contentAlignment = Alignment.Center
         )
 
@@ -58,7 +71,10 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
             Text(
                 text = stringResource(R.string.browse),
                 style = TypographyMedium.titleMedium,
-                color = NeutralWhite
+                color = if (productListViewmodel.mainTabController.value == MarketPlaceConstants.BROWSE)
+                    NeutralWhite
+                else
+                    NeutralBlack
             )
         }
 
@@ -67,8 +83,20 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                .clickable {
+                    productListViewmodel.setMainTabController(MarketPlaceConstants.FAVORITE)
+                }
+                .then(
+                    if (productListViewmodel.mainTabController.value == MarketPlaceConstants.FAVORITE) {
+                        Modifier.background(
+                            color = PrimaryDarkerLightB75,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
                 ), contentAlignment = Alignment.Center
         )
 
@@ -78,7 +106,10 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
             Text(
                 text = stringResource(R.string.favorites),
                 style = TypographyMedium.titleMedium,
-                color = NeutralBlack
+                color = if (productListViewmodel.mainTabController.value == MarketPlaceConstants.FAVORITE)
+                    NeutralWhite
+                else
+                    NeutralBlack
             )
         }
 
@@ -87,8 +118,20 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
                 .height(Dimensions.size50)
                 .width(100.dp)
                 .weight(1f)
-                .background(
-                    color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                .clickable {
+                    productListViewmodel.setMainTabController(MarketPlaceConstants.MYADDS)
+                }
+                .then(
+                    if (productListViewmodel.mainTabController.value == MarketPlaceConstants.MYADDS) {
+                        Modifier.background(
+                            color = PrimaryDarkerLightB75,
+                            shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    } else {
+                        Modifier.background(
+                            color = NeutralWhite, shape = RoundedCornerShape(Dimensions.size10)
+                        )
+                    }
                 ), contentAlignment = Alignment.Center
         )
 
@@ -98,7 +141,10 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
             Text(
                 text = stringResource(R.string.my_ads),
                 style = TypographyMedium.titleMedium,
-                color = NeutralBlack
+                color = if (productListViewmodel.mainTabController.value == MarketPlaceConstants.MYADDS)
+                    NeutralWhite
+                else
+                    NeutralBlack
             )
         }
 
@@ -106,7 +152,7 @@ fun MainTabs() {//PrimaryDarkerLightB75,NeutralBlack
 }
 
 @Composable
-fun SubTabs(){
+fun SubTabs() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,7 +174,7 @@ fun SubTabs(){
                 Box(
                     modifier = Modifier
                         .then(
-                            if (item==0) {
+                            if (item == 0) {
                                 Modifier.background(
                                     brush = GetGradient(
                                         PrimaryDarkerLightB75,
@@ -153,18 +199,17 @@ fun SubTabs(){
 
                 ) {
                     Text(
-                        text = if (item==0){
+                        text = if (item == 0) {
                             "All"
-                        }else if(item == 1){
+                        } else if (item == 1) {
                             "Motorcycle"
-                        }else if(item == 2){
+                        } else if (item == 2) {
                             "Gear"
-                        }else{
+                        } else {
                             "Parts"
-                        }
-                        ,//stringResource(R.string.upcoming),
+                        },//stringResource(R.string.upcoming),
                         style = TypographyMedium.titleMedium,
-                        color = if (item==0) {//viewModel.tabSelection.value == item.id
+                        color = if (item == 0) {//viewModel.tabSelection.value == item.id
                             NeutralWhite
                         } else {
                             NeutralBlack
