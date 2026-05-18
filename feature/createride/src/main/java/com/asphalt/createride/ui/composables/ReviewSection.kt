@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -39,6 +41,9 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun ReviewSection(viewModel: CreateRideScreenViewModel) {
+    val rideDetails by viewModel.rideDetailsState.collectAsState()
+    val ridersList by viewModel.ridersList.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,7 +86,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Column {
                         Text(
-                            text = viewModel.rideDetailsState.value.rideTitle ?: "",
+                            text = rideDetails.rideTitle ?: "",
                             style = TypographyMedium.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -89,8 +94,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            //text = "${stringResource(R.string.refreshment_to)} ${viewModel.rideDetailsState.value.endLocation ?: ""}",
-                            text = viewModel.rideDetailsState.value.description ?: "----",
+                            //text = "${stringResource(R.string.refreshment_to)} ${rideDetails.endLocation ?: ""}",
+                            text = rideDetails.description ?: "----",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey,
                             modifier = Modifier.testTag("ride_destination"),
@@ -116,7 +121,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
 
                 ) {
                     Text(
-                        text = viewModel.rideDetailsState.value.rideType ?: "",
+                        text = rideDetails.rideType ?: "",
                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                         color = GreenLIGHT25,
                         modifier = Modifier.testTag("ride_type")
@@ -156,8 +161,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = (viewModel.rideDetailsState.value.dateString ?: "") + " - " +
-                                    viewModel.rideDetailsState.value.displayTime,
+                            text = (rideDetails.dateString ?: "") + " - " +
+                                    rideDetails.displayTime,
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey,
                             modifier = Modifier.testTag("date_time")
@@ -167,8 +172,8 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                 }
 
                 /*  +" - "+
-                          (viewModel.rideDetailsState.value.endDateString ?: "") +" - "+
-                          viewModel.rideDetailsState.value.endDisplayTime,*/
+                          (rideDetails.endDateString ?: "") +" - "+
+                          rideDetails.endDisplayTime,*/
             }
         }
         Spacer(modifier = Modifier.height(Dimensions.padding16))
@@ -202,7 +207,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = "${viewModel.rideDetailsState.value.startLocation ?: ""} - ${viewModel.rideDetailsState.value.endLocation ?: ""}",
+                            text = "${rideDetails.startLocation ?: ""} - ${rideDetails.endLocation ?: ""}",
                             style = Typography.bodySmall,
                             color = NeutralDarkGrey, modifier = Modifier.testTag("route")
                         )
@@ -243,7 +248,7 @@ fun ReviewSection(viewModel: CreateRideScreenViewModel) {
                         )
                         Spacer(Modifier.height(Dimensions.size3))
                         Text(
-                            text = "${viewModel.ridersList.value.count { it.isSelect }} ${
+                            text = "${ridersList.count { it.isSelect }} ${
                                 stringResource(
                                     R.string.riders_selected
                                 )

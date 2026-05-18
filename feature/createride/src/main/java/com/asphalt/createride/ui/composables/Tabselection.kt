@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -34,6 +36,9 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun TabSelection(viewModel: CreateRideScreenViewModel) {
+    val tabSelection by viewModel.tabSelectState.collectAsState()
+    val showParticipantTab by viewModel.showParticipantTab.collectAsState()
+
 //    Spacer(Modifier.height(Dimensions.size30))
     Row(
         modifier = Modifier
@@ -49,7 +54,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     .height(Dimensions.padding50)
                     .width(Dimensions.padding50)
                     .then(
-                        if (viewModel.tabSelectState.value >= Constants.TAB_DETAILS) {
+                        if (tabSelection >= Constants.TAB_DETAILS) {
                             Modifier.background(
                                 color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
@@ -65,7 +70,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 Image(
                     painter = painterResource(R.drawable.ic_path),
                     contentDescription = "",
-                    colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_DETAILS) {
+                    colorFilter = if (tabSelection >= Constants.TAB_DETAILS) {
                         ColorFilter.tint(NeutralWhite)
                     } else {
                         ColorFilter.tint(NeutralDarkGrey)
@@ -76,12 +81,12 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
                 text = stringResource(R.string.details),
-                style = if (viewModel.tabSelectState.value == Constants.TAB_DETAILS) {
+                style = if (tabSelection == Constants.TAB_DETAILS) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
                 },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_DETAILS) {
+                color = if (tabSelection == Constants.TAB_DETAILS) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
@@ -97,7 +102,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     .height(Dimensions.padding50)
                     .width(Dimensions.padding50)
                     .then(
-                        if (viewModel.tabSelectState.value >= Constants.TAB_ROUTE) {
+                        if (tabSelection >= Constants.TAB_ROUTE) {
                             Modifier.background(
                                 color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
@@ -113,7 +118,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 Image(
                     painter = painterResource(R.drawable.ic_route),
                     contentDescription = "",
-                    colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_ROUTE) {
+                    colorFilter = if (tabSelection >= Constants.TAB_ROUTE) {
                         ColorFilter.tint(NeutralWhite)
                     } else {
                         ColorFilter.tint(NeutralDarkGrey)
@@ -124,12 +129,12 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
                 text = stringResource(R.string.route),
-                style = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                style = if (tabSelection == Constants.TAB_ROUTE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
                 },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                color = if (tabSelection == Constants.TAB_ROUTE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
@@ -137,7 +142,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 fontSize = Dimensions.textSize12
             )
         }
-        if (viewModel.show_participant_Tab.value) {
+        if (showParticipantTab) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f)
@@ -147,7 +152,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                         .height(Dimensions.padding50)
                         .width(Dimensions.padding50)
                         .then(
-                            if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
+                            if (tabSelection >= Constants.TAB_PARTICIPANT) {
                                 Modifier.background(
                                     color = PrimaryDarkerLightB75,
                                     shape = RoundedCornerShape(Dimensions.padding10)
@@ -163,7 +168,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     Image(
                         painter = painterResource(R.drawable.ic_participants),
                         contentDescription = "",
-                        colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_PARTICIPANT) {
+                        colorFilter = if (tabSelection >= Constants.TAB_PARTICIPANT) {
                             ColorFilter.tint(NeutralWhite)
                         } else {
                             ColorFilter.tint(NeutralDarkGrey)
@@ -174,12 +179,12 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 Spacer(modifier = Modifier.height(Dimensions.size10))
                 Text(
                     text = stringResource(R.string.participants),
-                    style = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                    style = if (tabSelection == Constants.TAB_PARTICIPANT) {
                         TypographyBold.bodySmall
                     } else {
                         Typography.bodySmall
                     },
-                    color = if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                    color = if (tabSelection == Constants.TAB_PARTICIPANT) {
                         NeutralBlack
                     } else {
                         NeutralDarkGrey
@@ -195,7 +200,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     .height(Dimensions.padding50)
                     .width(Dimensions.padding50)
                     .then(
-                        if (viewModel.tabSelectState.value >= Constants.TAB_REVIEW) {
+                        if (tabSelection >= Constants.TAB_REVIEW) {
                             Modifier.background(
                                 color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
@@ -211,7 +216,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 Image(
                     painter = painterResource(R.drawable.ic_review),
                     contentDescription = "",
-                    colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_REVIEW) {
+                    colorFilter = if (tabSelection >= Constants.TAB_REVIEW) {
                         ColorFilter.tint(NeutralWhite)
                     } else {
                         ColorFilter.tint(NeutralDarkGrey)
@@ -222,12 +227,12 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
                 text = stringResource(R.string.review),
-                style = if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
+                style = if (tabSelection == Constants.TAB_REVIEW) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
                 },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
+                color = if (tabSelection == Constants.TAB_REVIEW) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey
@@ -241,7 +246,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                     .height(Dimensions.padding50)
                     .width(Dimensions.padding50)
                     .then(
-                        if (viewModel.tabSelectState.value >= Constants.TAB_SHARE) {
+                        if (tabSelection >= Constants.TAB_SHARE) {
                             Modifier.background(
                                 color = PrimaryDarkerLightB75,
                                 shape = RoundedCornerShape(Dimensions.padding10)
@@ -257,7 +262,7 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
                 Image(
                     painter = painterResource(R.drawable.ic_share),
                     contentDescription = "",
-                    colorFilter = if (viewModel.tabSelectState.value >= Constants.TAB_SHARE) {
+                    colorFilter = if (tabSelection >= Constants.TAB_SHARE) {
                         ColorFilter.tint(NeutralWhite)
                     } else {
                         ColorFilter.tint(NeutralDarkGrey)
@@ -268,12 +273,12 @@ fun TabSelection(viewModel: CreateRideScreenViewModel) {
             Spacer(modifier = Modifier.height(Dimensions.size10))
             Text(
                 text = stringResource(R.string.share),
-                style = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                style = if (tabSelection == Constants.TAB_SHARE) {
                     TypographyBold.bodySmall
                 } else {
                     Typography.bodySmall
                 },
-                color = if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                color = if (tabSelection == Constants.TAB_SHARE) {
                     NeutralBlack
                 } else {
                     NeutralDarkGrey

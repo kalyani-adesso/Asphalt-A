@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,10 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 @Composable
 fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
     var text by remember { mutableStateOf("") }
+
+    val selectedUserCount by viewmodel.selectedUserCount.collectAsState()
+    val searchQuery by viewmodel.searchQuery.collectAsState()
+    val ridersList by viewmodel.ridersList.collectAsState()
 
     LazyColumn(
         modifier = mod
@@ -92,7 +97,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                         style = TypographyMedium.bodyMedium
                     )
                     Text(
-                        "${viewmodel.selectedUserCount.value} ${stringResource(R.string._selected)}",
+                        "${selectedUserCount} ${stringResource(R.string._selected)}",
                         style = TypographyMedium.bodySmall,
                         color = NeutralDarkGrey
                     )
@@ -111,8 +116,8 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextField(
-                        value = if (!viewmodel.searchQuery.value.isNullOrEmpty()) {
-                            viewmodel.searchQuery.value
+                        value = if (!searchQuery.isNullOrEmpty()) {
+                            searchQuery
                         } else {
                             ""
                         },
@@ -157,7 +162,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                 }
             }
         }
-        items(viewmodel.ridersList.value) { ridersList ->
+        items(ridersList) { ridersList ->
             Spacer(Modifier.height(Dimensions.padding10))
             Card(
                 modifier = Modifier

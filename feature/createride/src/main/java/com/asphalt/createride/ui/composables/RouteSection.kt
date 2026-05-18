@@ -20,6 +20,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,20 +57,26 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
     val assemblyLocation = 3
     var bottomSheetType by remember { mutableStateOf(0) }
 
+    val rideDetails by viewModel.rideDetailsState.collectAsState()
+    val showRideStartLocError by viewModel.showRideStartLocError.collectAsState()
+    val showRideEndLocError by viewModel.showRideEndLocError.collectAsState()
+    val showRideAssemblyLocError by viewModel.showRideAssemblyLocError.collectAsState()
+    val assemblyPointCheck by viewModel.assemblyPointCheck.collectAsState()
+
     if (bottomSheetType != 0) {
         PlacesBottomSheet(true, latLon = { lat, lon, locName ->
             if (bottomSheetType == startLocation) {
                 viewModel.updateStartLocation(locName)
                 viewModel.updateStartLocation(lat, lon)
-                viewModel._showRideStartLocError.value = false
+                viewModel.setShowRideStartLocError(false)
             } else if (bottomSheetType == endLocation) {
                 viewModel.updateEnLocation(locName)
                 viewModel.updateEndLocation(lat, lon)
-                viewModel._showRideEndLocError.value = false
+                viewModel.setShowRideEndLocError(false)
             }else if(bottomSheetType == assemblyLocation){
                 viewModel.updateAssembleLocation(locName)
                 viewModel.updateAssembleLocation(lat, lon)
-                viewModel._showRideAssemblyLocError.value = false
+                viewModel.setShowRideAssemblyLocError(false)
             }
             bottomSheetType = 0
         }, onDismiss = {
@@ -105,7 +112,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
                 )
                 .then(
-                    if (viewModel._showRideStartLocError.value) {
+                    if (showRideStartLocError) {
                         Modifier.border(
                             width = Dimensions.padding1,
                             color = VividRed,
@@ -137,10 +144,10 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             )
 
             Text(
-                text = viewModel.rideDetailsState.value.startLocation
+                text = rideDetails.startLocation
                     ?: stringResource(R.string.enter_start_loc),
                 style = Typography.bodyMedium, maxLines = 1,
-                color = if (viewModel.rideDetailsState.value.startLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
+                color = if (rideDetails.startLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
             )
 
 
@@ -165,7 +172,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
                 )
                 .then(
-                    if (viewModel._showRideEndLocError.value) {
+                    if (showRideEndLocError) {
                         Modifier.border(
                             width = Dimensions.padding1,
                             color = VividRed,
@@ -190,20 +197,20 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             )
 
             Text(
-                text = viewModel.rideDetailsState.value.endLocation
+                text = rideDetails.endLocation
                     ?: stringResource(R.string.enter_destination),
                 style = Typography.bodyMedium, maxLines = 1,
-                color = if (viewModel.rideDetailsState.value.endLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
+                color = if (rideDetails.endLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
             )
             /*TextField(
-                value = if (!viewModel.rideDetailsState.value.endLocation.isNullOrEmpty()) {
-                    viewModel.rideDetailsState.value.endLocation.toString()
+                value = if (!rideDetails.endLocation.isNullOrEmpty()) {
+                    rideDetails.endLocation.toString()
                 } else {
                     ""
                 },
                 onValueChange = {
                     *//* viewModel.updateEnLocation(it)*//*
-                    viewModel._showRideEndLocError.value = false
+                    viewModel.setShowRideEndLocError(false)
                 },
                 placeholder = {
                     Text(
@@ -262,8 +269,8 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                         uncheckedColor = NeutralMidGrey,
                         checkmarkColor = Color.White
                     ),
-                    checked = viewModel.assembly_point_check.value,
-                    onCheckedChange = { viewModel.assembly_point_check.value = it })
+                    checked = assemblyPointCheck,
+                    onCheckedChange = { viewModel.setAssemblyPointCheck(it) })
             }
             Spacer(modifier = Modifier.width(Dimensions.padding16))
             Text(
@@ -273,7 +280,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             )
         }
         Spacer(modifier = Modifier.height(Dimensions.padding30))
-        if (!viewModel.assembly_point_check.value) {
+        if (!assemblyPointCheck) {
         Text(
             text = stringResource(R.string.assembly_point),
             style = TypographyMedium.bodyMedium,
@@ -293,7 +300,7 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
                     NeutralWhite, shape = RoundedCornerShape(Dimensions.padding10)
                 )
                 .then(
-                    if (viewModel._showRideAssemblyLocError.value) {
+                    if (showRideAssemblyLocError) {
                         Modifier.border(
                             width = Dimensions.padding1,
                             color = VividRed,
@@ -318,10 +325,10 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
             )
 
             Text(
-                text = viewModel.rideDetailsState.value.assemblyLocation
+                text = rideDetails.assemblyLocation
                     ?: stringResource(R.string.enter_assembly),
                 style = Typography.bodyMedium, maxLines = 1,
-                color = if (viewModel.rideDetailsState.value.assemblyLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
+                color = if (rideDetails.assemblyLocation.isNullOrEmpty()) NeutralDarkGrey else NeutralBlackGrey
             )
         }
     }

@@ -19,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,12 +60,13 @@ fun CreateRideScreen(
     val scope = rememberCoroutineScope()
     viewModel.getUsers()
     val scrollState = rememberScrollState()
+    val tabSelection by viewModel.tabSelectState.collectAsState()
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.create_a_ride),
             actions = {
                 Text(
-                    text = "Step ${viewModel.tabSelectState.value}/${if (viewModel.isSoloRide()) 4 else 5}",
+                    text = "Step ${tabSelection}/${if (viewModel.isSoloRide()) 4 else 5}",
                     style = Typography.bodyMedium
                 )
                 Spacer(Modifier.width(Dimensions.padding16))
@@ -85,17 +88,17 @@ fun CreateRideScreen(
                 // ActionBarWithBack(R.drawable.ic_arrow_back, "Create a Ride") { }
                 TabSelection(viewModel)
                 Spacer(Modifier.height(Dimensions.padding20))
-                if (viewModel.tabSelectState.value == Constants.TAB_DETAILS)
+                if (tabSelection == Constants.TAB_DETAILS)
                     DetailsSection(viewModel)
-                if (viewModel.tabSelectState.value == Constants.TAB_ROUTE)
+                if (tabSelection == Constants.TAB_ROUTE)
                     RouteSection(viewModel)
-                if (viewModel.tabSelectState.value == Constants.TAB_REVIEW)
+                if (tabSelection == Constants.TAB_REVIEW)
                     ReviewSection(viewModel)
-                if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT)
+                if (tabSelection == Constants.TAB_PARTICIPANT)
                     ParticipantSection(mod = Modifier.weight(1f), viewModel)
-                if (viewModel.tabSelectState.value == Constants.TAB_SHARE)
+                if (tabSelection == Constants.TAB_SHARE)
                     ShareSection()
-                if (viewModel.tabSelectState.value != Constants.TAB_PARTICIPANT)
+                if (tabSelection != Constants.TAB_PARTICIPANT)
                     Spacer(Modifier.height(Dimensions.size132))
             }
             BottomButtons(viewModel, clickDone)
@@ -110,6 +113,8 @@ fun CreateRideScreen(
 fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val tabSelection by viewModel.tabSelectState.collectAsState()
+    val showParticipantTab by viewModel.showParticipantTab.collectAsState()
 
     /* if (viewModel.showToast.value) {
          LaunchedEffect(viewModel.showToast.value) {
@@ -133,13 +138,13 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 end = Dimensions.padding16
             )
     ) {
-        if (viewModel.tabSelectState.value == Constants.TAB_DETAILS ||
-            viewModel.tabSelectState.value == Constants.TAB_SHARE
-        ) {//viewModel.tabSelectState.value == Constants.TAB_DETAILS
+        if (tabSelection == Constants.TAB_DETAILS ||
+            tabSelection == Constants.TAB_SHARE
+        ) {//tabSelection == Constants.TAB_DETAILS
 
             GradientButton(
                 onClick = {
-                    if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                    if (tabSelection == Constants.TAB_SHARE) {
                         clickDone.invoke()
                     } else {
                         if (viewModel.detailsFieldValidation())
@@ -152,7 +157,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 buttonHeight = Dimensions.size50,
             ) {
                 ComposeUtils.DefaultButtonContent(
-                    if (viewModel.tabSelectState.value == Constants.TAB_SHARE) {
+                    if (tabSelection == Constants.TAB_SHARE) {
                         stringResource(R.string.done).uppercase()
 
                     } else {
@@ -168,9 +173,9 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
             ) {
                 BorderedButton(
                     modifier = Modifier.weight(1f), onClick = {
-                        if (viewModel.tabSelectState.value > 1) {
-                            if (viewModel.tabSelectState.value == Constants.TAB_REVIEW
-                                && !viewModel.show_participant_Tab.value
+                        if (tabSelection > 1) {
+                            if (tabSelection == Constants.TAB_REVIEW
+                                && !showParticipantTab
                             )
                                 viewModel.updateTab(-2)
                             else
@@ -194,10 +199,10 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                 GradientButton(
                     modifier = Modifier.weight(1f), endColor = PrimaryDarkerLightB75,
                     onClick = {
-                        if (viewModel.tabSelectState.value < 5) {
-                            if (viewModel.tabSelectState.value == Constants.TAB_ROUTE) {
+                        if (tabSelection < 5) {
+                            if (tabSelection == Constants.TAB_ROUTE) {
                                 if (viewModel.routeFieldValidation()) {
-                                    if (viewModel.show_participant_Tab.value) {
+                                    if (showParticipantTab) {
                                         viewModel.updateTab(1)
                                     } else {
                                         viewModel.updateTab(2)
@@ -205,9 +210,9 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
 
                                 }
 
-                            } else if (viewModel.tabSelectState.value == Constants.TAB_PARTICIPANT) {
+                            } else if (tabSelection == Constants.TAB_PARTICIPANT) {
                                 viewModel.updateTab(1)
-                            } else if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
+                            } else if (tabSelection == Constants.TAB_REVIEW) {
                                 scope.launch {
                                     viewModel.createRide()
                                 }
@@ -226,7 +231,7 @@ fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            if (viewModel.tabSelectState.value == Constants.TAB_REVIEW) {
+                            if (tabSelection == Constants.TAB_REVIEW) {
                                 stringResource(R.string.create_rides).uppercase()
 
                             } else {

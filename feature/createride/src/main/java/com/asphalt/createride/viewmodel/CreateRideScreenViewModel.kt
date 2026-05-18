@@ -5,9 +5,6 @@ import android.icu.util.Calendar
 import android.location.Location
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +23,8 @@ import com.asphalt.commonui.utils.Utils
 import com.asphalt.createride.model.CreateRideModel
 import com.asphalt.createride.model.RideType
 import com.asphalt.createride.model.RidersList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,43 +35,71 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     val ridesRepo: RidesRepository by inject()
 
 
-    private val _tabSelectMutableState: MutableState<Int> = mutableStateOf(Constants.TAB_DETAILS)
-    open val tabSelectState: State<Int> = _tabSelectMutableState
-    val show_datePicker = mutableStateOf(false)
-    val show_EndDatePicker = mutableStateOf(false)
+    private val _tabSelectMutableState = MutableStateFlow(Constants.TAB_DETAILS)
+    val tabSelectState: StateFlow<Int> = _tabSelectMutableState
 
-    val show_timePicker = mutableStateOf(false)
-    val show_EndTimePicker = mutableStateOf(false)
+    private val _showDatePicker = MutableStateFlow(false)
+    val showDatePicker: StateFlow<Boolean> = _showDatePicker
 
-    private val _rideDetailsMutableState = mutableStateOf(CreateRideModel())
-    open val rideDetailsState: State<CreateRideModel> = _rideDetailsMutableState
+    private val _showEndDatePicker = MutableStateFlow(false)
+    val showEndDatePicker: StateFlow<Boolean> = _showEndDatePicker
 
-    val selectedUserCount = mutableStateOf(0)
+    private val _showTimePicker = MutableStateFlow(false)
+    val showTimePicker: StateFlow<Boolean> = _showTimePicker
 
-    open val _showRideTypeError = mutableStateOf(false)
-    val _showRideTitleError = mutableStateOf(false)
-    val _showRideDateError = mutableStateOf(false)
-    val _showRideEndDateError = mutableStateOf(false)
-    val _showRideTimeError = mutableStateOf(false)
-    val _showRideEndTimeError = mutableStateOf(false)
-    val _showRideStartLocError = mutableStateOf(false)
-    val _showRideEndLocError = mutableStateOf(false)
-    val _showRideAssemblyLocError = mutableStateOf(false)
-    val show_participant_Tab = mutableStateOf(true)
-    val assembly_point_check = mutableStateOf(false)
+    private val _showEndTimePicker = MutableStateFlow(false)
+    val showEndTimePicker: StateFlow<Boolean> = _showEndTimePicker
 
+    private val _rideDetailsMutableState = MutableStateFlow(CreateRideModel())
+    val rideDetailsState: StateFlow<CreateRideModel> = _rideDetailsMutableState
 
-    private val _fullList = mutableStateOf(ArrayList<RidersList>())
-    private val _ridersListMutable: MutableState<ArrayList<RidersList>> =
-        mutableStateOf(arrayListOf())
-    open val ridersList: State<ArrayList<RidersList>> = _ridersListMutable
+    private val _selectedUserCount = MutableStateFlow(0)
+    val selectedUserCount: StateFlow<Int> = _selectedUserCount
+
+    private val _showRideTypeError = MutableStateFlow(false)
+    val showRideTypeError: StateFlow<Boolean> = _showRideTypeError
+
+    private val _showRideTitleError = MutableStateFlow(false)
+    val showRideTitleError: StateFlow<Boolean> = _showRideTitleError
+
+    private val _showRideDateError = MutableStateFlow(false)
+    val showRideDateError: StateFlow<Boolean> = _showRideDateError
+
+    private val _showRideEndDateError = MutableStateFlow(false)
+    val showRideEndDateError: StateFlow<Boolean> = _showRideEndDateError
+
+    private val _showRideTimeError = MutableStateFlow(false)
+    val showRideTimeError: StateFlow<Boolean> = _showRideTimeError
+
+    private val _showRideEndTimeError = MutableStateFlow(false)
+    val showRideEndTimeError: StateFlow<Boolean> = _showRideEndTimeError
+
+    private val _showRideStartLocError = MutableStateFlow(false)
+    val showRideStartLocError: StateFlow<Boolean> = _showRideStartLocError
+
+    private val _showRideEndLocError = MutableStateFlow(false)
+    val showRideEndLocError: StateFlow<Boolean> = _showRideEndLocError
+
+    private val _showRideAssemblyLocError = MutableStateFlow(false)
+    val showRideAssemblyLocError: StateFlow<Boolean> = _showRideAssemblyLocError
+
+    private val _showParticipantTab = MutableStateFlow(true)
+    val showParticipantTab: StateFlow<Boolean> = _showParticipantTab
+
+    private val _assemblyPointCheck = MutableStateFlow(false)
+    val assemblyPointCheck: StateFlow<Boolean> = _assemblyPointCheck
+
+    private val _fullList = MutableStateFlow(ArrayList<RidersList>())
+    private val _ridersListMutable = MutableStateFlow(ArrayList<RidersList>())
+    val ridersList: StateFlow<ArrayList<RidersList>> = _ridersListMutable
 
     /* init {
          _fullList.value = getUsers()
          _ridersListMutable.value = _fullList.value
      }*/
 
-    val searchQuery = mutableStateOf("")
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     fun isSoloRide(): Boolean {
         if (_rideDetailsMutableState.value.rideType == "Solo Ride") {
@@ -80,11 +107,10 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         } else {
             return false
         }
-        // return _rideDetailsMutableState.value.rideType ?: ""
     }
 
     fun onSearchQueryChanged(query: String) {
-        searchQuery.value = query
+        _searchQuery.value = query
 
         val q = query.trim().lowercase()
 
@@ -111,7 +137,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         })
 
         // Re-filter with current query so filtered list reflects changes
-        onSearchQueryChanged(searchQuery.value)
+        onSearchQueryChanged(_searchQuery.value)
         getUserCount()
 
 
@@ -145,6 +171,20 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         return true
     }
 
+    fun setShowDatePicker(value: Boolean) { _showDatePicker.value = value }
+    fun setShowEndDatePicker(value: Boolean) { _showEndDatePicker.value = value }
+    fun setShowTimePicker(value: Boolean) { _showTimePicker.value = value }
+    fun setShowEndTimePicker(value: Boolean) { _showEndTimePicker.value = value }
+    fun setShowRideTypeError(value: Boolean) { _showRideTypeError.value = value }
+    fun setShowRideTitleError(value: Boolean) { _showRideTitleError.value = value }
+    fun setShowRideDateError(value: Boolean) { _showRideDateError.value = value }
+    fun setShowRideEndDateError(value: Boolean) { _showRideEndDateError.value = value }
+    fun setShowRideTimeError(value: Boolean) { _showRideTimeError.value = value }
+    fun setShowRideEndTimeError(value: Boolean) { _showRideEndTimeError.value = value }
+    fun setShowRideStartLocError(value: Boolean) { _showRideStartLocError.value = value }
+    fun setShowRideEndLocError(value: Boolean) { _showRideEndLocError.value = value }
+    fun setShowRideAssemblyLocError(value: Boolean) { _showRideAssemblyLocError.value = value }
+
     fun routeFieldValidation(): Boolean {
         if (_rideDetailsMutableState.value.startLocation.isNullOrEmpty()) {
             _showRideStartLocError.value = true
@@ -154,7 +194,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
             _showRideEndLocError.value = true
             return false
         }
-        if (!assembly_point_check.value) {
+        if (!_assemblyPointCheck.value) {
             if (_rideDetailsMutableState.value.assemblyLocation.isNullOrEmpty()) {
                 _showRideAssemblyLocError.value = true
                 return false
@@ -164,7 +204,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     }
 
     fun getUserCount() {
-        selectedUserCount.value = _ridersListMutable.value.count { it.isSelect }
+        _selectedUserCount.value = _ridersListMutable.value.count { it.isSelect }
     }
 
     fun updateRiderType(type: String) {
@@ -242,28 +282,31 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
     }
 
     fun updateTab(tab: Int) {
-
         _tabSelectMutableState.value += tab
     }
 
     fun showDatePicker(isShow: Boolean) {
-        show_datePicker.value = isShow
+        _showDatePicker.value = isShow
     }
 
     fun showTimePicker(isShow: Boolean) {
-        show_timePicker.value = isShow
+        _showTimePicker.value = isShow
     }
 
     fun showEndDatePicker(isShow: Boolean) {
-        show_EndDatePicker.value = isShow
+        _showEndDatePicker.value = isShow
     }
 
     fun showEndTimePicker(isShow: Boolean) {
-        show_EndTimePicker.value = isShow
+        _showEndTimePicker.value = isShow
     }
 
     fun updateParticipantTab(showTab: Boolean) {
-        show_participant_Tab.value = showTab
+        _showParticipantTab.value = showTab
+    }
+
+    fun setAssemblyPointCheck(value: Boolean) {
+        _assemblyPointCheck.value = value
     }
 
 
@@ -315,7 +358,7 @@ open class CreateRideScreenViewModel : ViewModel(), KoinComponent {
         var assemblyLat: Double = 0.0
         var assemblyLon: Double = 0.0
 
-        if (assembly_point_check.value) {
+        if (_assemblyPointCheck.value) {
             hasAssemblyPoint = false
             assemblyPoint = _rideDetailsMutableState.value.startLocation
             assemblyLat = _rideDetailsMutableState.value.startLat ?: 0.0
