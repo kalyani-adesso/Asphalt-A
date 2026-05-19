@@ -91,6 +91,8 @@ fun ChatListingScreen(
         viewModel.getChatList()
     }
 
+    val selectedTab by viewModel.tabSelection.collectAsState()
+
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.messages),

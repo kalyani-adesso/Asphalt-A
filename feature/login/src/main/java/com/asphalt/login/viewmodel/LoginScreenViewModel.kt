@@ -1,7 +1,6 @@
 package com.asphalt.login.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.datastore.DataStoreManager
@@ -34,8 +33,13 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
     val isLoginSuccess = MutableStateFlow(false)
     val showFailureMessage = MutableStateFlow(false)
     val showLoader = MutableStateFlow(false)
-    val isrememberMe = mutableStateOf(false)
+    private val _isrememberMe = MutableStateFlow(false)
+    val isrememberMe: StateFlow<Boolean> = _isrememberMe
 
+
+    fun setRememberMe(value: Boolean) {
+        _isrememberMe.value = value
+    }
 
     fun updateMessage(boolean: Boolean) {
         showFailureMessage.value = boolean
@@ -75,12 +79,12 @@ class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: Data
                         CurrentUser(isSuccess, errorMessage, name, email, uid)
                     }
                    androidUserVM.updateUserData(user)
-                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, isrememberMe.value)
-                    //println("isRemberMe: ${isrememberMe.value}")
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, _isrememberMe.value)
+                    //println("isRemberMe: ${_isrememberMe.value}")
                     _emailTextMutableState.value = ""
                     _passwordTextMutableState.value = ""
                     isEmailVaild.value = false
-                    isrememberMe.value = false
+                    _isrememberMe.value = false
                     updateMessage(false)
                     updateLoader(false)
                     isLoginSuccess.value = true

@@ -1,13 +1,13 @@
 package com.asphalt.marketplace.viewmodel
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.asphalt.marketplace.model.CreateAdUIModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class CreateAdViewModel : ViewModel() {
-    private val _createAd_model = mutableStateOf(CreateAdUIModel())
-    val createAd_model: State<CreateAdUIModel> = _createAd_model
+    private val _createAd_model = MutableStateFlow(CreateAdUIModel())
+    val createAd_model: StateFlow<CreateAdUIModel> = _createAd_model
 
     fun validations(): Boolean {
         if (_createAd_model.value.tile.isEmpty()) {

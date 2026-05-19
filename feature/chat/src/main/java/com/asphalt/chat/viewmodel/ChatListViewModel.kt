@@ -1,6 +1,5 @@
 package com.asphalt.chat.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.model.chat.ChatRoom
@@ -15,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: AndroidUserVM) :
     ViewModel() {
-    val tabSelection = mutableStateOf(ChatConstants.TAB_ALL)
+    private val _tabSelection = MutableStateFlow(ChatConstants.TAB_ALL)
+    val tabSelection: StateFlow<Int> = _tabSelection
     private val currentUid: String
         get() = androidUserVM.getCurrentUserUID()
 
@@ -27,7 +27,7 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
     val searchQuery: StateFlow<String> = _searchQuery
 
     fun updateTab(tab: Int) {
-        tabSelection.value = tab
+        _tabSelection.value = tab
         applyTabFilter()
     }
 

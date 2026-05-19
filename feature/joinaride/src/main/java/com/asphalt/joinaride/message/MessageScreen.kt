@@ -69,8 +69,8 @@ fun MessageScreenUI(
 ) {
 
     val messagesList by viewModel.messagesList.collectAsState()
+    val message by viewModel.customMessage.collectAsState()
 
-    val message by remember { viewModel::customMessage }
     val currentUid = remember { viewModel.currentUid }
     val currentUser = remember { viewModel.currentUser }
 
@@ -78,7 +78,7 @@ fun MessageScreenUI(
 
     val listState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ridesData?.rideID, ridesData?.userID) {
         viewModel.listenForMessages(
             rideId = ridesData?.rideID ?: "",
             recevierId = ridesData?.userID ?: ""
@@ -393,7 +393,7 @@ fun MessageScreenUI(
                                 receiverName = name ?: "",
                                 onGoingRideID = ridesData?.rideID ?: "",
                                 isRideOnGoing = true,
-                                message = viewModel.customMessage,
+                                message = message,
                             )
                         },
                         buttonHeight = Dimensions.size60,

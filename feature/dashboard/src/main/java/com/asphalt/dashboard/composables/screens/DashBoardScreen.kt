@@ -71,7 +71,7 @@ fun DashBoardScreen(
     val context = LocalContext.current
     var locationStatus by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) {
+    LaunchedEffect(Constants.FIREBASE_DB_RIDES) {
         PlatformDatabase().getReference(Constants.FIREBASE_DB_RIDES).observeValue().collect { snapshot ->
             val ridesMap = mutableMapOf<String, CreateRideRoot>()
 

@@ -102,6 +102,7 @@ fun LoginScreen(
     var isLoginSuccess = viewModel.isLoginSuccess.collectAsState()
     var showFailureMessage = viewModel.showFailureMessage.collectAsState()
     var showLoader = viewModel.showLoader.collectAsState()
+    var isrememberMe = viewModel.isrememberMe.collectAsState()
 
     if (showLoader.value) {
         BouncingCirclesLoader()
@@ -376,8 +377,8 @@ fun LoginScreen(
                                     uncheckedColor = NeutralMidGrey,
                                     checkmarkColor = Color.White
                                 ),
-                                checked = viewModel.isrememberMe.value,
-                                onCheckedChange = { viewModel.isrememberMe.value = it })
+                                checked = isrememberMe.value,
+                                onCheckedChange = { viewModel.setRememberMe(it) })
                         }
                         Spacer(modifier = Modifier.width(Dimensions.padding8))
                         Text(

@@ -72,7 +72,7 @@ fun ConnectedRideGoogleMapScreen(
     val view = LocalView.current
     val elapsedTime by rideViewModel.elapsedTime.collectAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ridesData.ridesID) {
         rideViewModel.startRideTimer()
     }
     LaunchedEffect(ridesData.ridesID) {

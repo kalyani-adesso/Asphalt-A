@@ -33,7 +33,7 @@ fun EndRidersScreenLoader(
         )
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ridesData.ridesID) {
         delay(3000)
         isLoading = false
         delay(1000)

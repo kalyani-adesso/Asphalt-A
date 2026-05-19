@@ -54,7 +54,7 @@ fun RidersScreenLoader(
 
     var showBanner by remember {  mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ridesData.ridesID) {
         delay(3000)
         isLoading = false
         showBanner = true

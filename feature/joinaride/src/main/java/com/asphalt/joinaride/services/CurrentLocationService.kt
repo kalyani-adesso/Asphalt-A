@@ -138,11 +138,13 @@ class CurrentLocationService : Service() {
         }
 
         try {
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback!!,
-                locationHandlerThread.looper
-            )
+            locationCallback?.let {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    it,
+                    locationHandlerThread.looper
+                )
+            }
         } catch (unlikely: SecurityException) {
             Log.e("CurrentLocationService", "Location permission revoked")
         }

@@ -27,6 +27,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -85,9 +87,11 @@ fun RidesDetailsScreen(
             viewModel.getSingleRide(rideId)
     }
     val scrollState = rememberScrollState()
+    val ridesData by viewModel.ridesData.collectAsState()
+    val showDeleteButton by viewModel.showDeleteButton.collectAsState()
     setTopAppBarState(
         AppBarState(
-            title = viewModel.ridesData.value?.rideTitle ?: ""
+            title = ridesData?.rideTitle ?: ""
         )
     )
     AsphaltTheme {
@@ -104,9 +108,9 @@ fun RidesDetailsScreen(
                 //contentPadding = PaddingValues(bottom = Dimensions.spacing250)
             ) {
                 //Spacer(Modifier.height(Dimensions.size30))
-                HeaderSection(viewModel, onChatClick)
+                HeaderSection(viewModel, onChatClick, ridesData)
                 Spacer(Modifier.height(Dimensions.size20))
-                CountSection(viewModel)
+                CountSection(viewModel, ridesData)
                 Spacer(Modifier.height(Dimensions.size20))
                 UsersList(viewModel)
                 //Spacer(Modifier.height(Dimensions.size10))
@@ -145,7 +149,7 @@ fun RidesDetailsScreen(
                      }
                  }
                  Spacer(Modifier.height(Dimensions.size20))*/
-                if (viewModel.showDeleteButton.value) {
+                if (showDeleteButton) {
                     val message = stringResource(R.string.delete_ride_success)
                     BorderedButton(
                         onClick = {
@@ -182,6 +186,7 @@ fun RidesDetailsScreen(
 
 @Composable
 fun UsersList(viewModel: RidesDetailsViewModel) {
+    val userList by viewModel.ridersList.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,7 +203,6 @@ fun UsersList(viewModel: RidesDetailsViewModel) {
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(Dimensions.padding16))
-        val userList = viewModel.ridersList.value
         userList.forEach { user ->
             UserRow(user)
             Spacer(modifier = Modifier.height(Dimensions.padding16))
@@ -352,8 +356,8 @@ fun UserRow(user: RidersList) {
 
 
 @Composable
-fun CountSection(viewModel: RidesDetailsViewModel) {
-    val participants = viewModel.ridesData.value?.participants ?: emptyList()
+fun CountSection(viewModel: RidesDetailsViewModel, ridesData: RidesData?) {
+    val participants = ridesData?.participants ?: emptyList()
 
     val acceptedCount = participants.count {
         it.inviteStatus == APIConstants.RIDE_ACCEPTED ||
@@ -418,7 +422,7 @@ fun RowScope.CountRow(textColor: Color, count: Int, label: String) {
 }
 
 @Composable
-fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsModel?) -> Unit) {
+fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsModel?) -> Unit, ridesData: RidesData?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -447,15 +451,15 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Column {
                     Text(
-                        text = viewModel.ridesData.value?.rideTitle ?: "",
+                        text = ridesData?.rideTitle ?: "",
                         style = TypographyMedium.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(Modifier.height(Dimensions.size3))
                     Text(
-                        text = ("${viewModel.ridesData.value?.startLocation ?: ""} - " +
-                                "${viewModel.ridesData.value?.endLocation ?: ""}"),
+                        text = ("${ridesData?.startLocation ?: ""} - " +
+                                "${ridesData?.endLocation ?: ""}"),
                         style = Typography.bodySmall,
                         color = NeutralDarkGrey,
                         maxLines = 1,
@@ -464,7 +468,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 }
 
             }
-            if (viewModel.ridesData.value?.rideType != Constants.SOLO) {
+            if (ridesData?.rideType != Constants.SOLO) {
                 RoundedBox(
                     modifier = Modifier.size(Dimensions.size30),
                     cornerRadius = Dimensions.size10,
@@ -476,9 +480,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                             null,
                             modifier = Modifier.clickable {
                                 var params = ChatParamsModel(
-                                    viewModel.ridesData.value?.ridesID ?: "",
+                                    ridesData?.ridesID ?: "",
                                     viewModel.getAllMembers(),
-                                    viewModel.ridesData.value?.rideTitle ?: ""
+                                    ridesData?.rideTitle ?: ""
                                 )
                                 onChatClick.invoke(params)
                             })
@@ -503,9 +507,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Text(
-                    text = "Start: " + (viewModel.ridesData.value?.startDate?.let {
+                    text = "Start: " + (ridesData?.startDate?.let {
                         Utils.getDateWithOutTime(
-                            viewModel.ridesData.value?.startDate
+                            ridesData?.startDate
                         )
                     } ?: ""),
                     style = Typography.bodyMedium,
@@ -513,7 +517,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 )
             }
             Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
-                if (viewModel.ridesData.value?.startDate != null) {
+                if (ridesData?.startDate != null) {
                     Image(
                         modifier = Modifier
                             .height(Dimensions.padding20)
@@ -523,9 +527,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                     )
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Text(
-                        text = viewModel.ridesData.value?.startDate?.let {
+                        text = ridesData?.startDate?.let {
                             Utils.getTime(
-                                viewModel.ridesData.value?.startDate
+                                ridesData?.startDate
                             )
                         } ?: "",
                         style = Typography.bodyMedium,
@@ -552,9 +556,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 )
                 Spacer(modifier = Modifier.width(Dimensions.size5))
                 Text(
-                    text = "End: " + (viewModel.ridesData.value?.endDate?.let {
+                    text = "End: " + (ridesData?.endDate?.let {
                         Utils.getDateWithOutTime(
-                            viewModel.ridesData.value?.endDate
+                            ridesData?.endDate
                         )
                     } ?: ""),
                     style = Typography.bodyMedium,
@@ -562,7 +566,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 )
             }
             Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
-                if (viewModel.ridesData.value?.endDate != null) {
+                if (ridesData?.endDate != null) {
                     Image(
                         modifier = Modifier
                             .height(Dimensions.padding20)
@@ -572,9 +576,9 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                     )
                     Spacer(modifier = Modifier.width(Dimensions.size8))
                     Text(
-                        text = viewModel.ridesData.value?.endDate?.let {
+                        text = ridesData?.endDate?.let {
                             Utils.getTime(
-                                viewModel.ridesData.value?.endDate
+                                ridesData?.endDate
                             )
                         } ?: "",
                         style = Typography.bodyMedium,
@@ -594,7 +598,7 @@ fun HeaderSection(viewModel: RidesDetailsViewModel, onChatClick: (ChatParamsMode
                 contentDescription = ""
             )
             Spacer(modifier = Modifier.width(Dimensions.size10))
-            val count = viewModel.ridesData.value?.participants?.size ?: 0
+            val count = ridesData?.participants?.size ?: 0
             Text(
                 text = "${(count + 1)}" + " " + stringResource(
                     R.string.riders

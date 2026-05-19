@@ -362,7 +362,9 @@ class JoinRideViewModel(
                 }
             }
         }
-        rideRef!!.addValueEventListener(rideListener!!)
+        if (rideRef != null && rideListener != null) {
+            rideRef!!.addValueEventListener(rideListener!!)
+        }
     }
 
     private val _isRideStarted = MutableStateFlow(false)
@@ -447,7 +449,7 @@ class JoinRideViewModel(
                         _polyLine.value = routePoints
                         //_polyLine.value = listOf(LatLng(startLat, startLon))+routePoints+listOf(LatLng(endLat, endLon))
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e("JoinRide", "Failed to parse route coordinates", e)
                     }
 
                     //response.data.coordinates?.map { LatLng(it[1], it[0]) } ?: emptyList()

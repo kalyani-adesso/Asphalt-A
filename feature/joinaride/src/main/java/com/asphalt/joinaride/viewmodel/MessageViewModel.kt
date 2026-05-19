@@ -1,9 +1,6 @@
 package com.asphalt.joinaride.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.model.chat.Message
@@ -30,15 +27,15 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
         get() = androidUserVM.userState.value?.uid
     val currentUser: String?
         get() = androidUserVM.userState.value?.name
-    var customMessage by mutableStateOf("")
-        private set
+    private val _customMessage = MutableStateFlow("")
+    val customMessage: StateFlow<String> = _customMessage
     private val _messagesList = MutableStateFlow<List<MessageRoot>>(emptyList())
     val messagesList: StateFlow<List<MessageRoot>> = _messagesList
     fun onQuickMessageClick(message: String) {
-        customMessage = message
+        _customMessage.value = message
     }
     fun onCustomMessageChange(message: String) {
-        customMessage = message
+        _customMessage.value = message
     }
     fun sendMessage(
         senderID: String, // current user id
@@ -67,7 +64,7 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
             // api called
             ridesRepository.sendMessage(messageRoot)
             // clear input
-            customMessage = ""
+            _customMessage.value = ""
         }
     }
     private val _messages = MutableStateFlow<List<Message>>(emptyList())

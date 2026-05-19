@@ -1,7 +1,5 @@
 package com.asphalt.dashboard.viewmodels
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.constants.APIConstants
@@ -15,6 +13,8 @@ import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.R
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,12 +23,13 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
     val ridesRepo: RidesRepository by inject()
     val userRepoImpl: UserRepoImpl by inject()
     val androidUserVM: AndroidUserVM by inject()
-    private val ridesDetails = mutableStateOf<RidesData?>(null)
-    open val ridesData: State<RidesData?> = ridesDetails
+    private val _ridesDetails = MutableStateFlow<RidesData?>(null)
+    open val ridesData: StateFlow<RidesData?> = _ridesDetails
 
-    private val _ridersList = mutableStateOf<List<RidersList>>(emptyList())
-    open val ridersList: State<List<RidersList>> = _ridersList
-    val showDeleteButton = mutableStateOf(false)
+    private val _ridersList = MutableStateFlow<List<RidersList>>(emptyList())
+    open val ridersList: StateFlow<List<RidersList>> = _ridersList
+    private val _showDeleteButton = MutableStateFlow(false)
+    val showDeleteButton: StateFlow<Boolean> = _showDeleteButton
 
     fun getSingleRide(ridesId: String) {
         viewModelScope.launch {
@@ -37,7 +38,7 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
 
             }
             APIHelperUI.handleApiResult(apiResult, viewModelScope) { response ->
-                ridesDetails.value = response
+                _ridesDetails.value = response
                 getUserList()
             }
         }
@@ -49,7 +50,7 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
             var user = userRepoImpl.getUserDetails()
             val users: List<UserDomain> = androidUserVM.userList.value
 
-            val userList = ridesDetails.value?.participants ?: emptyList()
+            val userList = _ridesDetails.value?.participants ?: emptyList()
             val list = ArrayList(userList.mapNotNull { participant ->
                 //if (participant.inviteStatus == APIConstants.END_RIDE) return@mapNotNull null
 
@@ -73,14 +74,14 @@ open class RidesDetailsViewModel() : ViewModel(), KoinComponent {
                 }
             })
 
-            val organizer = ridesDetails.value?.createdBy ?: ""
+            val organizer = _ridesDetails.value?.createdBy ?: ""
             if (!organizer.isNullOrEmpty()) {
                 val organizerData = users.find { it.uid == organizer }
                 var name = if (organizerData?.uid == user?.uid) {
-                    showDeleteButton.value = true
+                    _showDeleteButton.value = true
                     "You"
                 } else {
-                    showDeleteButton.value = false
+                    _showDeleteButton.value = false
                     organizerData?.name
 
                 }

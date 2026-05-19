@@ -149,7 +149,9 @@ fun CurrentLocationMapScreen(
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseChat", "Child event listener cancelled", error.toException())
+            }
         }
 
         // 4. Attach the listener for new messages
@@ -303,7 +305,7 @@ fun MapWithCurrentLocation(
         )
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ridesData.startLatitude, ridesData.startLongitude) {
         cameraPositionState.animate(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
@@ -379,7 +381,7 @@ fun MapWithCurrentLocation(
 //    }
 
     // Get current location
-    LaunchedEffect(Unit) {
+    LaunchedEffect(locationProvider) {
         userLocation = locationProvider.getCurrentLocation()
         isLoading = false
     }

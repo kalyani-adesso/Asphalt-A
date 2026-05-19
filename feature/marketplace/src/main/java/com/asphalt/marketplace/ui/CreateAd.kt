@@ -20,6 +20,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -143,11 +145,12 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 @Composable
 fun CreateAdForm(viewModel: CreateAdViewModel) {
+    val adModel by viewModel.createAd_model.collectAsState()
     var title: String = ""
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(
-        "Title*", 1, showError = viewModel.createAd_model.value.isShowTitleError,
-        value = viewModel.createAd_model.value.tile
+        "Title*", 1, showError = adModel.isShowTitleError,
+        value = adModel.tile
     ) { tit ->
         viewModel.setTitle(tit)
     }
@@ -159,45 +162,45 @@ fun CreateAdForm(viewModel: CreateAdViewModel) {
     TwoDropDownWithTitle("Engine*", "Type*")
     Spacer(modifier = Modifier.height(Dimensions.size16))
     InputAndDropDown(
-        "Color*", "Owner*", viewModel.createAd_model.value.isShowColorError,
+        "Color*", "Owner*", adModel.isShowColorError,
         input1 = { input ->
             viewModel.setColor(input)
         }, input2 = {
 
-        }, inputString1 = viewModel.createAd_model.value.color
+        }, inputString1 = adModel.color
     )
     Spacer(modifier = Modifier.height(Dimensions.size16))
     InputAndDropDown(
         "Fuel Type*",
         "Insurance*",
-        viewModel.createAd_model.value.isShowFuelError,
+        adModel.isShowFuelError,
         input1 = { input ->
             viewModel.setFuelType(input)
         },
         input2 = { input ->
-        }, inputString1 = viewModel.createAd_model.value.fuel
+        }, inputString1 = adModel.fuel
     )
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(
         title = "Price*",
         maxLines = 1,
-        viewModel.createAd_model.value.isShowPriceError,
-        if (viewModel.createAd_model.value.price == null) "" else viewModel.createAd_model.value.price.toString(),
+        adModel.isShowPriceError,
+        if (adModel.price == null) "" else adModel.price.toString(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     ) { input ->
         viewModel.setPrice(input)
     }
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(
-        "Location", maxLines = 1, viewModel.createAd_model.value.isLocationError,
-        viewModel.createAd_model.value.location
+        "Location", maxLines = 1, adModel.isLocationError,
+        adModel.location
     ) {
 
     }
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(
-        "Description", maxLines = 3, viewModel.createAd_model.value.isShowDescError,
-        viewModel.createAd_model.value.desc
+        "Description", maxLines = 3, adModel.isShowDescError,
+        adModel.desc
     ) {
 
     }
