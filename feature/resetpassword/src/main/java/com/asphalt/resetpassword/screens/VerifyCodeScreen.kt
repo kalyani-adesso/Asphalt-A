@@ -22,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,7 +51,6 @@ import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.theme.TypographyMedium
 import com.asphalt.commonui.ui.GradientButton
-import com.asphalt.commonui.util.CustomTimer
 import com.asphalt.commonui.utils.ComposeUtils
 import com.asphalt.resetpassword.viewmodel.VerifyCodeViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -60,6 +61,10 @@ fun VerifyScreen(
     viewModel: VerifyCodeViewModel = koinViewModel(), onVerifyClick: () -> Unit
 ) {
 viewModel.startTimer()
+    val verificationCode by viewModel.verificationCode.collectAsState()
+    val isShowError by viewModel.isShowError.collectAsState()
+    val showResend by viewModel.showResend.collectAsState()
+    val showTime by viewModel.showTime.collectAsState()
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(
@@ -86,10 +91,10 @@ viewModel.startTimer()
 
                 ) {
                     val message = buildAnnotatedString {
-                        append("We’ve sent a 5-digit verification code to ")
+                        append("We've sent a 5-digit verification code to ")
 
                         withStyle(style = SpanStyle(color = PrimaryDarkerLightB75)) { // blue color
-                            append("\n${email}")
+                            append("\\n${email}")
                         }
                     }
                     Text(
@@ -136,7 +141,7 @@ viewModel.startTimer()
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = viewModel.verificationCode.value,
+                            value = verificationCode,
                             onValueChange = { viewModel.updateCode(it) },
                             placeholder = {
                                 Text(
@@ -187,15 +192,15 @@ viewModel.startTimer()
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = if (viewModel.showResend.value) {
+                                text = if (showResend) {
                                     "Resend"
                                 } else {
-                                    "Resend in ${viewModel.showTime.value}"
+                                    "Resend in ${showTime}"
                                 },
                                 modifier = Modifier
                                     .padding(end = Dimensions.size)
                                     .clickable {
-                                        if (viewModel.showResend.value) {
+                                        if (showResend) {
                                             viewModel.startTimer()
                                         }
                                     },
@@ -206,7 +211,7 @@ viewModel.startTimer()
 
 
                     }
-                    if (viewModel.isShowError.value) {
+                    if (isShowError) {
                         Text(
                             text = stringResource(R.string.enter_valid_verification_code),
                             Modifier.padding(top = Dimensions.size4),

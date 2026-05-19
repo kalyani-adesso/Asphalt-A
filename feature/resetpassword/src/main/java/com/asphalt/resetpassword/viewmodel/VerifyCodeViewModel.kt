@@ -2,33 +2,37 @@ package com.asphalt.resetpassword.viewmodel
 
 import android.os.CountDownTimer
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.asphalt.commonui.util.CustomTimer
 import com.asphalt.resetpassword.model.ResetConstants
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class VerifyCodeViewModel : ViewModel() {
-    private val _verificationCodeMutable = mutableStateOf("")
-    val verificationCode: State<String> = _verificationCodeMutable
+    private val _verificationCodeMutable = MutableStateFlow("")
+    val verificationCode: StateFlow<String> = _verificationCodeMutable
 
-    val isShowError = mutableStateOf(false)
+    private val _isShowError = MutableStateFlow(false)
+    val isShowError: StateFlow<Boolean> = _isShowError
 
-    val showTime = mutableStateOf("")
+    private val _showTime = MutableStateFlow("")
+    val showTime: StateFlow<String> = _showTime
 
-    val showResend = mutableStateOf(false)
+    private val _showResend = MutableStateFlow(false)
+    val showResend: StateFlow<Boolean> = _showResend
+
     var countDownTimer: CountDownTimer? = null
 
     fun startTimer() {
         countDownTimer?.cancel()
-        showResend.value = false
+        _showResend.value = false
         countDownTimer = CustomTimer.createCountDownTimer(
             ResetConstants.Total_Timer_Time,
             ResetConstants.Time_Interval, onTick = { count ->
-                showTime.value = count.toString()
+                _showTime.value = count.toString()
                 //Log.d("Countdown", "Time remaining: $count seconds")
             }, onFinish = {
-                showResend.value = true
+                _showResend.value = true
             }).start()
     }
 
@@ -37,7 +41,7 @@ class VerifyCodeViewModel : ViewModel() {
     }
 
     fun updateCode(code: String) {
-        isShowError.value = false
+        _isShowError.value = false
         _verificationCodeMutable.value = code
 
     }
@@ -51,10 +55,10 @@ class VerifyCodeViewModel : ViewModel() {
 
     fun validation(): Boolean {
         if (_verificationCodeMutable.value.isNullOrEmpty()) {
-            isShowError.value = true
+            _isShowError.value = true
             return false;
         }
-        isShowError.value = false
+        _isShowError.value = false
         return true
     }
 }
