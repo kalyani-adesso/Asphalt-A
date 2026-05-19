@@ -1,8 +1,5 @@
 package com.asphalt.resetpassword.viewmodel
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asphalt.android.helpers.APIHelperUI
@@ -11,24 +8,33 @@ import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.commonui.UIState
 import com.asphalt.commonui.UIStateHandler
 import com.asphalt.commonui.util.EmailValidator
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ForgotPasswordViewModel(
     val authViewModel: AuthViewModel,
     val userAPIRepository: UserRepository
 ) : ViewModel() {
-    private val _emailMutableState: MutableState<String> = mutableStateOf("")
-    val emailState: State<String> = _emailMutableState
-    val isShowTick = mutableStateOf(false)
-    val isShowError = mutableStateOf(false)
+    private val _emailMutableState = MutableStateFlow("")
+    val emailState: StateFlow<String> = _emailMutableState
 
-    val showSuccess = mutableStateOf(false)
-    val showFailure = mutableStateOf(false)
+    private val _isShowTick = MutableStateFlow(false)
+    val isShowTick: StateFlow<Boolean> = _isShowTick
+
+    private val _isShowError = MutableStateFlow(false)
+    val isShowError: StateFlow<Boolean> = _isShowError
+
+    private val _showSuccess = MutableStateFlow(false)
+    val showSuccess: StateFlow<Boolean> = _showSuccess
+
+    private val _showFailure = MutableStateFlow(false)
+    val showFailure: StateFlow<Boolean> = _showFailure
 
     fun updateEmail(email: String) {
-        isShowError.value = false
+        _isShowError.value = false
         _emailMutableState.value = email
-        isShowTick.value = EmailValidator.isValid(email)
+        _isShowTick.value = EmailValidator.isValid(email)
     }
 
     fun sendCode(): Boolean {
@@ -40,7 +46,6 @@ class ForgotPasswordViewModel(
 
     fun callRestPassword() {
         viewModelScope.launch {
-           // showLoader.value = true
             UIStateHandler.sendEvent(UIState.Loading)
             APIHelperUI.handleApiResult(
                 userAPIRepository.getAllUsers(),
@@ -52,36 +57,34 @@ class ForgotPasswordViewModel(
                     }) {
                     val response = authViewModel.resetPassword(_emailMutableState.value)
                     if (response.isSuccess) {
-                        showSuccess.value = true
-                        showFailure.value = false
+                        _showSuccess.value = true
+                        _showFailure.value = false
                     } else {
-                        showSuccess.value = false
-                        showFailure.value = true
+                        _showSuccess.value = false
+                        _showFailure.value = true
                     }
                     UIStateHandler.sendEvent(UIState.DismissLoader)
                 } else {
-                    showSuccess.value = false
-                    showFailure.value = true
+                    _showSuccess.value = false
+                    _showFailure.value = true
                     UIStateHandler.sendEvent(UIState.DismissLoader)
                 }
 
             }
 
         }
-
-
     }
 
     fun validation(): Boolean {
         if (_emailMutableState.value.isNullOrEmpty()) {
-            isShowError.value = true
+            _isShowError.value = true
             return false
         }
         if (!EmailValidator.isValid(_emailMutableState.value)) {
-            isShowError.value = true
+            _isShowError.value = true
             return false
         }
-        isShowError.value = false
+        _isShowError.value = false
         return true
     }
 

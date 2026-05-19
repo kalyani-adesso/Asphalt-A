@@ -24,6 +24,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.asphalt.android.model.places.PhotonFeature
 import com.asphalt.commonui.R
 import com.asphalt.commonui.theme.Dimensions
 import com.asphalt.commonui.theme.GreenLIGHT
@@ -80,7 +82,11 @@ fun BottomSheetLayout(
         lat: Double, lon: Double, placeName: String
     ) -> Unit
 ) {
-    if (placesVM?._showLoader?.value ?: false) {
+    if (placesVM == null) return
+    val showLoader by placesVM.showLoader.collectAsState()
+    val autoCompletePlaces by placesVM.autoCompletePlaces.collectAsState()
+
+    if (showLoader) {
         BouncingCirclesLoader()
     }
 
@@ -106,7 +112,7 @@ fun BottomSheetLayout(
                 value = text,
                 onValueChange = {
                     text = it
-                    placesVM?.getAutoCompletePlaces(
+                    placesVM.getAutoCompletePlaces(
                         text
                     )
 
@@ -129,7 +135,7 @@ fun BottomSheetLayout(
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        placesVM?.getAutoCompletePlaces(
+                        placesVM.getAutoCompletePlaces(
                             text,
                             needDelay = false
                         ) // Trigger your search operation
@@ -152,7 +158,7 @@ fun BottomSheetLayout(
                         contentDescription = "Email icon",
                         tint = Color.Unspecified,
                         modifier = Modifier.clickable {
-                            placesVM?.getAutoCompletePlaces(text, needDelay = false)
+                            placesVM.getAutoCompletePlaces(text, needDelay = false)
                         }
 
                     )
@@ -170,7 +176,7 @@ fun BottomSheetLayout(
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f) // limit height if needed
         ) {
-            items(placesVM?.autoCompletePlaces?.value ?: emptyList()) { item ->
+            items(autoCompletePlaces, key = { it.properties.getDisplayName() }) { item ->
                 Box(
                     modifier = Modifier.clickable {
                         latLon.invoke(
@@ -178,7 +184,7 @@ fun BottomSheetLayout(
                             item.geometry.coordinates[0] ?: 0.0,
                             item.properties.getDisplayName() ?: ""
                         )
-                        placesVM?.clearList()
+                        placesVM.clearList()
                     },
                 ) {
                     Row(

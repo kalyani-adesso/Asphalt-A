@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -64,10 +66,14 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
+    val showSuccess by viewModel.showSuccess.collectAsState()
+    val showFailure by viewModel.showFailure.collectAsState()
+    val emailState by viewModel.emailState.collectAsState()
+    val isShowTick by viewModel.isShowTick.collectAsState()
+    val isShowError by viewModel.isShowError.collectAsState()
     val scope = rememberCoroutineScope()
     AsphaltTheme {
-
-        if (viewModel.showSuccess.value) {
+        if (showSuccess) {
             val successMessage = stringResource(R.string.reset_success_msg)
             LaunchedEffect(Unit) {
                 UIStateHandler.sendEvent(UIState.SUCCESS(successMessage))
@@ -75,7 +81,7 @@ fun ForgotPasswordScreen(
             }
 
         }
-        if (viewModel.showFailure.value) {
+        if (showFailure) {
             val successMessage = stringResource(R.string.user_not_found)
             LaunchedEffect(Unit) {
                 UIStateHandler.sendEvent(UIState.Error(successMessage))
@@ -164,7 +170,7 @@ fun ForgotPasswordScreen(
                             ), verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
-                            value = viewModel.emailState.value,
+                            value = emailState,
                             onValueChange = { viewModel.updateEmail(it) },
                             placeholder = {
                                 Text(
@@ -196,7 +202,7 @@ fun ForgotPasswordScreen(
                                 )
                             },
                             trailingIcon = {
-                                if (viewModel.isShowTick.value) {
+                                if (isShowTick) {
                                     Icon(
                                         painter = painterResource(R.drawable.ic_tick_green),
                                         contentDescription = "Email icon",
@@ -210,7 +216,7 @@ fun ForgotPasswordScreen(
                         )
 
                     }
-                    if (viewModel.isShowError.value) {
+                    if (isShowError) {
                         Text(
                             text = stringResource(R.string.enter_valid_email),
                             Modifier.padding(top = Dimensions.size4),
@@ -224,7 +230,7 @@ fun ForgotPasswordScreen(
                         endColor = PrimaryDarkerLightB75, onClick = {
                             if (viewModel.sendCode())
                                 viewModel.callRestPassword()
-                            //onSendClick.invoke(viewModel.emailState.value)
+                            //onSendClick.invoke(emailState)
                         }
                     , buttonHeight = Dimensions.size50) {
                         ComposeUtils.DefaultButtonContent(
