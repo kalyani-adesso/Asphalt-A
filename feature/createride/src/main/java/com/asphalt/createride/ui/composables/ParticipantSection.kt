@@ -162,7 +162,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                 }
             }
         }
-        items(ridersList, key = { it.id }) { rider ->
+        items(ridersList, key = { it.id ?: "unknown_${it.name ?: it.bike ?: it.job}" }) { rider ->
             Spacer(Modifier.height(Dimensions.padding10))
             Card(
                 modifier = Modifier

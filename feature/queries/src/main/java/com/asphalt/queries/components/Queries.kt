@@ -54,7 +54,7 @@ fun Queries(queries: List<Query>, queriesVM: QueriesVM, selectQueryForAnswer: (S
         }
     else
         LazyColumn(verticalArrangement = Arrangement.spacedBy(Dimensions.spacing20)) {
-            items(queries) {
+            items(queries, key = { it.id }) {
                 ComposeUtils.CommonContentBox {
                     QueryComponent(it, queriesVM, selectQueryForAnswer)
                 }

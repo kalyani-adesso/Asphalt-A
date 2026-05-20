@@ -34,7 +34,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asphalt.android.PlatformDatabase
 import com.asphalt.android.constants.APIConstants.END_RIDE
 import com.asphalt.android.model.rides.RidesData
@@ -65,7 +64,7 @@ fun RideProgress(
     onClickEndRide: (RideSummaryData) -> Unit,
     ridesData: RidesData
 ) {
-    val currentUser = androidUserVM.userState.collectAsState(null)
+    val currentUser = androidUserVM.userState.collectAsStateWithLifecycle(null)
     val context = LocalContext.current
     val currentUserConnectedRideData by viewmodel.currentUserConnectedRideData.collectAsStateWithLifecycle()
 

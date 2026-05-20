@@ -160,7 +160,7 @@ fun GroupRidersCard(
     androidUserVM: AndroidUserVM = koinViewModel(),
 ) {
 
-    val currentUser = androidUserVM.userState.collectAsState(null)
+    val currentUser = androidUserVM.userState.collectAsStateWithLifecycle(null)
     val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }
 
     var showDialog by remember { mutableStateOf(false) }

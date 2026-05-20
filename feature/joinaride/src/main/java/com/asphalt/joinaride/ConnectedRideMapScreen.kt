@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -65,7 +66,7 @@ fun ConnectedRideGoogleMapScreen(
     val context = LocalContext.current
     val locationProvider = AndroidLocationProvider(context)
     var showBanner by remember {  mutableStateOf(true) }
-    val currentUser = androidUserVM.userState.collectAsState(null)
+    val currentUser = androidUserVM.userState.collectAsStateWithLifecycle(null)
     val scrollState = rememberScrollState()
     var isMapTouched by remember { mutableStateOf(false) }
     val view = LocalView.current

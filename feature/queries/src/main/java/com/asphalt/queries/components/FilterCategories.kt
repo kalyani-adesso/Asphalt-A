@@ -44,7 +44,7 @@ fun FilterCategories(selectedCategory: MutableIntState) {
                         CATEGORY_ALL_ID
                     )
                 }
-                items(QueryCategories.getAllCategories()) {
+                items(QueryCategories.getAllCategories(), key = { it.id }) {
                     CategorySelector(selectedCategory, stringResource(it.nameRes), it.id)
                 }
                 item { Spacer(Modifier.width(Dimensions.size10)) }
