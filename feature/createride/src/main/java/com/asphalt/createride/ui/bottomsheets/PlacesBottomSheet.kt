@@ -176,7 +176,7 @@ fun BottomSheetLayout(
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f) // limit height if needed
         ) {
-            items(autoCompletePlaces, key = { it.properties.getDisplayName() }) { item ->
+            items(autoCompletePlaces, key = { it.properties.getDisplayName() + "_" + it.geometry.coordinates.joinToString(",") }) { item ->
                 Box(
                     modifier = Modifier.clickable {
                         latLon.invoke(
