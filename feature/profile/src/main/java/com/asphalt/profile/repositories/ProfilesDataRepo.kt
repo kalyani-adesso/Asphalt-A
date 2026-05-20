@@ -13,7 +13,7 @@ class ProfilesDataRepo {
         delay(200)
         uid?.let {
             _profileData.value =
-                dummyProfiles.find { profileData -> profileData.uid == it } ?: dummyProfiles.first()
+                dummyProfiles.find { profileData -> profileData.uid == it } ?: dummyProfiles.firstOrNull()
         }
 
     }

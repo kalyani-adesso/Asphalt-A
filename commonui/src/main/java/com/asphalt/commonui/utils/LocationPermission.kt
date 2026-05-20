@@ -8,6 +8,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 
 
@@ -75,19 +79,22 @@ fun RequestPermission(
 
     }
 
+    var hasRequestedPermission by remember { mutableStateOf(false) }
+
     if (allGranted) {
 
         // All required permissions are already granted
 
         onPermissionsGranted()
 
-    } else {
+    } else if (!hasRequestedPermission) {
 
-        // Launch the permission request dialog
+        // Launch the permission request dialog (only once)
 
         LaunchedEffect(Unit) {
 
             permissionLauncher.launch(permissions.toTypedArray())
+            hasRequestedPermission = true
 
         }
 

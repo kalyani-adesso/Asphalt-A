@@ -55,24 +55,22 @@ fun RegistrationForm(
         LoaderPopup()
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                is SignUpUiEvent.Success -> {
-                    delay(1500)
-                    navigateToLogin.invoke()
-                    viewModel.onEvent(SignUpUiEvent.clearMessage)
-                    Toast.makeText(context, event.success, Toast.LENGTH_SHORT).show()
-
-                }
-
-                is SignUpUiEvent.Error -> {
-                    viewModel.onEvent(SignUpUiEvent.clearMessage)
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
-
-                else -> null
+    val currentEvent by viewModel.eventFlow.collectAsState()
+    LaunchedEffect(currentEvent) {
+        when (val event = currentEvent) {
+            is SignUpUiEvent.Success -> {
+                delay(1500)
+                navigateToLogin.invoke()
+                viewModel.onEvent(SignUpUiEvent.clearMessage)
+                Toast.makeText(context, event.success, Toast.LENGTH_SHORT).show()
             }
+
+            is SignUpUiEvent.Error -> {
+                viewModel.onEvent(SignUpUiEvent.clearMessage)
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> {}
         }
     }
 

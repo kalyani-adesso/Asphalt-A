@@ -4,7 +4,10 @@ import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import com.asphalt.commonui.R
@@ -59,18 +62,24 @@ fun ShowDefaultTimePicker(
     }
 
 
-    LaunchedEffect(Unit) {
-        timePickerDialog.show()
-        try {
-            timePickerDialog.getButton(TimePickerDialog.BUTTON_POSITIVE)
-                ?.setTextColor(PrimaryDarkerLightB75.toArgb()) // OK button
+    var showDialog by remember { mutableStateOf(false) }
 
-            timePickerDialog.getButton(TimePickerDialog.BUTTON_NEGATIVE)
-                ?.setTextColor(NeutralDarkGrey.toArgb())
+    LaunchedEffect(showDialog) {
+        if (showDialog) {
+            timePickerDialog.show()
+            try {
+                timePickerDialog.getButton(TimePickerDialog.BUTTON_POSITIVE)
+                    ?.setTextColor(PrimaryDarkerLightB75.toArgb())
 
-        } catch (e: Exception) {
-            e.printStackTrace()
+                timePickerDialog.getButton(TimePickerDialog.BUTTON_NEGATIVE)
+                    ?.setTextColor(NeutralDarkGrey.toArgb())
+            } catch (e: Exception) {
+                // ignore styling errors
+            }
         }
+    }
 
+    LaunchedEffect(hour, minute, isAm) {
+        showDialog = true
     }
 }

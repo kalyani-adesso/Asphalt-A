@@ -74,5 +74,10 @@ class PlacesViewModel(val placesRepo: PlacesRepository) : ViewModel() {
             }
         }
     }
+
+    override fun onCleared() {
+        searchJob?.cancel()
+        super.onCleared()
+    }
 }
 

@@ -22,11 +22,14 @@ import kotlin.getValue
 class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel(), KoinComponent {
 
     val androidUserVM: AndroidUserVM by inject()
-    private val messageRef = getInstance().getReference("messages")
+    private val rootMessageRef = getInstance().getReference("messages")
     val currentUid: String?
         get() = androidUserVM.userState.value?.uid
     val currentUser: String?
         get() = androidUserVM.userState.value?.name
+
+    private var messageRef: DatabaseReference? = null
+
     private val _customMessage = MutableStateFlow("")
     val customMessage: StateFlow<String> = _customMessage
     private val _messagesList = MutableStateFlow<List<MessageRoot>>(emptyList())
@@ -71,18 +74,13 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
     val messages: StateFlow<List<Message>> = _messages
 
     private var messageListener: ValueEventListener? = null
-    private var messageRef2: DatabaseReference? = null
 
     // LISTEN FOR LIVE MESSAGES
     fun listenForMessages(rideId: String, recevierId: String) {
-        messageListener?.let { messageRef2?.removeEventListener(it) }
+        messageListener?.let { messageRef?.removeEventListener(it) }
 
-        val ref = messageRef.database.getReference("messages/$rideId")
-        messageRef2 = ref
-
-        Log.d("TAG", "listenForMessages rideId: $rideId")
-
-        val listener = object : ValueEventListener {
+        val ref = rootMessageRef.database.getReference("messages/$rideId")
+        val newListener = object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -109,12 +107,17 @@ class MessageViewModel(private val ridesRepository: RidesRepository) : ViewModel
                 Log.e("TAG", "listenForMessages cancelled", error.toException())
             }
         }
-        messageListener = listener
-        ref.addValueEventListener(listener)
+        messageRef = ref
+        messageListener = newListener
+        ref.addValueEventListener(newListener)
     }
 
     override fun onCleared() {
-        messageListener?.let { messageRef2?.removeEventListener(it) }
+        val listener = messageListener
+        val ref = messageRef
+        listener?.let {
+            ref?.removeEventListener(it)
+        }
         super.onCleared()
     }
 }

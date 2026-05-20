@@ -39,7 +39,7 @@ class HighlightRoundedBarRenderer(
     override fun drawExtras(c: Canvas) {
         super.drawExtras(c)
         val selectedIndex = selectedIndexProvider() ?: return
-        val buffer = mBarBuffers[0]
+        val buffer = mBarBuffers.firstOrNull() ?: return
 
         val entryIndex = selectedIndex
         val j = entryIndex * 4
@@ -73,7 +73,7 @@ class HighlightRoundedBarRenderer(
         c.drawPath(path, highlightPaint)
         chart.highlightValue(selectedIndex.toFloat(), 0) // highlight the bar
         chart.marker?.let { marker ->
-            val highlight = chart.highlighted[0] // current highlight
+            val highlight = chart.highlighted.firstOrNull() ?: return@let
             marker.refreshContent(
                 chart.data.getDataSetByIndex(0).getEntryForIndex(selectedIndex),
                 highlight

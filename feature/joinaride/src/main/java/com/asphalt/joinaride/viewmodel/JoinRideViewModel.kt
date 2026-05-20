@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.emptyList
 import kotlin.getValue
 import kotlinx.coroutines.flow.combine
@@ -283,7 +284,7 @@ class JoinRideViewModel(
     var endRideID: String? = null
     private var _ongoingRideUpdate = MutableStateFlow("")
     var ongoingRideUpdate = _ongoingRideUpdate.asStateFlow()
-    private var observeRetryCount = 0
+    private val observeRetryCount = AtomicInteger(0)
     private val MAX_RETRIES = 3
 
     // Observe all riders in real-time
@@ -299,7 +300,7 @@ class JoinRideViewModel(
         rideListener = object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                observeRetryCount = 0
+                observeRetryCount.set(0)
                 if (!snapshot.exists()) {
                     _joinedUsers.value = emptyList()
                     return
@@ -346,9 +347,9 @@ class JoinRideViewModel(
                 rideListener?.let { rideRef?.removeEventListener(it) }
                 rideListener = null
 
-                if (observeRetryCount < MAX_RETRIES) {
-                    observeRetryCount++
-                    val delayMillis = (1000L * (1 shl observeRetryCount))
+                if (observeRetryCount.get() < MAX_RETRIES) {
+                    observeRetryCount.incrementAndGet()
+                    val delayMillis = (1000L * (1 shl observeRetryCount.get()))
                     viewModelScope.launch {
                         Log.d(
                             "Firebase",

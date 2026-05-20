@@ -90,8 +90,8 @@ object Utils {
         return try {
             val inputFormat = SimpleDateFormat(inputFormat, Locale.getDefault())
             val outputFormat = SimpleDateFormat(outputFormat, Locale.getDefault())
-            val date = inputFormat.parse(input)
-            outputFormat.format(date!!)
+            val date = inputFormat.parse(input) ?: return input
+            outputFormat.format(date)
         } catch (e: Exception) {
             e.printStackTrace()
             input
@@ -103,10 +103,10 @@ object Utils {
             val dateFormat = SimpleDateFormat(Constants.SERVER_TIME_FORMAT, Locale.getDefault())
             dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 
-            val pastDate = dateFormat.parse(pastTimestamp)
+            val pastDate = dateFormat.parse(pastTimestamp) ?: return "Just now"
 
             val now = Date()
-            val diff = now.time - pastDate!!.time
+            val diff = now.time - pastDate.time
 
             if (diff < 0) return SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(
                 pastDate

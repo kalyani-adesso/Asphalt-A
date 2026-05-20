@@ -38,30 +38,32 @@ fun CombinedCameraGalleryLauncher(
 
             if (uri != null && uri != tempCameraFileUri && result.resultCode == android.app.Activity.RESULT_OK) {
 
-                val grantFlags = result.data!!.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION
+                result.data?.let { dataIntent ->
+                    val grantFlags = dataIntent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION
 
-                if (grantFlags != 0) {
-                    try {
-                        context.contentResolver.takePersistableUriPermission(
-                            uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
+                    if (grantFlags != 0) {
+                        try {
+                            context.contentResolver.takePersistableUriPermission(
+                                uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
 
-                        result.data!!.clipData?.let { clipData ->
-                            for (i in 0 until clipData.itemCount) {
-                                clipData.getItemAt(i).uri?.let { clipUri ->
-                                    context.contentResolver.takePersistableUriPermission(
-                                        clipUri,
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                    )
+                            dataIntent.clipData?.let { clipData ->
+                                for (i in 0 until clipData.itemCount) {
+                                    clipData.getItemAt(i).uri?.let { clipUri ->
+                                        context.contentResolver.takePersistableUriPermission(
+                                            clipUri,
+                                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        )
+                                    }
                                 }
                             }
+                        } catch (e: SecurityException) {
+                            println("Failed to persist permission for URI: ${e.message}")
                         }
-                    } catch (e: SecurityException) {
-                        println("Failed to persist permission for URI: ${e.message}")
+                    } else {
+                        println("Permission Warning: Result Intent lacks FLAG_GRANT_READ_URI_PERMISSION. Cannot persist access.")
                     }
-                } else {
-                    println("Permission Warning: Result Intent lacks FLAG_GRANT_READ_URI_PERMISSION. Cannot persist access.")
                 }
             }
             onMediaPicked(uri)

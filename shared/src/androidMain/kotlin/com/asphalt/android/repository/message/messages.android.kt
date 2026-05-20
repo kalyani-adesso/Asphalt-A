@@ -56,8 +56,7 @@ actual class MessageImpl {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-                trySend(APIResult.Error(Exception(error.message)))
+                close(error.toException())
             }
         }
         dbRef.addValueEventListener(listener)

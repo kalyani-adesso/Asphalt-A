@@ -78,7 +78,7 @@ fun RideStatsPerMonth(
 
 
                     }
-                    if (rideStat != perMonthStats.value.last())
+                    if (rideStat != perMonthStats.value.lastOrNull())
                         Spacer(Modifier.width(Dimensions.size16))
                 }
             }

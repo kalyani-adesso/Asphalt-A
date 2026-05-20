@@ -10,10 +10,8 @@ import com.asphalt.android.viewmodel.AuthViewModel
 import com.asphalt.android.viewmodels.AndroidUserVM
 import com.asphalt.commonui.constants.PreferenceKeys
 import com.asphalt.commonui.util.EmailValidator
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,8 +23,8 @@ class RegistrationDetailsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState
-    private val _eventFlow = MutableSharedFlow<SignUpUiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = MutableStateFlow<SignUpUiEvent?>(null)
+    val eventFlow: StateFlow<SignUpUiEvent?> = _eventFlow
     val showLoader = MutableStateFlow(false)
     fun updateLoader(boolean: Boolean) {
         showLoader.value = boolean
@@ -157,7 +155,7 @@ class RegistrationDetailsViewModel(
                         )
                     }
                     callLogin()
-                   /* _eventFlow.emit(SignUpUiEvent.Success("Account Created Successfully"))
+                   /* _eventFlow.value =SignUpUiEvent.Success("Account Created Successfully"))
                     updateLoader(false)*/
                 } else {
                     _uiState.update {
@@ -166,14 +164,14 @@ class RegistrationDetailsViewModel(
                             errorMessage = "Registration Failed"
                         )
                     }
-                    //_eventFlow.emit(SignUpUiEvent.clearMessage)
-                    _eventFlow.emit(SignUpUiEvent.Error("Registration Failed"))
+                    //_eventFlow.value =SignUpUiEvent.clearMessage)
+                    _eventFlow.value = SignUpUiEvent.Error("Registration Failed")
                     _uiState.value.errorMessage = response.isFailure.toString()
                     updateLoader(false)
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false) }
-                _eventFlow.emit(SignUpUiEvent.Error(e.message ?: "Unknown error"))
+                _eventFlow.value = SignUpUiEvent.Error(e.message ?: "Unknown error")
                 updateLoader(false)
             }
         }
@@ -196,12 +194,12 @@ class RegistrationDetailsViewModel(
                   _passwordTextMutableState.value = ""
                   isEmailVaild.value = false
                   updateMessage(false)*/
-                _eventFlow.emit(SignUpUiEvent.Success("Account Created Successfully"))
+                _eventFlow.value = SignUpUiEvent.Success("Account Created Successfully")
                 updateLoader(false)
                 //isLoginSuccess.value = true
             } else {
                 //isLoginSuccess.value = false
-                _eventFlow.emit(SignUpUiEvent.Error("Login failed. Please try again."))
+                _eventFlow.value = SignUpUiEvent.Error("Login failed. Please try again.")
                 updateLoader(false)
                 //updateMessage(true)
             }

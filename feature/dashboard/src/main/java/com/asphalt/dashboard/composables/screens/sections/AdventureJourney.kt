@@ -43,7 +43,7 @@ fun AdventureJourney(
 ) {
 
     val options = AdventureJourneyTimeFrameChoices.getAllChoices()
-    val selectedItem = remember { mutableStateOf(options[0]) }
+    val selectedItem = remember { mutableStateOf(options.firstOrNull() ?: options[0]) }
     LaunchedEffect(dashboardData) {
         adventureJourneyViewModel.setDashboardData(dashboardData)
         adventureJourneyViewModel.fetchAdventureData(selectedItem.value.choiceId)

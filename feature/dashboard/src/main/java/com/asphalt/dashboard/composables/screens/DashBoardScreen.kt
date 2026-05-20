@@ -107,6 +107,9 @@ fun DashBoardScreen(
                             locationStatus = ""
                         }
                     }
+                    .addOnFailureListener {
+                        locationStatus = ""
+                    }
             }
         },
         onPermissionsDenied = { denied ->
