@@ -29,7 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -108,10 +108,10 @@ fun JoinRide(
     navigateToEndRide: () -> Unit,
 
     ) {
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val rides by viewModel.acceptedRides.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val rides by viewModel.acceptedRides.collectAsStateWithLifecycle()
     viewModel.completedRideID(rides)
-    val completedRideID by viewModel.completedRideId.collectAsState()
+    val completedRideID by viewModel.completedRideId.collectAsStateWithLifecycle()
 
     val sortedList = rides.sortedBy { it.startDate }
 

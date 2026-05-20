@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +41,8 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun ReviewSection(viewModel: CreateRideScreenViewModel) {
-    val rideDetails by viewModel.rideDetailsState.collectAsState()
-    val ridersList by viewModel.ridersList.collectAsState()
+    val rideDetails by viewModel.rideDetailsState.collectAsStateWithLifecycle()
+    val ridersList by viewModel.ridersList.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier

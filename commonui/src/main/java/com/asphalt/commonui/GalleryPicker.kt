@@ -59,10 +59,10 @@ fun CombinedCameraGalleryLauncher(
                                 }
                             }
                         } catch (e: SecurityException) {
-                            println("Failed to persist permission for URI: ${e.message}")
+                            android.util.Log.d("GalleryPicker", "Failed to persist permission for URI: ${e.message}")
                         }
                     } else {
-                        println("Permission Warning: Result Intent lacks FLAG_GRANT_READ_URI_PERMISSION. Cannot persist access.")
+                        android.util.Log.d("GalleryPicker", "Permission Warning: Result Intent lacks FLAG_GRANT_READ_URI_PERMISSION. Cannot persist access.")
                     }
                 }
             }

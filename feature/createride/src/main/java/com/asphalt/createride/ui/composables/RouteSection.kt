@@ -20,7 +20,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,11 +57,11 @@ fun RouteSection(viewModel: CreateRideScreenViewModel) {
     val assemblyLocation = 3
     var bottomSheetType by remember { mutableStateOf(0) }
 
-    val rideDetails by viewModel.rideDetailsState.collectAsState()
-    val showRideStartLocError by viewModel.showRideStartLocError.collectAsState()
-    val showRideEndLocError by viewModel.showRideEndLocError.collectAsState()
-    val showRideAssemblyLocError by viewModel.showRideAssemblyLocError.collectAsState()
-    val assemblyPointCheck by viewModel.assemblyPointCheck.collectAsState()
+    val rideDetails by viewModel.rideDetailsState.collectAsStateWithLifecycle()
+    val showRideStartLocError by viewModel.showRideStartLocError.collectAsStateWithLifecycle()
+    val showRideEndLocError by viewModel.showRideEndLocError.collectAsStateWithLifecycle()
+    val showRideAssemblyLocError by viewModel.showRideAssemblyLocError.collectAsStateWithLifecycle()
+    val assemblyPointCheck by viewModel.assemblyPointCheck.collectAsStateWithLifecycle()
 
     if (bottomSheetType != 0) {
         PlacesBottomSheet(true, latLon = { lat, lon, locName ->

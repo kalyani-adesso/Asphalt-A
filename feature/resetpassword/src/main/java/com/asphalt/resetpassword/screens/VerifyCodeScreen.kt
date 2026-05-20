@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,10 +61,10 @@ fun VerifyScreen(
     viewModel: VerifyCodeViewModel = koinViewModel(), onVerifyClick: () -> Unit
 ) {
 viewModel.startTimer()
-    val verificationCode by viewModel.verificationCode.collectAsState()
-    val isShowError by viewModel.isShowError.collectAsState()
-    val showResend by viewModel.showResend.collectAsState()
-    val showTime by viewModel.showTime.collectAsState()
+    val verificationCode by viewModel.verificationCode.collectAsStateWithLifecycle()
+    val isShowError by viewModel.isShowError.collectAsStateWithLifecycle()
+    val showResend by viewModel.showResend.collectAsStateWithLifecycle()
+    val showTime by viewModel.showTime.collectAsStateWithLifecycle()
     AsphaltTheme {
         Scaffold { paddingValues ->
             Column(

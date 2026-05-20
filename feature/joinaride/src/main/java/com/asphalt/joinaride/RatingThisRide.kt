@@ -30,7 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,13 +69,13 @@ fun RatingThisRide(
     onSubmit : () -> Unit,
     ridesData: RidesData
 ) {
-    val rating by viewModel.rating.collectAsState()
-    val isSubmitted by viewModel.isSumitted.collectAsState()
+    val rating by viewModel.rating.collectAsStateWithLifecycle()
+    val isSubmitted by viewModel.isSumitted.collectAsStateWithLifecycle()
     var feedbackText by remember { mutableStateOf("") }
 
 
-    val comments by viewModel.comments.collectAsState()
-    val apiState by viewModel.ratingState.collectAsState()
+    val comments by viewModel.comments.collectAsStateWithLifecycle()
+    val apiState by viewModel.ratingState.collectAsStateWithLifecycle()
 
     Dialog(onDismissRequest = {onDismiss},
         properties = DialogProperties(usePlatformDefaultWidth = false)

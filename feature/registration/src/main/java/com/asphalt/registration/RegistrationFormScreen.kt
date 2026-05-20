@@ -12,7 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,17 +45,17 @@ fun RegistrationForm(
     navigateToLogin: () -> Unit
 ) {
 
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var showLoader = viewModel.showLoader.collectAsState()
+    var showLoader = viewModel.showLoader.collectAsStateWithLifecycle()
 
     if (showLoader.value) {
         LoaderPopup()
     }
 
-    val currentEvent by viewModel.eventFlow.collectAsState()
+    val currentEvent by viewModel.eventFlow.collectAsStateWithLifecycle()
     LaunchedEffect(currentEvent) {
         when (val event = currentEvent) {
             is SignUpUiEvent.Success -> {

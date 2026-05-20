@@ -20,7 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,7 +145,7 @@ fun CreateAd(setTopAppBarState: (AppBarState) -> Unit) {
 
 @Composable
 fun CreateAdForm(viewModel: CreateAdViewModel) {
-    val adModel by viewModel.createAd_model.collectAsState()
+    val adModel by viewModel.createAd_model.collectAsStateWithLifecycle()
     var title: String = ""
     Spacer(modifier = Modifier.height(Dimensions.size16))
     TextFieldWithTitle(

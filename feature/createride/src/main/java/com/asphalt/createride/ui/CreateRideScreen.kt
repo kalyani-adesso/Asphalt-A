@@ -19,7 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -60,7 +60,7 @@ fun CreateRideScreen(
     val scope = rememberCoroutineScope()
     viewModel.getUsers()
     val scrollState = rememberScrollState()
-    val tabSelection by viewModel.tabSelectState.collectAsState()
+    val tabSelection by viewModel.tabSelectState.collectAsStateWithLifecycle()
     setTopAppBarState(
         AppBarState(
             title = stringResource(R.string.create_a_ride),
@@ -113,8 +113,8 @@ fun CreateRideScreen(
 fun BoxScope.BottomButtons(viewModel: CreateRideScreenViewModel, clickDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val tabSelection by viewModel.tabSelectState.collectAsState()
-    val showParticipantTab by viewModel.showParticipantTab.collectAsState()
+    val tabSelection by viewModel.tabSelectState.collectAsStateWithLifecycle()
+    val showParticipantTab by viewModel.showParticipantTab.collectAsStateWithLifecycle()
 
     /* if (viewModel.showToast.value) {
          LaunchedEffect(viewModel.showToast.value) {

@@ -249,7 +249,7 @@ fun NavigationRoot(
     }
 
     fun onBackPressed() {
-        println("Back Nav from ${backStack.lastOrNull()}")
+        android.util.Log.d("NavigationRoot", "Back Nav from ${backStack.lastOrNull()}")
         if (drawerState.isOpen) {
             scope.launch {
                 drawerState.close()

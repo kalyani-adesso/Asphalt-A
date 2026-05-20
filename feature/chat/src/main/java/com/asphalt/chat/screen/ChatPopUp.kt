@@ -27,7 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,7 +91,7 @@ fun ChatDialog(
     }
     val listState = rememberLazyListState()
     var msgText by remember { mutableStateOf("") }
-    val messages by viewModel.chatMessage.collectAsState()
+    val messages by viewModel.chatMessage.collectAsStateWithLifecycle()
     Dialog(
         onDismissRequest = {
             viewModel.clearChat()

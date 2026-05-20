@@ -24,7 +24,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -83,8 +83,8 @@ fun BottomSheetLayout(
     ) -> Unit
 ) {
     if (placesVM == null) return
-    val showLoader by placesVM.showLoader.collectAsState()
-    val autoCompletePlaces by placesVM.autoCompletePlaces.collectAsState()
+    val showLoader by placesVM.showLoader.collectAsStateWithLifecycle()
+    val autoCompletePlaces by placesVM.autoCompletePlaces.collectAsStateWithLifecycle()
 
     if (showLoader) {
         BouncingCirclesLoader()

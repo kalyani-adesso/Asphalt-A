@@ -24,7 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,7 +68,7 @@ fun CreatePasswordScreen(
     onUpdateClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    val state = viewModel.createPasswordState.collectAsState()
+    val state = viewModel.createPasswordState.collectAsStateWithLifecycle()
     viewModel.updateEmail(email)
     val scrollState = rememberScrollState()
     var showPassword by remember { mutableStateOf(false) }

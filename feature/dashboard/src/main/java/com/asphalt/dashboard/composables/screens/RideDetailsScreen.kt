@@ -27,7 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,8 +87,8 @@ fun RidesDetailsScreen(
             viewModel.getSingleRide(rideId)
     }
     val scrollState = rememberScrollState()
-    val ridesData by viewModel.ridesData.collectAsState()
-    val showDeleteButton by viewModel.showDeleteButton.collectAsState()
+    val ridesData by viewModel.ridesData.collectAsStateWithLifecycle()
+    val showDeleteButton by viewModel.showDeleteButton.collectAsStateWithLifecycle()
     setTopAppBarState(
         AppBarState(
             title = ridesData?.rideTitle ?: ""
@@ -186,7 +186,7 @@ fun RidesDetailsScreen(
 
 @Composable
 fun UsersList(viewModel: RidesDetailsViewModel) {
-    val userList by viewModel.ridersList.collectAsState()
+    val userList by viewModel.ridersList.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxWidth()

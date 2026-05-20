@@ -29,7 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -68,8 +68,8 @@ fun MessageScreenUI(
     androidUserVM: AndroidUserVM = koinViewModel()
 ) {
 
-    val messagesList by viewModel.messagesList.collectAsState()
-    val message by viewModel.customMessage.collectAsState()
+    val messagesList by viewModel.messagesList.collectAsStateWithLifecycle()
+    val message by viewModel.customMessage.collectAsStateWithLifecycle()
 
     val currentUid = remember { viewModel.currentUid }
     val currentUser = remember { viewModel.currentUser }

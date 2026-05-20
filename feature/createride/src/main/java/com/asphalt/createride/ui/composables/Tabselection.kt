@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,8 +36,8 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 
 @Composable
 fun TabSelection(viewModel: CreateRideScreenViewModel) {
-    val tabSelection by viewModel.tabSelectState.collectAsState()
-    val showParticipantTab by viewModel.showParticipantTab.collectAsState()
+    val tabSelection by viewModel.tabSelectState.collectAsStateWithLifecycle()
+    val showParticipantTab by viewModel.showParticipantTab.collectAsStateWithLifecycle()
 
 //    Spacer(Modifier.height(Dimensions.size30))
     Row(

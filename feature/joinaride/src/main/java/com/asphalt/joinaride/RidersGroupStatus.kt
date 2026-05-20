@@ -29,7 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,13 +84,13 @@ fun RidersGroupStatus(
     val scrollState = rememberScrollState()
 
 
-//    val rideUsers by viewModel.rideUsers.collectAsState()
+//    val rideUsers by viewModel.rideUsers.collectAsStateWithLifecycle()
 
-//    val riders by viewModel.joinedUsers.collectAsState()
+//    val riders by viewModel.joinedUsers.collectAsStateWithLifecycle()
 
 //    val currentUser = androidUserVM.userState.collectAsState(null)
 
-    val joinedRiders by viewModel.joinedUsers.collectAsState()
+    val joinedRiders by viewModel.joinedUsers.collectAsStateWithLifecycle()
 
 //    LaunchedEffect(currentUser) {
 //        val userData = currentUser.value?.uid?.let { androidUserVM.getUser(it) }

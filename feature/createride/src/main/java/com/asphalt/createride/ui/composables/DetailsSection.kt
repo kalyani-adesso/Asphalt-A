@@ -23,7 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,17 +67,17 @@ fun DetailsSection(viewModel: CreateRideScreenViewModel) {
     val am = stringResource(R.string.am)
     val pm = stringResource(R.string.pm)
 
-    val showDatePicker by viewModel.showDatePicker.collectAsState()
-    val showEndDatePicker by viewModel.showEndDatePicker.collectAsState()
-    val showTimePicker by viewModel.showTimePicker.collectAsState()
-    val showEndTimePicker by viewModel.showEndTimePicker.collectAsState()
-    val rideDetails by viewModel.rideDetailsState.collectAsState()
-    val showRideTypeError by viewModel.showRideTypeError.collectAsState()
-    val showRideTitleError by viewModel.showRideTitleError.collectAsState()
-    val showRideDateError by viewModel.showRideDateError.collectAsState()
-    val showRideEndDateError by viewModel.showRideEndDateError.collectAsState()
-    val showRideTimeError by viewModel.showRideTimeError.collectAsState()
-    val showRideEndTimeError by viewModel.showRideEndTimeError.collectAsState()
+    val showDatePicker by viewModel.showDatePicker.collectAsStateWithLifecycle()
+    val showEndDatePicker by viewModel.showEndDatePicker.collectAsStateWithLifecycle()
+    val showTimePicker by viewModel.showTimePicker.collectAsStateWithLifecycle()
+    val showEndTimePicker by viewModel.showEndTimePicker.collectAsStateWithLifecycle()
+    val rideDetails by viewModel.rideDetailsState.collectAsStateWithLifecycle()
+    val showRideTypeError by viewModel.showRideTypeError.collectAsStateWithLifecycle()
+    val showRideTitleError by viewModel.showRideTitleError.collectAsStateWithLifecycle()
+    val showRideDateError by viewModel.showRideDateError.collectAsStateWithLifecycle()
+    val showRideEndDateError by viewModel.showRideEndDateError.collectAsStateWithLifecycle()
+    val showRideTimeError by viewModel.showRideTimeError.collectAsStateWithLifecycle()
+    val showRideEndTimeError by viewModel.showRideEndTimeError.collectAsStateWithLifecycle()
 
     val tagRideType = if (showRideTypeError) "Ride_Type_Error" else "Ride_Type"
     //Start Date

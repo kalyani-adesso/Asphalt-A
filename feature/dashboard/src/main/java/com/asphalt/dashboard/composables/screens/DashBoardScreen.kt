@@ -12,7 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -114,10 +113,10 @@ fun DashBoardScreen(
         },
         onPermissionsDenied = { denied ->
             locationStatus = ""
-            println("Permissions denied: $denied")
+            android.util.Log.d("DashBoardScreen", "Permissions denied: $denied")
         }
     )
-    val currentUser = androidUserVM.userState.collectAsState(null)
+    val currentUser = androidUserVM.userState.collectAsStateWithLifecycle(null)
 
     val helloUser = stringResource(R.string.hello)
     LaunchedEffect(currentUser, locationStatus) {

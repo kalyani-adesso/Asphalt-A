@@ -32,7 +32,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,12 +85,12 @@ fun ChatListingScreen(
     androidUserVM: AndroidUserVM = koinViewModel()
 ) {
     val chatList by viewModel.chatModel.collectAsStateWithLifecycle()
-    val text by viewModel.searchQuery.collectAsState()
+    val text by viewModel.searchQuery.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.getChatList()
     }
 
-    val selectedTab by viewModel.tabSelection.collectAsState()
+    val selectedTab by viewModel.tabSelection.collectAsStateWithLifecycle()
 
     setTopAppBarState(
         AppBarState(

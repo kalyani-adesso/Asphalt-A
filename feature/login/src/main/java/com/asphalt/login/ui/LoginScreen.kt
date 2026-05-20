@@ -35,7 +35,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,14 +95,14 @@ fun LoginScreen(
     var showPassword by remember { mutableStateOf(false) }
 //    val dataStoreManager : DataStoreManager = koinInject()
 
-    var emailState = viewModel.emailTextState.collectAsState()
-    var isValidEmail = viewModel.isEmailVaild.collectAsState()
-    var passwordState = viewModel.passwordTextState.collectAsState()
-    var validateState = viewModel.validateState.collectAsState()
-    var isLoginSuccess = viewModel.isLoginSuccess.collectAsState()
-    var showFailureMessage = viewModel.showFailureMessage.collectAsState()
-    var showLoader = viewModel.showLoader.collectAsState()
-    var isrememberMe = viewModel.isrememberMe.collectAsState()
+    var emailState = viewModel.emailTextState.collectAsStateWithLifecycle()
+    var isValidEmail = viewModel.isEmailVaild.collectAsStateWithLifecycle()
+    var passwordState = viewModel.passwordTextState.collectAsStateWithLifecycle()
+    var validateState = viewModel.validateState.collectAsStateWithLifecycle()
+    var isLoginSuccess = viewModel.isLoginSuccess.collectAsStateWithLifecycle()
+    var showFailureMessage = viewModel.showFailureMessage.collectAsStateWithLifecycle()
+    var showLoader = viewModel.showLoader.collectAsStateWithLifecycle()
+    var isrememberMe = viewModel.isrememberMe.collectAsStateWithLifecycle()
 
     if (showLoader.value) {
         BouncingCirclesLoader()

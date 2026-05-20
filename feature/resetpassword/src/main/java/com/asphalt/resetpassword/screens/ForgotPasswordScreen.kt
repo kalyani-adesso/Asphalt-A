@@ -20,7 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,11 +66,11 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val showSuccess by viewModel.showSuccess.collectAsState()
-    val showFailure by viewModel.showFailure.collectAsState()
-    val emailState by viewModel.emailState.collectAsState()
-    val isShowTick by viewModel.isShowTick.collectAsState()
-    val isShowError by viewModel.isShowError.collectAsState()
+    val showSuccess by viewModel.showSuccess.collectAsStateWithLifecycle()
+    val showFailure by viewModel.showFailure.collectAsStateWithLifecycle()
+    val emailState by viewModel.emailState.collectAsStateWithLifecycle()
+    val isShowTick by viewModel.isShowTick.collectAsStateWithLifecycle()
+    val isShowError by viewModel.isShowError.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     AsphaltTheme {
         if (showSuccess) {

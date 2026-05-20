@@ -31,7 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -276,8 +276,8 @@ fun MapWithCurrentLocation(
     val context = LocalContext.current
     val refreshScope = rememberCoroutineScope()
     var userRecentlyInteracted by remember { mutableStateOf(false) }
-    val riders by rideViewModel.joinedUsers.collectAsState()
-    val polyline by rideViewModel.polyLine.collectAsState()
+    val riders by rideViewModel.joinedUsers.collectAsStateWithLifecycle()
+    val polyline by rideViewModel.polyLine.collectAsStateWithLifecycle()
 
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var isLoading by remember { mutableStateOf(true) }

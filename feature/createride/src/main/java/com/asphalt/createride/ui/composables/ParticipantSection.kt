@@ -27,7 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +60,9 @@ import com.asphalt.createride.viewmodel.CreateRideScreenViewModel
 fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
     var text by remember { mutableStateOf("") }
 
-    val selectedUserCount by viewmodel.selectedUserCount.collectAsState()
-    val searchQuery by viewmodel.searchQuery.collectAsState()
-    val ridersList by viewmodel.ridersList.collectAsState()
+    val selectedUserCount by viewmodel.selectedUserCount.collectAsStateWithLifecycle()
+    val searchQuery by viewmodel.searchQuery.collectAsStateWithLifecycle()
+    val ridersList by viewmodel.ridersList.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = mod
@@ -162,7 +162,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                 }
             }
         }
-        items(ridersList) { ridersList ->
+        items(ridersList, key = { it.id }) { rider ->
             Spacer(Modifier.height(Dimensions.padding10))
             Card(
                 modifier = Modifier
@@ -198,7 +198,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                         shape = CircleShape
                                     ),
                                     size = Dimensions.padding40,
-                                    imageUrl = ridersList.imgUrl ?: ""
+                                    imageUrl = rider.imgUrl ?: ""
                                 )
                                 Image(
                                     painter = painterResource(R.drawable.ic_online_icon),
@@ -211,7 +211,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             Spacer(Modifier.width(Dimensions.size5))
                             Column(modifier = Modifier) {
                                 Row() {
-                                    val originalText = ridersList.name
+                                    val originalText = rider.name
                                     val maxLength = 20
 
                                     Text(
@@ -222,7 +222,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                         overflow = TextOverflow.Ellipsis,
                                     )
                                     Spacer(Modifier.width(Dimensions.size5))
-                                    if (!ridersList.job.isNullOrEmpty()) {
+                                    if (!rider.job.isNullOrEmpty()) {
                                         Row(
                                             modifier = Modifier
                                                 .background(
@@ -247,7 +247,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                             )
                                             Spacer(Modifier.width(Dimensions.size4))
                                             Text(
-                                                text = ridersList.job ?: "",
+                                                text = rider.job ?: "",
                                                 style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                                 color = NeutralBlack,
                                                 modifier = Modifier,
@@ -268,7 +268,7 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                                     )
                                     Spacer(Modifier.width(Dimensions.size4))
                                     Text(
-                                        text = ridersList.bike ?: "",
+                                        text = rider.bike ?: "",
                                         style = Typography.bodySmall.copy(fontSize = Dimensions.textSize12),
                                         color = NeutralDarkGrey,
                                         modifier = Modifier,
@@ -278,14 +278,14 @@ fun ParticipantSection(mod: Modifier, viewmodel: CreateRideScreenViewModel) {
                             }
                         }
                         Image(
-                            painter = if (ridersList.isSelect) {
+                            painter = if (rider.isSelect) {
                                 painterResource(R.drawable.ic_radio_back_blue)
                             } else {
                                 painterResource(R.drawable.ic_radio_btn_back_gray)
 
                             },
                             contentDescription = "", modifier = Modifier.clickable {
-                                viewmodel.updateUerList(!ridersList.isSelect, ridersList.id)
+                                viewmodel.updateUerList(!rider.isSelect, rider.id)
                                 // viewmodel.getUserCount()
                             }
                         )
