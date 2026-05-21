@@ -5,6 +5,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,7 @@ import com.asphalt.commonui.theme.PrimaryDarkerLightB75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
 import com.asphalt.commonui.ui.CircularNetworkImage
+import com.asphalt.commonui.ui.RoundedBox
 import com.asphalt.marketplace.ui.composable.MainTabs
 import com.asphalt.marketplace.ui.composable.SubTabs
 import com.asphalt.marketplace.viewmodel.ProductListViewModel
@@ -63,11 +65,46 @@ import java.nio.file.WatchEvent
 @Composable
 fun ProductListScreen(
     setTopAppBarState: (AppBarState) -> Unit,
-    productListViewmodel: ProductListViewModel = koinInject()
+    productListViewmodel: ProductListViewModel = koinInject(), postAddClick: () -> Unit,
+    productClick: () -> Unit
 ) {
     setTopAppBarState(
         AppBarState(
-            title = stringResource(R.string.marketplace)
+            title = stringResource(R.string.marketplace),
+            actions = {
+                RoundedBox(
+                    borderColor = PrimaryDarkerLightB75,
+                    borderStroke = Dimensions.padding1,
+                    cornerRadius = Dimensions.size10,
+                    modifier = Modifier
+                        .padding(end = Dimensions.padding15)
+                        .clickable {
+                            postAddClick.invoke()
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = Dimensions.size10)
+                            .height(Dimensions.padding30),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            tint = PrimaryDarkerLightB75,
+                            contentDescription = null
+                        )
+                        Spacer(Modifier.width(Dimensions.spacing5))
+                        Text(
+                            stringResource(R.string.post_ad).uppercase(),
+                            color = PrimaryDarkerLightB75,
+                            fontSize = Dimensions.textSize12,
+                            style = TypographyBold.titleMedium
+                        )
+                    }
+                }
+            }
         )
     )
     Column(
@@ -152,10 +189,14 @@ fun ProductListScreen(
                 Spacer(modifier = Modifier.height(Dimensions.size16))
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth().height(180.dp)
+                        .fillMaxWidth()
+                        .height(180.dp)
                         .padding(horizontal = Dimensions.padding16)
                         .clip(RoundedCornerShape(16.dp))
                         .background(GrayLite33)
+                        .clickable {
+                            productClick.invoke()
+                        }
 
                 ) {
                     Row(modifier = Modifier.fillMaxSize()) {
@@ -215,19 +256,27 @@ fun ProductListScreen(
                                         imageUrl = ""
                                     )
                                     Spacer(modifier = Modifier.width(Dimensions.size5))
-                                    Text(text = "Hari", style = Typography.bodyMedium,
-                                        maxLines = 1, overflow = TextOverflow.Ellipsis )
+                                    Text(
+                                        text = "Hari", style = Typography.bodyMedium,
+                                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                                    )
                                 }
-                                Text("2 days ago",style = Typography.bodyMedium)
+                                Text("2 days ago", style = Typography.bodyMedium)
 
 
                             }
                             Spacer(modifier = Modifier.height(Dimensions.padding16))
-                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                Image(painter = painterResource(R.drawable.ic_location), contentDescription = "",
-                                    colorFilter = ColorFilter.tint(PrimaryDarkerLightB75))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_location),
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(PrimaryDarkerLightB75)
+                                )
                                 Spacer(modifier = Modifier.width(Dimensions.padding8))
-                                Text("Kakkanad,Kochi",style = Typography.bodyMedium)
+                                Text("Kakkanad,Kochi", style = Typography.bodyMedium)
                             }
                             Spacer(modifier = Modifier.height(Dimensions.padding16))
                         }
@@ -245,5 +294,5 @@ fun ProductListScreen(
 @Preview
 @Composable
 fun ProductListPreview() {
-    ProductListScreen({}, ProductListViewModel())
+    ProductListScreen({}, ProductListViewModel(), {}, {})
 }

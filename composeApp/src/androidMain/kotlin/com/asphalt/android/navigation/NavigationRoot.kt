@@ -184,12 +184,12 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideMapNavKey,
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
-        is AppNavKey.RideDetails -> true
-
         is AppNavKey.RideDetails,
         is AppNavKey.ChatScreenNavaKey,
         is AppNavKey.ChatListNavaKey,
-        is AppNavKey.CreateAd -> true
+        is AppNavKey.CreateAd,
+        is AppNavKey.ProductList,
+        is AppNavKey.ProductDetails -> true
 
         else -> false
     }
@@ -258,9 +258,9 @@ fun NavigationRoot(
         } else {
             val currentKey = backStack.lastOrNull()
             if (currentKey is AppNavKey.DashboardNavKey) {
-            (context as? android.app.Activity)?.finish()
-            return
-        }
+                (context as? android.app.Activity)?.finish()
+                return
+            }
             if (backStack.size > 1) {
                 val key = backStack.lastOrNull()
 
@@ -628,12 +628,22 @@ fun NavigationRoot(
                         )
                     }
 
+                    entry<AppNavKey.ProductList> { key ->
+                        ProductListScreen(setTopAppBarState = setTopAppBarState, postAddClick = {
+                            backStack.add(AppNavKey.CreateAd)
+                        }, productClick = {
+                            backStack.add(AppNavKey.ProductDetails)
+                        })
+                    }
+
                     entry<AppNavKey.CreateAd> { key ->
-                        //CreateAd(setTopAppBarState = setTopAppBarState)
-                        //ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
-                        ProductListScreen(setTopAppBarState = setTopAppBarState)
+                        CreateAd(setTopAppBarState = setTopAppBarState)
+                    }
+                    entry<AppNavKey.ProductDetails> { key ->
+                        ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
+
 
             )
             if (showLoader) {
@@ -668,11 +678,11 @@ fun NavigationRoot(
                 }
 
                 Constants.MARKET_PLACE_CLICK -> {
-                   //Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
-                     scope.launch {
-                          backStack.add(AppNavKey.CreateAd)
-                          drawerState.close()
-                      }
+                    //Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
+                    scope.launch {
+                        backStack.add(AppNavKey.ProductList)
+                        drawerState.close()
+                    }
                 }
 
                 Constants.SETTINGS_CLICK -> {

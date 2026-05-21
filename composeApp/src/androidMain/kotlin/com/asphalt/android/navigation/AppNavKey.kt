@@ -66,21 +66,26 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     data class MessageUiScreenKey(val ridesData: ConnectedRideDTO) : AppNavKey
+
     @Serializable
-    data class ConnectedRideEndNavKey(val ridesData: RidesData,val summaryData: RideSummaryData) : AppNavKey
+    data class ConnectedRideEndNavKey(val ridesData: RidesData, val summaryData: RideSummaryData) :
+        AppNavKey
 
     @Serializable
     data class RatingRideNavKey(val ridesData: RidesData) : AppNavKey
 
     @Serializable
-    data class RatingRide(val ridesID: String? = null,
-        val userId: String? = null) : AppNavKey
+    data class RatingRide(
+        val ridesID: String? = null,
+        val userId: String? = null
+    ) : AppNavKey
 
     @Serializable
     data class JoinRideConnectedRideMapNavKey(val joinRide: ConnectedRideRoot) : AppNavKey
 
     @Serializable
-    data class EndRideLoaderNavKey(val ridesData: RidesData,val rideSummaryData: RideSummaryData) : AppNavKey
+    data class EndRideLoaderNavKey(val ridesData: RidesData, val rideSummaryData: RideSummaryData) :
+        AppNavKey
 
     @Serializable
     data class RideDetails(val ridesID: String? = null) : AppNavKey
@@ -98,11 +103,15 @@ sealed interface AppNavKey : NavKey {
 
     @Serializable
     object CreateAd : AppNavKey
-@Serializable
-object ProductDetails : AppNavKey
+
+    @Serializable
+    object ProductDetails : AppNavKey
+
+
+    @Serializable
+    object ProductList : AppNavKey
+
 }
-
-
 
 data class BottomNavItems(
     val key: AppNavKey,
