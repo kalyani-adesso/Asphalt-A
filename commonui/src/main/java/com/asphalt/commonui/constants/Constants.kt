@@ -55,6 +55,7 @@ object Constants {
     const val SETTINGS_CLICK = 4
     const val REFER_FRIEND = 5
     const val CONNECTED_RIDE_CLICK = 6
+    const val DELETE_ACCOUNT = 7
 
     const val GROUP_CHAT = "group"
     const val PRIVATE_CHAT = "private"

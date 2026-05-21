@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -103,6 +104,7 @@ fun NavigationRoot(
     val density = LocalDensity.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteAccount by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -246,6 +248,31 @@ fun NavigationRoot(
                     drawerState.close()
                 }
             }
+        )
+    }
+
+    if(showDeleteAccount){
+        CustomLogoutDialog(
+            showDialog = showDeleteAccount,
+            onDismiss = { showDeleteAccount = false },
+            onConfirm = {
+                showDeleteAccount = false
+                scope.launch {
+                    // Perform logout operations
+                    /*CurrentLocationUpdates.stopRideTracking(context)
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    androidUserVM.initialiseUserData()
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    androidUserVM.removeUserData()
+                    authenticatorImpl.logout()
+
+                    // Clear navigation and go to Login
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()*/
+                }
+            }, message = stringResource(R.string.delete_account_msg),
+            title = stringResource(R.string.delete_account)
         )
     }
 
@@ -710,7 +737,19 @@ fun NavigationRoot(
                     }
                 }
 
-
+                Constants.DELETE_ACCOUNT -> {
+                    showDeleteAccount = true
+                    /*scope.launch {
+                        CurrentLocationUpdates.stopRideTracking(context)
+                        datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        androidUserVM.initialiseUserData()
+                        datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        androidUserVM.removeUserData()
+                        backStack.clear()
+                        backStack.add(AppNavKey.LoginScreenNavKey)
+                        drawerState.close()
+                    }*/
+                }
             }
 
         }, isGestureEnabled) {

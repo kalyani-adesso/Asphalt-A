@@ -292,6 +292,8 @@
     <string name="motor_cycle">Motorcycle</string>
     <string name="parts">Parts</string>
     <string name="post_ad">POST AD</string>
+    <string name="delete_account_msg">Are you sure you want to delete your account?</string>
+    <string name="delete_account">Delete Account</string>
 
 
 
