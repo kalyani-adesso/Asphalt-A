@@ -31,6 +31,7 @@ class ChatListViewModel(val chatRepository: ChatRepository, val androidUserVM: A
         applyTabFilter()
     }
 
+    /*function to do search in chat list */
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
         applyTabFilter()
