@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -97,7 +98,7 @@ fun ProductListScreen(
                         )
                         Spacer(Modifier.width(Dimensions.spacing5))
                         Text(
-                            stringResource(R.string.post_ad).uppercase(),
+                            stringResource(R.string.post_ad),
                             color = PrimaryDarkerLightB75,
                             fontSize = Dimensions.textSize12,
                             style = TypographyBold.titleMedium
@@ -194,6 +195,7 @@ fun ProductListScreen(
                         .padding(horizontal = Dimensions.padding16)
                         .clip(RoundedCornerShape(16.dp))
                         .background(GrayLite33)
+                        .testTag("product_item")
                         .clickable {
                             productClick.invoke()
                         }
