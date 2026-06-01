@@ -50,6 +50,7 @@ mapbox-offline = "11.4.0"
 mockito = "5.21.0"
 mockito-kotlin = "6.1.0"
 firebaseCrashlyticsPlugin = "2.9.9"
+coroutinesTest = "1.8.1"
 
 [libraries]
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
@@ -91,7 +92,11 @@ mpchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mp-char
 #mockito-mock test
 # For JVM unit tests
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
+test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+
+
 
 # For Android instrumented tests (works on Dalvik/ART)
 mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockito" }

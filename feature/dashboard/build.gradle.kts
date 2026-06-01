@@ -86,7 +86,7 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 
     //mokito
-    androidTestImplementation(libs.mockito.core)
-    androidTestImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.test.coroutines)
 }
