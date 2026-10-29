@@ -18,3 +18,9 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 /shared/shared.podspec
+.env
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
