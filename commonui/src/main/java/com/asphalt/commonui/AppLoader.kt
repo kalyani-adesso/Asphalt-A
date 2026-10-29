@@ -23,7 +23,7 @@ import com.asphalt.commonui.theme.NeutralBlack
 import com.asphalt.commonui.theme.PrimaryBrighterLightW75
 import com.asphalt.commonui.theme.Typography
 import com.asphalt.commonui.theme.TypographyBold
-
+//app loader
 @Composable
 fun AppLoader(
     logoRes: Int = R.drawable.ic_app_icon,
