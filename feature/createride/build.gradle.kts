@@ -43,10 +43,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.compose.material3)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.testExt.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.core)
@@ -58,7 +54,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
+
     debugImplementation(libs.compose.ui.tooling)
 
     // ViewModel
@@ -85,4 +81,9 @@ dependencies {
     // Compose UI tests
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
+
+    //mokito
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.test.coroutines)
 }

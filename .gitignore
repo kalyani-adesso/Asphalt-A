@@ -18,3 +18,20 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 /shared/shared.podspec
+.env
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+
+# Claude / streb tooling (local only)
+.claude/
+.streb/
+.ralph/
+.mcp.json
+.container-use.yaml
+CLAUDE.local.md*
+hooks/
+patterns/
+toolchain.yaml

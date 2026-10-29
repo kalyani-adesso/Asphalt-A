@@ -286,6 +286,15 @@
     <string name="message">MESSAGE</string>
     <string name="make_offer">MAKE OFFER</string>
     <string name="price">Price</string>
+    <string name="marketplace">Marketplace</string>
+    <string name="browse">Browse</string>
+    <string name="my_ads">My Ads</string>
+    <string name="motor_cycle">Motorcycle</string>
+    <string name="parts">Parts</string>
+    <string name="post_ad">POST AD</string>
+    <string name="delete_account_msg">Are you sure you want to delete your account?</string>
+    <string name="delete_account">Delete Account</string>
+
 
 
 </resources>

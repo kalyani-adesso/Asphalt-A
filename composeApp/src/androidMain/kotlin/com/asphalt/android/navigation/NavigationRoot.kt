@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -68,6 +69,7 @@ import com.asphalt.login.ui.LoginScreen
 import com.asphalt.login.ui.LoginSuccessScreen
 import com.asphalt.marketplace.ui.CreateAd
 import com.asphalt.marketplace.ui.ProductDetailsScreen
+import com.asphalt.marketplace.ui.ProductListScreen
 import com.asphalt.profile.screens.ProfileScreen
 import com.asphalt.queries.screens.QueriesScreen
 import com.asphalt.registration.navigation.NavigationRegistrationCode
@@ -102,6 +104,7 @@ fun NavigationRoot(
     val density = LocalDensity.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteAccount by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -183,12 +186,12 @@ fun NavigationRoot(
         is AppNavKey.ConnectedRideMapNavKey,
         is AppNavKey.ConnectedRideEndNavKey,
         is AppNavKey.EndRideLoaderNavKey,
-        is AppNavKey.RideDetails -> true
-
         is AppNavKey.RideDetails,
         is AppNavKey.ChatScreenNavaKey,
         is AppNavKey.ChatListNavaKey,
-        is AppNavKey.CreateAd -> true
+        is AppNavKey.CreateAd,
+        is AppNavKey.ProductList,
+        is AppNavKey.ProductDetails -> true
 
         else -> false
     }
@@ -248,6 +251,31 @@ fun NavigationRoot(
         )
     }
 
+    if(showDeleteAccount){
+        CustomLogoutDialog(
+            showDialog = showDeleteAccount,
+            onDismiss = { showDeleteAccount = false },
+            onConfirm = {
+                showDeleteAccount = false
+                scope.launch {
+                    // Perform logout operations
+                    /*CurrentLocationUpdates.stopRideTracking(context)
+                    datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                    androidUserVM.initialiseUserData()
+                    datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                    androidUserVM.removeUserData()
+                    authenticatorImpl.logout()
+
+                    // Clear navigation and go to Login
+                    backStack.clear()
+                    backStack.add(AppNavKey.LoginScreenNavKey)
+                    drawerState.close()*/
+                }
+            }, message = stringResource(R.string.delete_account_msg),
+            title = stringResource(R.string.delete_account)
+        )
+    }
+
     fun onBackPressed() {
         println("Back Nav from ${backStack.lastOrNull()}")
         if (drawerState.isOpen) {
@@ -257,9 +285,9 @@ fun NavigationRoot(
         } else {
             val currentKey = backStack.lastOrNull()
             if (currentKey is AppNavKey.DashboardNavKey) {
-            (context as? android.app.Activity)?.finish()
-            return
-        }
+                (context as? android.app.Activity)?.finish()
+                return
+            }
             if (backStack.size > 1) {
                 val key = backStack.lastOrNull()
 
@@ -627,11 +655,22 @@ fun NavigationRoot(
                         )
                     }
 
+                    entry<AppNavKey.ProductList> { key ->
+                        ProductListScreen(setTopAppBarState = setTopAppBarState, postAddClick = {
+                            backStack.add(AppNavKey.CreateAd)
+                        }, productClick = {
+                            backStack.add(AppNavKey.ProductDetails)
+                        })
+                    }
+
                     entry<AppNavKey.CreateAd> { key ->
                         CreateAd(setTopAppBarState = setTopAppBarState)
-                        //ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
+                    }
+                    entry<AppNavKey.ProductDetails> { key ->
+                        ProductDetailsScreen(setTopAppBarState = setTopAppBarState)
                     }
                 }
+
 
             )
             if (showLoader) {
@@ -667,10 +706,10 @@ fun NavigationRoot(
 
                 Constants.MARKET_PLACE_CLICK -> {
                     Toast.makeText(context, "Coming Soon...!", Toast.LENGTH_SHORT).show()
-                     /*scope.launch {
-                          backStack.add(AppNavKey.CreateAd)
-                          drawerState.close()
-                      }*/
+                    /*scope.launch {
+                        backStack.add(AppNavKey.ProductList)
+                        drawerState.close()
+                    }*/
                 }
 
                 Constants.SETTINGS_CLICK -> {
@@ -698,7 +737,19 @@ fun NavigationRoot(
                     }
                 }
 
-
+                Constants.DELETE_ACCOUNT -> {
+                    showDeleteAccount = true
+                    /*scope.launch {
+                        CurrentLocationUpdates.stopRideTracking(context)
+                        datastore.saveValue(PreferenceKeys.USER_DETAILS, "")
+                        androidUserVM.initialiseUserData()
+                        datastore.saveValue(PreferenceKeys.REMEMBER_ME, false)
+                        androidUserVM.removeUserData()
+                        backStack.clear()
+                        backStack.add(AppNavKey.LoginScreenNavKey)
+                        drawerState.close()
+                    }*/
+                }
             }
 
         }, isGestureEnabled) {

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager,val androidUserVM: AndroidUserVM) :
+open class LoginScreenViewModel(val authViewModel: AuthViewModel, val datastore: DataStoreManager,val androidUserVM: AndroidUserVM) :
     ViewModel() {
 
     private val _emailTextMutableState = MutableStateFlow("")

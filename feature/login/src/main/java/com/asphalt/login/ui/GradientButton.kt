@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.asphalt.commonui.theme.Dimensions
@@ -66,7 +67,7 @@ fun GradientButton(
                 onClick = { onClick.invoke() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize().testTag("BUTTON_GRADIENT"),
                 shape = RoundedCornerShape(buttonRadius)
 
             ) {

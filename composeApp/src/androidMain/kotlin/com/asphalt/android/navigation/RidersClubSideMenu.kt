@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.asphalt.commonui.R
 import com.asphalt.commonui.constants.Constants
 import com.asphalt.commonui.theme.AzureBlue
+import com.asphalt.commonui.theme.DarkRed
 import com.asphalt.commonui.theme.LightGreen30
 import com.asphalt.commonui.theme.LightOrange
 import com.asphalt.commonui.theme.NeutralLightPaper
@@ -173,6 +174,29 @@ fun RidersClubSideMenu(drawerState: DrawerState, itemClick:(Int)->Unit,isGesture
                             itemClick.invoke(Constants.REFER_FRIEND)
                         }
                     )
+
+                    NavigationDrawerItem(
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_delete),
+                                contentDescription = "error",
+                                tint = DarkRed
+                            )
+                        },
+                        badge = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow),
+                                contentDescription = "",
+                                tint = Color.Black
+                            )
+                        },
+                        label = { Text("Delete Account", style = TypographyMedium.bodyMedium) },
+                        selected = false,
+                        onClick = {
+                            itemClick.invoke(Constants.DELETE_ACCOUNT)
+                        }
+                    )
+
                     HorizontalDivider(
                         modifier = Modifier.padding(16.dp),
                         thickness = 0.6.dp,
