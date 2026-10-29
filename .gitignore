@@ -35,3 +35,4 @@ CLAUDE.local.md*
 hooks/
 patterns/
 toolchain.yaml
+.beads/
